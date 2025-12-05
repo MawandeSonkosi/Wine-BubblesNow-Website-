@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wine & Bubbles — Wine List</title>
-<link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+  <title>Wine & Bubbles — Pairing Details</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
   <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+  
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
   <!-- Font Awesome for icons -->
@@ -14,8 +17,8 @@
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Wine-specific CSS -->
-  <link rel="stylesheet" href="wine.css">
+  <!-- Pairings Detail Specific CSS -->
+  <link rel="stylesheet" href="pairings_detail.css">
 </head>
 <body>
   <!-- Top bar with two sections -->
@@ -36,11 +39,11 @@
       <nav class="main-nav">
         <ul>
           <li><a href="../index.html">Home</a></li>
-          <li><a href="all_wines.html">All Wines</a></li>
-          <li><a href="../index.html#bookings">Book African Wine Bar</a></li>
-          <li><a href="../index.html#tastings">Tastings Near Me</a></li>
-          <li><a href="../index.html#pairings">Pairings</a></li>
-          <li><a href="../index.html#contact">Contact Us</a></li>
+          <li><a href="../wine/all_wines.html">All Wines</a></li>
+          <li><a href="#">Book African Wine Bar</a></li>
+          <li><a href="#">Tastings Near Me</a></li>
+          <li><a href="pairings.html">Pairings</a></li>
+          <li><a href="#">Contact Us</a></li>
         </ul>
       </nav>
 
@@ -56,35 +59,51 @@
     </div>
   </div>
 
-  <!-- Main Content -->
-  <section class="section all-wines-section">
+  <!-- Pairing Detail Content -->
+  <section class="section pairing-detail-section">
     <div class="container">
-      <h2 class="section-title" id="pageTitle">Loading...</h2>
-      <p class="muted" id="pageSubtitle">Browse wines in this category</p>
-      
-      <!-- Search and Filter Bar -->
-      <div class="search-filter-bar">
+      <!-- Back button and header -->
+      <div class="pairing-detail-header">
+        <a href="javascript:history.back()" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="pairing-category" id="pairingCategory">Loading...</h2>
+        <!-- Cart and Profile icons removed here - using top navigation instead -->
+      </div>
+
+      <!-- Search Bar (for related pairings) -->
+      <div class="search-filter-bar detail-search">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Search wines..." class="search-input">
+          <input type="text" id="searchInput" placeholder="Search related pairings..." class="search-input">
         </div>
         <div class="filter-dropdown">
           <button class="filter-btn" id="filterBtn">
             <i class="fas fa-filter"></i>
-            Filter by Category
+            Filter
           </button>
           <div class="filter-dropdown-content" id="filterDropdown">
-            <!-- Categories will be populated dynamically by JavaScript -->
+            <a href="#" data-filter="">All</a>
+            <a href="#" data-filter="Biltong">Biltong</a>
+            <a href="#" data-filter="Cheese Platter">Cheese Platter</a>
+            <a href="#" data-filter="Chocolate">Chocolate</a>
           </div>
         </div>
       </div>
 
-      <!-- Wine Grid -->
-      <div class="wine-grid" id="wineGrid">
-        <!-- Loading state -->
+      <!-- Main Pairing Details -->
+      <div class="pairing-detail-container" id="pairingDetailContainer">
         <div class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Loading wines...</p>
+          <p>Loading pairing details...</p>
+        </div>
+      </div>
+
+      <!-- Related Pairings Grid (hidden initially) -->
+      <div class="related-pairings-section" id="relatedPairingsSection" style="display: none;">
+        <h3 class="section-title">Related Pairings</h3>
+        <div class="wine-grid" id="relatedPairingsGrid">
+          <!-- Related pairings will be populated here -->
         </div>
       </div>
     </div>
@@ -109,17 +128,17 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="all_wines.html">All Wines</a></li>
-            <li><a href="../index.html#bookings">Bookings</a></li>
-            <li><a href="../index.html#tastings">Tastings</a></li>
-            <li><a href="../index.html#blog">Blog</a></li>
+            <li><a href="../wine/all_wines.html">All Wines</a></li>
+            <li><a href="#">Bookings</a></li>
+            <li><a href="#">Tastings</a></li>
+            <li><a href="#">Blog</a></li>
           </ul>
         </div>
 
         <div class="footer-links-column">
           <h4 class="footer-heading">&nbsp;</h4>
           <ul class="footer-links">
-            <li><a href="../index.html#contact">Contact Us</a></li>
+            <li><a href="#">Contact Us</a></li>
             <li><a href="#">FAQ</a></li>
             <li><a href="#">Terms & Conditions</a></li>
           </ul>
@@ -129,6 +148,6 @@
   </footer>
 
   <!-- JavaScript -->
-  <script src="wine_list.js"></script>
+  <script src="pairings_detail.js"></script>
 </body>
 </html>

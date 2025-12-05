@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wine & Bubbles — Wine List</title>
-<link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+  <title>Wine & Bubbles — Pairings</title>
+  <!-- Favicon using your Icons.png -->
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
   <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
   <!-- Fonts -->
@@ -12,13 +13,13 @@
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Main CSS -->
+  <!-- Main CSS - FIXED PATH: Go up one level to root -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Wine-specific CSS -->
-  <link rel="stylesheet" href="wine.css">
+  <!-- Pairings-specific CSS - In same folder -->
+  <link rel="stylesheet" href="pairings.css">
 </head>
 <body>
-  <!-- Top bar with two sections -->
+  <!-- Top bar with two sections - EXACT SAME AS HOMEPAGE -->
   <div class="topbar-top">
     <div class="topbar-top-inner">
       <!-- Empty - no content as requested -->
@@ -28,73 +29,69 @@
   <div class="topbar-main">
     <div class="topbar-main-inner">
       <div class="logo">
-        <a href="../index.html">
-          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+        <a href="../index.html"> <!-- FIXED: Go up to root -->
+          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo"> <!-- FIXED PATH -->
         </a>
       </div>
 
       <nav class="main-nav">
         <ul>
-          <li><a href="../index.html">Home</a></li>
-          <li><a href="all_wines.html">All Wines</a></li>
-          <li><a href="../index.html#bookings">Book African Wine Bar</a></li>
-          <li><a href="../index.html#tastings">Tastings Near Me</a></li>
-          <li><a href="../index.html#pairings">Pairings</a></li>
-          <li><a href="../index.html#contact">Contact Us</a></li>
+          <li><a href="../index.html">Home</a></li> <!-- FIXED PATH -->
+          <li><a href="../wine/all_wines.html">All Wines</a></li> <!-- FIXED PATH -->
+          <li><a href="#">Book African Wine Bar</a></li>
+          <li><a href="#">Tastings Near Me</a></li>
+          <li><a href="pairings.html" class="active">Pairings</a></li>
+          <li><a href="#">Contact Us</a></li>
         </ul>
       </nav>
 
       <div class="top-icons">
-        <a href="#" class="icon cart-icon" id="cartIcon">
-          <i class="fas fa-shopping-cart"></i>
-          <span class="cart-badge" id="cartBadge">0</span>
-        </a>
-        <a href="#" class="icon" id="userIcon">
-          <i class="fas fa-user"></i>
-        </a>
+        <a href="#" class="icon"><i class="fas fa-shopping-cart"></i></a>
+        <a href="#" class="icon"><i class="fas fa-user"></i></a>
       </div>
     </div>
   </div>
 
   <!-- Main Content -->
-  <section class="section all-wines-section">
+  <section class="section all-pairings-section">
     <div class="container">
-      <h2 class="section-title" id="pageTitle">Loading...</h2>
-      <p class="muted" id="pageSubtitle">Browse wines in this category</p>
+      <h2 class="section-title">All Pairings</h2>
+      <p class="muted">Browse our premium wine pairings and add-ons</p>
       
       <!-- Search and Filter Bar -->
       <div class="search-filter-bar">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Search wines..." class="search-input">
+          <input type="text" id="searchInput" placeholder="Search all pairings..." class="search-input">
         </div>
         <div class="filter-dropdown">
           <button class="filter-btn" id="filterBtn">
             <i class="fas fa-filter"></i>
-            Filter by Category
+            Filter
           </button>
           <div class="filter-dropdown-content" id="filterDropdown">
+            <a href="#" data-filter="">All</a>
             <!-- Categories will be populated dynamically by JavaScript -->
           </div>
         </div>
       </div>
 
-      <!-- Wine Grid -->
-      <div class="wine-grid" id="wineGrid">
+      <!-- Pairings Grid -->
+      <div class="wine-grid" id="pairingsGrid">
         <!-- Loading state -->
         <div class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Loading wines...</p>
+          <p>Loading pairings...</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- Footer - EXACT SAME AS HOMEPAGE -->
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <img src="../assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+        <img src="../assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo"> <!-- FIXED PATH -->
         <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
         <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
         <div class="socials">
@@ -109,17 +106,17 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="all_wines.html">All Wines</a></li>
-            <li><a href="../index.html#bookings">Bookings</a></li>
-            <li><a href="../index.html#tastings">Tastings</a></li>
-            <li><a href="../index.html#blog">Blog</a></li>
+            <li><a href="../wine/all_wines.html">All Wines</a></li> <!-- FIXED PATH -->
+            <li><a href="#">Bookings</a></li>
+            <li><a href="#">Tastings</a></li>
+            <li><a href="#">Blog</a></li>
           </ul>
         </div>
 
         <div class="footer-links-column">
           <h4 class="footer-heading">&nbsp;</h4>
           <ul class="footer-links">
-            <li><a href="../index.html#contact">Contact Us</a></li>
+            <li><a href="#">Contact Us</a></li>
             <li><a href="#">FAQ</a></li>
             <li><a href="#">Terms & Conditions</a></li>
           </ul>
@@ -129,6 +126,6 @@
   </footer>
 
   <!-- JavaScript -->
-  <script src="wine_list.js"></script>
+  <script src="pairings.js"></script>
 </body>
 </html>

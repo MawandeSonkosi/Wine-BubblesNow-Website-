@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wine & Bubbles — Wine List</title>
-<link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+  <title>Wine & Bubbles — Wine Details</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
   <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+  
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
   <!-- Font Awesome for icons -->
@@ -16,6 +19,8 @@
   <link rel="stylesheet" href="../style.css">
   <!-- Wine-specific CSS -->
   <link rel="stylesheet" href="wine.css">
+  <!-- Wine Detail Specific CSS -->
+  <link rel="stylesheet" href="wine_detail.css">
 </head>
 <body>
   <!-- Top bar with two sections -->
@@ -56,35 +61,51 @@
     </div>
   </div>
 
-  <!-- Main Content -->
-  <section class="section all-wines-section">
+  <!-- Wine Detail Content -->
+  <section class="section wine-detail-section">
     <div class="container">
-      <h2 class="section-title" id="pageTitle">Loading...</h2>
-      <p class="muted" id="pageSubtitle">Browse wines in this category</p>
-      
-      <!-- Search and Filter Bar -->
-      <div class="search-filter-bar">
+      <!-- Back button and header - REMOVED DUPLICATE CART/PROFILE ICONS -->
+      <div class="wine-detail-header">
+        <a href="javascript:history.back()" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="wine-type" id="wineType">Loading...</h2>
+        <!-- Cart and Profile icons removed here - using top navigation instead -->
+      </div>
+
+      <!-- Search Bar (for related wines) -->
+      <div class="search-filter-bar detail-search">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Search wines..." class="search-input">
+          <input type="text" id="searchInput" placeholder="Search related wines..." class="search-input">
         </div>
         <div class="filter-dropdown">
           <button class="filter-btn" id="filterBtn">
             <i class="fas fa-filter"></i>
-            Filter by Category
+            Filter
           </button>
           <div class="filter-dropdown-content" id="filterDropdown">
-            <!-- Categories will be populated dynamically by JavaScript -->
+            <a href="#" data-filter="">All</a>
+            <a href="#" data-filter="White Wine">White Wine</a>
+            <a href="#" data-filter="Red Wine">Red Wine</a>
+            <a href="#" data-filter="Champagne">Champagne</a>
           </div>
         </div>
       </div>
 
-      <!-- Wine Grid -->
-      <div class="wine-grid" id="wineGrid">
-        <!-- Loading state -->
+      <!-- Main Wine Details -->
+      <div class="wine-detail-container" id="wineDetailContainer">
         <div class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Loading wines...</p>
+          <p>Loading wine details...</p>
+        </div>
+      </div>
+
+      <!-- Related Wines Grid (hidden initially) -->
+      <div class="related-wines-section" id="relatedWinesSection" style="display: none;">
+        <h3 class="section-title">Related Wines</h3>
+        <div class="wine-grid" id="relatedWinesGrid">
+          <!-- Related wines will be populated here -->
         </div>
       </div>
     </div>
@@ -129,6 +150,6 @@
   </footer>
 
   <!-- JavaScript -->
-  <script src="wine_list.js"></script>
+  <script src="wine_detail.js"></script>
 </body>
 </html>

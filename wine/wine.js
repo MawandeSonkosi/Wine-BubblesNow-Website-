@@ -150,12 +150,10 @@ function renderWines() {
     const price = wine.price || 0;
     const type = wine.type || 'Wine';
     
-    // DEBUG: Log what we're rendering
-    console.log(`Rendering wine: ${wine.name}, Type: ${type}, Price: ${price}`);
-    
     // SIMPLIFIED TEMPLATE: Only Name, Type, Price - NO CATEGORY, NO STOCK
+    // ADDED onclick TO NAVIGATE TO WINE DETAIL
     return `
-      <div class="wine-card">
+      <div class="wine-card" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${wine.name}" 
@@ -200,6 +198,11 @@ function filterWines() {
   renderWines();
 }
 
+// Navigate to wine detail page
+function navigateToWineDetail(wineId) {
+  window.location.href = `wine_detail.html?id=${wineId}`;
+}
+
 // UI States
 function showLoading() {
   wineGrid.innerHTML = `
@@ -229,6 +232,9 @@ function showEmptyState(message) {
       <i class="fas fa-wine-bottle"></i>
       <h3>${message}</h3>
       <p>Try changing your search or filter</p>
+      <button onclick="resetFilters()" class="btn-fill" style="margin-top: 20px;">
+        Show All Wines
+      </button>
     </div>
   `;
 }
@@ -243,5 +249,7 @@ function resetFilters() {
   renderWines();
 }
 
+// Make functions available globally
 window.fetchWines = fetchWines;
 window.resetFilters = resetFilters;
+window.navigateToWineDetail = navigateToWineDetail;

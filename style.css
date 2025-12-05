@@ -176,28 +176,48 @@ a{text-decoration:none;color:inherit}
   box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
-/* Section Titles */
-.section{padding:34px 0}
-.section-title{font-family:'Playfair Display',serif;text-align:center;font-size:28px;margin:6px 0 22px;color:#1b1b1b}
+/* Section Titles - INCREASED SIZE */
+.section{padding:40px 0} /* Increased from 34px */
+.section-title{
+  font-family:'Playfair Display',serif;
+  text-align:center;
+  font-size: 34px; /* INCREASED from 28px */
+  margin: 10px 0 28px; /* INCREASED margins */
+  color:#1b1b1b;
+  font-weight: 700;
+}
 .muted{color:var(--muted)}
 
-/* ---------- Curated Cards ---------- */
-.cards-row{display:flex;gap:20px;justify-content:center;align-items:flex-end;padding-bottom:8px}
+/* ---------- Curated Cards - INCREASED SIZE ---------- */
+.cards-row{
+  display:flex;
+  gap: 28px; /* INCREASED from 20px */
+  justify-content:center;
+  align-items:flex-end;
+  padding-bottom:12px;
+  margin-bottom: 15px;
+}
 .card{
-  width:300px; /* DECREASED from 320px */
-  border-radius:12px;
+  width: 350px; /* INCREASED from 300px */
+  border-radius:16px; /* INCREASED from 12px */
   overflow:hidden;
   background:#fff;
-  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  box-shadow:0 6px 16px rgba(0,0,0,0.12); /* Enhanced shadow */
   position:relative;
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* SIGNIFICANTLY REDUCED HEIGHT: Just enough for the image to show full width */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+/* INCREASED CARD IMAGE CONTAINER SIZE */
 .card-image-container {
   width: 100%;
-  height: 150px; /* Drastically reduced from 200px */
+  height: 200px; /* INCREASED from 150px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,44 +239,53 @@ a{text-decoration:none;color:inherit}
 .card-label{
   background:var(--card-dark);
   color:#fff;
-  padding:14px;
-  border-radius:0 0 12px 12px;
+  padding: 18px; /* INCREASED from 14px */
+  border-radius:0 0 16px 16px; /* Updated to match new border-radius */
   flex-shrink: 0; /* Prevents label from shrinking */
 }
-.label-title{font-weight:600;font-size:16px}
-.label-sub{font-size:14px;opacity:.85;margin-top:6px}
+.label-title{
+  font-weight:600;
+  font-size: 18px; /* INCREASED from 16px */
+}
+.label-sub{
+  font-size: 16px; /* INCREASED from 14px */
+  opacity:.85;
+  margin-top: 8px; /* INCREASED from 6px */
+}
 
 /* carousel dots centered under curated */
-.carousel-dots{display:flex;gap:8px;justify-content:center;margin:14px 0}
-.carousel-dots .dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block}
+.carousel-dots{display:flex;gap:8px;justify-content:center;margin: 20px 0} /* INCREASED margin */
+.carousel-dots .dot{width:10px;height:10px;border-radius:50%;background:#ccc;display:inline-block;transition: background 0.3s ease}
 .carousel-dots .dot.active{background:#2a2a2a}
+.carousel-dots .dot:hover{background:#666}
 
-/* ---------- Icon Sections ---------- */
+/* ---------- Icon Sections - INCREASED SIZE ---------- */
 .icon-section {
-  margin-top: 40px;
+  margin-top: 50px; /* INCREASED from 40px */
 }
 
 .icon-category-section {
-  padding: 34px 0;
+  padding: 40px 0; /* INCREASED from 34px */
   background: #fafafa;
 }
 
 .icon-section-title {
   font-family: 'Playfair Display', serif;
-  font-size: 22px; /* DECREASED from 24px (original was 22px) */
+  font-size: 28px; /* INCREASED from 22px */
   color: #1b1b1b;
-  margin-bottom: 25px; /* DECREASED from 30px */
+  margin-bottom: 35px; /* INCREASED from 25px */
   text-align: left;
   padding-left: 10px;
+  font-weight: 700;
 }
 
 .icon-row{
   display: flex;
-  gap: 12px; /* INCREASED from 8px */
+  gap: 20px; /* INCREASED from 12px */
   justify-content: center;
-  margin: 0 0 30px;
+  margin: 0 0 40px; /* INCREASED bottom margin */
   width: 100%;
-  max-width: 980px; /* DECREASED to match 3 cards (300px * 3) + gaps (20px * 2) = 980px */
+  max-width: 1100px; /* INCREASED from 980px */
   margin-left: auto;
   margin-right: auto;
 }
@@ -265,182 +294,231 @@ a{text-decoration:none;color:inherit}
   flex: 1;
   min-width: 0; /* Allow boxes to shrink */
   background: transparent;
-  border-radius: 12px; /* INCREASED from 10px */
-  padding: 20px 12px; /* INCREASED padding */
+  border-radius: 16px; /* INCREASED from 12px */
+  padding: 25px 15px; /* INCREASED padding */
   text-align: center;
-  border: none; /* Removed border */
+  border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease;
 }
 
 .icon-box:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  background: rgba(107, 13, 43, 0.05); /* Subtle maroon background on hover */
 }
 
 .icon-image-container {
-  width: 90px; /* INCREASED from 70px */
-  height: 90px; /* INCREASED from 70px */
+  width: 110px; /* INCREASED from 90px */
+  height: 110px; /* INCREASED from 90px */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px; /* INCREASED margin */
+  margin: 0 auto 20px; /* INCREASED margin */
   background: transparent;
+  transition: filter 0.3s ease;
 }
 
+/* Apply black and white filter initially */
 .icon-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* Removed the black and white filter to show original colors */
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+/* On hover, show original colors and add red tint */
+.icon-box:hover .icon-image {
+  filter: grayscale(0%) brightness(1.1) sepia(0.3) hue-rotate(-10deg) saturate(1.2);
 }
 
 .icon-text {
   margin: 0;
-  font-size: 16px; /* INCREASED from 14px */
+  font-size: 18px; /* INCREASED from 16px */
   color: #333;
-  font-weight: 600; /* INCREASED from 500 */
+  font-weight: 600;
   text-align: center;
   line-height: 1.4;
+  transition: color 0.3s ease;
 }
 
-/* ---------- Promotional Banners Section ---------- */
-.banners .section-title {
-  margin-bottom: 30px;
+/* Add maroon color on hover for text */
+.icon-box:hover .icon-text {
+  color: var(--maroon);
 }
 
 /* centered utility */
-.center{text-align:center;margin-top:18px}
+.center{text-align:center;margin-top: 25px} /* INCREASED from 18px */
 
 /* ---------- Blog cards ---------- */
-.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
-.blog-card{position:relative;border-radius:12px;overflow:hidden}
-.blog-card img{width:100%;height:220px;object-fit:cover;display:block}
-.blog-overlay{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(0,0,0,0.7);color:#fff;padding:14px;border-radius:10px}
-.blog-overlay .category{font-size:12px;opacity:.9}
-.blog-overlay h5{margin:6px 0 8px;font-size:15px}
-.blog-overlay .read{font-size:13px;color:#f0d6c2}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap: 24px;margin-top: 24px} /* INCREASED gaps */
+.blog-card{position:relative;border-radius:16px;overflow:hidden;transition: transform 0.3s ease}
+.blog-card:hover{transform: translateY(-5px)}
+.blog-card img{width:100%;height:240px;object-fit:cover;display:block} /* INCREASED height */
+.blog-overlay{position:absolute;left:16px;right:16px;bottom:16px;background:rgba(0,0,0,0.7);color:#fff;padding:18px;border-radius:12px}
+.blog-overlay .category{font-size:13px;opacity:.9}
+.blog-overlay h5{margin:8px 0 10px;font-size:16px}
+.blog-overlay .read{font-size:14px;color:#f0d6c2}
 
 /* ---------- App promo ---------- */
-.app-promo{background:#faf6f5;padding:34px 0}
-.app-inner{display:flex;gap:18px;align-items:center;justify-content:space-between}
-.app-copy h3{font-family:'Playfair Display',serif;margin:0;font-size:22px}
-.feature-list{list-style:none;padding:0;margin:12px 0 18px;color:#4b4b4b}
-.feature-list li{margin:8px 0;font-size:14px}
+.app-promo{background:#faf6f5;padding: 50px 0} /* INCREASED padding */
+.app-inner{display:flex;gap: 40px;align-items:center;justify-content:space-between} /* INCREASED gap */
+.app-copy h3{font-family:'Playfair Display',serif;margin:0;font-size: 26px} /* INCREASED from 22px */
+.feature-list{list-style:none;padding:0;margin: 18px 0 25px;color:#4b4b4b} /* INCREASED margins */
+.feature-list li{margin: 10px 0;font-size: 16px} /* INCREASED font size */
 
 /* INCREASED APP BUTTON SIZE */
 .app-buttons {
   display: flex;
-  gap: 15px;
-  margin-top: 20px;
+  gap: 20px; /* INCREASED from 15px */
+  margin-top: 25px; /* INCREASED from 20px */
 }
 
 .app-button {
-  height: 60px; /* Increased from 40px */
+  height: 70px; /* INCREASED from 60px */
   width: auto;
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .app-button:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px);
 }
 
 .app-visual img {
-  height: 280px; /* Increased to match larger layout */
+  height: 320px; /* INCREASED from 280px */
   object-fit: contain;
   transform: rotate(-12deg);
+  transition: transform 0.5s ease;
+}
+
+.app-visual:hover img {
+  transform: rotate(-8deg);
 }
 
 /* ---------- FOOTER ---------- */
-.footer{background:var(--maroon);color:#fff;padding:36px 0;margin-top:12px}
-.footer-inner{display:flex;gap:24px;align-items:flex-start;justify-content:space-between}
-.footer-logo{height:56px;margin-bottom:12px}
-.footer-brand{flex:1;max-width:400px}
-.brand-tagline{font-size:16px;font-weight:600;margin-bottom:8px;color:#fff}
-.brand-description{font-size:14px;line-height:1.5;color:rgba(255,255,255,0.8);margin-bottom:16px}
-.socials{display:flex;gap:12px;margin-top:16px}
-.social-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:50%;font-size:14px;transition:all 0.3s;color:#fff}
-.social-icon:hover{background:rgba(255,255,255,0.2);transform:translateY(-2px)}
-.social-icon i{font-size:16px}
+.footer{background:var(--maroon);color:#fff;padding: 50px 0;margin-top: 20px} /* INCREASED padding */
+.footer-inner{display:flex;gap: 40px;align-items:flex-start;justify-content:space-between} /* INCREASED gap */
+.footer-logo{height: 65px;margin-bottom: 15px} /* INCREASED size */
+.brand-tagline{font-size: 18px;font-weight:600;margin-bottom:10px;color:#fff} /* INCREASED font size */
+.brand-description{font-size:15px;line-height:1.6;color:rgba(255,255,255,0.8);margin-bottom:20px}
+.socials{display:flex;gap:15px;margin-top:20px}
+.social-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:rgba(255,255,255,0.1);border-radius:50%;font-size:16px;transition:all 0.3s;color:#fff}
+.social-icon:hover{background:rgba(255,255,255,0.2);transform:translateY(-3px)}
+.social-icon i{font-size:18px}
 
-.footer-links-grid{display:flex;gap:40px}
+.footer-links-grid{display:flex;gap: 60px} /* INCREASED gap */
 .footer-links-column{flex:1}
-.footer-heading{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;color:#fff}
+.footer-heading{font-family:'Playfair Display',serif;font-size: 20px;margin-bottom:20px;color:#fff} /* INCREASED font size */
 .footer-links{list-style:none;padding:0;margin:0}
-.footer-links li{margin-bottom:10px}
-.footer-links a{color:rgba(255,255,255,0.8);font-size:14px;transition:color 0.3s}
+.footer-links li{margin-bottom:12px}
+.footer-links a{color:rgba(255,255,255,0.8);font-size:15px;transition:color 0.3s}
 .footer-links a:hover{color:#fff}
 
 /* ---------- Tiny helpers ---------- */
-.small{font-size:13px}
-.tiny{font-size:12px;color:#7a7a7a}
-.center .btn-outline{margin-top:12px}
+.small{font-size:14px}
+.tiny{font-size:13px;color:#7a7a7a}
+.center .btn-outline{margin-top:15px}
 
 /* small carousel under promo banner */
-.carousel-dots.small{margin-top:12px}
+.carousel-dots.small{margin-top:15px}
+
+/* ---------- Button Styles ---------- */
+.btn-outline {
+  display: inline-block;
+  padding: 12px 28px;
+  border: 2px solid var(--maroon);
+  color: var(--maroon);
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: var(--maroon);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(107, 13, 43, 0.2);
+}
+
+.btn-outline.small {
+  padding: 10px 24px;
+  font-size: 13px;
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width:1100px){
   .cards-row{flex-wrap:wrap;justify-content:center}
   .blog-grid{grid-template-columns:repeat(2,1fr)}
   .app-inner{flex-direction:column}
-  .footer-links-grid{gap:30px}
+  .footer-links-grid{gap:40px}
   
   /* Adjust icon row for smaller screens */
   .icon-row {
-    max-width: 90%;
+    max-width: 95%;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 18px;
   }
   
   .icon-box {
-    width: calc(33.333% - 10px);
-    min-width: 160px; /* INCREASED from 140px */
+    width: calc(33.333% - 12px);
+    min-width: 180px;
   }
   
   /* Adjust card height for smaller screens */
   .card-image-container {
-    height: 140px; /* Reduced from 180px */
+    height: 180px;
   }
   
   .card {
-    width: 280px; /* Adjusted for smaller screens */
+    width: 320px;
   }
   
   .card-image {
-    width: 105%; /* Keep consistent scaling */
+    width: 105%;
     margin-left: -2.5%;
   }
   
   /* Adjust icons for smaller screens */
   .icon-image-container {
-    width: 80px; /* Adjusted from 90px */
-    height: 80px;
-    margin-bottom: 14px;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 16px;
   }
   
   .icon-text {
-    font-size: 15px; /* Adjusted from 16px */
+    font-size: 17px;
   }
   
   .icon-section-title {
-    font-size: 21px; /* Adjusted for smaller screens */
-    margin-bottom: 22px;
+    font-size: 26px;
+    margin-bottom: 30px;
   }
   
   /* Adjust promo banner for smaller screens */
   .banner-section .container .site-banner.promo-banner {
-    max-width: 90%;
+    max-width: 95%;
   }
   
   /* Adjust other banners */
   .pairings-banner,
   .tastings-banner {
-    max-width: 90%;
+    max-width: 95%;
     margin-left: auto;
     margin-right: auto;
+  }
+  
+  /* Adjust section titles for smaller screens */
+  .section-title {
+    font-size: 32px;
   }
 }
 
@@ -465,55 +543,60 @@ a{text-decoration:none;color:inherit}
   .icon-section-title {
     text-align: center;
     padding-left: 0;
-    font-size: 20px; /* Adjusted for tablet */
-    margin-bottom: 22px;
+    font-size: 24px;
+    margin-bottom: 28px;
   }
   
-  .footer-inner{flex-direction:column;gap:30px}
+  .footer-inner{flex-direction:column;gap:35px}
   .footer-brand{max-width:100%}
   .footer-links-grid{width:100%;justify-content:space-between}
   
   /* Adjust icon row for tablet */
   .icon-box {
-    width: calc(50% - 10px);
-    min-width: 150px;
-    padding: 18px 10px;
+    width: calc(50% - 12px);
+    min-width: 170px;
+    padding: 22px 12px;
   }
   
   /* Adjust app buttons for tablet */
   .app-button {
-    height: 50px;
+    height: 60px;
   }
   
   .app-visual img {
-    height: 220px;
+    height: 260px;
   }
   
   /* Adjust card height for tablet */
   .card-image-container {
-    height: 120px; /* Reduced from 160px */
+    height: 160px;
   }
   
   .card {
-    width: 260px; /* Adjusted for tablet */
+    width: 300px;
   }
   
   /* Adjust icons for tablet */
   .icon-image-container {
-    width: 75px;
-    height: 75px;
-    margin-bottom: 12px;
+    width: 90px;
+    height: 90px;
+    margin-bottom: 14px;
   }
   
   .icon-text {
-    font-size: 14px;
+    font-size: 16px;
   }
   
   /* Adjust banners for tablet */
   .banner-section .container .site-banner.promo-banner,
   .pairings-banner,
   .tastings-banner {
-    max-width: 95%;
+    max-width: 98%;
+  }
+  
+  /* Adjust section titles for tablet */
+  .section-title {
+    font-size: 28px;
   }
 }
 
@@ -533,24 +616,24 @@ a{text-decoration:none;color:inherit}
   
   .icon-row{
     flex-wrap:wrap;
-    gap:10px;
+    gap:15px;
     max-width: 100%;
   }
   
   .icon-box {
-    width: calc(50% - 10px);
-    min-width: 140px; /* INCREASED from 120px */
-    padding: 16px 8px;
+    width: calc(50% - 8px);
+    min-width: 160px;
+    padding: 20px 10px;
   }
   
   .icon-image-container {
-    width: 65px; /* Adjusted from 50px */
-    height: 65px;
-    margin-bottom: 10px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 12px;
   }
   
   .icon-text {
-    font-size: 14px; /* INCREASED from 12px */
+    font-size: 15px;
     font-weight: 600;
   }
   
@@ -558,35 +641,35 @@ a{text-decoration:none;color:inherit}
   .app-buttons {
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
   
   .app-button {
-    height: 45px;
-    width: 180px;
+    height: 55px;
+    width: 200px;
   }
   
   .app-visual img {
-    height: 180px;
+    height: 220px;
   }
   
-  .cards-row .card{width:90%; max-width: 280px;}
+  .cards-row .card{width:90%; max-width: 320px;}
   /* Adjust card height for mobile */
   .card-image-container {
-    height: 100px; /* Reduced from 140px */
+    height: 140px;
   }
   
   .card-image {
-    width: 105%; /* Keep consistent scaling */
+    width: 105%;
     margin-left: -2.5%;
   }
   
   .blog-grid{grid-template-columns:1fr}
-  .footer-links-grid{flex-direction:column;gap:20px}
+  .footer-links-grid{flex-direction:column;gap:25px}
   
   .icon-section-title {
-    font-size: 19px; /* Adjusted for mobile */
-    margin-bottom: 20px;
+    font-size: 22px;
+    margin-bottom: 24px;
   }
   
   /* Adjust banners for mobile */
@@ -594,40 +677,45 @@ a{text-decoration:none;color:inherit}
   .pairings-banner,
   .tastings-banner {
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: 10px;
+  }
+  
+  /* Adjust section titles for mobile */
+  .section-title {
+    font-size: 26px;
   }
 }
 
 @media (max-width:400px){
   .icon-box {
     width: calc(50% - 5px);
-    min-width: 130px; /* INCREASED from 100px */
-    padding: 14px 6px;
+    min-width: 150px;
+    padding: 18px 8px;
   }
   
   .icon-image-container {
-    width: 60px; /* INCREASED from 40px */
-    height: 60px;
-    margin-bottom: 8px;
+    width: 75px;
+    height: 75px;
+    margin-bottom: 10px;
   }
   
   .icon-text {
-    font-size: 13px; /* INCREASED from 11px */
+    font-size: 14px;
     font-weight: 600;
   }
   
   .app-button {
-    height: 40px;
-    width: 160px;
+    height: 50px;
+    width: 180px;
   }
   
   .app-visual img {
-    height: 150px;
+    height: 190px;
   }
   
   /* Adjust card height for small mobile */
   .card-image-container {
-    height: 90px; /* Reduced from 120px */
+    height: 120px;
   }
   
   .card {
@@ -635,14 +723,19 @@ a{text-decoration:none;color:inherit}
   }
   
   .icon-section-title {
-    font-size: 18px; /* Adjusted for small mobile */
-    margin-bottom: 18px;
+    font-size: 20px;
+    margin-bottom: 22px;
   }
   
   /* Adjust banners for small mobile */
   .banner-section .container .site-banner.promo-banner,
   .pairings-banner,
   .tastings-banner {
-    border-radius: 6px;
+    border-radius: 8px;
+  }
+  
+  /* Adjust section titles for small mobile */
+  .section-title {
+    font-size: 24px;
   }
 }

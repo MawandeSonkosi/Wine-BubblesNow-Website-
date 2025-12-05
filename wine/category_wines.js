@@ -5,7 +5,7 @@ const CORS_PROXY = 'https://corsproxy.io/?';
 // State
 let allWines = [];
 let filteredWines = [];
-let currentCategory = '';
+let currentCategoryType = '';
 let searchQuery = '';
 
 // DOM Elements
@@ -16,34 +16,35 @@ const filterDropdown = document.getElementById('filterDropdown');
 const pageTitle = document.getElementById('pageTitle');
 const pageSubtitle = document.getElementById('pageSubtitle');
 
-// Available categories (matching your Flutter app)
-const availableCategories = [
-  'Breakfast Wines',
-  'Lunch Wines',
-  'Dinner Wines',
-  'Gifting Wines',
-  'Event Wines'
+// Available category types (these should match your homepage icons)
+const categoryTypes = [
+  'Red Wine',
+  'White Wine',
+  'Champagne',
+  'Whiskey',
+  'Gin',
+  'Cognac'
 ];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🍷 Wine List page loaded');
+  console.log('🍷 Category Wines page loaded');
   
-  // Get category from URL
+  // Get category type from URL
   const urlParams = new URLSearchParams(window.location.search);
-  currentCategory = urlParams.get('category') || '';
+  currentCategoryType = urlParams.get('type') || '';
   
-  if (currentCategory) {
-    pageTitle.textContent = currentCategory;
-    pageSubtitle.textContent = `Browse our curated collection of ${currentCategory.toLowerCase()}`;
+  if (currentCategoryType) {
+    pageTitle.textContent = currentCategoryType;
+    pageSubtitle.textContent = `Browse our curated collection of ${currentCategoryType.toLowerCase()}`;
     
     // Update filter button text to show current category
     if (filterBtn) {
-      filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${currentCategory}`;
+      filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${currentCategoryType}`;
       filterBtn.classList.add('has-filter');
     }
     
-    console.log(`🎯 Filtering by category: ${currentCategory}`);
+    console.log(`🎯 Filtering by category type: ${currentCategoryType}`);
   }
   
   fetchWines();
@@ -61,32 +62,32 @@ function setupEventListeners() {
   }
 }
 
-// Populate filter dropdown with categories
+// Populate filter dropdown with category types
 function populateFilterDropdown() {
   if (!filterDropdown) return;
   
-  console.log('📊 Populating filter dropdown with categories:', availableCategories);
+  console.log('📊 Populating filter dropdown with category types:', categoryTypes);
   
   // Clear existing content
   filterDropdown.innerHTML = '';
   
-  // Add each category
-  availableCategories.forEach(category => {
+  // Add each category type
+  categoryTypes.forEach(categoryType => {
     const link = document.createElement('a');
     link.href = '#';
-    link.dataset.category = category;
-    link.textContent = category;
+    link.dataset.category = categoryType;
+    link.textContent = categoryType;
     
-    // Highlight current category
-    if (category === currentCategory) {
+    // Highlight current category type
+    if (categoryType === currentCategoryType) {
       link.classList.add('active-category');
     }
     
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      if (category !== currentCategory) {
-        // Navigate to wine_list.html with new category
-        window.location.href = `wine_list.html?category=${encodeURIComponent(category)}`;
+      if (categoryType !== currentCategoryType) {
+        // Navigate to category_wines.html with new category type
+        window.location.href = `category_wines.html?type=${encodeURIComponent(categoryType)}`;
       }
     });
     filterDropdown.appendChild(link);
@@ -130,37 +131,30 @@ async function fetchWines() {
     
     allWines = wines;
     
-    // Filter by category if specified
-    if (currentCategory) {
-      // Handle special cases (like in Flutter)
-      switch(currentCategory.toLowerCase()) {
-        case 'gifting wines':
-          filteredWines = wines.filter(wine => wine.isGifting === true);
-          console.log(`🎁 Filtered to ${filteredWines.length} gifting wines`);
-          break;
-        case 'event wines':
-          filteredWines = wines.filter(wine => wine.isEvent === true);
-          console.log(`🎪 Filtered to ${filteredWines.length} event wines`);
-          break;
-        case 'wine cases':
-          // Show all wines for wine cases (like in Flutter)
-          filteredWines = wines;
-          console.log('📦 Showing all wines for wine cases');
-          break;
-        default:
-          // Filter by category
-          filteredWines = wines.filter(wine => 
-            wine.category && wine.category.toLowerCase() === currentCategory.toLowerCase()
-          );
-          console.log(`📊 Filtered to ${filteredWines.length} wines in category "${currentCategory}"`);
-      }
+    // Filter by category type if specified
+    if (currentCategoryType) {
+      // Filter wines by type OR category matching the category type
+      filteredWines = wines.filter(wine => {
+        // Exclude wine cases
+        if (wine.isCase) return false;
+        
+        // Check both type and category for matching
+        const matchesType = wine.type && 
+                           wine.type.toLowerCase() === currentCategoryType.toLowerCase();
+        const matchesCategory = wine.category && 
+                               wine.category.toLowerCase() === currentCategoryType.toLowerCase();
+        
+        return matchesType || matchesCategory;
+      });
+      
+      console.log(`📊 Filtered to ${filteredWines.length} wines for category type "${currentCategoryType}"`);
     } else {
-      // No category specified, show all
-      filteredWines = wines;
+      // No category type specified, show all non-case wines
+      filteredWines = wines.filter(wine => !wine.isCase);
     }
     
     if (filteredWines.length === 0) {
-      showEmptyState(`No wines found in ${currentCategory || 'this category'}`);
+      showEmptyState(`No ${currentCategoryType} found`);
     } else {
       populateFilterDropdown();
       renderWines();
@@ -189,12 +183,12 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render wines - USING SAME CARD LAYOUT AS all_wines.html
+// Render wines
 function renderWines() {
   console.log(`🎨 Rendering ${filteredWines.length} wines...`);
   
   if (filteredWines.length === 0) {
-    showEmptyState(`No wines found matching "${searchQuery}" in ${currentCategory}`);
+    showEmptyState(`No ${currentCategoryType} found matching "${searchQuery}"`);
     return;
   }
   
@@ -215,7 +209,7 @@ function renderWines() {
   }
   
   if (winesToShow.length === 0) {
-    showEmptyState(`No wines found matching "${searchQuery}" in ${currentCategory}`);
+    showEmptyState(`No ${currentCategoryType} found matching "${searchQuery}"`);
     return;
   }
   
@@ -225,8 +219,7 @@ function renderWines() {
     const type = wine.type || 'Wine';
     const category = wine.category || '';
     
-    // EXACT SAME CARD LAYOUT AS all_wines.html
-    // ADDED onclick TO NAVIGATE TO WINE DETAIL
+    // Same card layout as all_wines.html
     return `
       <div class="wine-card" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">
@@ -249,7 +242,7 @@ function renderWines() {
   console.log('✅ Render complete!');
 }
 
-// Filter wines
+// Filter wines (only for search, not for type filtering)
 function filterWines() {
   console.log(`🔍 Filtering: search="${searchQuery}"`);
   renderWines();
