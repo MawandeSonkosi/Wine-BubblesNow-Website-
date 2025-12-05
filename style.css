@@ -1,0 +1,648 @@
+:root{
+  --maroon: #6b0d2b;
+  --beige: #eadfcf;
+  --muted: #6d6d6d;
+  --card-dark: #363636;
+  --card-round: 12px;
+  --max-width: 1180px;
+}
+
+/* ---------- Reset ---------- */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Montserrat',sans-serif;color:#222;background:#fff}
+a{text-decoration:none;color:inherit}
+.container{max-width:var(--max-width);margin:0 auto;padding:0 24px}
+
+/* ---------- TOPBAR (Two Sections) ---------- */
+/* Top third - colored section - INCREASED SIZE */
+.topbar-top {
+  background: var(--maroon);
+  height: 60px; /* Increased from 30px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+}
+
+.topbar-top-inner {
+  width: 100%;
+  max-width: var(--max-width);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+/* Bottom two-thirds - white section with navigation */
+.topbar-main {
+  background: #fff;
+  height: 100px; /* Increased to maintain ratio */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.topbar-main-inner {
+  width: 100%;
+  max-width: var(--max-width);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+/* Increased logo size */
+.logo img {
+  height: 70px; /* Increased from 45px */
+}
+
+.main-nav ul {
+  display: flex;
+  gap: 35px; /* Increased gap */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.main-nav a {
+  color: #333;
+  font-size: 16px; /* Increased font size */
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.3s;
+}
+
+.main-nav a:hover {
+  color: var(--maroon);
+}
+
+.top-icons {
+  display: flex;
+  gap: 25px; /* Increased gap */
+  align-items: center;
+}
+
+.top-icons .icon {
+  color: #333;
+  font-size: 20px; /* Increased icon size */
+  transition: color 0.3s;
+}
+
+.top-icons .icon:hover {
+  color: var(--maroon);
+}
+
+/* ---------- BANNER SECTION ---------- */
+/* Make all banners clickable */
+.site-banner {
+  width: 100%;
+  display: block;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  position: relative;
+}
+
+/* Banner link wrapper */
+.banner-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hover effect for all clickable banners */
+.banner-link:hover {
+  opacity: 0.95;
+  transform: scale(1.01);
+}
+
+/* Add visual indicator for clickable banners */
+.banner-link::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(107, 13, 43, 0); /* Maroon color with 0 opacity initially */
+  transition: background 0.3s ease;
+  border-radius: inherit;
+}
+
+.banner-link:hover::after {
+  background: rgba(107, 13, 43, 0.05); /* Subtle maroon overlay on hover */
+}
+
+.banner-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-width: 100%;
+}
+
+/* Specific styles for promo-banner */
+.banner-section .container .site-banner.promo-banner {
+  max-width: 980px; /* Same as icon-row max-width */
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Enhance hover effect for promo banner */
+.banner-section .container .site-banner.promo-banner:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Additional banners (pairings and tastings) */
+.pairings-banner,
+.tastings-banner {
+  margin: 20px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.pairings-banner:hover,
+.tastings-banner:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Section Titles */
+.section{padding:34px 0}
+.section-title{font-family:'Playfair Display',serif;text-align:center;font-size:28px;margin:6px 0 22px;color:#1b1b1b}
+.muted{color:var(--muted)}
+
+/* ---------- Curated Cards ---------- */
+.cards-row{display:flex;gap:20px;justify-content:center;align-items:flex-end;padding-bottom:8px}
+.card{
+  width:300px; /* DECREASED from 320px */
+  border-radius:12px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+  position:relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* SIGNIFICANTLY REDUCED HEIGHT: Just enough for the image to show full width */
+.card-image-container {
+  width: 100%;
+  height: 150px; /* Drastically reduced from 200px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  background: #f8f8f8;
+}
+
+/* FIXED: Make images fill width completely - start from the beginning */
+.card-image {
+  width: 105%; /* Slightly wider than container to fill gaps */
+  height: 100%;
+  object-fit: contain; /* Show full image without cropping */
+  object-position: center center;
+  display: block;
+  margin-left: -2.5%; /* Center the wider image */
+}
+
+.card-label{
+  background:var(--card-dark);
+  color:#fff;
+  padding:14px;
+  border-radius:0 0 12px 12px;
+  flex-shrink: 0; /* Prevents label from shrinking */
+}
+.label-title{font-weight:600;font-size:16px}
+.label-sub{font-size:14px;opacity:.85;margin-top:6px}
+
+/* carousel dots centered under curated */
+.carousel-dots{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.carousel-dots .dot{width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block}
+.carousel-dots .dot.active{background:#2a2a2a}
+
+/* ---------- Icon Sections ---------- */
+.icon-section {
+  margin-top: 40px;
+}
+
+.icon-category-section {
+  padding: 34px 0;
+  background: #fafafa;
+}
+
+.icon-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; /* DECREASED from 24px (original was 22px) */
+  color: #1b1b1b;
+  margin-bottom: 25px; /* DECREASED from 30px */
+  text-align: left;
+  padding-left: 10px;
+}
+
+.icon-row{
+  display: flex;
+  gap: 12px; /* INCREASED from 8px */
+  justify-content: center;
+  margin: 0 0 30px;
+  width: 100%;
+  max-width: 980px; /* DECREASED to match 3 cards (300px * 3) + gaps (20px * 2) = 980px */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.icon-box{
+  flex: 1;
+  min-width: 0; /* Allow boxes to shrink */
+  background: transparent;
+  border-radius: 12px; /* INCREASED from 10px */
+  padding: 20px 12px; /* INCREASED padding */
+  text-align: center;
+  border: none; /* Removed border */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.icon-box:hover {
+  transform: translateY(-5px);
+}
+
+.icon-image-container {
+  width: 90px; /* INCREASED from 70px */
+  height: 90px; /* INCREASED from 70px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px; /* INCREASED margin */
+  background: transparent;
+}
+
+.icon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Removed the black and white filter to show original colors */
+}
+
+.icon-text {
+  margin: 0;
+  font-size: 16px; /* INCREASED from 14px */
+  color: #333;
+  font-weight: 600; /* INCREASED from 500 */
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ---------- Promotional Banners Section ---------- */
+.banners .section-title {
+  margin-bottom: 30px;
+}
+
+/* centered utility */
+.center{text-align:center;margin-top:18px}
+
+/* ---------- Blog cards ---------- */
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+.blog-card{position:relative;border-radius:12px;overflow:hidden}
+.blog-card img{width:100%;height:220px;object-fit:cover;display:block}
+.blog-overlay{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(0,0,0,0.7);color:#fff;padding:14px;border-radius:10px}
+.blog-overlay .category{font-size:12px;opacity:.9}
+.blog-overlay h5{margin:6px 0 8px;font-size:15px}
+.blog-overlay .read{font-size:13px;color:#f0d6c2}
+
+/* ---------- App promo ---------- */
+.app-promo{background:#faf6f5;padding:34px 0}
+.app-inner{display:flex;gap:18px;align-items:center;justify-content:space-between}
+.app-copy h3{font-family:'Playfair Display',serif;margin:0;font-size:22px}
+.feature-list{list-style:none;padding:0;margin:12px 0 18px;color:#4b4b4b}
+.feature-list li{margin:8px 0;font-size:14px}
+
+/* INCREASED APP BUTTON SIZE */
+.app-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.app-button {
+  height: 60px; /* Increased from 40px */
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.app-button:hover {
+  transform: translateY(-3px);
+}
+
+.app-visual img {
+  height: 280px; /* Increased to match larger layout */
+  object-fit: contain;
+  transform: rotate(-12deg);
+}
+
+/* ---------- FOOTER ---------- */
+.footer{background:var(--maroon);color:#fff;padding:36px 0;margin-top:12px}
+.footer-inner{display:flex;gap:24px;align-items:flex-start;justify-content:space-between}
+.footer-logo{height:56px;margin-bottom:12px}
+.footer-brand{flex:1;max-width:400px}
+.brand-tagline{font-size:16px;font-weight:600;margin-bottom:8px;color:#fff}
+.brand-description{font-size:14px;line-height:1.5;color:rgba(255,255,255,0.8);margin-bottom:16px}
+.socials{display:flex;gap:12px;margin-top:16px}
+.social-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:50%;font-size:14px;transition:all 0.3s;color:#fff}
+.social-icon:hover{background:rgba(255,255,255,0.2);transform:translateY(-2px)}
+.social-icon i{font-size:16px}
+
+.footer-links-grid{display:flex;gap:40px}
+.footer-links-column{flex:1}
+.footer-heading{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;color:#fff}
+.footer-links{list-style:none;padding:0;margin:0}
+.footer-links li{margin-bottom:10px}
+.footer-links a{color:rgba(255,255,255,0.8);font-size:14px;transition:color 0.3s}
+.footer-links a:hover{color:#fff}
+
+/* ---------- Tiny helpers ---------- */
+.small{font-size:13px}
+.tiny{font-size:12px;color:#7a7a7a}
+.center .btn-outline{margin-top:12px}
+
+/* small carousel under promo banner */
+.carousel-dots.small{margin-top:12px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .cards-row{flex-wrap:wrap;justify-content:center}
+  .blog-grid{grid-template-columns:repeat(2,1fr)}
+  .app-inner{flex-direction:column}
+  .footer-links-grid{gap:30px}
+  
+  /* Adjust icon row for smaller screens */
+  .icon-row {
+    max-width: 90%;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .icon-box {
+    width: calc(33.333% - 10px);
+    min-width: 160px; /* INCREASED from 140px */
+  }
+  
+  /* Adjust card height for smaller screens */
+  .card-image-container {
+    height: 140px; /* Reduced from 180px */
+  }
+  
+  .card {
+    width: 280px; /* Adjusted for smaller screens */
+  }
+  
+  .card-image {
+    width: 105%; /* Keep consistent scaling */
+    margin-left: -2.5%;
+  }
+  
+  /* Adjust icons for smaller screens */
+  .icon-image-container {
+    width: 80px; /* Adjusted from 90px */
+    height: 80px;
+    margin-bottom: 14px;
+  }
+  
+  .icon-text {
+    font-size: 15px; /* Adjusted from 16px */
+  }
+  
+  .icon-section-title {
+    font-size: 21px; /* Adjusted for smaller screens */
+    margin-bottom: 22px;
+  }
+  
+  /* Adjust promo banner for smaller screens */
+  .banner-section .container .site-banner.promo-banner {
+    max-width: 90%;
+  }
+  
+  /* Adjust other banners */
+  .pairings-banner,
+  .tastings-banner {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width:768px){
+  .topbar-top {
+    height: 40px;
+  }
+  
+  .topbar-main {
+    height: 80px;
+    padding: 10px 0;
+  }
+  
+  .logo img {
+    height: 50px;
+  }
+  
+  .main-nav {
+    display: none;
+  }
+  
+  .icon-section-title {
+    text-align: center;
+    padding-left: 0;
+    font-size: 20px; /* Adjusted for tablet */
+    margin-bottom: 22px;
+  }
+  
+  .footer-inner{flex-direction:column;gap:30px}
+  .footer-brand{max-width:100%}
+  .footer-links-grid{width:100%;justify-content:space-between}
+  
+  /* Adjust icon row for tablet */
+  .icon-box {
+    width: calc(50% - 10px);
+    min-width: 150px;
+    padding: 18px 10px;
+  }
+  
+  /* Adjust app buttons for tablet */
+  .app-button {
+    height: 50px;
+  }
+  
+  .app-visual img {
+    height: 220px;
+  }
+  
+  /* Adjust card height for tablet */
+  .card-image-container {
+    height: 120px; /* Reduced from 160px */
+  }
+  
+  .card {
+    width: 260px; /* Adjusted for tablet */
+  }
+  
+  /* Adjust icons for tablet */
+  .icon-image-container {
+    width: 75px;
+    height: 75px;
+    margin-bottom: 12px;
+  }
+  
+  .icon-text {
+    font-size: 14px;
+  }
+  
+  /* Adjust banners for tablet */
+  .banner-section .container .site-banner.promo-banner,
+  .pairings-banner,
+  .tastings-banner {
+    max-width: 95%;
+  }
+}
+
+@media (max-width:600px){
+  .topbar-top {
+    height: 30px;
+  }
+  
+  .topbar-main {
+    height: 70px;
+    padding: 8px 0;
+  }
+  
+  .logo img {
+    height: 40px;
+  }
+  
+  .icon-row{
+    flex-wrap:wrap;
+    gap:10px;
+    max-width: 100%;
+  }
+  
+  .icon-box {
+    width: calc(50% - 10px);
+    min-width: 140px; /* INCREASED from 120px */
+    padding: 16px 8px;
+  }
+  
+  .icon-image-container {
+    width: 65px; /* Adjusted from 50px */
+    height: 65px;
+    margin-bottom: 10px;
+  }
+  
+  .icon-text {
+    font-size: 14px; /* INCREASED from 12px */
+    font-weight: 600;
+  }
+  
+  /* Adjust app buttons for mobile */
+  .app-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .app-button {
+    height: 45px;
+    width: 180px;
+  }
+  
+  .app-visual img {
+    height: 180px;
+  }
+  
+  .cards-row .card{width:90%; max-width: 280px;}
+  /* Adjust card height for mobile */
+  .card-image-container {
+    height: 100px; /* Reduced from 140px */
+  }
+  
+  .card-image {
+    width: 105%; /* Keep consistent scaling */
+    margin-left: -2.5%;
+  }
+  
+  .blog-grid{grid-template-columns:1fr}
+  .footer-links-grid{flex-direction:column;gap:20px}
+  
+  .icon-section-title {
+    font-size: 19px; /* Adjusted for mobile */
+    margin-bottom: 20px;
+  }
+  
+  /* Adjust banners for mobile */
+  .banner-section .container .site-banner.promo-banner,
+  .pairings-banner,
+  .tastings-banner {
+    max-width: 100%;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width:400px){
+  .icon-box {
+    width: calc(50% - 5px);
+    min-width: 130px; /* INCREASED from 100px */
+    padding: 14px 6px;
+  }
+  
+  .icon-image-container {
+    width: 60px; /* INCREASED from 40px */
+    height: 60px;
+    margin-bottom: 8px;
+  }
+  
+  .icon-text {
+    font-size: 13px; /* INCREASED from 11px */
+    font-weight: 600;
+  }
+  
+  .app-button {
+    height: 40px;
+    width: 160px;
+  }
+  
+  .app-visual img {
+    height: 150px;
+  }
+  
+  /* Adjust card height for small mobile */
+  .card-image-container {
+    height: 90px; /* Reduced from 120px */
+  }
+  
+  .card {
+    width: 95%;
+  }
+  
+  .icon-section-title {
+    font-size: 18px; /* Adjusted for small mobile */
+    margin-bottom: 18px;
+  }
+  
+  /* Adjust banners for small mobile */
+  .banner-section .container .site-banner.promo-banner,
+  .pairings-banner,
+  .tastings-banner {
+    border-radius: 6px;
+  }
+}
