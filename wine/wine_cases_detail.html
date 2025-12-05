@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wine & Bubbles — Wine Farm Details</title>
+  <title>Wine & Bubbles — Wine Case Details</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
@@ -17,8 +17,10 @@
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Wine Farm Detail CSS -->
-  <link rel="stylesheet" href="wine_farm_detail.css">
+  <!-- Wine Cases CSS -->
+  <link rel="stylesheet" href="wine_cases.css">
+  <!-- Wine Case Detail Specific CSS -->
+  <link rel="stylesheet" href="wine_case_detail.css">
 </head>
 <body>
   <!-- Top bar with two sections -->
@@ -38,11 +40,11 @@
 
       <nav class="main-nav">
         <ul>
-           <li><a href="../wine/all_wines.html">All Wines</a></li>
+        
+          <li><a href="all_wines.html">All Wines</a></li>
           <li><a href="#">Book African Wine Bar</a></li>
-          <li><a href="wine_farm.html">Tastings Near Me</a></li>
+          <li><a href="../wine_farm/wine_farm.html">Tastings Near Me</a></li>
           <li><a href="../pairings/pairings.html">Pairings</a></li>
-          
           <li><a href="#">Contact Us</a></li>
         </ul>
       </nav>
@@ -59,62 +61,52 @@
     </div>
   </div>
 
-  <!-- Wine Farm Detail Content -->
-  <section class="section wine-farm-detail-section">
+  <!-- Wine Case Detail Content -->
+  <section class="section wine-case-detail-section">
     <div class="container">
       <!-- Back button and header -->
-      <div class="wine-farm-detail-header">
+      <div class="wine-case-detail-header">
         <a href="javascript:history.back()" class="back-button">
           <i class="fas fa-arrow-left"></i>
         </a>
-        <h2 class="section-title">Wine Farm Details</h2>
-        <!-- Cart and Profile icons removed here - using top navigation instead -->
+        <h2 class="wine-case-type" id="wineCaseType">Wine Case Details</h2>
       </div>
 
-      <!-- Main Wine Farm Details -->
-      <div class="wine-farm-detail-container" id="wineFarmDetailContainer">
+      <!-- Search Bar (for related wine cases) -->
+      <div class="search-filter-bar detail-search">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search related wine cases..." class="search-input">
+        </div>
+        <div class="filter-dropdown">
+          <button class="filter-btn" id="filterBtn">
+            <i class="fas fa-filter"></i>
+            Filter
+          </button>
+          <div class="filter-dropdown-content" id="filterDropdown">
+            <a href="#" data-filter="">All</a>
+            <!-- Filter options will be populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Wine Case Details -->
+      <div class="wine-case-detail-container" id="wineCaseDetailContainer">
         <div class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Loading wine farm details...</p>
+          <p>Loading wine case details...</p>
+        </div>
+      </div>
+
+      <!-- Related Wine Cases Grid (hidden initially) -->
+      <div class="related-wine-cases-section" id="relatedWineCasesSection" style="display: none;">
+        <h3 class="section-title">Related Wine Cases</h3>
+        <div class="wine-cases-grid" id="relatedWineCasesGrid">
+          <!-- Related wine cases will be populated here -->
         </div>
       </div>
     </div>
   </section>
-
-  <!-- Video Modal (hidden by default) -->
-  <div class="video-modal" id="videoModal">
-    <div class="video-modal-content">
-      <div class="video-modal-header">
-        <h3 id="videoTitle">Vineyard Tour</h3>
-        <button class="close-modal-btn" id="closeVideoModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="video-player-container">
-        <!-- Simple HTML5 video player -->
-        <video id="farmVideo" controls preload="metadata" playsinline>
-          Your browser does not support the video tag.
-        </video>
-        <div class="video-controls" id="videoControls">
-          <button class="video-control-btn" id="playPauseBtn">
-            <i class="fas fa-play"></i>
-          </button>
-          <div class="video-progress-container">
-            <div class="video-progress-bar" id="videoProgressBar"></div>
-            <input type="range" id="videoSeek" min="0" max="100" value="0" class="video-seek">
-          </div>
-          <div class="video-time" id="videoTime">0:00 / 0:00</div>
-          <button class="video-control-btn" id="muteBtn">
-            <i class="fas fa-volume-up"></i>
-          </button>
-          <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider">
-          <button class="video-control-btn" id="fullscreenBtn">
-            <i class="fas fa-expand"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -135,10 +127,10 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="../wine/all_wines.html">All Wines</a></li>
+            <li><a href="all_wines.html">All Wines</a></li>
+            <li><a href="wine_cases_list.html">Wine Cases</a></li>
             <li><a href="#">Bookings</a></li>
             <li><a href="#">Tastings</a></li>
-            <li><a href="#">Blog</a></li>
           </ul>
         </div>
 
@@ -155,6 +147,6 @@
   </footer>
 
   <!-- JavaScript -->
-  <script src="wine_farm_detail.js"></script>
+  <script src="wine_case_detail.js"></script>
 </body>
 </html>
