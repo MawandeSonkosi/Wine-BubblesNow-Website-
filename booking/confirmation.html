@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wine & Bubbles — Booking Confirmation</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+  <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    /* Confirmation Page Specific Styles */
+    :root {
+      --maroon: #6b0d2b;
+      --beige: #eadfcf;
+      --muted: #6d6d6d;
+      --card-dark: #363636;
+      --bg-dark: #0F0F0F;
+      --card-round: 12px;
+      --max-width: 1180px;
+    }
+
+    /* User dropdown styles */
+    .user-dropdown {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 16px;
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+      border: 1px solid #eee;
+    }
+    
+    .user-dropdown.show {
+      display: block !important;
+    }
+    
+    .user-dropdown a:hover {
+      color: var(--maroon) !important;
+    }
+    
+    .top-icons a {
+      position: relative;
+    }
+    
+    /* Login icon style */
+    .fas.fa-sign-in-alt {
+      color: var(--maroon) !important;
+    }
+    
+    .fas.fa-user-check {
+      color: var(--maroon) !important;
+    }
+    
+    .user-dropdown-info {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .user-dropdown-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .user-dropdown-email {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .user-dropdown-link {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    
+    .user-dropdown-link i {
+      margin-right: 8px;
+      width: 20px;
+    }
+    
+    .user-dropdown-logout {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: var(--maroon);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .user-dropdown-logout:hover {
+      background: #8a1e3d;
+    }
+    
+    /* Cart badge */
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--maroon);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #323232;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1001;
+      display: none;
+      max-width: 400px;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .toast.success {
+      background: #27ae60;
+    }
+    
+    .toast.error {
+      background: #e74c3c;
+    }
+    
+    .toast.warning {
+      background: #f39c12;
+    }
+
+    /* Confirmation Section */
+    .confirmation-section {
+      background: var(--bg-dark);
+      min-height: calc(100vh - 160px);
+      padding: 40px 0;
+      color: var(--beige);
+    }
+
+    .confirmation-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Success Header */
+    .success-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .success-icon-circle {
+      width: 80px;
+      height: 80px;
+      background: var(--maroon);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      animation: checkmark 0.5s ease-out;
+    }
+
+    @keyframes checkmark {
+      0% {
+        transform: scale(0);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .success-icon {
+      font-size: 40px;
+      color: var(--beige);
+    }
+
+    .success-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      color: var(--beige);
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .success-subtitle {
+      color: rgba(216, 192, 157, 0.8);
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* Confirmation Number */
+    .confirmation-number {
+      background: rgba(122, 0, 38, 0.2);
+      border: 1px solid rgba(216, 192, 157, 0.3);
+      border-radius: 8px;
+      padding: 12px 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .confirmation-number i {
+      color: var(--beige);
+      font-size: 18px;
+    }
+
+    .confirmation-number span {
+      color: var(--beige);
+      font-size: 14px;
+    }
+
+    .confirmation-number strong {
+      color: var(--beige);
+      font-weight: 600;
+    }
+
+    /* Details Container */
+    .details-container {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(216, 192, 157, 0.1);
+    }
+
+    /* Detail Row */
+    .detail-row {
+      display: flex;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(216, 192, 157, 0.1);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .detail-label {
+      min-width: 140px;
+      color: var(--beige);
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .detail-value {
+      color: var(--beige);
+      font-size: 16px;
+      flex: 1;
+    }
+
+    .detail-value.bold {
+      font-weight: 600;
+    }
+
+    /* Add-ons List */
+    .addons-list {
+      margin-top: 8px;
+    }
+
+    .addon-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      color: var(--beige);
+      font-size: 14px;
+    }
+
+    .addon-item i {
+      color: var(--maroon);
+      font-size: 12px;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: rgba(216, 192, 157, 0.3);
+      margin: 24px 0;
+    }
+
+    /* Total Row */
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 2px solid rgba(216, 192, 157, 0.3);
+    }
+
+    .total-label {
+      color: var(--beige);
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .total-amount {
+      color: var(--beige);
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    /* Back Button */
+    .back-button {
+      width: 100%;
+      background: var(--maroon);
+      color: var(--beige);
+      border: none;
+      padding: 18px;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+      margin-top: 30px;
+    }
+
+    .back-button:hover {
+      background: #5a0b23;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(122, 0, 38, 0.3);
+    }
+
+    .back-button i {
+      font-size: 20px;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.pending {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .status-badge.confirmed {
+      background: rgba(40, 167, 69, 0.2);
+      color: #28a745;
+      border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .status-badge.completed {
+      background: rgba(0, 123, 255, 0.2);
+      color: #007bff;
+      border: 1px solid rgba(0, 123, 255, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--beige);
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      color: rgba(216, 192, 157, 0.3);
+      margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .empty-state p {
+      color: rgba(216, 192, 157, 0.6);
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .confirmation-container {
+        padding: 0 16px;
+      }
+
+      .success-title {
+        font-size: 28px;
+      }
+
+      .details-container {
+        padding: 20px;
+      }
+
+      .detail-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .detail-label {
+        min-width: auto;
+      }
+
+      .back-button {
+        padding: 16px;
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .success-icon-circle {
+        width: 60px;
+        height: 60px;
+      }
+
+      .success-icon {
+        font-size: 30px;
+      }
+
+      .success-title {
+        font-size: 24px;
+      }
+
+      .details-container {
+        padding: 16px;
+      }
+
+      .detail-label,
+      .detail-value {
+        font-size: 14px;
+      }
+
+      .total-label {
+        font-size: 16px;
+      }
+
+      .total-amount {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top bar with two sections -->
+  <div class="topbar-top">
+    <div class="topbar-top-inner">
+      <!-- Empty - no content as requested -->
+    </div>
+  </div>
+
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo">
+        <a href="../index.html">
+          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+        </a>
+      </div>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="../all_wines/all_wines.html">All Wines</a></li>
+          <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
+          <li><a href="../wine_farm/wine_farm.html">Tastings Near Me</a></li>
+          <li><a href="../pairings/pairings.html">Pairings</a></li>
+          <li><a href="../index.html#contact">Contact Us</a></li>
+        </ul>
+      </nav>
+
+      <div class="top-icons">
+        <a href="../cart/cart.html" class="icon cart-icon" id="cartIcon">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+        </a>
+        <a href="../user/profile.html" class="icon" id="userIcon">
+          <i class="fas fa-user" id="userIconElement"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Confirmation Content -->
+  <section class="section confirmation-section">
+    <div class="confirmation-container">
+      <!-- Success Header -->
+      <div class="success-header">
+        <div class="success-icon-circle">
+          <i class="fas fa-check success-icon"></i>
+        </div>
+        <h1 class="success-title">Booking Confirmed!</h1>
+        <p class="success-subtitle">Your African Wine Bar experience has been booked successfully</p>
+        <div class="confirmation-number">
+          <i class="fas fa-ticket-alt"></i>
+          <span>Confirmation: <strong id="confirmationNumber">#WB00001</strong></span>
+        </div>
+      </div>
+
+      <!-- Booking Details -->
+      <div class="details-container">
+        <!-- Booking Details -->
+        <div class="detail-row">
+          <span class="detail-label">Date:</span>
+          <span class="detail-value" id="bookingDate">November 15, 2023</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Time:</span>
+          <span class="detail-value" id="bookingTime">6:00 PM</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Guests:</span>
+          <span class="detail-value" id="bookingGuests">4</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Event Type:</span>
+          <span class="detail-value" id="eventType">Corporate Event</span>
+        </div>
+
+        <!-- Sommelier Service -->
+        <div class="detail-row" id="sommelierRow" style="display: none;">
+          <span class="detail-label">Sommelier:</span>
+          <span class="detail-value">Yes</span>
+        </div>
+
+        <!-- Add-ons -->
+        <div class="detail-row" id="addonsRow" style="display: none;">
+          <span class="detail-label">Add-Ons:</span>
+          <div class="detail-value">
+            <div class="addons-list" id="addonsList">
+              <!-- Add-ons will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Special Requests -->
+        <div class="detail-row" id="specialRequestsRow" style="display: none;">
+          <span class="detail-label">Special Request:</span>
+          <span class="detail-value" id="specialRequest"></span>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- Total Amount -->
+        <div class="total-row">
+          <span class="total-label">Total Amount:</span>
+          <span class="total-amount" id="totalAmount">R1,200.00</span>
+        </div>
+      </div>
+
+      <!-- Back to Home Button -->
+      <button class="back-button" id="backButton">
+        <i class="fas fa-home"></i>
+        Back to Home
+      </button>
+
+      <!-- Empty State (hidden by default) -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <i class="fas fa-calendar-times"></i>
+        <h3>No Booking Found</h3>
+        <p>It looks like there's no booking information available.</p>
+        <button class="back-button" onclick="window.location.href='../index.html'">
+          <i class="fas fa-home"></i>
+          Return to Home
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+        <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+        <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+        <div class="socials">
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links-grid">
+        <div class="footer-links-column">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="../all_wines/all_wines.html">All Wines</a></li>
+            <li><a href="../booking/booking.html">Bookings</a></li>
+            <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+            <li><a href="../pairings/pairings.html">Pairings</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-column">
+          <h4 class="footer-heading">&nbsp;</h4>
+          <ul class="footer-links">
+            <li><a href="../contact_us.html">Contact Us</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="../terms_conditions.html">Terms & Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Configuration
+    const CONFIG = {
+      PRIMARY_COLOR: '#6b0d2b',
+      ACCENT_COLOR: '#d8c09d',
+      BG_COLOR: '#0F0F0F'
+    };
+
+    // Format date function
+    function formatDate(dateString) {
+      if (!dateString) return 'Not specified';
+      
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          // If it's already a formatted string, return as is
+          return dateString;
+        }
+        
+        return date.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString;
+      }
+    }
+
+    // Format time function
+    function formatTime(timeString) {
+      if (!timeString) return 'Not specified';
+      
+      // If time is already in 12-hour format with AM/PM, return as is
+      if (timeString.includes('AM') || timeString.includes('PM')) {
+        return timeString;
+      }
+      
+      // Otherwise, try to parse it
+      try {
+        const [hours, minutes] = timeString.split(':');
+        const hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${minutes} ${ampm}`;
+      } catch (error) {
+        return timeString;
+      }
+    }
+
+    // Format currency
+    function formatCurrency(amount) {
+      return 'R' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    // Generate booking ID
+    function generateBookingId() {
+      const prefix = 'WB';
+      const timestamp = Date.now().toString().slice(-6);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      return `${prefix}${timestamp}${random}`;
+    }
+
+    // Load booking data
+    function loadBookingData() {
+      const bookingData = localStorage.getItem('lastBooking');
+      
+      if (!bookingData) {
+        // No booking data found, show empty state
+        document.getElementById('emptyState').style.display = 'block';
+        document.querySelector('.details-container').style.display = 'none';
+        document.querySelector('.success-header').style.display = 'none';
+        return;
+      }
+
+      try {
+        const booking = JSON.parse(bookingData);
+        
+        // Generate and display booking ID
+        const bookingId = generateBookingId();
+        document.getElementById('confirmationNumber').textContent = `#${bookingId}`;
+        
+        // Format and display date
+        if (booking.date) {
+          document.getElementById('bookingDate').textContent = formatDate(booking.date);
+        }
+        
+        // Format and display time
+        if (booking.time) {
+          document.getElementById('bookingTime').textContent = formatTime(booking.time);
+        }
+        
+        // Display number of guests
+        if (booking.numberOfGuests) {
+          document.getElementById('bookingGuests').textContent = booking.numberOfGuests;
+        }
+        
+        // Display event type
+        if (booking.type) {
+          document.getElementById('eventType').textContent = booking.type;
+        }
+        
+        // Display sommelier service if included
+        if (booking.includesSommelier) {
+          document.getElementById('sommelierRow').style.display = 'flex';
+        }
+        
+        // Display add-ons if any
+        if (booking.addOns && booking.addOns.length > 0) {
+          const addonsList = document.getElementById('addonsList');
+          booking.addOns.forEach(addon => {
+            const addonItem = document.createElement('div');
+            addonItem.className = 'addon-item';
+            addonItem.innerHTML = `
+              <i class="fas fa-check-circle"></i>
+              <span>${addon.name} - ${formatCurrency(addon.price)}</span>
+            `;
+            addonsList.appendChild(addonItem);
+          });
+          document.getElementById('addonsRow').style.display = 'flex';
+        }
+        
+        // Display special requests if any
+        if (booking.specialRequest && booking.specialRequest.trim() !== '') {
+          document.getElementById('specialRequest').textContent = booking.specialRequest;
+          document.getElementById('specialRequestsRow').style.display = 'flex';
+        }
+        
+        // Display total amount
+        if (booking.totalAmount) {
+          document.getElementById('totalAmount').textContent = formatCurrency(booking.totalAmount);
+        }
+        
+        // Store the booking ID for future reference
+        localStorage.setItem('lastBookingId', bookingId);
+        
+      } catch (error) {
+        console.error('Error parsing booking data:', error);
+        showToast('Error loading booking details', 'error');
+        document.getElementById('emptyState').style.display = 'block';
+        document.querySelector('.details-container').style.display = 'none';
+        document.querySelector('.success-header').style.display = 'none';
+      }
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.style.display = 'block';
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 5000);
+    }
+
+    // Handle back button click
+    function setupBackButton() {
+      const backButton = document.getElementById('backButton');
+      backButton.addEventListener('click', () => {
+        // Clear the booking data from localStorage if needed
+        // localStorage.removeItem('lastBooking');
+        
+        // Redirect to home page
+        window.location.href = '../index.html';
+      });
+    }
+
+    // User authentication and session management
+    function setupUserAuthentication() {
+      const token = localStorage.getItem('wineBubbles_token');
+      const userData = localStorage.getItem('wineBubbles_user');
+      
+      const userIcon = document.getElementById('userIcon');
+      const userIconElement = document.getElementById('userIconElement');
+      const cartIcon = document.getElementById('cartIcon');
+      
+      if (token && userData) {
+        // User is logged in
+        try {
+          const user = JSON.parse(userData);
+          
+          // Update user icon
+          if (userIconElement) {
+            userIconElement.className = 'fas fa-user-check';
+            userIconElement.style.color = CONFIG.PRIMARY_COLOR;
+          }
+          
+          // Setup user dropdown
+          if (userIcon) {
+            userIcon.href = '#';
+            userIcon.addEventListener('click', function(e) {
+              e.preventDefault();
+              toggleUserDropdown();
+            });
+          }
+          
+          createUserDropdown(user);
+          
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          resetUserIcon();
+        }
+      } else {
+        // User is not logged in
+        resetUserIcon();
+      }
+      
+      // Setup cart functionality
+      if (cartIcon) {
+        updateCartCount();
+        cartIcon.addEventListener('click', function(e) {
+          if (!token) {
+            e.preventDefault();
+            showToast('Please login to view your cart', 'error');
+            setTimeout(() => {
+              window.location.href = '../login/login.html';
+            }, 2000);
+          }
+        });
+      }
+    }
+
+    function resetUserIcon() {
+      const userIcon = document.getElementById('userIcon');
+      const userIconElement = document.getElementById('userIconElement');
+      
+      if (userIcon) {
+        userIcon.href = '../login/login.html';
+        if (userIconElement) {
+          userIconElement.className = 'fas fa-sign-in-alt';
+          userIconElement.style.color = CONFIG.PRIMARY_COLOR;
+        }
+      }
+    }
+
+    function toggleUserDropdown() {
+      const dropdown = document.querySelector('.user-dropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+      }
+    }
+
+    function createUserDropdown(user) {
+      // Remove existing dropdown if any
+      const existingDropdown = document.querySelector('.user-dropdown');
+      if (existingDropdown) {
+        existingDropdown.remove();
+      }
+      
+      // Create dropdown container
+      const dropdown = document.createElement('div');
+      dropdown.className = 'user-dropdown';
+      
+      // User info
+      const userInfo = document.createElement('div');
+      userInfo.className = 'user-dropdown-info';
+      
+      const userName = document.createElement('div');
+      userName.className = 'user-dropdown-name';
+      userName.textContent = user.fullName || user.email.split('@')[0];
+      
+      const userEmail = document.createElement('div');
+      userEmail.className = 'user-dropdown-email';
+      userEmail.textContent = user.email;
+      
+      userInfo.appendChild(userName);
+      userInfo.appendChild(userEmail);
+      dropdown.appendChild(userInfo);
+      
+      // Dropdown items
+      const items = [
+        { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' },
+        { text: 'My Bookings', icon: 'fas fa-calendar', href: '../user/bookings.html' }
+      ];
+      
+      // Add items to dropdown
+      items.forEach(item => {
+        const link = document.createElement('a');
+        link.href = item.href;
+        link.className = 'user-dropdown-link';
+        link.innerHTML = `
+          <i class="${item.icon}"></i>
+          <span>${item.text}</span>
+        `;
+        dropdown.appendChild(link);
+      });
+      
+      // Logout button
+      const logoutButton = document.createElement('button');
+      logoutButton.className = 'user-dropdown-logout';
+      logoutButton.textContent = 'Logout';
+      logoutButton.addEventListener('click', function() {
+        localStorage.removeItem('wineBubbles_token');
+        localStorage.removeItem('wineBubbles_token_timestamp');
+        localStorage.removeItem('wineBubbles_user');
+        showToast('Logged out successfully', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      });
+      
+      dropdown.appendChild(logoutButton);
+      document.body.appendChild(dropdown);
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        const dropdown = document.querySelector('.user-dropdown');
+        const userIcon = document.getElementById('userIcon');
+        if (dropdown && !dropdown.contains(event.target) && 
+            userIcon && !userIcon.contains(event.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+    }
+
+    function updateCartCount() {
+      const cartBadge = document.getElementById('cartBadge');
+      const cartData = localStorage.getItem('wineBubbles_cart');
+      
+      if (cartData) {
+        try {
+          const cart = JSON.parse(cartData);
+          const itemCount = cart.items ? cart.items.length : 0;
+          
+          if (itemCount > 0 && cartBadge) {
+            cartBadge.textContent = itemCount;
+            cartBadge.style.display = 'flex';
+          }
+        } catch (error) {
+          console.error('Error parsing cart data:', error);
+        }
+      }
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('✅ Booking confirmation page loaded');
+      
+      // Load booking data
+      loadBookingData();
+      
+      // Setup back button
+      setupBackButton();
+      
+      // Setup user authentication
+      setupUserAuthentication();
+      
+      // Add some celebration confetti
+      createConfetti();
+    });
+
+    // Create confetti effect for celebration
+    function createConfetti() {
+      const colors = ['#6b0d2b', '#d8c09d', '#ffffff', '#ffd700'];
+      const confettiCount = 50;
+      
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        
+        // Random properties
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const width = Math.random() * 10 + 5;
+        const height = Math.random() * 20 + 10;
+        const delay = Math.random() * 2;
+        const duration = Math.random() * 2 + 2;
+        
+        confetti.style.cssText = `
+          background: ${color};
+          left: ${left}%;
+          width: ${width}px;
+          height: ${height}px;
+          animation-delay: ${delay}s;
+          animation-duration: ${duration}s;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+        `;
+        
+        document.body.appendChild(confetti);
+        
+        // Remove confetti after animation completes
+        setTimeout(() => {
+          confetti.remove();
+        }, (delay + duration) * 1000);
+      }
+    }
+  </script>
+</body>
+</html>

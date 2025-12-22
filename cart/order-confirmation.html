@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine & Bubbles — Order Confirmation</title>
+    <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+    <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
+    <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/cart/cart-utils.js"></script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f8f8;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .confirmation-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #27ae60;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: white;
+            font-size: 40px;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #6b0d2b;
+            margin-bottom: 16px;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .order-details {
+            background: rgba(107, 13, 43, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: left;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(107, 13, 43, 0.1);
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #6b0d2b;
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #5a0b23;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #6b0d2b;
+            border: 2px solid #6b0d2b;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(107, 13, 43, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .confirmation-container {
+                margin: 40px 16px;
+                padding: 24px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        
+        <h1>Order Confirmed!</h1>
+        <p>Thank you for your order. Your order has been successfully placed and is being processed.</p>
+        <p>An order confirmation email has been sent to your email address.</p>
+        
+        <div class="order-details">
+            <div class="detail-item">
+                <span class="detail-label">Order ID:</span>
+                <span class="detail-value" id="orderId">Loading...</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Order Date:</span>
+                <span class="detail-value" id="orderDate">Loading...</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Total Amount:</span>
+                <span class="detail-value" id="orderTotal">Loading...</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Payment Method:</span>
+                <span class="detail-value" id="paymentMethod">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="../index.html" class="btn btn-secondary">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
+            <a href="../user/orders.html" class="btn btn-primary">
+                <i class="fas fa-shopping-bag"></i>
+                View My Orders
+            </a>
+        </div>
+    </div>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        
+        // Get order from localStorage
+        const orders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
+        
+        // Try to find order by different possible IDs
+        let order = null;
+        
+        if (orderId) {
+            // Try exact match first
+            order = orders.find(o => o.id === orderId);
+            
+            // Try _id field (from backend)
+            if (!order) {
+                order = orders.find(o => o._id === orderId);
+            }
+            
+            // Try ID field without 'local-' prefix
+            if (!order && orderId.startsWith('local-')) {
+                const localId = orderId.replace('local-', '');
+                order = orders.find(o => o.id && o.id.toString() === localId);
+            }
+        }
+        
+        if (order) {
+            console.log('Found order:', order);
+            
+            // Update order ID display
+            document.getElementById('orderId').textContent = order.id || order._id || orderId;
+            
+            // Update order date
+            const orderDate = order.createdAt || new Date().toISOString();
+            document.getElementById('orderDate').textContent = new Date(orderDate).toLocaleDateString();
+            
+            // Update total amount - use the correct property name
+            const total = order.total || order.totalAmount || order.Total || 0;
+            document.getElementById('orderTotal').textContent = `R${parseFloat(total).toFixed(2)}`;
+            
+            // Update payment method
+            document.getElementById('paymentMethod').textContent = order.paymentMethod || 'Not specified';
+            
+            // Update the success message based on email status
+            const emailSent = order.emailSent || false;
+            if (!emailSent) {
+                const successMsg = document.querySelector('p');
+                if (successMsg && successMsg.textContent.includes('email has been sent')) {
+                    successMsg.textContent = 'Thank you for your order. Your order has been successfully placed and is being processed.';
+                }
+            }
+        } else {
+            console.warn('Order not found in localStorage:', orderId);
+            console.log('Available orders:', orders);
+            
+            // Show at least the order ID from URL
+            document.getElementById('orderId').textContent = orderId || 'Not found';
+            
+            // Try to get data from URL params as fallback
+            const totalFromURL = urlParams.get('total');
+            const paymentFromURL = urlParams.get('payment');
+            
+            if (totalFromURL) {
+                document.getElementById('orderTotal').textContent = `R${parseFloat(totalFromURL).toFixed(2)}`;
+            } else {
+                document.getElementById('orderTotal').textContent = 'R0.00';
+            }
+            
+            if (paymentFromURL) {
+                document.getElementById('paymentMethod').textContent = decodeURIComponent(paymentFromURL);
+            } else {
+                document.getElementById('paymentMethod').textContent = 'Not specified';
+            }
+            
+            // Set current date
+            document.getElementById('orderDate').textContent = new Date().toLocaleDateString();
+        }
+    });
+</script>
+</body>
+</html>

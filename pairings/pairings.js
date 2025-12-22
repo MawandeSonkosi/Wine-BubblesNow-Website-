@@ -130,6 +130,7 @@ function fixImageUrl(imageUrl) {
 }
 
 // Render pairings - EXACT SAME FORMAT AS WINE PAGE
+// NO STOCK CHECKING FOR PAIRINGS - THEY'RE ALWAYS AVAILABLE
 function renderPairings() {
   console.log(`🎨 Rendering ${filteredPairings.length} pairings...`);
   
@@ -144,6 +145,7 @@ function renderPairings() {
     const category = pairing.category || 'Add-On';
     
     // EXACT SAME FORMAT AS WINE PAGE: Name, Type (Category), Price
+    // NO STOCK STATUS - PAIRINGS ARE ALWAYS AVAILABLE
     // UPDATED: Add onclick to navigate to detail page
     return `
       <div class="wine-card" onclick="navigateToPairingDetail(${pairing.id})">
@@ -158,6 +160,7 @@ function renderPairings() {
           <div class="wine-title">${pairing.name}</div>
           <div class="wine-sub">${category}</div>
           <div class="wine-price">R${price.toFixed(2)}</div>
+          <!-- NO STOCK STATUS FOR PAIRINGS - THEY DON'T HAVE STOCK COUNT -->
         </div>
       </div>
     `;
@@ -195,12 +198,6 @@ function filterPairings() {
   
   renderPairings();
 }
-
-// Show pairing detail (REMOVED - Now using navigateToPairingDetail)
-// function showPairingDetail(pairingId) {
-//   console.log(`📱 Show pairing detail: ${pairingId}`);
-//   alert(`Pairing detail for ID: ${pairingId}\nThis feature will be implemented in the next phase.`);
-// }
 
 // UI States
 function showLoading() {

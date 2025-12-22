@@ -19,6 +19,146 @@
   <link rel="stylesheet" href="../style.css">
   <!-- Wine Cases CSS -->
   <link rel="stylesheet" href="wine_cases.css">
+  <script src="/cart/cart-utils.js"></script>
+
+  <style>
+    /* Additional styles for user dropdown */
+    .user-dropdown {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 16px;
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+      border: 1px solid #eee;
+    }
+    
+    .user-dropdown.show {
+      display: block !important;
+    }
+    
+    .user-dropdown a:hover {
+      color: #6b0d2b !important;
+    }
+    
+    .top-icons a {
+      position: relative;
+    }
+    
+    /* Login icon style */
+    .fas.fa-sign-in-alt {
+      color: #6b0d2b !important;
+    }
+    
+    .fas.fa-user-check {
+      color: #6b0d2b !important;
+    }
+    
+    .user-dropdown-info {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .user-dropdown-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .user-dropdown-email {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .user-dropdown-link {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    
+    .user-dropdown-link i {
+      margin-right: 8px;
+      width: 20px;
+    }
+    
+    .user-dropdown-logout {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #6b0d2b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .user-dropdown-logout:hover {
+      background: #8a1e3d;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      .user-dropdown {
+        position: fixed;
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+      }
+    }
+    
+    /* Admin badge */
+    .admin-badge {
+      display: inline-block;
+      background: #6b0d2b;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    /* Driver badge */
+    .driver-badge {
+      display: inline-block;
+      background: #1e6b0d;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    /* Cart badge style */
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #6b0d2b;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
 </head>
 <body>
   <!-- Top bar with two sections -->
@@ -38,22 +178,21 @@
 
       <nav class="main-nav">
         <ul>
-          
           <li><a href="all_wines.html">All Wines</a></li>
-          <li><a href="#">Book African Wine Bar</a></li>
+          <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
           <li><a href="../wine_farm/wine_farm.html">Tastings Near Me</a></li>
           <li><a href="../pairings/pairings.html">Pairings</a></li>
-          <li><a href="#">Contact Us</a></li>
+          <li><a href="../contact_us.html">Track Order</a></li>
         </ul>
       </nav>
 
       <div class="top-icons">
-        <a href="#" class="icon cart-icon" id="cartIcon">
+        <a href="../cart/cart.html" class="icon cart-icon" id="cartIcon">
           <i class="fas fa-shopping-cart"></i>
-          <span class="cart-badge" id="cartBadge">0</span>
+          <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
         </a>
-        <a href="#" class="icon" id="userIcon">
-          <i class="fas fa-user"></i>
+        <a href="../user/profile.html" class="icon" id="userIcon">
+          <i class="fas fa-user" id="userIconElement"></i>
         </a>
       </div>
     </div>
@@ -122,9 +261,9 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">&nbsp;</h4>
           <ul class="footer-links">
-            <li><a href="#">Contact Us</a></li>
+            <li><a href="/contact_us.html">Contact Us</a></li>
             <li><a href="#">FAQ</a></li>
-            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="/terms_conditions.html">Terms & Conditions</a></li>
           </ul>
         </div>
       </div>
@@ -133,5 +272,326 @@
 
   <!-- JavaScript -->
   <script src="wine_cases.js"></script>
+  <script>
+    // Authentication logic for Wine Cases page
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🍷 Wine Cases page loaded - checking authentication');
+        
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // Token validation function
+        function isTokenValid() {
+            const token = localStorage.getItem('wineBubbles_token');
+            const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
+            
+            if (!token || !timestamp) return false;
+            
+            const tokenAge = Date.now() - parseInt(timestamp);
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+            
+            return tokenAge < sevenDays;
+        }
+        
+        // Clear user session function
+        function clearUserSession() {
+            localStorage.removeItem('wineBubbles_token');
+            localStorage.removeItem('wineBubbles_token_timestamp');
+            localStorage.removeItem('wineBubbles_user');
+            localStorage.removeItem('wineBubbles_isAdmin');
+            localStorage.removeItem('wineBubbles_isDriver');
+            localStorage.removeItem('wineBubbles_userFullName');
+            localStorage.removeItem('wineBubbles_userEmail');
+            localStorage.removeItem('wineBubbles_userPhone');
+            localStorage.removeItem('wineBubbles_userImage');
+            localStorage.removeItem('wineBubbles_userVerified');
+            localStorage.removeItem('wineBubbles_userCreated');
+            
+            // Update cart count
+            updateCartCount(0);
+        }
+        
+        // Update cart count display
+        function updateCartCount(count) {
+            const cartBadge = document.getElementById('cartBadge');
+            if (cartBadge) {
+                if (count > 0) {
+                    cartBadge.textContent = count;
+                    cartBadge.style.display = 'flex';
+                } else {
+                    cartBadge.style.display = 'none';
+                }
+            }
+        }
+        
+        // Load cart count from localStorage
+        function loadCartCount() {
+            const cartData = localStorage.getItem('wineBubbles_cart');
+            if (cartData) {
+                try {
+                    const cart = JSON.parse(cartData);
+                    const itemCount = cart.items ? cart.items.length : 0;
+                    updateCartCount(itemCount);
+                } catch (error) {
+                    console.error('Error parsing cart data:', error);
+                    updateCartCount(0);
+                }
+            } else {
+                updateCartCount(0);
+            }
+        }
+        
+        // Check if user is logged in
+        const token = localStorage.getItem('wineBubbles_token');
+        const userData = localStorage.getItem('wineBubbles_user');
+        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+        const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
+        const isValidToken = isTokenValid();
+        
+        // Get user icon elements
+        const userIcon = document.getElementById('userIcon');
+        const userIconElement = document.getElementById('userIconElement');
+        const cartIcon = document.getElementById('cartIcon');
+        
+        // Load cart count
+        loadCartCount();
+        
+        if (isValidToken && userData) {
+            console.log('✅ User is logged in on Wine Cases page');
+            
+            try {
+                const user = JSON.parse(userData);
+                
+                // Update user icon to show logged-in state (profile icon)
+                if (userIconElement) {
+                    userIconElement.className = 'fas fa-user-check';
+                    userIconElement.style.color = '#6b0d2b';
+                }
+                
+                // Update user icon link
+                if (userIcon) {
+                    userIcon.href = '#';
+                    userIcon.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleUserDropdown();
+                    });
+                }
+                
+                // Create appropriate dropdown based on user type
+                createUserDropdown(user, isAdmin, isDriver);
+                
+                // Cart functionality
+                if (cartIcon) {
+                    cartIcon.addEventListener('click', function(e) {
+                        if (isValidToken) {
+                            // Allow cart access for logged in users
+                            window.location.href = '../cart/cart.html';
+                        } else {
+                            e.preventDefault();
+                            alert('Please login to view your cart');
+                            window.location.href = '../login/login.html';
+                        }
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                clearUserSession();
+                resetUserIcon();
+            }
+            
+        } else {
+            console.log('❌ User is not logged in or token expired on Wine Cases page');
+            clearUserSession();
+            resetUserIcon();
+            
+            // Cart requires login
+            if (cartIcon) {
+                cartIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Please login to view your cart');
+                    window.location.href = '../login/login.html';
+                });
+            }
+        }
+        
+        // Reset user icon to login state (sign-in icon)
+        function resetUserIcon() {
+            if (userIcon) {
+                userIcon.href = '../login/login.html';
+                if (userIconElement) {
+                    // Change to login/sign-in icon
+                    userIconElement.className = 'fas fa-sign-in-alt';
+                    userIconElement.style.color = '#6b0d2b';
+                }
+            }
+        }
+        
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+        
+        // Create user dropdown menu
+        function createUserDropdown(user, isAdmin, isDriver) {
+            // Remove existing dropdown if any
+            const existingDropdown = document.querySelector('.user-dropdown');
+            if (existingDropdown) {
+                existingDropdown.remove();
+            }
+            
+            // Create dropdown container
+            const dropdown = document.createElement('div');
+            dropdown.className = 'user-dropdown';
+            
+            // User info
+            const userInfo = document.createElement('div');
+            userInfo.className = 'user-dropdown-info';
+            
+            const userName = document.createElement('div');
+            userName.className = 'user-dropdown-name';
+            userName.textContent = user.fullName || user.email.split('@')[0];
+            
+            // Add badge for admin or driver
+            if (isAdmin) {
+                const adminBadge = document.createElement('span');
+                adminBadge.className = 'admin-badge';
+                adminBadge.textContent = 'ADMIN';
+                userName.appendChild(adminBadge);
+            } else if (isDriver) {
+                const driverBadge = document.createElement('span');
+                driverBadge.className = 'driver-badge';
+                driverBadge.textContent = 'DRIVER';
+                userName.appendChild(driverBadge);
+            }
+            
+            const userEmail = document.createElement('div');
+            userEmail.className = 'user-dropdown-email';
+            userEmail.textContent = user.email;
+            
+            userInfo.appendChild(userName);
+            userInfo.appendChild(userEmail);
+            dropdown.appendChild(userInfo);
+            
+            // Dropdown items based on user type
+            const items = [];
+            
+            if (isAdmin) {
+                // Admin items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else if (isDriver) {
+                // Driver items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else {
+                // Regular user items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            }
+            
+            // Add items to dropdown
+            items.forEach(item => {
+                const link = document.createElement('a');
+                link.href = item.href;
+                link.className = 'user-dropdown-link';
+                link.innerHTML = `
+                    <i class="${item.icon}"></i>
+                    <span>${item.text}</span>
+                `;
+                link.addEventListener('mouseenter', () => {
+                    link.style.color = '#6b0d2b';
+                });
+                link.addEventListener('mouseleave', () => {
+                    link.style.color = '#333';
+                });
+                dropdown.appendChild(link);
+            });
+            
+            // Logout button
+            const logoutButton = document.createElement('button');
+            logoutButton.className = 'user-dropdown-logout';
+            logoutButton.textContent = 'Logout';
+            logoutButton.addEventListener('click', function() {
+                clearUserSession();
+                window.location.href = '../index.html';
+            });
+            
+            dropdown.appendChild(logoutButton);
+            document.body.appendChild(dropdown);
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const dropdown = document.querySelector('.user-dropdown');
+                if (dropdown && !dropdown.contains(event.target) && 
+                    userIcon && !userIcon.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const dropdown = document.querySelector('.user-dropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            });
+        }
+        
+        // Check for welcome message after login
+        const urlParams = new URLSearchParams(window.location.search);
+        const justLoggedIn = urlParams.get('login') === 'success';
+        
+        if (justLoggedIn) {
+            // Show welcome message
+            const userData = localStorage.getItem('wineBubbles_user');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    setTimeout(() => {
+                        alert(`Welcome back, ${user.fullName || user.email.split('@')[0]}!`);
+                        // Remove the parameter from URL without reloading
+                        const url = new URL(window.location);
+                        url.searchParams.delete('login');
+                        window.history.replaceState({}, '', url);
+                    }, 500);
+                } catch (error) {
+                    console.error('Error parsing user data for welcome:', error);
+                }
+            }
+        }
+        
+        // Add event listener for cart updates
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'wineBubbles_cart') {
+                loadCartCount();
+            }
+        });
+        
+        // Initialize cart if not exists
+        function initializeCart() {
+            if (!localStorage.getItem('wineBubbles_cart')) {
+                const emptyCart = {
+                    items: [],
+                    total: 0,
+                    updatedAt: new Date().toISOString()
+                };
+                localStorage.setItem('wineBubbles_cart', JSON.stringify(emptyCart));
+            }
+        }
+        
+        initializeCart();
+        
+        console.log('✅ Wine Cases page authentication initialized');
+    });
+  </script>
 </body>
 </html>

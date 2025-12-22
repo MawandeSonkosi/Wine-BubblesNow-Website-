@@ -1,3 +1,4 @@
+// /pairings/pairings_detail.js - UPDATED FOR UNIFIED CART
 // Configuration
 const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
 const CORS_PROXY = 'https://corsproxy.io/?';
@@ -6,7 +7,6 @@ const CORS_PROXY = 'https://corsproxy.io/?';
 let currentPairing = null;
 let relatedPairings = [];
 let quantity = 1;
-let cartCount = 0;
 
 // DOM Elements
 const pairingDetailContainer = document.getElementById('pairingDetailContainer');
@@ -16,8 +16,6 @@ const relatedPairingsGrid = document.getElementById('relatedPairingsGrid');
 const searchInput = document.getElementById('searchInput');
 const filterBtn = document.getElementById('filterBtn');
 const filterDropdown = document.getElementById('filterDropdown');
-const cartBadge = document.getElementById('cartBadge');
-const cartIcon = document.getElementById('cartIcon');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,7 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
   
   fetchPairingDetail(parseInt(pairingId));
   setupEventListeners();
-  loadCartCount();
+  
+  // Initialize cart badge
+  if (window.CartUtils) {
+    window.CartUtils.updateCartBadge();
+  }
 });
 
 // Event Listeners
@@ -52,25 +54,6 @@ function setupEventListeners() {
       filterDropdown.style.display = 'none';
     }
   });
-}
-
-// Load cart count from localStorage
-function loadCartCount() {
-  try {
-    const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
-    cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    updateCartBadge();
-  } catch (error) {
-    console.error('Error loading cart:', error);
-  }
-}
-
-// Update cart badge
-function updateCartBadge() {
-  if (cartBadge) {
-    cartBadge.textContent = cartCount;
-    cartBadge.style.display = cartCount > 0 ? 'flex' : 'none';
-  }
 }
 
 // Fetch pairing detail
@@ -137,12 +120,13 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render pairing detail
+// Render pairing detail - REMOVED STOCK CHECKING
 function renderPairingDetail(pairing) {
   const imageUrl = fixImageUrl(pairing.imageUrl);
   const price = pairing.price || 0;
   const category = pairing.category || 'Add-On';
   
+  // PAIRINGS ARE ALWAYS IN STOCK - NO STOCK CHECKING NEEDED
   const template = `
     <div class="pairing-detail-card">
       <div class="pairing-detail-image-container">
@@ -157,7 +141,11 @@ function renderPairingDetail(pairing) {
         <div class="pairing-detail-category">${category}</div>
         <div class="pairing-detail-price">R${price.toFixed(2)}</div>
         
-        <!-- Quantity Selector -->
+        <!-- REMOVED STOCK STATUS SECTION -->
+        
+        <p class="pairing-detail-description">${pairing.description || 'No description available.'}</p>
+        
+        <!-- Quantity Selector - ALWAYS SHOW (no stock check) -->
         <div class="quantity-selector">
           <button class="quantity-btn" id="decrementBtn" ${quantity <= 1 ? 'disabled' : ''}>
             <i class="fas fa-minus"></i>
@@ -168,7 +156,7 @@ function renderPairingDetail(pairing) {
           </button>
         </div>
         
-        <!-- Add to Cart Button -->
+        <!-- Add to Cart Button - ALWAYS ENABLED (no stock check) -->
         <button class="add-to-cart-btn" id="addToCartBtn">
           Add to Cart
         </button>
@@ -179,9 +167,9 @@ function renderPairingDetail(pairing) {
   pairingDetailContainer.innerHTML = template;
   
   // Setup quantity buttons
-  document.getElementById('decrementBtn').addEventListener('click', decrementQuantity);
-  document.getElementById('incrementBtn').addEventListener('click', incrementQuantity);
-  document.getElementById('addToCartBtn').addEventListener('click', addToCart);
+  document.getElementById('decrementBtn')?.addEventListener('click', decrementQuantity);
+  document.getElementById('incrementBtn')?.addEventListener('click', incrementQuantity);
+  document.getElementById('addToCartBtn')?.addEventListener('click', addToCart);
 }
 
 // Quantity controls
@@ -210,52 +198,42 @@ function updateQuantityDisplay() {
   }
 }
 
-// Add to cart
+// Add to cart - REMOVED STOCK CHECKING
 function addToCart() {
   if (!currentPairing) return;
   
-  try {
-    // Get current cart from localStorage
-    const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
+  // Create cart item for pairing/addon
+  const cartItem = {
+    id: currentPairing.id.toString(), // Ensure it's a string
+    name: currentPairing.name,
+    price: currentPairing.price,
+    imageUrl: currentPairing.imageUrl,
+    type: 'addon', // Important: Must match CartUtils type
+    category: currentPairing.category || '',
+    description: currentPairing.description,
+    quantity: quantity
+  };
+  
+  console.log('🛒 Adding pairing to cart:', cartItem);
+  
+  // Add to cart using unified cart system
+  if (window.CartUtils) {
+    // Use addItem() not addPairing() - method doesn't exist
+    const result = window.CartUtils.addItem(cartItem);
     
-    // Check if pairing already exists in cart
-    const existingIndex = cart.findIndex(item => 
-      item.type === 'pairing' && item.id === currentPairing.id
-    );
-    
-    if (existingIndex !== -1) {
-      // Update quantity
-      cart[existingIndex].quantity += quantity;
+    if (result) {
+      // Show success message
+      showToast(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} of ${currentPairing.name} to cart`);
+      
+      // Reset quantity
+      quantity = 1;
+      updateQuantityDisplay();
     } else {
-      // Add new item
-      cart.push({
-        type: 'pairing',
-        id: currentPairing.id,
-        name: currentPairing.name,
-        price: currentPairing.price,
-        imageUrl: currentPairing.imageUrl,
-        category: currentPairing.category,
-        quantity: quantity
-      });
+      showToast('Failed to add to cart', 'error');
     }
-    
-    // Save to localStorage
-    localStorage.setItem('wine_cart', JSON.stringify(cart));
-    
-    // Update cart count
-    cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    updateCartBadge();
-    
-    // Show success message
-    showToast(`${quantity} × ${currentPairing.name} added to cart`);
-    
-    // Reset quantity
-    quantity = 1;
-    updateQuantityDisplay();
-    
-  } catch (error) {
-    console.error('Error adding to cart:', error);
-    showToast('Failed to add to cart', 'error');
+  } else {
+    console.error('CartUtils not available');
+    showToast('Cart system not available', 'error');
   }
 }
 
@@ -467,3 +445,4 @@ function showToast(message, type = 'success') {
 
 // Make functions available globally
 window.filterRelatedPairingsByCategory = filterRelatedPairingsByCategory;
+window.filterRelatedPairings = filterRelatedPairings;

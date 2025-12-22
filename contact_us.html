@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Wine & Bubbles Now</title>
+    
+    <!-- Same as homepage -->
+    <link rel="icon" type="image/png" href="assets/categories/Icons.png">
+    <link rel="shortcut icon" href="assets/categories/Icons.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/categories/Icons.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="/cart/cart-utils.js"></script>
+
+    <style>
+        /* Import homepage variables */
+        :root {
+            --maroon: #6b0d2b;
+            --beige: #eadfcf;
+            --muted: #6d6d6d;
+            --card-dark: #363636;
+            --card-round: 12px;
+            --max-width: 1180px;
+            --error: #ff4444;
+            --success: #4CAF50;
+        }
+
+        /* Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0 }
+        html, body { height: 100%; font-family: 'Montserrat', sans-serif; color: #222; background: #fff }
+        a { text-decoration: none; color: inherit }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px }
+
+        /* ---------- TOPBAR (Two Sections) ---------- */
+        .topbar-top {
+            background: var(--maroon);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .topbar-top-inner {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .topbar-main {
+            background: #fff;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .topbar-main-inner {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .logo img { height: 70px; }
+
+        .main-nav ul {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        .main-nav a {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+
+        .main-nav a:hover { color: var(--maroon); }
+
+        .top-icons {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .top-icons .icon {
+            color: #333;
+            font-size: 20px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .top-icons .icon:hover { color: var(--maroon); }
+
+        /* User dropdown */
+        .user-dropdown {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 16px;
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            border: 1px solid #eee;
+        }
+        
+        .user-dropdown.show {
+            display: block !important;
+        }
+        
+        .user-dropdown a:hover {
+            color: var(--maroon) !important;
+        }
+        
+        .top-icons a {
+            position: relative;
+        }
+        
+        /* Login icon style */
+        .fas.fa-sign-in-alt {
+            color: var(--maroon) !important;
+        }
+        
+        .fas.fa-user-check {
+            color: var(--maroon) !important;
+        }
+        
+        .user-dropdown-info {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-dropdown-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .user-dropdown-email {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .user-dropdown-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .user-dropdown-link i {
+            margin-right: 8px;
+            width: 20px;
+        }
+        
+        .user-dropdown-logout {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--maroon);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .user-dropdown-logout:hover {
+            background: #8a1e3d;
+        }
+
+        /* Contact Us Section Styles */
+        .contact-section {
+            padding: 60px 0;
+            min-height: calc(100vh - 260px);
+            background: #fafafa;
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .contact-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--maroon);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .contact-subtitle {
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .contact-container {
+            display: flex;
+            gap: 40px;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .contact-info {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .contact-details {
+            margin-bottom: 40px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--maroon);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .contact-icon i {
+            color: white;
+            font-size: 20px;
+        }
+
+        .contact-content h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .contact-content p {
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .contact-content a {
+            color: var(--maroon);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .contact-content a:hover {
+            color: #8a1e3d;
+            text-decoration: underline;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--maroon);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 16px;
+            background-color: #f9f9f9;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            color: #333;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--maroon);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(107, 13, 43, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--maroon);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background: #8a1e3d;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(107, 13, 43, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: var(--max-width);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--maroon);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .section-content {
+            color: var(--muted);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .section-content p {
+            margin-bottom: 20px;
+        }
+
+        .section-content ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-content li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        /* Snackbar */
+        .snackbar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--maroon);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 500;
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(107, 13, 43, 0.3);
+        }
+
+        .snackbar.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .snackbar.error {
+            background: var(--error);
+        }
+
+        .snackbar.success {
+            background: var(--success);
+        }
+
+        /* FOOTER (Same as homepage) */
+        .footer {
+            background: var(--maroon);
+            color: #fff;
+            padding: 50px 0;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .footer-logo {
+            height: 65px;
+            margin-bottom: 15px;
+        }
+
+        .brand-tagline {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .brand-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+        }
+
+        .socials {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .social-icon:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+
+        .social-icon i {
+            font-size: 18px;
+        }
+
+        .footer-links-grid {
+            display: flex;
+            gap: 60px;
+        }
+
+        .footer-links-column {
+            flex: 1;
+        }
+
+        .footer-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .contact-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .contact-info, .contact-form {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .contact-section {
+                padding: 40px 0;
+            }
+
+            .contact-title {
+                font-size: 32px;
+            }
+
+            .contact-subtitle {
+                font-size: 16px;
+                padding: 0 20px;
+            }
+
+            .contact-info, .contact-form, .content-section {
+                padding: 30px;
+            }
+
+            .contact-item {
+                flex-direction: column;
+            }
+
+            .contact-icon {
+                margin-bottom: 15px;
+                margin-right: 0;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 35px;
+            }
+
+            .footer-links-grid {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .topbar-main {
+                height: 80px;
+                padding: 10px 0;
+            }
+
+            .logo img {
+                height: 50px;
+            }
+
+            .main-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .contact-section {
+                padding: 30px 0;
+            }
+
+            .contact-container {
+                padding: 0 15px;
+            }
+
+            .contact-title {
+                font-size: 28px;
+            }
+
+            .contact-info, .contact-form, .content-section {
+                padding: 25px 20px;
+            }
+
+            .topbar-main {
+                height: 70px;
+                padding: 8px 0;
+            }
+
+            .logo img {
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contact-title {
+                font-size: 24px;
+            }
+
+            .contact-subtitle {
+                font-size: 14px;
+            }
+
+            .form-title, .section-title {
+                font-size: 24px;
+            }
+
+            .submit-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .contact-icon {
+                width: 45px;
+                height: 45px;
+            }
+
+            .contact-icon i {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOP BAR (Same as homepage) -->
+    <div class="topbar-top">
+        <div class="topbar-top-inner">
+            <!-- Empty as requested -->
+        </div>
+    </div>
+
+    <div class="topbar-main">
+        <div class="topbar-main-inner">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+                </a>
+            </div>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="wine/all_wines.html">All Wines</a></li>
+                    <li><a href="/booking/booking.html">Book African Wine Bar</a></li>
+                    <li><a href="wine_farm/wine_farm.html">Tastings Near Me</a></li>
+                    <li><a href="pairings/pairings.html">Pairings</a></li>
+                    <li><a href="contact_us.html">Track Order</a></li>
+                </ul>
+            </nav>
+
+            <div class="top-icons">
+               <a href="/cart/cart.html" class="icon cart-icon">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-badge" style="display: none;">0</span>
+  </a>
+                <a href="user/profile.html" class="icon" id="userIcon">
+                    <i class="fas fa-user" id="userIconElement"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Us Content -->
+    <section class="contact-section">
+        <div class="contact-header">
+            <h1 class="contact-title">Contact Us</h1>
+            <p class="contact-subtitle">We'd love to hear from you! Whether you have questions about our wines, need assistance with an order, or want to provide feedback, our team is here to help.</p>
+        </div>
+
+        <div class="contact-container">
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <div class="contact-details">
+                    <h2 class="form-title">Contact Information</h2>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-content">
+                            <h3>Email Address</h3>
+                            <p><a href="mailto:winebubblesnow@gmail.com">winebubblesnow@gmail.com</a></p>
+                            <p>We strive to respond to all emails within 24 hours</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-content">
+                            <h3>Phone Number</h3>
+                            <p><a href="tel:0812669757">081 266 9757</a></p>
+                            <p>Calls are answered promptly during business hours</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-content">
+                            <h3>Business Hours</h3>
+                            <p>Monday - Sunday: 9:00 AM - 11:00 PM</p>
+                            <p>Our customer support team is available during these hours</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-content">
+                            <h3>Service Area</h3>
+                            <p>Throughout South Africa</p>
+                            <p>We deliver to all major cities and regions across the country</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Contact Form -->
+                <div class="contact-form">
+                    <h2 class="form-title">Send Us a Message</h2>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label class="form-label">Your Name</label>
+                            <input type="text" class="form-input" id="name" placeholder="Enter your name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" id="email" placeholder="Enter your email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <input type="text" class="form-input" id="subject" placeholder="What is this regarding?" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-textarea" id="message" placeholder="How can we help you?" rows="5" required></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span id="btnText">Send Message</span>
+                            <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information Sections -->
+        <div class="content-section">
+            <h2 class="section-title">Customer Support</h2>
+            <div class="section-content">
+                <p>Our dedicated customer support team is available during business hours to assist you with any inquiries, order issues, or feedback. We strive to respond to all emails within 24 hours and phone calls are answered promptly during business hours.</p>
+                <p>Whether you need help with your account, have questions about our services, or want to provide suggestions for improvement, our team is here to listen and help.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title">Order Assistance</h2>
+            <div class="section-content">
+                <p>Need help with an existing order? Have questions about delivery? Contact us immediately and we'll resolve any issues with your wine delivery or booking.</p>
+                <p>Our team can assist with:</p>
+                <ul>
+                    <li>Order tracking and status updates</li>
+                    <li>Delivery scheduling and changes</li>
+                    <li>Payment and billing inquiries</li>
+                    <li>Returns and exchanges</li>
+                    <li>Gift orders and special requests</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title">Product Inquiries</h2>
+            <div class="section-content">
+                <p>Curious about our wine selection? Want to know more about specific vintages or pairing suggestions? Our wine experts are happy to provide recommendations and information about our products.</p>
+                <p>We can help you with:</p>
+                <ul>
+                    <li>Wine recommendations based on your preferences</li>
+                    <li>Food pairing suggestions for different occasions</li>
+                    <li>Information about wine regions and producers</li>
+                    <li>Advice on wine storage and serving</li>
+                    <li>Details about limited edition or special release wines</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title">Feedback & Suggestions</h2>
+            <div class="section-content">
+                <p>We value your feedback! Let us know how we can improve our service, what wines you'd like to see, or any suggestions you have for Wine & Bubbles Now.</p>
+                <p>Your input helps us:</p>
+                <ul>
+                    <li>Improve our customer experience</li>
+                    <li>Expand our wine selection based on customer preferences</li>
+                    <li>Enhance our delivery and service processes</li>
+                    <li>Develop new features and services</li>
+                    <li>Create better promotions and offers</li>
+                </ul>
+                <p>We're constantly working to make Wine & Bubbles Now the best possible experience for our customers, and your feedback is essential to that process.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (Same as homepage) -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+                <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+                <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+                <div class="socials">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-grid">
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="wine/all_wines.html">All Wines</a></li>
+                        <li><a href="wine/wine_cases_list.html">Wine Cases</a></li>
+                        <li><a href="pairings/pairings.html">Pairings</a></li>
+                        <li><a href="wine_farm/wine_farm.html">Tastings</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">&nbsp;</h4>
+                    <ul class="footer-links">
+                        <li><a href="contact_us.html">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="/terms_conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Snackbar for messages -->
+    <div class="snackbar" id="snackbar"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const contactForm = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const snackbar = document.getElementById('snackbar');
+            const userIcon = document.getElementById('userIcon');
+            const userIconElement = document.getElementById('userIconElement');
+            
+            // Check if user is logged in and update top navigation
+            checkAuth();
+            
+            // Form submission
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    await submitContactForm();
+                }
+            });
+            
+            // Functions
+            function checkAuth() {
+                const token = localStorage.getItem('wineBubbles_token');
+                const userData = localStorage.getItem('wineBubbles_user');
+                
+                if (token && userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        updateTopNavigation(user);
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            function updateTopNavigation(user) {
+                if (userIcon && userIconElement) {
+                    // Change to logged in icon
+                    userIconElement.className = 'fas fa-user-check';
+                    userIconElement.style.color = 'var(--maroon)';
+                    
+                    // Update user icon to show dropdown instead of login page
+                    userIcon.href = '#';
+                    userIcon.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleUserDropdown(user);
+                    });
+                    
+                    // Create user dropdown
+                    createUserDropdown(user);
+                }
+            }
+            
+            function toggleUserDropdown(user) {
+                const dropdown = document.querySelector('.user-dropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('show');
+                }
+            }
+            
+            function createUserDropdown(user) {
+                // Remove existing dropdown if any
+                const existingDropdown = document.querySelector('.user-dropdown');
+                if (existingDropdown) {
+                    existingDropdown.remove();
+                }
+                
+                // Create dropdown container
+                const dropdown = document.createElement('div');
+                dropdown.className = 'user-dropdown';
+                
+                // User info
+                const userInfo = document.createElement('div');
+                userInfo.className = 'user-dropdown-info';
+                
+                const userName = document.createElement('div');
+                userName.className = 'user-dropdown-name';
+                userName.textContent = user.fullName || user.email.split('@')[0];
+                
+                const userEmail = document.createElement('div');
+                userEmail.className = 'user-dropdown-email';
+                userEmail.textContent = user.email;
+                
+                userInfo.appendChild(userName);
+                userInfo.appendChild(userEmail);
+                dropdown.appendChild(userInfo);
+                
+                // Dropdown items
+                const items = [
+                    { text: 'My Profile', icon: 'fas fa-user', href: 'profile/profile.html' },
+                    { text: 'Edit Profile', icon: 'fas fa-edit', href: 'profile/edit_profile.html' },
+                    { text: 'Change Password', icon: 'fas fa-lock', href: 'profile/change_password.html' }
+                ];
+                
+                // Add items to dropdown
+                items.forEach(item => {
+                    const link = document.createElement('a');
+                    link.href = item.href;
+                    link.className = 'user-dropdown-link';
+                    link.innerHTML = `
+                        <i class="${item.icon}"></i>
+                        <span>${item.text}</span>
+                    `;
+                    link.addEventListener('mouseenter', () => {
+                        link.style.color = 'var(--maroon)';
+                    });
+                    link.addEventListener('mouseleave', () => {
+                        link.style.color = '#333';
+                    });
+                    dropdown.appendChild(link);
+                });
+                
+                // Logout button
+                const logoutButton = document.createElement('button');
+                logoutButton.className = 'user-dropdown-logout';
+                logoutButton.textContent = 'Logout';
+                logoutButton.addEventListener('click', function() {
+                    clearAuthData();
+                    window.location.href = 'index.html';
+                });
+                
+                dropdown.appendChild(logoutButton);
+                document.body.appendChild(dropdown);
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    const dropdown = document.querySelector('.user-dropdown');
+                    const userIcon = document.getElementById('userIcon');
+                    if (dropdown && !dropdown.contains(event.target) && 
+                        userIcon && !userIcon.contains(event.target)) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+                
+                // Close dropdown on escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        const dropdown = document.querySelector('.user-dropdown');
+                        if (dropdown) {
+                            dropdown.classList.remove('show');
+                        }
+                    }
+                });
+            }
+            
+            function validateForm() {
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const subject = document.getElementById('subject').value.trim();
+                const message = document.getElementById('message').value.trim();
+                
+                // Simple validation
+                if (!name || !email || !subject || !message) {
+                    showSnackbar('Please fill in all fields', 'error');
+                    return false;
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showSnackbar('Please enter a valid email address', 'error');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            async function submitContactForm() {
+                submitBtn.disabled = true;
+                btnText.textContent = 'Sending...';
+                loadingSpinner.style.display = 'inline-block';
+                
+                // Simulate API call (in a real implementation, this would be a fetch to your backend)
+                setTimeout(() => {
+                    // Get form data
+                    const name = document.getElementById('name').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const subject = document.getElementById('subject').value.trim();
+                    const message = document.getElementById('message').value.trim();
+                    
+                    // Show success message
+                    showSnackbar('Message sent successfully! We\'ll get back to you soon.', 'success');
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    btnText.textContent = 'Send Message';
+                    loadingSpinner.style.display = 'none';
+                    
+                    // In a real implementation, you would send the data to your server:
+                    /*
+                    fetch('https://your-api-endpoint.com/contact', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            subject: subject,
+                            message: message,
+                            timestamp: new Date().toISOString()
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Handle response
+                    })
+                    .catch(error => {
+                        // Handle error
+                    });
+                    */
+                    
+                }, 1500);
+            }
+            
+            function showSnackbar(message, type = 'success') {
+                snackbar.textContent = message;
+                snackbar.className = 'snackbar';
+                
+                if (type === 'error') {
+                    snackbar.classList.add('error');
+                } else if (type === 'success') {
+                    snackbar.classList.add('success');
+                }
+                
+                snackbar.classList.add('show');
+                
+                setTimeout(() => {
+                    snackbar.classList.remove('show');
+                }, 3000);
+            }
+            
+            function clearAuthData() {
+                const authKeys = [
+                    'wineBubbles_token',
+                    'wineBubbles_user'
+                ];
+                authKeys.forEach(key => localStorage.removeItem(key));
+            }
+        });
+    </script>
+</body>
+</html>

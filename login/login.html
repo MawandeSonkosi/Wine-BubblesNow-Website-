@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Wine & Bubbles Now</title>
+    
+    <!-- Same as homepage -->
+    <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+    <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
+    <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Import homepage variables */
+        :root {
+            --maroon: #6b0d2b;
+            --beige: #eadfcf;
+            --muted: #6d6d6d;
+            --card-dark: #363636;
+            --card-round: 12px;
+            --max-width: 1180px;
+            --error: #ff4444;
+            --success: #4CAF50;
+        }
+
+        /* Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0 }
+        html, body { height: 100%; font-family: 'Montserrat', sans-serif; color: #222; background: #fff }
+        a { text-decoration: none; color: inherit }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px }
+
+        /* ---------- TOPBAR (Two Sections) ---------- */
+        .topbar-top {
+            background: var(--maroon);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .topbar-top-inner {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .topbar-main {
+            background: #fff;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .topbar-main-inner {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .logo img { height: 70px; }
+
+        .main-nav ul {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        .main-nav a {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+
+        .main-nav a:hover { color: var(--maroon); }
+
+        .top-icons {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .top-icons .icon {
+            color: #333;
+            font-size: 20px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .top-icons .icon:hover { color: var(--maroon); }
+
+        /* Login Section Styles */
+        .login-section {
+            padding: 60px 0;
+            min-height: calc(100vh - 260px);
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            max-width: 520px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, var(--maroon) 0%, #8a1e3d 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 30px;
+            top: 30px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .login-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .login-content {
+            padding: 40px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-img {
+            height: 45px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            background-color: #f9f9f9;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            color: #333;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--maroon);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(107, 13, 43, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #999;
+            font-size: 15px;
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--maroon);
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+        }
+        
+        .password-toggle:hover {
+            opacity: 1;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+            accent-color: var(--maroon);
+        }
+        
+        .remember-me label {
+            font-size: 14px;
+            color: var(--muted);
+            cursor: pointer;
+        }
+        
+        .forgot-link {
+            color: var(--maroon);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .forgot-link:hover {
+            color: #8a1e3d;
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--maroon);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .submit-btn:hover {
+            background: #8a1e3d;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(107, 13, 43, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+        
+        .signup-link .muted {
+            color: var(--muted);
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .signup-link a {
+            color: var(--maroon);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+        
+        .signup-link a:hover {
+            color: #8a1e3d;
+            text-decoration: underline;
+        }
+
+        .error-message, .success-message {
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .input-error {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 5px;
+            margin-left: 4px;
+            display: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Snackbar */
+        .snackbar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--maroon);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 500;
+            z-index: 1001;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(107, 13, 43, 0.3);
+        }
+
+        .snackbar.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .snackbar.error {
+            background: var(--error);
+        }
+
+        .snackbar.success {
+            background: var(--success);
+        }
+
+        /* FOOTER (Same as homepage) */
+        .footer {
+            background: var(--maroon);
+            color: #fff;
+            padding: 50px 0;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .footer-logo {
+            height: 65px;
+            margin-bottom: 15px;
+        }
+
+        .brand-tagline {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .brand-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+        }
+
+        .socials {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .social-icon:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+
+        .social-icon i {
+            font-size: 18px;
+        }
+
+        .footer-links-grid {
+            display: flex;
+            gap: 60px;
+        }
+
+        .footer-links-column {
+            flex: 1;
+        }
+
+        .footer-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-header {
+                padding: 30px 20px;
+            }
+
+            .login-title {
+                font-size: 28px;
+            }
+
+            .back-button {
+                left: 20px;
+                top: 20px;
+            }
+
+            .login-content {
+                padding: 30px 20px;
+            }
+
+            .form-input {
+                padding: 14px;
+            }
+
+            .submit-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 35px;
+            }
+
+            .footer-links-grid {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .topbar-main {
+                height: 80px;
+                padding: 10px 0;
+            }
+
+            .logo img {
+                height: 50px;
+            }
+
+            .main-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .login-section {
+                padding: 40px 0;
+            }
+
+            .login-container {
+                margin: 0 10px;
+            }
+
+            .topbar-main {
+                height: 70px;
+                padding: 8px 0;
+            }
+
+            .logo img {
+                height: 40px;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOP BAR (Same as homepage) -->
+    <div class="topbar-top">
+        <div class="topbar-top-inner">
+            <!-- Empty as requested -->
+        </div>
+    </div>
+
+    <div class="topbar-main">
+        <div class="topbar-main-inner">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+                </a>
+            </div>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="../wine/all_wines.html">All Wines</a></li>
+                    <li><a href="#">Book African Wine Bar</a></li>
+                    <li><a href="../wine_farm/wine_farm.html">Tastings Near Me</a></li>
+                    <li><a href="../pairings/pairings.html">Pairings</a></li>
+                    <li><a href="#">Track Order</a></li>
+                </ul>
+            </nav>
+
+            <div class="top-icons">
+                <a href="../cart/cart.html" class="icon" id="cartIcon">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="../user/profile.html" class="icon" id="userIcon">
+                    <i class="fas fa-sign-in-alt" id="userIconElement"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Content -->
+    <section class="login-section">
+        <div class="login-container">
+            <div class="login-header">
+                <button class="back-button" id="backButton">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="login-title">Welcome Back!</h1>
+                <div class="login-subtitle">Sign in to continue</div>
+            </div>
+
+            <div class="login-content">
+                
+
+                <!-- Error Message -->
+                <div class="error-message" id="errorMessage"></div>
+
+                <!-- Login Form -->
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            class="form-input" 
+                            placeholder="Email"
+                            required
+                        >
+                        <div class="input-error" id="emailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="password-input">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                class="form-input" 
+                                placeholder="Password"
+                                required
+                            >
+                            <button type="button" class="password-toggle" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="input-error" id="passwordError"></div>
+                    </div>
+
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="forgot_password.html" class="forgot-link" id="forgotPasswordLink">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span id="btnText">LOG IN</span>
+                        <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+                    </button>
+                </form>
+
+                <!-- Signup Link -->
+                <div class="signup-link">
+                    <p class="muted">Don't have an account? <a href="register.html" id="signupLink">SIGN UP</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (Same as homepage) -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="../assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+                <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+                <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+                <div class="socials">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-grid">
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="../wine/all_wines.html">All Wines</a></li>
+                        <li><a href="../wine/wine_cases_list.html">Wine Cases</a></li>
+                        <li><a href="../pairings/pairings.html">Pairings</a></li>
+                        <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">&nbsp;</h4>
+                    <ul class="footer-links">
+                        <li><a href="/contact_us.html">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="/terms_conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Snackbar for messages -->
+    <div class="snackbar" id="snackbar"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const backButton = document.getElementById('backButton');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const togglePassword = document.getElementById('togglePassword');
+            const rememberMe = document.getElementById('rememberMe');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const loginForm = document.getElementById('loginForm');
+            const errorMessage = document.getElementById('errorMessage');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const snackbar = document.getElementById('snackbar');
+            
+            // API Configuration
+            const API_BASE_URL = 'http://localhost:3000/api';
+            
+            // Check if user is already logged in
+            checkAuth();
+            
+            // Back button functionality
+            backButton.addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // Toggle password visibility
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            });
+            
+            // Forgot password link
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Redirect to forgot password page
+                window.location.href = 'forgot_password.html';
+            });
+            
+            // Form submission
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    await login();
+                }
+            });
+            
+            // Functions
+            function checkAuth() {
+                const token = localStorage.getItem('wineBubbles_token');
+                const userData = localStorage.getItem('wineBubbles_user');
+                
+                if (token && userData) {
+                    // Already logged in, redirect to home
+                    window.location.href = '../index.html';
+                    return;
+                }
+            }
+            
+            function validateForm() {
+                let isValid = true;
+                
+                // Clear previous errors
+                emailError.style.display = 'none';
+                passwordError.style.display = 'none';
+                errorMessage.style.display = 'none';
+                
+                // Email validation
+                const email = emailInput.value.trim();
+                if (!email) {
+                    emailError.textContent = 'Email is required';
+                    emailError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        emailError.textContent = 'Enter a valid email address';
+                        emailError.style.display = 'block';
+                        isValid = false;
+                    }
+                }
+                
+                // Password validation
+                const password = passwordInput.value.trim();
+                if (!password) {
+                    passwordError.textContent = 'Password is required';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                } else if (password.length < 6) {
+                    passwordError.textContent = 'Password must be at least 6 characters';
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            async function login() {
+                submitBtn.disabled = true;
+                btnText.textContent = 'Logging in...';
+                loadingSpinner.style.display = 'inline-block';
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: emailInput.value.trim(),
+                            password: passwordInput.value.trim()
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Login successful
+                        showMessage('Login successful!', 'success');
+                        
+                        // Store token and user data
+                        localStorage.setItem('wineBubbles_token', data.token);
+                        localStorage.setItem('wineBubbles_user', JSON.stringify(data.user));
+                        
+                        // Store additional user info if available
+                        if (data.user.fullName) {
+                            localStorage.setItem('wineBubbles_userFullName', data.user.fullName);
+                        }
+                        if (data.user.email) {
+                            localStorage.setItem('wineBubbles_userEmail', data.user.email);
+                        }
+                        if (data.user.phoneNumber) {
+                            localStorage.setItem('wineBubbles_userPhone', data.user.phoneNumber);
+                        }
+                        if (data.user.isAdmin) {
+                            localStorage.setItem('wineBubbles_isAdmin', data.user.isAdmin);
+                        }
+                        if (data.user.isDriver) {
+                            localStorage.setItem('wineBubbles_isDriver', data.user.isDriver);
+                        }
+                        
+                        // Store timestamp for token
+                        localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
+                        
+                        // Redirect to home page after delay
+                        setTimeout(() => {
+                            window.location.href = '../index.html';
+                        }, 1500);
+                        
+                    } else {
+                        throw new Error(data.message || 'Login failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    errorMessage.textContent = error.message || 'Login failed. Please try again.';
+                    errorMessage.style.display = 'block';
+                    showSnackbar(error.message || 'Login failed', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    btnText.textContent = 'LOG IN';
+                    loadingSpinner.style.display = 'none';
+                }
+            }
+            
+            function showMessage(message, type = 'success') {
+                errorMessage.textContent = message;
+                errorMessage.className = type === 'error' ? 'error-message' : 'success-message';
+                errorMessage.style.display = 'block';
+                
+                if (type === 'success') {
+                    showSnackbar(message, 'success');
+                }
+            }
+            
+            function showSnackbar(message, type = 'success') {
+                snackbar.textContent = message;
+                snackbar.className = 'snackbar';
+                
+                if (type === 'error') {
+                    snackbar.classList.add('error');
+                } else if (type === 'success') {
+                    snackbar.classList.add('success');
+                }
+                
+                snackbar.classList.add('show');
+                
+                setTimeout(() => {
+                    snackbar.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

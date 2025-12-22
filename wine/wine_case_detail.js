@@ -22,9 +22,19 @@ const filterBtn = document.getElementById('filterBtn');
 const filterDropdown = document.getElementById('filterDropdown');
 const wineCaseTypeElement = document.getElementById('wineCaseType');
 
+// Cart Utilities
+let cartUtils = null;
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📦 Wine Case Detail page loaded');
+  
+  // Initialize cart utils
+  waitForCartUtils(() => {
+    cartUtils = window.CartUtils;
+    console.log('✅ CartUtils loaded successfully');
+    updateCartBadge();
+  });
   
   // Get wine ID from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -38,8 +48,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   setupEventListeners();
-  updateCartBadge();
 });
+
+// Wait for CartUtils to load
+function waitForCartUtils(callback) {
+  const maxAttempts = 20;
+  let attempts = 0;
+  
+  const check = () => {
+    attempts++;
+    if (window.CartUtils && typeof window.CartUtils.getCart === 'function') {
+      console.log('✅ CartUtils loaded successfully after', attempts, 'attempts');
+      callback();
+    } else if (attempts >= maxAttempts) {
+      console.error('❌ CartUtils failed to load after', maxAttempts, 'attempts');
+      showToast('Cart system not available', 'error');
+    } else {
+      console.log(`⏳ Waiting for CartUtils... (attempt ${attempts})`);
+      setTimeout(check, 250);
+    }
+  };
+  
+  check();
+}
 
 // Event Listeners
 function setupEventListeners() {
@@ -70,6 +101,11 @@ function setupEventListeners() {
     if (filterDropdown && !event.target.closest('.filter-dropdown')) {
       filterDropdown.style.display = 'none';
     }
+  });
+  
+  // Listen for cart updates
+  window.addEventListener('cartUpdated', () => {
+    updateCartBadge();
   });
 }
 
@@ -340,52 +376,42 @@ function updateQuantityDisplay() {
   // Plus button is never disabled - NO LIMIT
 }
 
-// Add to cart (as wine case)
+// Add to cart (as wine case) - UPDATED to use CartUtils
 function addToCart() {
   if (!currentWine) return;
+  
+  if (!cartUtils) {
+    showToast('Cart system not available', 'error');
+    return;
+  }
   
   if (currentWine.stockCount <= 0) {
     showToast(`${currentWine.name} case is out of stock`, 'error');
     return;
   }
   
-  // Get current cart from localStorage
-  let cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
-  
   // Calculate case price (6 bottles per case)
   const casePrice = (currentWine.price * 6).toFixed(2);
   
-  // Check if wine case already in cart
-  const itemId = `case_${currentWine.id}`;
-  const existingIndex = cart.findIndex(item => item.id === itemId);
+  // Create wine case item with CartUtils compatible structure
+  const wineCaseItem = {
+    id: `case_${currentWine.id}`,
+    name: `${currentWine.name} Case`,
+    price: parseFloat(casePrice),
+    type: 'wine', // Important: must be 'wine' type for CartUtils to handle it correctly
+    category: currentWine.category,
+    imageUrl: currentWine.imageUrl,
+    description: currentWine.description || `Case of 6 bottles of ${currentWine.name}`,
+    quantity: quantity,
+    isCase: true,
+    pricePerBottle: currentWine.price // For cart calculations
+  };
   
-  if (existingIndex > -1) {
-    // Update quantity
-    cart[existingIndex].quantity += quantity;
-  } else {
-    // Add new wine case item
-    cart.push({
-      id: itemId,
-      name: `${currentWine.name} Case`,
-      price: parseFloat(casePrice),
-      imageUrl: currentWine.imageUrl,
-      type: `${currentWine.type} Case`,
-      category: currentWine.category,
-      quantity: quantity,
-      isCase: true,
-      bottleCount: 6 * quantity,
-      singleBottlePrice: currentWine.price
-    });
-  }
-  
-  // Save to localStorage
-  localStorage.setItem('wine_cart', JSON.stringify(cart));
-  
-  // Update cart badge in top navigation
-  updateCartBadge();
+  // Add to cart using CartUtils
+  cartUtils.addItem(wineCaseItem);
   
   // Show success message
-  showToast(`Added ${quantity} ${currentWine.name} case${quantity > 1 ? 's' : ''} to cart (${6 * quantity} bottles total)`);
+  showToast(`Added ${quantity} ${currentWine.name} case${quantity > 1 ? 's' : ''} to cart (${6 * quantity} bottles total)`, 'success');
   
   // Reset quantity
   quantity = 1;
@@ -394,15 +420,20 @@ function addToCart() {
 
 // Update cart badge in top navigation
 function updateCartBadge() {
-  const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  
-  // Update cart badges in top navigation
-  const cartBadges = document.querySelectorAll('.cart-badge');
-  cartBadges.forEach(badge => {
-    badge.textContent = totalItems;
-    badge.style.display = totalItems > 0 ? 'flex' : 'none';
-  });
+  if (cartUtils) {
+    cartUtils.updateCartBadge();
+  } else {
+    // Fallback if CartUtils not loaded yet
+    const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Update cart badges in top navigation
+    const cartBadges = document.querySelectorAll('.cart-badge');
+    cartBadges.forEach(badge => {
+      badge.textContent = totalItems;
+      badge.style.display = totalItems > 0 ? 'flex' : 'none';
+    });
+  }
 }
 
 // Show related wine cases (optional - you can remove this if not needed)

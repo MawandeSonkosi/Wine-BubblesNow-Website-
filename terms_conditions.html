@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - Wine & Bubbles Now</title>
+    
+    <!-- Same as homepage -->
+    <link rel="icon" type="image/png" href="assets/categories/Icons.png">
+    <link rel="shortcut icon" href="assets/categories/Icons.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/categories/Icons.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="/cart/cart-utils.js"></script>
+
+    <style>
+        /* Import homepage variables */
+        :root {
+            --maroon: #6b0d2b;
+            --beige: #eadfcf;
+            --muted: #6d6d6d;
+            --card-dark: #363636;
+            --card-round: 12px;
+            --max-width: 1180px;
+        }
+
+        /* Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0 }
+        html, body { height: 100%; font-family: 'Montserrat', sans-serif; color: #222; background: #fff }
+        a { text-decoration: none; color: inherit }
+        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px }
+
+        /* ---------- TOPBAR (Two Sections) ---------- */
+        .topbar-top {
+            background: var(--maroon);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .topbar-top-inner {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .topbar-main {
+            background: #fff;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .topbar-main-inner {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        .logo img { height: 70px; }
+
+        .main-nav ul {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        .main-nav a {
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+
+        .main-nav a:hover { color: var(--maroon); }
+
+        .top-icons {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .top-icons .icon {
+            color: #333;
+            font-size: 20px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .top-icons .icon:hover { color: var(--maroon); }
+
+        /* Terms & Conditions Section Styles */
+        .terms-section {
+            padding: 60px 0;
+            min-height: calc(100vh - 260px);
+            background: #fafafa;
+        }
+
+        .terms-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .terms-header {
+            background: linear-gradient(135deg, var(--maroon) 0%, #8a1e3d 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .terms-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .terms-content {
+            padding: 50px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .welcome-note {
+            font-size: 18px;
+            color: var(--maroon);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--maroon);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .subsection {
+            margin-bottom: 25px;
+        }
+
+        .subsection-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .subsection-content {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .subsection-content p {
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            color: var(--maroon);
+            font-weight: 600;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        /* Company Info Section */
+        .company-info {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 50px;
+            border-left: 4px solid var(--maroon);
+        }
+
+        .company-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: var(--maroon);
+            margin-bottom: 15px;
+        }
+
+        .company-details {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* FOOTER (Same as homepage) */
+        .footer {
+            background: var(--maroon);
+            color: #fff;
+            padding: 50px 0;
+            margin-top: 20px;
+        }
+
+        .footer-inner {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .footer-logo {
+            height: 65px;
+            margin-bottom: 15px;
+        }
+
+        .brand-tagline {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .brand-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+        }
+
+        .socials {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .social-icon:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+
+        .social-icon i {
+            font-size: 18px;
+        }
+
+        .footer-links-grid {
+            display: flex;
+            gap: 60px;
+        }
+
+        .footer-links-column {
+            flex: 1;
+        }
+
+        .footer-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .terms-header {
+                padding: 40px 30px;
+            }
+
+            .terms-title {
+                font-size: 32px;
+            }
+
+            .terms-content {
+                padding: 40px 30px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .subsection-title {
+                font-size: 18px;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                gap: 35px;
+            }
+
+            .footer-links-grid {
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .topbar-main {
+                height: 80px;
+                padding: 10px 0;
+            }
+
+            .logo img {
+                height: 50px;
+            }
+
+            .main-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .terms-section {
+                padding: 40px 0;
+            }
+
+            .terms-container {
+                margin: 0 15px;
+            }
+
+            .terms-title {
+                font-size: 28px;
+            }
+
+            .terms-content {
+                padding: 30px 20px;
+            }
+
+            .breadcrumb {
+                flex-wrap: wrap;
+                font-size: 13px;
+            }
+
+            .topbar-main {
+                height: 70px;
+                padding: 8px 0;
+            }
+
+            .logo img {
+                height: 40px;
+            }
+
+            .company-info {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .terms-title {
+                font-size: 24px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .subsection-title {
+                font-size: 17px;
+            }
+
+            .welcome-note {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOP BAR (Same as homepage) -->
+    <div class="topbar-top">
+        <div class="topbar-top-inner">
+            <!-- Empty as requested -->
+        </div>
+    </div>
+
+    <div class="topbar-main">
+        <div class="topbar-main-inner">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="assets/categories/Logo_Top.png" alt="Wine & Bubbles Now Logo">
+                </a>
+            </div>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="wine/all_wines.html">All Wines</a></li>
+                    <li><a href="/booking/booking.html">Book African Wine Bar</a></li>
+                    <li><a href="wine_farm/wine_farm.html">Tastings Near Me</a></li>
+                    <li><a href="pairings/pairings.html">Pairings</a></li>
+                    <li><a href="contact_us.html">Contact Us</a></li>
+                </ul>
+            </nav>
+
+            <div class="top-icons">
+              <a href="/cart/cart.html" class="icon cart-icon">
+    <i class="fas fa-shopping-cart"></i>
+    <span class="cart-badge" style="display: none;">0</span>
+  </a>
+                <a href="user/profile.html" class="icon" id="userIcon">
+                    <i class="fas fa-user" id="userIconElement"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Content -->
+    <section class="terms-section">
+        <div class="terms-container">
+            <div class="terms-header">
+                <h1 class="terms-title">Terms & Conditions</h1>
+                <div class="breadcrumb">
+                    <a href="index.html">HOME</a>
+                    <span>|</span>
+                    <a href="privacy_policy.html">PRIVACY POLICY</a>
+                    <span>|</span>
+                    <span>TERMS & CONDITIONS</span>
+                    <span>|</span>
+                    <a href="about_us.html">ABOUT US</a>
+                    <span>|</span>
+                    <a href="contact_us.html">CONTACT US</a>
+                </div>
+            </div>
+
+            <div class="terms-content">
+                <div class="welcome-note">
+                    Welcome to Wine & Bubbles Now. These Terms and Conditions outline the rules and regulations for using our website and engaging with our products and services. By accessing this website, you accept these Terms and Conditions in full. If you disagree with any part, please discontinue use of the website immediately.
+                </div>
+
+                <!-- Section I: Introduction -->
+                <div class="section">
+                    <h2 class="section-title">I. Introduction</h2>
+                    <div class="subsection">
+                        <div class="subsection-content">
+                            <p>Wine & Bubbles Now is a brand that values quality, excellence, and exclusivity. Through this platform, we provide information and access to our products, particularly our range of exclusive wines crafted in South Africa.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section II: Use of the Website -->
+                <div class="section">
+                    <h2 class="section-title">II. Use of the Website</h2>
+                    
+                    <div class="subsection">
+                        <h3 class="subsection-title">2.1. Eligibility</h3>
+                        <div class="subsection-content">
+                            <p>To use this website, you must be at least 18 years old or the legal drinking age in your country of residence. By using the website, you confirm that you meet this requirement.</p>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">2.2. Content Ownership</h3>
+                        <div class="subsection-content">
+                            <p>All content, images, and text on this website are the intellectual property of <span class="highlight">Wine & Bubbles Now</span> unless otherwise stated. Unauthorized use, reproduction, or redistribution is prohibited without prior written consent.</p>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">2.3. Prohibited Actions</h3>
+                        <div class="subsection-content">
+                            <ul>
+                                <li>Using the website for fraudulent activities.</li>
+                                <li>Attempting to interfere with the website's functionality.</li>
+                                <li>Accessing or collecting data from the website without authorization.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section III: Products and Orders -->
+                <div class="section">
+                    <h2 class="section-title">III. Products and Orders</h2>
+                    
+                    <div class="subsection">
+                        <h3 class="subsection-title">3.1. Product Availability</h3>
+                        <div class="subsection-content">
+                            <p>The availability of our wines is subject to stock levels and may vary. We reserve the right to modify or discontinue any product without prior notice.</p>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">3.2. Order Process</h3>
+                        <div class="subsection-content">
+                            <p>Orders placed through our website are considered an offer to purchase. We reserve the right to accept or decline orders at our discretion.</p>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">3.3. Pricing</h3>
+                        <div class="subsection-content">
+                            <p>All prices listed on our website are in South African Rand (ZAR) and are subject to change without notice. Taxes and delivery charges may apply and will be clearly stated at checkout.</p>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">3.4. Delivery</h3>
+                        <div class="subsection-content">
+                            <p>We deliver within South Africa and selected international locations. Delivery times and costs vary depending on your location and will be provided during the checkout process.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section IV: Returns and Refunds -->
+                <div class="section">
+                    <h2 class="section-title">IV. Returns and Refunds</h2>
+                    
+                    <div class="subsection">
+                        <h3 class="subsection-title">4.1. Returns</h3>
+                        <div class="subsection-content">
+                            <p>Due to the nature of our products, we can only accept returns for defective or damaged items. Proof of purchase and photographic evidence may be required.</p>
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <h3 class="subsection-title">4.2. Refunds</h3>
+                        <div class="subsection-content">
+                            <p>Refunds will be processed only for valid returns as per the above condition and will be credited to the original payment method within 7-14 business days.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section V: Privacy Policy -->
+                <div class="section">
+                    <h2 class="section-title">V. Privacy Policy</h2>
+                    <div class="subsection">
+                        <div class="subsection-content">
+                            <p>We are committed to protecting your privacy. Any personal information collected on this website will be used solely for the purpose of processing orders and improving your shopping experience. For more information, refer to our <a href="privacy_policy.html" class="highlight">Privacy Policy</a>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section VI: Limitation of Liability -->
+                <div class="section">
+                    <h2 class="section-title">VI. Limitation of Liability</h2>
+                    <div class="subsection">
+                        <div class="subsection-content">
+                            <p><span class="highlight">Wine & Bubbles Now</span> is not liable for:</p>
+                            <ul>
+                                <li>Indirect or consequential damages arising from the use of our website or products.</li>
+                                <li>Delays or failure to perform our obligations due to events beyond our control, such as natural disasters or transportation issues.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section VII: Governing Law -->
+                <div class="section">
+                    <h2 class="section-title">VII. Governing Law</h2>
+                    <div class="subsection">
+                        <div class="subsection-content">
+                            <p>These Terms and Conditions are governed by and construed in accordance with the laws of South Africa. Any disputes arising will be subject to the exclusive jurisdiction of the South African courts.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section VIII: Changes to Terms and Conditions -->
+                <div class="section">
+                    <h2 class="section-title">VIII. Changes to Terms and Conditions</h2>
+                    <div class="subsection">
+                        <div class="subsection-content">
+                            <p>We may update these Terms and Conditions periodically. Continued use of the website implies acceptance of any changes. Please review them regularly to stay informed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Information -->
+                <div class="company-info">
+                    <div class="company-name">Wine & Bubbles Now</div>
+                    <div class="company-details">
+                        <p>We're dedicated to bringing you the finest selection of wines with exceptional service throughout South Africa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER (Same as homepage) -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Now Logo" class="footer-logo">
+                <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+                <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+                <div class="socials">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-grid">
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="wine/all_wines.html">All Wines</a></li>
+                        <li><a href="wine/wine_cases_list.html">Wine Cases</a></li>
+                        <li><a href="pairings/pairings.html">Pairings</a></li>
+                        <li><a href="wine_farm/wine_farm.html">Tastings</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">&nbsp;</h4>
+                    <ul class="footer-links">
+                        <li><a href="contact_us.html">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="terms_conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>PRIVACY POLICY | TERMS & CONDITIONS | © 2024 WINE & BUBBLES NOW</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const userIcon = document.getElementById('userIcon');
+            const userIconElement = document.getElementById('userIconElement');
+            
+            // Check if user is logged in and update top navigation
+            checkAuth();
+            
+            // Functions
+            function checkAuth() {
+                const token = localStorage.getItem('wineBubbles_token');
+                const userData = localStorage.getItem('wineBubbles_user');
+                
+                if (token && userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        updateTopNavigation(user);
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            }
+            
+            function updateTopNavigation(user) {
+                if (userIcon && userIconElement) {
+                    // Change to logged in icon
+                    userIconElement.className = 'fas fa-user-check';
+                    userIconElement.style.color = 'var(--maroon)';
+                    
+                    // Update user icon to show dropdown instead of login page
+                    userIcon.href = '#';
+                    userIcon.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleUserDropdown(user);
+                    });
+                    
+                    // Create user dropdown
+                    createUserDropdown(user);
+                }
+            }
+            
+            function toggleUserDropdown(user) {
+                const dropdown = document.querySelector('.user-dropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('show');
+                }
+            }
+            
+            function createUserDropdown(user) {
+                // Remove existing dropdown if any
+                const existingDropdown = document.querySelector('.user-dropdown');
+                if (existingDropdown) {
+                    existingDropdown.remove();
+                }
+                
+                // Create dropdown container
+                const dropdown = document.createElement('div');
+                dropdown.className = 'user-dropdown';
+                
+                // User info
+                const userInfo = document.createElement('div');
+                userInfo.className = 'user-dropdown-info';
+                
+                const userName = document.createElement('div');
+                userName.className = 'user-dropdown-name';
+                userName.textContent = user.fullName || user.email.split('@')[0];
+                
+                const userEmail = document.createElement('div');
+                userEmail.className = 'user-dropdown-email';
+                userEmail.textContent = user.email;
+                
+                userInfo.appendChild(userName);
+                userInfo.appendChild(userEmail);
+                dropdown.appendChild(userInfo);
+                
+                // Dropdown items
+                const items = [
+                    { text: 'My Profile', icon: 'fas fa-user', href: 'profile/profile.html' },
+                    { text: 'Edit Profile', icon: 'fas fa-edit', href: 'profile/edit_profile.html' },
+                    { text: 'Change Password', icon: 'fas fa-lock', href: 'profile/change_password.html' }
+                ];
+                
+                // Add items to dropdown
+                items.forEach(item => {
+                    const link = document.createElement('a');
+                    link.href = item.href;
+                    link.className = 'user-dropdown-link';
+                    link.innerHTML = `
+                        <i class="${item.icon}"></i>
+                        <span>${item.text}</span>
+                    `;
+                    link.addEventListener('mouseenter', () => {
+                        link.style.color = 'var(--maroon)';
+                    });
+                    link.addEventListener('mouseleave', () => {
+                        link.style.color = '#333';
+                    });
+                    dropdown.appendChild(link);
+                });
+                
+                // Logout button
+                const logoutButton = document.createElement('button');
+                logoutButton.className = 'user-dropdown-logout';
+                logoutButton.textContent = 'Logout';
+                logoutButton.addEventListener('click', function() {
+                    clearAuthData();
+                    window.location.href = 'index.html';
+                });
+                
+                dropdown.appendChild(logoutButton);
+                document.body.appendChild(dropdown);
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    const dropdown = document.querySelector('.user-dropdown');
+                    const userIcon = document.getElementById('userIcon');
+                    if (dropdown && !dropdown.contains(event.target) && 
+                        userIcon && !userIcon.contains(event.target)) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+                
+                // Close dropdown on escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        const dropdown = document.querySelector('.user-dropdown');
+                        if (dropdown) {
+                            dropdown.classList.remove('show');
+                        }
+                    }
+                });
+            }
+            
+            function clearAuthData() {
+                const authKeys = [
+                    'wineBubbles_token',
+                    'wineBubbles_user'
+                ];
+                authKeys.forEach(key => localStorage.removeItem(key));
+            }
+        });
+    </script>
+</body>
+</html>
