@@ -937,6 +937,73 @@ app.post('/api/email/send-delivery-confirmation', async (req, res) => {
         });
     }
 });
+// Get single delivery by ID
+app.get('/api/deliveries/:id', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        console.log('📄 Getting delivery by ID:', req.params.id);
+        
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        };
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`${BACKEND_URL}/api/deliveries/${req.params.id}`, {
+            method: 'GET',
+            headers: headers
+        });
+        
+        const data = await response.json();
+        console.log(`📤 Delivery by ID response: ${response.status}`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Delivery by ID proxy error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch delivery',
+            error: error.message
+        });
+    }
+});// Get single delivery by ID
+app.get('/api/deliveries/:id', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        console.log('📄 Getting delivery by ID:', req.params.id);
+        
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        };
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`${BACKEND_URL}/api/deliveries/${req.params.id}`, {
+            method: 'GET',
+            headers: headers
+        });
+        
+        const data = await response.json();
+        console.log(`📤 Delivery by ID response: ${response.status}`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Delivery by ID proxy error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch delivery',
+            error: error.message
+        });
+    }
+});
 
 // ============ CATCH-ALL ROUTE ============
 
