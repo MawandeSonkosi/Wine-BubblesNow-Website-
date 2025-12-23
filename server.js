@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
@@ -8,15 +9,16 @@ const BACKEND_URL = 'https://www.wineandbubblesnow.co.za';
 // Dynamic import for node-fetch
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-// CORS Configuration
 const allowedOrigins = [
   'https://www.wineandbubblesnow.co.za',
   'https://wineandbubblesnow.co.za',
   'http://localhost:3000',
   'capacitor://localhost',
-  'ionic://localhost'
+  'ionic://localhost',
+  // Add Railway domains
+  'https://*.up.railway.app',
+  'http://*.up.railway.app'
 ];
-
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -34,8 +36,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
 app.use(express.static(__dirname));
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -1197,18 +1199,23 @@ app.get('/api/test/wines', async (req, res) => {
 
 // Catch-all route for SPA - serve index.html for non-API routes
 app.get('*', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ 
-            error: 'API endpoint not found',
-            path: req.path,
-            method: req.method,
-            timestamp: new Date().toISOString()
-        });
-    }
-    
-    // For all other routes, let static middleware handle it
-    next();
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ 
+      error: 'API endpoint not found',
+      path: req.path,
+      method: req.method,
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  // Try to serve static file first
+  if (express.static.mime.lookup(req.path)) {
+    return next();
+  }
+  
+  // Otherwise serve index.html for SPA routing
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Error handling
