@@ -1,35 +1,52 @@
-// server.js - IN ROOT DIRECTORY
 const express = require('express');
 const cors = require('cors');
-const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const BACKEND_URL = 'https://www.wineandbubblesnow.co.za';
 
-// Middleware
+// Dynamic import for node-fetch
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+// CORS Configuration
+const allowedOrigins = [
+  'https://www.wineandbubblesnow.co.za',
+  'https://wineandbubblesnow.co.za',
+  'http://localhost:3000',
+  'capacitor://localhost',
+  'ionic://localhost'
+];
+
 app.use(cors({
-    origin: '*',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH, OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin']
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked: ${origin}`);
+      callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin']
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from current directory
+// Serve static files
 app.use(express.static(__dirname));
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        message: 'Wine & Bubbles Website Server',
-        backend: BACKEND_URL,
-        timestamp: new Date().toISOString()
-    });
+  res.json({
+    status: 'ok',
+    message: 'Wine & Bubbles Website Server',
+    backend: BACKEND_URL,
+    timestamp: new Date().toISOString()
+  });
 });
+
 
 // Test backend connection
 app.get('/api/test-backend', async (req, res) => {

@@ -21,6 +21,129 @@
   <link rel="stylesheet" href="wine_farm_detail.css">
   <script src="/cart/cart-utils.js"></script>
 
+  <!-- Profile Dropdown Styles - ADDED -->
+  <style>
+    /* Profile Dropdown Styles - MATCHES HOMEPAGE */
+    .user-dropdown {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 16px;
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+      border: 1px solid #eee;
+    }
+    
+    .user-dropdown.show {
+      display: block !important;
+    }
+    
+    .user-dropdown a:hover {
+      color: #6b0d2b !important;
+    }
+    
+    .top-icons a {
+      position: relative;
+    }
+    
+    /* Login icon style */
+    .fas.fa-sign-in-alt {
+      color: #6b0d2b !important;
+    }
+    
+    .fas.fa-user-check {
+      color: #6b0d2b !important;
+    }
+    
+    .user-dropdown-info {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .user-dropdown-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .user-dropdown-email {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .user-dropdown-link {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    
+    .user-dropdown-link i {
+      margin-right: 8px;
+      width: 20px;
+    }
+    
+    .user-dropdown-logout {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #6b0d2b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .user-dropdown-logout:hover {
+      background: #8a1e3d;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      .user-dropdown {
+        position: fixed;
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+      }
+    }
+    
+    /* Admin badge */
+    .admin-badge {
+      display: inline-block;
+      background: #6b0d2b;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    /* Driver badge */
+    .driver-badge {
+      display: inline-block;
+      background: #1e6b0d;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
 </head>
 <body>
   <!-- Top bar with two sections -->
@@ -40,7 +163,7 @@
 
       <nav class="main-nav">
         <ul>
-           <li><a href="../wine/all_wines.html">All Wines</a></li>
+          <li><a href="../wine/all_wines.html">All Wines</a></li>
           <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
           <li><a href="wine_farm.html">Tastings Near Me</a></li>
           <li><a href="../pairings/pairings.html">Pairings</a></li>
@@ -50,11 +173,11 @@
 
       <div class="top-icons">
         <a href="/cart/cart.html" class="icon cart-icon">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-badge" style="display: none;">0</span>
-  </a>
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" style="display: none;">0</span>
+        </a>
         <a href="../user/profile.html" class="icon" id="userIcon">
-          <i class="fas fa-user"></i>
+          <i class="fas fa-user" id="userIconElement"></i>
         </a>
       </div>
     </div>
@@ -157,5 +280,224 @@
 
   <!-- JavaScript -->
   <script src="wine_farm_detail.js"></script>
+
+  <!-- Profile Authentication Script - ADDED -->
+  <script>
+    // Profile authentication logic for Wine Farm Detail page - MATCHES HOMEPAGE
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🍇 Wine Farm Detail page loaded - checking authentication');
+        
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // Token validation function
+        function isTokenValid() {
+            const token = localStorage.getItem('wineBubbles_token');
+            const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
+            
+            if (!token || !timestamp) return false;
+            
+            const tokenAge = Date.now() - parseInt(timestamp);
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+            
+            return tokenAge < sevenDays;
+        }
+        
+        // Clear user session function
+        function clearUserSession() {
+            localStorage.removeItem('wineBubbles_token');
+            localStorage.removeItem('wineBubbles_token_timestamp');
+            localStorage.removeItem('wineBubbles_user');
+            localStorage.removeItem('wineBubbles_isAdmin');
+            localStorage.removeItem('wineBubbles_isDriver');
+            localStorage.removeItem('wineBubbles_userFullName');
+            localStorage.removeItem('wineBubbles_userEmail');
+            localStorage.removeItem('wineBubbles_userPhone');
+            localStorage.removeItem('wineBubbles_userImage');
+            localStorage.removeItem('wineBubbles_userVerified');
+            localStorage.removeItem('wineBubbles_userCreated');
+        }
+        
+        // Check if user is logged in
+        const token = localStorage.getItem('wineBubbles_token');
+        const userData = localStorage.getItem('wineBubbles_user');
+        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+        const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
+        const isValidToken = isTokenValid();
+        
+        // Get user icon elements
+        const userIcon = document.getElementById('userIcon');
+        const userIconElement = document.getElementById('userIconElement');
+        
+        if (isValidToken && userData) {
+            console.log('✅ User is logged in on Wine Farm Detail page');
+            
+            try {
+                const user = JSON.parse(userData);
+                
+                // Update user icon to show logged-in state (profile icon)
+                if (userIconElement) {
+                    userIconElement.className = 'fas fa-user-check';
+                    userIconElement.style.color = '#6b0d2b';
+                }
+                
+                // Update user icon link
+                if (userIcon) {
+                    userIcon.href = '#';
+                    userIcon.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleUserDropdown();
+                    });
+                }
+                
+                // Create appropriate dropdown based on user type
+                createUserDropdown(user, isAdmin, isDriver);
+                
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                clearUserSession();
+                resetUserIcon();
+            }
+            
+        } else {
+            console.log('❌ User is not logged in or token expired on Wine Farm Detail page');
+            clearUserSession();
+            resetUserIcon();
+        }
+        
+        // Reset user icon to login state (sign-in icon)
+        function resetUserIcon() {
+            if (userIcon) {
+                userIcon.href = '../login/login.html';
+                if (userIconElement) {
+                    // Change to login/sign-in icon
+                    userIconElement.className = 'fas fa-sign-in-alt';
+                    userIconElement.style.color = '#6b0d2b';
+                }
+            }
+        }
+        
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+        
+        // Create user dropdown menu
+        function createUserDropdown(user, isAdmin, isDriver) {
+            // Remove existing dropdown if any
+            const existingDropdown = document.querySelector('.user-dropdown');
+            if (existingDropdown) {
+                existingDropdown.remove();
+            }
+            
+            // Create dropdown container
+            const dropdown = document.createElement('div');
+            dropdown.className = 'user-dropdown';
+            
+            // User info
+            const userInfo = document.createElement('div');
+            userInfo.className = 'user-dropdown-info';
+            
+            const userName = document.createElement('div');
+            userName.className = 'user-dropdown-name';
+            userName.textContent = user.fullName || user.email.split('@')[0];
+            
+            // Add badge for admin or driver
+            if (isAdmin) {
+                const adminBadge = document.createElement('span');
+                adminBadge.className = 'admin-badge';
+                adminBadge.textContent = 'ADMIN';
+                userName.appendChild(adminBadge);
+            } else if (isDriver) {
+                const driverBadge = document.createElement('span');
+                driverBadge.className = 'driver-badge';
+                driverBadge.textContent = 'DRIVER';
+                userName.appendChild(driverBadge);
+            }
+            
+            const userEmail = document.createElement('div');
+            userEmail.className = 'user-dropdown-email';
+            userEmail.textContent = user.email;
+            
+            userInfo.appendChild(userName);
+            userInfo.appendChild(userEmail);
+            dropdown.appendChild(userInfo);
+            
+            // Dropdown items based on user type
+            const items = [];
+            
+            if (isAdmin) {
+                // Admin items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else if (isDriver) {
+                // Driver items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else {
+                // Regular user items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            }
+            
+            // Add items to dropdown
+            items.forEach(item => {
+                const link = document.createElement('a');
+                link.href = item.href;
+                link.className = 'user-dropdown-link';
+                link.innerHTML = `
+                    <i class="${item.icon}"></i>
+                    <span>${item.text}</span>
+                `;
+                link.addEventListener('mouseenter', () => {
+                    link.style.color = '#6b0d2b';
+                });
+                link.addEventListener('mouseleave', () => {
+                    link.style.color = '#333';
+                });
+                dropdown.appendChild(link);
+            });
+            
+            // Logout button
+            const logoutButton = document.createElement('button');
+            logoutButton.className = 'user-dropdown-logout';
+            logoutButton.textContent = 'Logout';
+            logoutButton.addEventListener('click', function() {
+                clearUserSession();
+                window.location.href = '../index.html';
+            });
+            
+            dropdown.appendChild(logoutButton);
+            document.body.appendChild(dropdown);
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const dropdown = document.querySelector('.user-dropdown');
+                if (dropdown && !dropdown.contains(event.target) && 
+                    userIcon && !userIcon.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const dropdown = document.querySelector('.user-dropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            });
+        }
+        
+        console.log('✅ Wine Farm Detail page authentication initialized');
+    });
+  </script>
 </body>
 </html>

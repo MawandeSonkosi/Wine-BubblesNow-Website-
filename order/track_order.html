@@ -17,8 +17,130 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="../style.css">
     
+    <!-- Profile Dropdown Styles - ADDED -->
     <style>
-        /* Track Order Specific Styles */
+        /* Profile Dropdown Styles - MATCHES HOMEPAGE */
+        .user-dropdown {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 16px;
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            border: 1px solid #eee;
+        }
+        
+        .user-dropdown.show {
+            display: block !important;
+        }
+        
+        .user-dropdown a:hover {
+            color: #6b0d2b !important;
+        }
+        
+        .top-icons a {
+            position: relative;
+        }
+        
+        /* Login icon style */
+        .fas.fa-sign-in-alt {
+            color: #6b0d2b !important;
+        }
+        
+        .fas.fa-user-check {
+            color: #6b0d2b !important;
+        }
+        
+        .user-dropdown-info {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-dropdown-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .user-dropdown-email {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .user-dropdown-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .user-dropdown-link i {
+            margin-right: 8px;
+            width: 20px;
+        }
+        
+        .user-dropdown-logout {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: #6b0d2b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .user-dropdown-logout:hover {
+            background: #8a1e3d;
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .user-dropdown {
+                position: fixed;
+                top: 70px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+        }
+        
+        /* Admin badge */
+        .admin-badge {
+            display: inline-block;
+            background: #6b0d2b;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        /* Driver badge */
+        .driver-badge {
+            display: inline-block;
+            background: #1e6b0d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        /* Track Order Specific Styles - KEEP YOUR EXISTING STYLES */
         .track-orders-section {
             padding: 40px 0;
             background: #f8f8f8;
@@ -514,507 +636,726 @@
         <div class="topbar-top-inner">
             <!-- Empty - no content as requested -->
         </div>
+  </div>
+
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo">
+        <a href="../index.html">
+          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+        </a>
+      </div>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="../wine/all_wines.html">All Wines</a></li>
+          <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
+          <li><a href="../wine_farm/wine_farm.html">Tastings Near Me</a></li>
+          <li><a href="../pairings/pairings.html">Pairings</a></li>
+          <li><a href="track_order.html" class="active">Track Order</a></li>
+        </ul>
+      </nav>
+
+      <div class="top-icons">
+        <a href="../cart/cart.html" class="icon cart-icon" id="cartIcon">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+        </a>
+        <a href="../user/profile.html" class="icon" id="userIcon">
+          <i class="fas fa-user" id="userIconElement"></i>
+        </a>
+      </div>
     </div>
+  </div>
 
-    <div class="topbar-main">
-        <div class="topbar-main-inner">
-            <div class="logo">
-                <a href="../index.html">
-                    <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
-                </a>
-            </div>
+  <!-- Track Orders Section -->
+  <section class="section track-orders-section">
+    <div class="track-orders-container">
+      <div class="track-orders-header">
+        <h1 class="track-orders-title">Track Your Orders</h1>
+        <p class="track-orders-subtitle">View and track all your delivery orders</p>
+      </div>
 
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="../wine/all_wines.html">All Wines</a></li>
-                    <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
-                    <li><a href="../wine_farm/wine_farm.html">Tastings Near Me</a></li>
-                    <li><a href="../pairings/pairings.html">Pairings</a></li>
-                    <li><a href="track_order.html" class="active">Track Order</a></li>
-                </ul>
-            </nav>
-
-            <div class="top-icons">
-                <a href="../cart/cart.html" class="icon cart-icon" id="cartIcon">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-                </a>
-                <a href="../user/profile.html" class="icon" id="userIcon">
-                    <i class="fas fa-user" id="userIconElement"></i>
-                </a>
-            </div>
+      <div id="trackOrdersContent">
+        <!-- Content will be loaded dynamically by JavaScript -->
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p style="color: #666;">Loading your orders...</p>
         </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Track Orders Section -->
-    <section class="section track-orders-section">
-        <div class="track-orders-container">
-            <div class="track-orders-header">
-                <h1 class="track-orders-title">Track Your Orders</h1>
-                <p class="track-orders-subtitle">View and track all your delivery orders</p>
-            </div>
-
-            <div id="trackOrdersContent">
-                <!-- Content will be loaded dynamically by JavaScript -->
-                <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p style="color: #666;">Loading your orders...</p>
-                </div>
-            </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+        <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+        <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+        <div class="socials">
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
         </div>
-    </section>
+      </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <img src="../assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo">
-                <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
-                <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
-                <div class="socials">
-                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
-
-            <div class="footer-links-grid">
-                <div class="footer-links-column">
-                    <h4 class="footer-heading">Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="../wine/all_wines.html">All Wines</a></li>
-                        <li><a href="../booking/booking.html">Bookings</a></li>
-                        <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
-                        <li><a href="../pairings/pairings.html">Pairings</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-links-column">
-                    <h4 class="footer-heading">&nbsp;</h4>
-                    <ul class="footer-links">
-                        <li><a href="../contact_us.html">Contact Us</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="../terms_conditions.html">Terms & Conditions</a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="footer-links-grid">
+        <div class="footer-links-column">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="../wine/all_wines.html">All Wines</a></li>
+            <li><a href="../booking/booking.html">Bookings</a></li>
+            <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+            <li><a href="../pairings/pairings.html">Pairings</a></li>
+          </ul>
         </div>
-    </footer>
 
-    <!-- JavaScript -->
-    <script>
-    class TrackOrderSystem {
-        constructor() {
-            this.API_BASE_URL = 'http://localhost:3000/api';
-            this.contentElement = document.getElementById('trackOrdersContent');
-            this.isLoading = false;
-            this.deliveries = [];
-            this.userId = null;
-            this.token = null;
+        <div class="footer-links-column">
+          <h4 class="footer-heading">&nbsp;</h4>
+          <ul class="footer-links">
+            <li><a href="../contact_us.html">Contact Us</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="../terms_conditions.html">Terms & Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Profile Authentication Script - ADDED TO MATCH HOMEPAGE -->
+  <script>
+    // Profile authentication logic for Track Order page - MATCHES HOMEPAGE
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📦 Track Order page loaded - checking authentication');
+        
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // Token validation function
+        function isTokenValid() {
+            const token = localStorage.getItem('wineBubbles_token');
+            const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
             
-            this.init();
-        }
-
-        init() {
-            this.checkAuthentication();
-            this.setupEventListeners();
-            this.updateCartBadge();
-        }
-
-        checkAuthentication() {
-            const userData = localStorage.getItem('wineBubbles_user');
-            this.token = localStorage.getItem('wineBubbles_token');
+            if (!token || !timestamp) return false;
             
-            if (userData && this.token) {
-                try {
-                    const user = JSON.parse(userData);
-                    this.userId = user.id || user.email;
-                    console.log('✅ User authenticated:', this.userId);
-                    
-                    // Load deliveries after a short delay
-                    setTimeout(() => this.loadDeliveries(), 100);
-                } catch (error) {
-                    console.error('Error parsing user data:', error);
-                    this.showAuthRequired();
+            const tokenAge = Date.now() - parseInt(timestamp);
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+            
+            return tokenAge < sevenDays;
+        }
+        
+        // Clear user session function
+        function clearUserSession() {
+            localStorage.removeItem('wineBubbles_token');
+            localStorage.removeItem('wineBubbles_token_timestamp');
+            localStorage.removeItem('wineBubbles_user');
+            localStorage.removeItem('wineBubbles_isAdmin');
+            localStorage.removeItem('wineBubbles_isDriver');
+            localStorage.removeItem('wineBubbles_userFullName');
+            localStorage.removeItem('wineBubbles_userEmail');
+            localStorage.removeItem('wineBubbles_userPhone');
+            localStorage.removeItem('wineBubbles_userImage');
+            localStorage.removeItem('wineBubbles_userVerified');
+            localStorage.removeItem('wineBubbles_userCreated');
+        }
+        
+        // Check if user is logged in
+        const token = localStorage.getItem('wineBubbles_token');
+        const userData = localStorage.getItem('wineBubbles_user');
+        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+        const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
+        const isValidToken = isTokenValid();
+        
+        // Get user icon elements
+        const userIcon = document.getElementById('userIcon');
+        const userIconElement = document.getElementById('userIconElement');
+        
+        if (isValidToken && userData) {
+            console.log('✅ User is logged in on Track Order page');
+            
+            try {
+                const user = JSON.parse(userData);
+                
+                // Update user icon to show logged-in state (profile icon)
+                if (userIconElement) {
+                    userIconElement.className = 'fas fa-user-check';
+                    userIconElement.style.color = '#6b0d2b';
                 }
-            } else {
-                console.log('❌ User not authenticated');
-                this.showAuthRequired();
+                
+                // Update user icon link
+                if (userIcon) {
+                    userIcon.href = '#';
+                    userIcon.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleUserDropdown();
+                    });
+                }
+                
+                // Create appropriate dropdown based on user type
+                createUserDropdown(user, isAdmin, isDriver);
+                
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                clearUserSession();
+                resetUserIcon();
+            }
+            
+        } else {
+            console.log('❌ User is not logged in or token expired on Track Order page');
+            clearUserSession();
+            resetUserIcon();
+        }
+        
+        // Reset user icon to login state (sign-in icon)
+        function resetUserIcon() {
+            if (userIcon) {
+                userIcon.href = '../login/login.html';
+                if (userIconElement) {
+                    // Change to login/sign-in icon
+                    userIconElement.className = 'fas fa-sign-in-alt';
+                    userIconElement.style.color = '#6b0d2b';
+                }
             }
         }
-
-        setupEventListeners() {
-            // Listen for cart updates
-            window.addEventListener('cartUpdated', () => {
-                this.updateCartBadge();
+        
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+        
+        // Create user dropdown menu
+        function createUserDropdown(user, isAdmin, isDriver) {
+            // Remove existing dropdown if any
+            const existingDropdown = document.querySelector('.user-dropdown');
+            if (existingDropdown) {
+                existingDropdown.remove();
+            }
+            
+            // Create dropdown container
+            const dropdown = document.createElement('div');
+            dropdown.className = 'user-dropdown';
+            
+            // User info
+            const userInfo = document.createElement('div');
+            userInfo.className = 'user-dropdown-info';
+            
+            const userName = document.createElement('div');
+            userName.className = 'user-dropdown-name';
+            userName.textContent = user.fullName || user.email.split('@')[0];
+            
+            // Add badge for admin or driver
+            if (isAdmin) {
+                const adminBadge = document.createElement('span');
+                adminBadge.className = 'admin-badge';
+                adminBadge.textContent = 'ADMIN';
+                userName.appendChild(adminBadge);
+            } else if (isDriver) {
+                const driverBadge = document.createElement('span');
+                driverBadge.className = 'driver-badge';
+                driverBadge.textContent = 'DRIVER';
+                userName.appendChild(driverBadge);
+            }
+            
+            const userEmail = document.createElement('div');
+            userEmail.className = 'user-dropdown-email';
+            userEmail.textContent = user.email;
+            
+            userInfo.appendChild(userName);
+            userInfo.appendChild(userEmail);
+            dropdown.appendChild(userInfo);
+            
+            // Dropdown items based on user type
+            const items = [];
+            
+            if (isAdmin) {
+                // Admin items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else if (isDriver) {
+                // Driver items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else {
+                // Regular user items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            }
+            
+            // Add items to dropdown
+            items.forEach(item => {
+                const link = document.createElement('a');
+                link.href = item.href;
+                link.className = 'user-dropdown-link';
+                link.innerHTML = `
+                    <i class="${item.icon}"></i>
+                    <span>${item.text}</span>
+                `;
+                link.addEventListener('mouseenter', () => {
+                    link.style.color = '#6b0d2b';
+                });
+                link.addEventListener('mouseleave', () => {
+                    link.style.color = '#333';
+                });
+                dropdown.appendChild(link);
+            });
+            
+            // Logout button
+            const logoutButton = document.createElement('button');
+            logoutButton.className = 'user-dropdown-logout';
+            logoutButton.textContent = 'Logout';
+            logoutButton.addEventListener('click', function() {
+                clearUserSession();
+                window.location.href = '../index.html';
+            });
+            
+            dropdown.appendChild(logoutButton);
+            document.body.appendChild(dropdown);
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const dropdown = document.querySelector('.user-dropdown');
+                if (dropdown && !dropdown.contains(event.target) && 
+                    userIcon && !userIcon.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const dropdown = document.querySelector('.user-dropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                }
             });
         }
+        
+        console.log('✅ Track Order page authentication initialized');
+    });
+  </script>
 
-        async loadDeliveries() {
-            if (this.isLoading) return;
+  <!-- JavaScript -->
+  <script>
+  class TrackOrderSystem {
+    constructor() {
+        this.API_BASE_URL = 'http://localhost:3000/api';
+        this.contentElement = document.getElementById('trackOrdersContent');
+        this.isLoading = false;
+        this.deliveries = [];
+        this.userId = null;
+        this.token = null;
+        
+        this.init();
+    }
+
+    init() {
+        this.checkAuthentication();
+        this.setupEventListeners();
+        this.updateCartBadge();
+    }
+
+    checkAuthentication() {
+        const userData = localStorage.getItem('wineBubbles_user');
+        this.token = localStorage.getItem('wineBubbles_token');
+        
+        if (userData && this.token) {
+            try {
+                const user = JSON.parse(userData);
+                this.userId = user.id || user.email;
+                console.log('✅ User authenticated:', this.userId);
+                
+                // Load deliveries after a short delay
+                setTimeout(() => this.loadDeliveries(), 100);
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                this.showAuthRequired();
+            }
+        } else {
+            console.log('❌ User not authenticated');
+            this.showAuthRequired();
+        }
+    }
+
+    setupEventListeners() {
+        // Listen for cart updates
+        window.addEventListener('cartUpdated', () => {
+            this.updateCartBadge();
+        });
+    }
+
+    async loadDeliveries() {
+        if (this.isLoading) return;
+        
+        if (!this.userId || !this.token) {
+            this.showAuthRequired();
+            return;
+        }
+
+        this.isLoading = true;
+        this.showLoading();
+
+        try {
+            console.log('📦 Fetching deliveries for user:', this.userId);
             
-            if (!this.userId || !this.token) {
+            const response = await fetch(`${this.API_BASE_URL}/deliveries/user/${this.userId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.status === 401) {
+                // Token expired or invalid
+                console.error('❌ Authentication failed - token invalid');
                 this.showAuthRequired();
                 return;
             }
 
-            this.isLoading = true;
-            this.showLoading();
-
-            try {
-                console.log('📦 Fetching deliveries for user:', this.userId);
-                
-                const response = await fetch(`${this.API_BASE_URL}/deliveries/user/${this.userId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (response.status === 401) {
-                    // Token expired or invalid
-                    console.error('❌ Authentication failed - token invalid');
-                    this.showAuthRequired();
-                    return;
-                }
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                console.log('✅ API Response:', result);
-                
-                // Check if response has success flag and data array
-                if (result.success && Array.isArray(result.data)) {
-                    this.deliveries = result.data;
-                } 
-                // Try direct array
-                else if (Array.isArray(result)) {
-                    this.deliveries = result;
-                }
-                // Try different response format
-                else if (result.data && Array.isArray(result.data)) {
-                    this.deliveries = result.data;
-                }
-                // Try deliveries property
-                else if (result.deliveries && Array.isArray(result.deliveries)) {
-                    this.deliveries = result.deliveries;
-                }
-                else {
-                    console.warn('⚠️ Unexpected response format:', result);
-                    this.deliveries = [];
-                }
-                
-                console.log(`✅ Processed ${this.deliveries.length} deliveries`);
-                
-                if (this.deliveries.length === 0) {
-                    this.showEmptyState();
-                } else {
-                    this.renderDeliveries(this.deliveries);
-                }
-
-            } catch (error) {
-                console.error('❌ Error loading deliveries:', error);
-                this.showError(`Failed to load orders: ${error.message}`);
-                
-                // Debug: try to get deliveries from localStorage as fallback
-                this.tryLocalStorageFallback();
-            } finally {
-                this.isLoading = false;
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-        }
 
-        // Fallback to localStorage if API fails
-        tryLocalStorageFallback() {
-            try {
-                const savedOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
-                console.log(`🔄 Trying localStorage fallback: ${savedOrders.length} orders found`);
-                
-                if (savedOrders.length > 0) {
-                    this.deliveries = savedOrders.map(order => ({
-                        _id: order.id || order._id || `local-${Date.now()}`,
-                        address: order.address || 'Address not saved',
-                        status: order.status || 'Order received',
-                        paymentMethod: order.paymentMethod || 'Not specified',
-                        totalAmount: order.total || order.totalAmount || 0,
-                        totalWineQuantity: (order.items?.length || 0) + (order.addOns?.length || 0),
-                        createdAt: order.createdAt || new Date().toISOString(),
-                        items: order.items || [],
-                        addOns: order.addOns || []
-                    }));
-                    
-                    console.log(`✅ Using ${this.deliveries.length} orders from localStorage`);
-                    this.renderDeliveries(this.deliveries);
-                } else {
-                    this.showEmptyState();
-                }
-            } catch (error) {
-                console.error('❌ localStorage fallback failed:', error);
+            const result = await response.json();
+            console.log('✅ API Response:', result);
+            
+            // Check if response has success flag and data array
+            if (result.success && Array.isArray(result.data)) {
+                this.deliveries = result.data;
+            } 
+            // Try direct array
+            else if (Array.isArray(result)) {
+                this.deliveries = result;
+            }
+            // Try different response format
+            else if (result.data && Array.isArray(result.data)) {
+                this.deliveries = result.data;
+            }
+            // Try deliveries property
+            else if (result.deliveries && Array.isArray(result.deliveries)) {
+                this.deliveries = result.deliveries;
+            }
+            else {
+                console.warn('⚠️ Unexpected response format:', result);
+                this.deliveries = [];
+            }
+            
+            console.log(`✅ Processed ${this.deliveries.length} deliveries`);
+            
+            if (this.deliveries.length === 0) {
                 this.showEmptyState();
-            }
-        }
-
-        getStatusColor(status) {
-            const statusLower = status.toLowerCase();
-            
-            switch (statusLower) {
-                case 'order received': return 'status-received';
-                case 'processing': return 'status-processing';
-                case 'out for delivery': return 'status-delivery';
-                case 'delivered': return 'status-delivered';
-                case 'cancelled': return 'status-cancelled';
-                default: return 'status-processing';
-            }
-        }
-
-        getStatusIcon(status) {
-            const statusLower = status.toLowerCase();
-            
-            switch (statusLower) {
-                case 'order received': return 'fas fa-inventory-alt';
-                case 'processing': return 'fas fa-cog';
-                case 'out for delivery': return 'fas fa-shipping-fast';
-                case 'delivered': return 'fas fa-check-circle';
-                case 'cancelled': return 'fas fa-times-circle';
-                default: return 'fas fa-question-circle';
-            }
-        }
-
-        getStatusText(status) {
-            const statusLower = status.toLowerCase();
-            const isDelivered = statusLower === 'delivered';
-            const isCancelled = statusLower === 'cancelled';
-            
-            return isDelivered ? 'status-text-completed' : 
-                   isCancelled ? 'status-text-cancelled' : 'status-text-progress';
-        }
-
-        getStatusDisplayText(status) {
-            const statusLower = status.toLowerCase();
-            switch (statusLower) {
-                case 'order received': return 'In Progress';
-                case 'processing': return 'In Progress';
-                case 'out for delivery': return 'In Progress';
-                case 'delivered': return 'Completed';
-                case 'cancelled': return 'Cancelled';
-                default: return 'In Progress';
-            }
-        }
-
-        formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            });
-        }
-
-               renderDeliveries(deliveries) {
-            if (!this.contentElement) return;
-
-            const deliveriesHTML = deliveries.map(delivery => {
-                const statusColor = this.getStatusColor(delivery.status);
-                const statusIcon = this.getStatusIcon(delivery.status);
-                const statusTextClass = this.getStatusText(delivery.status);
-                const statusDisplayText = this.getStatusDisplayText(delivery.status);
-                const totalItems = delivery.totalWineQuantity || 
-                                 (delivery.items?.length || 0) + (delivery.addOns?.length || 0);
-                
-                // Extract the delivery ID
-                const deliveryId = delivery._id || delivery.id;
-                console.log('Delivery ID for link:', deliveryId);
-
-                return `
-                    <div class="delivery-card" data-delivery-id="${deliveryId}">
-                        <div class="delivery-header">
-                            <div class="status-badge ${statusColor}">
-                                <i class="${statusIcon}"></i>
-                                <span>${delivery.status.toUpperCase()}</span>
-                            </div>
-                            <div class="delivery-date">
-                                ${this.formatDate(delivery.createdAt)}
-                            </div>
-                        </div>
-                        
-                        <div class="delivery-content">
-                            <div class="delivery-icon">
-                                <i class="fas fa-shipping-fast"></i>
-                            </div>
-                            <div class="delivery-details">
-                                <div class="delivery-address-title">DELIVERY ADDRESS</div>
-                                <div class="delivery-address">${delivery.address || 'No address provided'}</div>
-                                
-                                <div class="delivery-meta">
-                                    <div class="meta-item">
-                                        <div class="meta-label">Payment Method</div>
-                                        <div class="meta-value">${delivery.paymentMethod || 'Not specified'}</div>
-                                    </div>
-                                    <div class="meta-item">
-                                        <div class="meta-label">Total Items</div>
-                                        <div class="meta-value">${totalItems} item${totalItems !== 1 ? 's' : ''}</div>
-                                    </div>
-                                    ${delivery.items?.length ? `
-                                    <div class="meta-item">
-                                        <div class="meta-label">Wine Bottles</div>
-                                        <div class="meta-value">${delivery.items.reduce((sum, item) => sum + (item.quantity || 1), 0)}</div>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="delivery-footer">
-                            <div class="delivery-amount">
-                                <span class="delivery-amount-currency">R</span>
-                                ${delivery.totalAmount ? delivery.totalAmount.toFixed(2) : '0.00'}
-                            </div>
-                            <div class="delivery-status-text ${statusTextClass}">
-                                ${statusDisplayText}
-                            </div>
-                        </div>
-                        
-                        <button class="view-details-btn" data-delivery-id="${deliveryId}">
-                            <i class="fas fa-eye"></i>
-                            View Order Details
-                        </button>
-                    </div>
-                `;
-            }).join('');
-
-            this.contentElement.innerHTML = deliveriesHTML;
-            
-            // Add event listeners after rendering
-            this.setupCardClickListeners();
-        }
-
-        setupCardClickListeners() {
-            // Add click event to view details buttons
-            const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
-            viewDetailsButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent card click from firing
-                    const deliveryId = button.getAttribute('data-delivery-id');
-                    console.log('Button clicked for delivery:', deliveryId);
-                    this.viewDeliveryDetails(deliveryId);
-                });
-            });
-
-            // Add click event to entire delivery cards
-            const deliveryCards = document.querySelectorAll('.delivery-card');
-            deliveryCards.forEach(card => {
-                card.addEventListener('click', (e) => {
-                    // Only trigger if not clicking on the button
-                    if (!e.target.closest('.view-details-btn')) {
-                        const deliveryId = card.getAttribute('data-delivery-id');
-                        console.log('Card clicked for delivery:', deliveryId);
-                        this.viewDeliveryDetails(deliveryId);
-                    }
-                });
-            });
-        }
-               viewDeliveryDetails(deliveryId) {
-            console.log('🔍 Viewing delivery details:', deliveryId);
-            
-            // Use the correct path to order_detail.html
-            // Since track_order.html is in /orders folder, and order_detail.html should be in same folder
-            window.location.href = `order_detail.html?id=${deliveryId}`;
-            
-            // Alternative if order_detail.html is in a different location:
-            // window.location.href = `../orders/order_detail.html?id=${deliveryId}`;
-        }
-        showAuthRequired() {
-            if (!this.contentElement) return;
-
-            this.contentElement.innerHTML = `
-                <div class="auth-required-state">
-                    <div class="auth-required-icon">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <h2 class="auth-required-title">Authentication Required</h2>
-                    <p class="auth-required-text">Please log in to view your delivery orders and track their status.</p>
-                    <button class="go-back-btn" onclick="window.location.href='../login/login.html'">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Go to Login
-                    </button>
-                </div>
-            `;
-        }
-
-        showEmptyState() {
-            if (!this.contentElement) return;
-
-            this.contentElement.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-shipping-fast"></i>
-                    </div>
-                    <h2 class="empty-state-title">No Orders Yet</h2>
-                    <p class="empty-state-text">Your order history will appear here once you place your first order.</p>
-                    <p class="empty-state-subtext">Start exploring our collection to begin your wine journey!</p>
-                    <button class="start-shopping-btn" onclick="window.location.href='../index.html'">
-                        <i class="fas fa-wine-bottle"></i>
-                        Start Shopping
-                    </button>
-                </div>
-            `;
-        }
-
-        showLoading() {
-            if (!this.contentElement) return;
-
-            this.contentElement.innerHTML = `
-                <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p style="color: #666;">Loading your orders...</p>
-                </div>
-            `;
-        }
-
-        showError(message) {
-            if (!this.contentElement) return;
-
-            this.contentElement.innerHTML = `
-                <div class="error-state">
-                    <div class="error-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <div class="error-message">${message}</div>
-                    <button class="retry-btn" onclick="trackOrderSystem.loadDeliveries()">
-                        <i class="fas fa-redo"></i>
-                        Retry
-                    </button>
-                </div>
-            `;
-        }
-
-        updateCartBadge() {
-            // Use your existing CartUtils if available
-            if (window.CartUtils && typeof window.CartUtils.updateCartBadge === 'function') {
-                window.CartUtils.updateCartBadge();
             } else {
-                // Fallback to manual badge update
-                const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
-                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                
-                const cartBadges = document.querySelectorAll('.cart-badge');
-                cartBadges.forEach(badge => {
-                    badge.textContent = totalItems;
-                    badge.style.display = totalItems > 0 ? 'flex' : 'none';
-                });
+                this.renderDeliveries(this.deliveries);
             }
+
+        } catch (error) {
+            console.error('❌ Error loading deliveries:', error);
+            this.showError(`Failed to load orders: ${error.message}`);
+            
+            // Debug: try to get deliveries from localStorage as fallback
+            this.tryLocalStorageFallback();
+        } finally {
+            this.isLoading = false;
         }
     }
 
-    // Initialize the track order system
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('📦 Track Orders page loaded');
-        window.trackOrderSystem = new TrackOrderSystem();
-    });
-    </script>
+    // Fallback to localStorage if API fails
+    tryLocalStorageFallback() {
+        try {
+            const savedOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
+            console.log(`🔄 Trying localStorage fallback: ${savedOrders.length} orders found`);
+            
+            if (savedOrders.length > 0) {
+                this.deliveries = savedOrders.map(order => ({
+                    _id: order.id || order._id || `local-${Date.now()}`,
+                    address: order.address || 'Address not saved',
+                    status: order.status || 'Order received',
+                    paymentMethod: order.paymentMethod || 'Not specified',
+                    totalAmount: order.total || order.totalAmount || 0,
+                    totalWineQuantity: (order.items?.length || 0) + (order.addOns?.length || 0),
+                    createdAt: order.createdAt || new Date().toISOString(),
+                    items: order.items || [],
+                    addOns: order.addOns || []
+                }));
+                
+                console.log(`✅ Using ${this.deliveries.length} orders from localStorage`);
+                this.renderDeliveries(this.deliveries);
+            } else {
+                this.showEmptyState();
+            }
+        } catch (error) {
+            console.error('❌ localStorage fallback failed:', error);
+            this.showEmptyState();
+        }
+    }
+
+    getStatusColor(status) {
+        const statusLower = status.toLowerCase();
+        
+        switch (statusLower) {
+            case 'order received': return 'status-received';
+            case 'processing': return 'status-processing';
+            case 'out for delivery': return 'status-delivery';
+            case 'delivered': return 'status-delivered';
+            case 'cancelled': return 'status-cancelled';
+            default: return 'status-processing';
+        }
+    }
+
+    getStatusIcon(status) {
+        const statusLower = status.toLowerCase();
+        
+        switch (statusLower) {
+            case 'order received': return 'fas fa-inventory-alt';
+            case 'processing': return 'fas fa-cog';
+            case 'out for delivery': return 'fas fa-shipping-fast';
+            case 'delivered': return 'fas fa-check-circle';
+            case 'cancelled': return 'fas fa-times-circle';
+            default: return 'fas fa-question-circle';
+        }
+    }
+
+    getStatusText(status) {
+        const statusLower = status.toLowerCase();
+        const isDelivered = statusLower === 'delivered';
+        const isCancelled = statusLower === 'cancelled';
+        
+        return isDelivered ? 'status-text-completed' : 
+               isCancelled ? 'status-text-cancelled' : 'status-text-progress';
+    }
+
+    getStatusDisplayText(status) {
+        const statusLower = status.toLowerCase();
+        switch (statusLower) {
+            case 'order received': return 'In Progress';
+            case 'processing': return 'In Progress';
+            case 'out for delivery': return 'In Progress';
+            case 'delivered': return 'Completed';
+            case 'cancelled': return 'Cancelled';
+            default: return 'In Progress';
+        }
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    }
+
+           renderDeliveries(deliveries) {
+        if (!this.contentElement) return;
+
+        const deliveriesHTML = deliveries.map(delivery => {
+            const statusColor = this.getStatusColor(delivery.status);
+            const statusIcon = this.getStatusIcon(delivery.status);
+            const statusTextClass = this.getStatusText(delivery.status);
+            const statusDisplayText = this.getStatusDisplayText(delivery.status);
+            const totalItems = delivery.totalWineQuantity || 
+                             (delivery.items?.length || 0) + (delivery.addOns?.length || 0);
+            
+            // Extract the delivery ID
+            const deliveryId = delivery._id || delivery.id;
+            console.log('Delivery ID for link:', deliveryId);
+
+            return `
+                <div class="delivery-card" data-delivery-id="${deliveryId}">
+                    <div class="delivery-header">
+                        <div class="status-badge ${statusColor}">
+                            <i class="${statusIcon}"></i>
+                            <span>${delivery.status.toUpperCase()}</span>
+                        </div>
+                        <div class="delivery-date">
+                            ${this.formatDate(delivery.createdAt)}
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-content">
+                        <div class="delivery-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="delivery-details">
+                            <div class="delivery-address-title">DELIVERY ADDRESS</div>
+                            <div class="delivery-address">${delivery.address || 'No address provided'}</div>
+                            
+                            <div class="delivery-meta">
+                                <div class="meta-item">
+                                    <div class="meta-label">Payment Method</div>
+                                    <div class="meta-value">${delivery.paymentMethod || 'Not specified'}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Total Items</div>
+                                    <div class="meta-value">${totalItems} item${totalItems !== 1 ? 's' : ''}</div>
+                                </div>
+                                ${delivery.items?.length ? `
+                                <div class="meta-item">
+                                    <div class="meta-label">Wine Bottles</div>
+                                    <div class="meta-value">${delivery.items.reduce((sum, item) => sum + (item.quantity || 1), 0)}</div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-footer">
+                        <div class="delivery-amount">
+                            <span class="delivery-amount-currency">R</span>
+                            ${delivery.totalAmount ? delivery.totalAmount.toFixed(2) : '0.00'}
+                        </div>
+                        <div class="delivery-status-text ${statusTextClass}">
+                            ${statusDisplayText}
+                        </div>
+                    </div>
+                    
+                    <button class="view-details-btn" data-delivery-id="${deliveryId}">
+                        <i class="fas fa-eye"></i>
+                        View Order Details
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        this.contentElement.innerHTML = deliveriesHTML;
+        
+        // Add event listeners after rendering
+        this.setupCardClickListeners();
+    }
+
+    setupCardClickListeners() {
+        // Add click event to view details buttons
+        const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+        viewDetailsButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click from firing
+                const deliveryId = button.getAttribute('data-delivery-id');
+                console.log('Button clicked for delivery:', deliveryId);
+                this.viewDeliveryDetails(deliveryId);
+            });
+        });
+
+        // Add click event to entire delivery cards
+        const deliveryCards = document.querySelectorAll('.delivery-card');
+        deliveryCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Only trigger if not clicking on the button
+                if (!e.target.closest('.view-details-btn')) {
+                    const deliveryId = card.getAttribute('data-delivery-id');
+                    console.log('Card clicked for delivery:', deliveryId);
+                    this.viewDeliveryDetails(deliveryId);
+                }
+            });
+        });
+    }
+           viewDeliveryDetails(deliveryId) {
+        console.log('🔍 Viewing delivery details:', deliveryId);
+        
+        // Use the correct path to order_detail.html
+        // Since track_order.html is in /orders folder, and order_detail.html should be in same folder
+        window.location.href = `order_detail.html?id=${deliveryId}`;
+        
+        // Alternative if order_detail.html is in a different location:
+        // window.location.href = `../orders/order_detail.html?id=${deliveryId}`;
+    }
+    showAuthRequired() {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="auth-required-state">
+                <div class="auth-required-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="auth-required-title">Authentication Required</h2>
+                <p class="auth-required-text">Please log in to view your delivery orders and track their status.</p>
+                <button class="go-back-btn" onclick="window.location.href='../login/login.html'">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Go to Login
+                </button>
+            </div>
+        `;
+    }
+
+    showEmptyState() {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h2 class="empty-state-title">No Orders Yet</h2>
+                <p class="empty-state-text">Your order history will appear here once you place your first order.</p>
+                <p class="empty-state-subtext">Start exploring our collection to begin your wine journey!</p>
+                <button class="start-shopping-btn" onclick="window.location.href='../index.html'">
+                    <i class="fas fa-wine-bottle"></i>
+                    Start Shopping
+                </button>
+            </div>
+        `;
+    }
+
+    showLoading() {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p style="color: #666;">Loading your orders...</p>
+            </div>
+        `;
+    }
+
+    showError(message) {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="error-state">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="error-message">${message}</div>
+                <button class="retry-btn" onclick="trackOrderSystem.loadDeliveries()">
+                    <i class="fas fa-redo"></i>
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+
+    updateCartBadge() {
+        // Use your existing CartUtils if available
+        if (window.CartUtils && typeof window.CartUtils.updateCartBadge === 'function') {
+            window.CartUtils.updateCartBadge();
+        } else {
+            // Fallback to manual badge update
+            const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            const cartBadges = document.querySelectorAll('.cart-badge');
+            cartBadges.forEach(badge => {
+                badge.textContent = totalItems;
+                badge.style.display = totalItems > 0 ? 'flex' : 'none';
+            });
+        }
+    }
+  }
+
+  // Initialize the track order system
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('📦 Track Orders page loaded');
+    window.trackOrderSystem = new TrackOrderSystem();
+  });
+  </script>
 </body>
 </html>

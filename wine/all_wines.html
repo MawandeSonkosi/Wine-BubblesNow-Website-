@@ -276,8 +276,12 @@
 
   <!-- JavaScript -->
   <script src="wine.js"></script>
+    <!-- JavaScript -->
+  <script src="wine.js"></script>
+    <!-- JavaScript -->
+  <script src="wine.js"></script>
   <script>
-    // Authentication logic for All Wines page - UPDATED FOR UNIFIED CART
+    // Authentication logic for All Wines page - PROFILE ONLY, cart stays as is
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🍷 All Wines page loaded - checking authentication');
         
@@ -322,13 +326,6 @@
         // Get user icon elements
         const userIcon = document.getElementById('userIcon');
         const userIconElement = document.getElementById('userIconElement');
-        const cartIcon = document.getElementById('cartIcon');
-        
-        // Initialize cart badge
-        if (window.CartUtils) {
-            window.CartUtils.updateCartBadge();
-            window.CartUtils.migrateOldCart();
-        }
         
         if (isValidToken && userData) {
             console.log('✅ User is logged in on All Wines page');
@@ -336,13 +333,13 @@
             try {
                 const user = JSON.parse(userData);
                 
-                // Update user icon to show logged-in state (profile icon)
+                // Update user icon to show logged-in state (profile icon) - MATCHES HOMEPAGE
                 if (userIconElement) {
                     userIconElement.className = 'fas fa-user-check';
                     userIconElement.style.color = '#6b0d2b';
                 }
                 
-                // Update user icon link
+                // Update user icon link - MATCHES HOMEPAGE
                 if (userIcon) {
                     userIcon.href = '#';
                     userIcon.addEventListener('click', function(e) {
@@ -351,22 +348,8 @@
                     });
                 }
                 
-                // Create appropriate dropdown based on user type
+                // Create appropriate dropdown based on user type - MATCHES HOMEPAGE
                 createUserDropdown(user, isAdmin, isDriver);
-                
-                // Cart functionality
-                if (cartIcon) {
-                    cartIcon.addEventListener('click', function(e) {
-                        if (isValidToken) {
-                            // Allow cart access for logged in users
-                            window.location.href = '../cart/cart.html';
-                        } else {
-                            e.preventDefault();
-                            alert('Please login to view your cart');
-                            window.location.href = '../login/login.html';
-                        }
-                    });
-                }
                 
             } catch (error) {
                 console.error('Error parsing user data:', error);
@@ -378,18 +361,9 @@
             console.log('❌ User is not logged in or token expired on All Wines page');
             clearUserSession();
             resetUserIcon();
-            
-            // Cart requires login
-            if (cartIcon) {
-                cartIcon.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    alert('Please login to view your cart');
-                    window.location.href = '../login/login.html';
-                });
-            }
         }
         
-        // Reset user icon to login state (sign-in icon)
+        // Reset user icon to login state (sign-in icon) - MATCHES HOMEPAGE
         function resetUserIcon() {
             if (userIcon) {
                 userIcon.href = '../login/login.html';
@@ -401,7 +375,7 @@
             }
         }
         
-        // Toggle user dropdown
+        // Toggle user dropdown - MATCHES HOMEPAGE
         function toggleUserDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
             if (dropdown) {
@@ -409,7 +383,7 @@
             }
         }
         
-        // Create user dropdown menu
+        // Create user dropdown menu - MATCHES HOMEPAGE
         function createUserDropdown(user, isAdmin, isDriver) {
             // Remove existing dropdown if any
             const existingDropdown = document.querySelector('.user-dropdown');
@@ -450,7 +424,7 @@
             userInfo.appendChild(userEmail);
             dropdown.appendChild(userInfo);
             
-            // Dropdown items based on user type
+            // Dropdown items based on user type - MATCHES HOMEPAGE
             const items = [];
             
             if (isAdmin) {
@@ -500,7 +474,7 @@
             dropdown.appendChild(logoutButton);
             document.body.appendChild(dropdown);
             
-            // Close dropdown when clicking outside
+            // Close dropdown when clicking outside - MATCHES HOMEPAGE
             document.addEventListener('click', function(event) {
                 const dropdown = document.querySelector('.user-dropdown');
                 if (dropdown && !dropdown.contains(event.target) && 
@@ -509,7 +483,7 @@
                 }
             });
             
-            // Close dropdown on escape key
+            // Close dropdown on escape key - MATCHES HOMEPAGE
             document.addEventListener('keydown', function(event) {
                 if (event.key === 'Escape') {
                     const dropdown = document.querySelector('.user-dropdown');
@@ -520,7 +494,7 @@
             });
         }
         
-        // Check for welcome message after login
+        // Check for welcome message after login - MATCHES HOMEPAGE
         const urlParams = new URLSearchParams(window.location.search);
         const justLoggedIn = urlParams.get('login') === 'success';
         
@@ -543,17 +517,7 @@
             }
         }
         
-        // Add event listener for cart updates
-        window.addEventListener('storage', function(event) {
-            if (event.key === 'wineBubbles_cart') {
-                if (window.CartUtils) {
-                    window.CartUtils.updateCartBadge();
-                }
-            }
-        });
-        
         console.log('✅ All Wines page authentication initialized');
     });
   </script>
-</body>
 </html>
