@@ -1004,6 +1004,177 @@ app.get('/api/deliveries/:id', async (req, res) => {
         });
     }
 });
+// ============ WINE ENDPOINTS ============
+
+// Get all wines
+app.get('/api/wines', async (req, res) => {
+  try {
+    console.log('🍷 Fetching wines from backend');
+    
+    // Forward query parameters
+    const queryParams = new URLSearchParams(req.query).toString();
+    const backendUrl = queryParams ? 
+      `${BACKEND_URL}/api/wines?${queryParams}` : 
+      `${BACKEND_URL}/api/wines`;
+    
+    console.log('🍷 Backend URL:', backendUrl);
+    
+    const response = await fetch(backendUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 10000 // 10 second timeout
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`🍷 Wines response: ${response.status} (${Array.isArray(data) ? data.length : 'object'})`);
+    
+    res.status(response.status).json(data);
+    
+  } catch (error) {
+    console.error('🚨 Wines proxy error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch wines',
+      error: error.message
+    });
+  }
+});
+
+// Get featured wines (special endpoint)
+app.get('/api/wines/featured', async (req, res) => {
+  try {
+    console.log('🌟 Fetching featured wines from backend');
+    
+    const response = await fetch(`${BACKEND_URL}/api/wines/featured/featured`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 10000
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`🌟 Featured wines response: ${response.status} (${Array.isArray(data) ? data.length : 0} wines)`);
+    
+    res.status(response.status).json(data);
+    
+  } catch (error) {
+    console.error('🚨 Featured wines proxy error:', error.message);
+    
+    // Return fallback data if backend fails
+    const fallbackWines = [
+      {
+        id: 1,
+        name: 'The African Diamond Grenache Noir',
+        type: 'Red Wine',
+        price: 299.99,
+        bannerImageUrl: 'assets/wines/breakfast/Noir.png',
+        imageUrl: 'assets/wines/breakfast/Noir.png',
+        isFeatured: true
+      },
+      {
+        id: 2,
+        name: 'The African Diamond Grenache Blanc',
+        type: 'White Wine',
+        price: 299.99,
+        bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
+        imageUrl: 'assets/wines/breakfast/Blanc.png',
+        isFeatured: true
+      },
+      {
+        id: 3,
+        name: 'YBY Crystal Dry',
+        type: 'Champagne',
+        price: 499.99,
+        bannerImageUrl: 'assets/wines/breakfast/YBY.png',
+        imageUrl: 'assets/wines/breakfast/YBY.png',
+        isFeatured: true
+      }
+    ];
+    
+    console.log('⚠️ Using fallback featured wines data');
+    res.json(fallbackWines);
+  }
+});
+
+// Get single wine by ID
+app.get('/api/wines/:id', async (req, res) => {
+  try {
+    console.log('🍷 Fetching wine by ID:', req.params.id);
+    
+    const response = await fetch(`${BACKEND_URL}/api/wines/${req.params.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 10000
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`🍷 Wine by ID response: ${response.status}`);
+    
+    res.status(response.status).json(data);
+    
+  } catch (error) {
+    console.error('🚨 Wine by ID proxy error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch wine',
+      error: error.message
+    });
+  }
+});
+
+// Test wines endpoint
+app.get('/api/test/wines', async (req, res) => {
+  try {
+    console.log('🧪 Testing wines connection to backend');
+    
+    const response = await fetch(`${BACKEND_URL}/api/wines?all=true`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+    
+    const data = await response.json();
+    
+    res.json({
+      success: true,
+      backendUrl: BACKEND_URL,
+      status: response.status,
+      winesCount: Array.isArray(data) ? data.length : 0,
+      sampleWine: Array.isArray(data) && data.length > 0 ? data[0] : null
+    });
+    
+  } catch (error) {
+    console.error('🧪 Wines test failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Cannot connect to backend wines endpoint',
+      error: error.message,
+      backendUrl: BACKEND_URL
+    });
+  }
+});
 
 // ============ CATCH-ALL ROUTE ============
 

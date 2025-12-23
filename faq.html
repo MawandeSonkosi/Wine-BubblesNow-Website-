@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms & Conditions - Wine & Bubbles Now</title>
+    <title>FAQ - Wine & Bubbles Now</title>
     
     <!-- Same as homepage -->
     <link rel="icon" type="image/png" href="assets/categories/Icons.png">
@@ -105,14 +105,14 @@
 
         .top-icons .icon:hover { color: var(--maroon); }
 
-        /* Terms & Conditions Section Styles */
-        .terms-section {
+        /* FAQ Section Styles */
+        .faq-section {
             padding: 60px 0;
             min-height: calc(100vh - 260px);
             background: #fafafa;
         }
 
-        .terms-container {
+        .faq-container {
             max-width: 900px;
             margin: 0 auto;
             background: white;
@@ -121,14 +121,14 @@
             overflow: hidden;
         }
 
-        .terms-header {
+        .faq-header {
             background: linear-gradient(135deg, var(--maroon) 0%, #8a1e3d 100%);
             color: white;
             padding: 50px 40px;
             text-align: center;
         }
 
-        .terms-title {
+        .faq-title {
             font-family: 'Playfair Display', serif;
             font-size: 42px;
             font-weight: 700;
@@ -161,7 +161,7 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        .terms-content {
+        .faq-content {
             padding: 50px;
             line-height: 1.8;
             color: #333;
@@ -170,43 +170,85 @@
         .welcome-note {
             font-size: 18px;
             color: var(--maroon);
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             padding-bottom: 20px;
             border-bottom: 2px solid #eee;
             font-weight: 600;
+            text-align: center;
         }
 
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 28px;
-            color: var(--maroon);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .subsection {
+        /* FAQ Accordion Styles */
+        .faq-item {
             margin-bottom: 25px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .subsection-title {
-            font-size: 20px;
+        .faq-item.active {
+            border-color: var(--maroon);
+            box-shadow: 0 4px 15px rgba(107, 13, 43, 0.1);
+        }
+
+        .faq-question {
+            padding: 25px 30px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 18px;
             color: #333;
-            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: #f9f9f9;
+        }
+
+        .faq-question-number {
+            display: inline-block;
+            background: var(--maroon);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            margin-right: 15px;
+            font-size: 14px;
             font-weight: 600;
         }
 
-        .subsection-content {
-            color: #555;
-            font-size: 16px;
-            margin-bottom: 15px;
+        .faq-icon {
+            color: var(--maroon);
+            font-size: 18px;
+            transition: transform 0.3s;
         }
 
-        .subsection-content p {
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 30px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: #fcfcfc;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 25px 30px;
+            max-height: 1000px;
+        }
+
+        .faq-answer p {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.7;
             margin-bottom: 15px;
         }
 
@@ -215,35 +257,49 @@
             font-weight: 600;
         }
 
-        ul {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-
-        li {
-            margin-bottom: 8px;
-            color: #555;
-        }
-
-        /* Company Info Section */
-        .company-info {
+        /* Contact Prompt */
+        .contact-prompt {
             background: #f9f9f9;
             border-radius: 12px;
-            padding: 30px;
+            padding: 40px;
             margin-top: 50px;
-            border-left: 4px solid var(--maroon);
+            text-align: center;
+            border-top: 4px solid var(--maroon);
         }
 
-        .company-name {
+        .contact-title {
             font-family: 'Playfair Display', serif;
-            font-size: 24px;
+            font-size: 28px;
             color: var(--maroon);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        .company-details {
+        .contact-text {
             color: #555;
-            line-height: 1.6;
+            font-size: 16px;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        .contact-button {
+            display: inline-block;
+            background: var(--maroon);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .contact-button:hover {
+            background: #8a1e3d;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(107, 13, 43, 0.2);
         }
 
         /* FOOTER (Same as homepage) */
@@ -355,24 +411,37 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .terms-header {
+            .faq-header {
                 padding: 40px 30px;
             }
 
-            .terms-title {
+            .faq-title {
                 font-size: 32px;
             }
 
-            .terms-content {
+            .faq-content {
                 padding: 40px 30px;
             }
 
-            .section-title {
-                font-size: 24px;
+            .faq-question {
+                padding: 20px;
+                font-size: 17px;
             }
 
-            .subsection-title {
-                font-size: 18px;
+            .faq-question-number {
+                width: 28px;
+                height: 28px;
+                line-height: 28px;
+                font-size: 13px;
+                margin-right: 12px;
+            }
+
+            .contact-prompt {
+                padding: 30px;
+            }
+
+            .contact-title {
+                font-size: 24px;
             }
 
             .footer-inner {
@@ -400,25 +469,34 @@
         }
 
         @media (max-width: 600px) {
-            .terms-section {
+            .faq-section {
                 padding: 40px 0;
             }
 
-            .terms-container {
+            .faq-container {
                 margin: 0 15px;
             }
 
-            .terms-title {
+            .faq-title {
                 font-size: 28px;
             }
 
-            .terms-content {
+            .faq-content {
                 padding: 30px 20px;
             }
 
             .breadcrumb {
                 flex-wrap: wrap;
                 font-size: 13px;
+            }
+
+            .faq-question {
+                padding: 18px;
+                font-size: 16px;
+            }
+
+            .faq-answer p {
+                font-size: 15px;
             }
 
             .topbar-main {
@@ -430,22 +508,36 @@
                 height: 40px;
             }
 
-            .company-info {
-                padding: 20px;
+            .contact-prompt {
+                padding: 25px 20px;
             }
         }
 
         @media (max-width: 480px) {
-            .terms-title {
+            .faq-title {
                 font-size: 24px;
             }
 
-            .section-title {
+            .faq-question-number {
+                width: 24px;
+                height: 24px;
+                line-height: 24px;
+                font-size: 12px;
+                margin-right: 10px;
+            }
+
+            .faq-question {
+                font-size: 15px;
+                padding: 16px;
+            }
+
+            .contact-title {
                 font-size: 22px;
             }
 
-            .subsection-title {
-                font-size: 17px;
+            .contact-button {
+                padding: 12px 25px;
+                font-size: 14px;
             }
 
             .welcome-note {
@@ -492,171 +584,167 @@
         </div>
     </div>
 
-    <!-- Terms & Conditions Content -->
-    <section class="terms-section">
-        <div class="terms-container">
-            <div class="terms-header">
-                <h1 class="terms-title">Terms & Conditions</h1>
+    <!-- FAQ Content -->
+    <section class="faq-section">
+        <div class="faq-container">
+            <div class="faq-header">
+                <h1 class="faq-title">Frequently Asked Questions</h1>
                 <div class="breadcrumb">
                     <a href="index.html">HOME</a>
                     <span>|</span>
                     <a href="privacy_policy.html">PRIVACY POLICY</a>
                     <span>|</span>
-                    <span>TERMS & CONDITIONS</span>
+                    <a href="terms_conditions.html">TERMS & CONDITIONS</span>
                     <span>|</span>
                     <a href="about_us.html">ABOUT US</a>
                     <span>|</span>
-                    <a href="contact_us.html">CONTACT US</a>
+                    <a href="contact_us.html">CONTACT US</span>
                 </div>
             </div>
 
-            <div class="terms-content">
+            <div class="faq-content">
                 <div class="welcome-note">
-                    Welcome to Wine & Bubbles Now. These Terms and Conditions outline the rules and regulations for using our website and engaging with our products and services. By accessing this website, you accept these Terms and Conditions in full. If you disagree with any part, please discontinue use of the website immediately.
+                    Find answers to common questions about our services, delivery, payments, and more. Can't find what you're looking for? Contact our support team.
                 </div>
 
-                <!-- Section I: Introduction -->
-                <div class="section">
-                    <h2 class="section-title">I. Introduction</h2>
-                    <div class="subsection">
-                        <div class="subsection-content">
-                            <p>Wine & Bubbles Now is a brand that values quality, excellence, and exclusivity. Through this platform, we provide information and access to our products, particularly our range of exclusive wines crafted in South Africa.</p>
+                <!-- FAQ Items -->
+                <div class="faq-item active">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">1</span>
+                            What are your delivery hours?
                         </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
                     </div>
-                </div>
-
-                <!-- Section II: Use of the Website -->
-                <div class="section">
-                    <h2 class="section-title">II. Use of the Website</h2>
-                    
-                    <div class="subsection">
-                        <h3 class="subsection-title">2.1. Eligibility</h3>
-                        <div class="subsection-content">
-                            <p>To use this website, you must be at least 18 years old or the legal drinking age in your country of residence. By using the website, you confirm that you meet this requirement.</p>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3 class="subsection-title">2.2. Content Ownership</h3>
-                        <div class="subsection-content">
-                            <p>All content, images, and text on this website are the intellectual property of <span class="highlight">Wine & Bubbles Now</span> unless otherwise stated. Unauthorized use, reproduction, or redistribution is prohibited without prior written consent.</p>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3 class="subsection-title">2.3. Prohibited Actions</h3>
-                        <div class="subsection-content">
-                            <ul>
-                                <li>Using the website for fraudulent activities.</li>
-                                <li>Attempting to interfere with the website's functionality.</li>
-                                <li>Accessing or collecting data from the website without authorization.</li>
-                            </ul>
-                        </div>
+                    <div class="faq-answer">
+                        <p>We deliver daily from 9:00 AM to 11:00 PM throughout South Africa.</p>
                     </div>
                 </div>
 
-                <!-- Section III: Products and Orders -->
-                <div class="section">
-                    <h2 class="section-title">III. Products and Orders</h2>
-                    
-                    <div class="subsection">
-                        <h3 class="subsection-title">3.1. Product Availability</h3>
-                        <div class="subsection-content">
-                            <p>The availability of our wines is subject to stock levels and may vary. We reserve the right to modify or discontinue any product without prior notice.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">2</span>
+                            Do you offer same-day delivery?
                         </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
                     </div>
-
-                    <div class="subsection">
-                        <h3 class="subsection-title">3.2. Order Process</h3>
-                        <div class="subsection-content">
-                            <p>Orders placed through our website are considered an offer to purchase. We reserve the right to accept or decline orders at our discretion.</p>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3 class="subsection-title">3.3. Pricing</h3>
-                        <div class="subsection-content">
-                            <p>All prices listed on our website are in South African Rand (ZAR) and are subject to change without notice. Taxes and delivery charges may apply and will be clearly stated at checkout.</p>
-                        </div>
-                    </div>
-
-                    <div class="subsection">
-                        <h3 class="subsection-title">3.4. Delivery</h3>
-                        <div class="subsection-content">
-                            <p>We deliver within South Africa and selected international locations. Delivery times and costs vary depending on your location and will be provided during the checkout process.</p>
-                        </div>
+                    <div class="faq-answer">
+                        <p>Yes, we offer same-day delivery for orders placed before 8:00 PM.</p>
                     </div>
                 </div>
 
-                <!-- Section IV: Returns and Refunds -->
-                <div class="section">
-                    <h2 class="section-title">IV. Returns and Refunds</h2>
-                    
-                    <div class="subsection">
-                        <h3 class="subsection-title">4.1. Returns</h3>
-                        <div class="subsection-content">
-                            <p>Due to the nature of our products, we can only accept returns for defective or damaged items. Proof of purchase and photographic evidence may be required.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">3</span>
+                            What payment methods do you accept?
                         </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
                     </div>
-
-                    <div class="subsection">
-                        <h3 class="subsection-title">4.2. Refunds</h3>
-                        <div class="subsection-content">
-                            <p>Refunds will be processed only for valid returns as per the above condition and will be credited to the original payment method within 7-14 business days.</p>
-                        </div>
+                    <div class="faq-answer">
+                        <p>We accept credit cards, debit cards, and mobile payment methods.</p>
                     </div>
                 </div>
 
-                <!-- Section V: Privacy Policy -->
-                <div class="section">
-                    <h2 class="section-title">V. Privacy Policy</h2>
-                    <div class="subsection">
-                        <div class="subsection-content">
-                            <p>We are committed to protecting your privacy. Any personal information collected on this website will be used solely for the purpose of processing orders and improving your shopping experience. For more information, refer to our <a href="privacy_policy.html" class="highlight">Privacy Policy</a>.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">4</span>
+                            Can I schedule delivery for a specific time?
                         </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, you can schedule delivery during checkout for your preferred time slot.</p>
                     </div>
                 </div>
 
-                <!-- Section VI: Limitation of Liability -->
-                <div class="section">
-                    <h2 class="section-title">VI. Limitation of Liability</h2>
-                    <div class="subsection">
-                        <div class="subsection-content">
-                            <p><span class="highlight">Wine & Bubbles Now</span> is not liable for:</p>
-                            <ul>
-                                <li>Indirect or consequential damages arising from the use of our website or products.</li>
-                                <li>Delays or failure to perform our obligations due to events beyond our control, such as natural disasters or transportation issues.</li>
-                            </ul>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">5</span>
+                            What is your return policy?
                         </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Due to the nature of our products, we can only accept returns for defective or damaged items.</p>
                     </div>
                 </div>
 
-                <!-- Section VII: Governing Law -->
-                <div class="section">
-                    <h2 class="section-title">VII. Governing Law</h2>
-                    <div class="subsection">
-                        <div class="subsection-content">
-                            <p>These Terms and Conditions are governed by and construed in accordance with the laws of South Africa. Any disputes arising will be subject to the exclusive jurisdiction of the South African courts.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">6</span>
+                            How do I track my order?
                         </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You will receive tracking information via email and SMS once your order is dispatched.</p>
                     </div>
                 </div>
 
-                <!-- Section VIII: Changes to Terms and Conditions -->
-                <div class="section">
-                    <h2 class="section-title">VIII. Changes to Terms and Conditions</h2>
-                    <div class="subsection">
-                        <div class="subsection-content">
-                            <p>We may update these Terms and Conditions periodically. Continued use of the website implies acceptance of any changes. Please review them regularly to stay informed.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">7</span>
+                            Do you deliver to all areas in South Africa?
                         </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we deliver throughout South Africa. Delivery times may vary by location.</p>
                     </div>
                 </div>
 
-                <!-- Company Information -->
-                <div class="company-info">
-                    <div class="company-name">Wine & Bubbles Now</div>
-                    <div class="company-details">
-                        <p>We're dedicated to bringing you the finest selection of wines with exceptional service throughout South Africa.</p>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">8</span>
+                            What is the minimum order amount?
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
                     </div>
+                    <div class="faq-answer">
+                        <p>There is no minimum order amount for delivery.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">9</span>
+                            Can I cancel my order?
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Orders can be cancelled within 1 hour of placement. Contact us immediately for cancellations.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <div>
+                            <span class="faq-question-number">10</span>
+                            Do you offer wine recommendations?
+                        </div>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! Our wine experts are happy to provide recommendations based on your preferences.</p>
+                    </div>
+                </div>
+
+                <!-- Contact Prompt -->
+                <div class="contact-prompt">
+                    <h2 class="contact-title">Still Have Questions?</h2>
+                    <p class="contact-text">Our customer support team is ready to help you with any additional questions you may have about our products, services, or delivery options.</p>
+                    <button class="contact-button" onclick="window.location.href='contact_us.html'">
+                        Contact Support
+                    </button>
                 </div>
             </div>
         </div>
@@ -692,7 +780,7 @@
                     <h4 class="footer-heading">&nbsp;</h4>
                     <ul class="footer-links">
                         <li><a href="contact_us.html">Contact Us</a></li>
-                        <li><a href="/faq.html">FAQ</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
                         <li><a href="terms_conditions.html">Terms & Conditions</a></li>
                     </ul>
                 </div>
@@ -709,6 +797,27 @@
             // Elements
             const userIcon = document.getElementById('userIcon');
             const userIconElement = document.getElementById('userIconElement');
+            
+            // FAQ Accordion Functionality
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            // Initialize first FAQ as open
+            faqItems[0].classList.add('active');
+            
+            // Add click event to each FAQ question
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    // Close all other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    // Toggle current item
+                    item.classList.toggle('active');
+                });
+            });
             
             // Check if user is logged in and update top navigation
             checkAuth();

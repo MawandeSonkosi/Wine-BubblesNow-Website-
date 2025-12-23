@@ -263,7 +263,7 @@
           <h4 class="footer-heading">&nbsp;</h4>
           <ul class="footer-links">
             <li><a href="../index.html#contact">Contact Us</a></li>
-            <li><a href="#">FAQ</a></li>
+            <li><a href="/faq.html">FAQ</a></li>
             <li><a href="/terms_conditions.html">Terms & Conditions</a></li>
           </ul>
         </div>
@@ -307,38 +307,58 @@
             localStorage.removeItem('wineBubbles_userImage');
             localStorage.removeItem('wineBubbles_userVerified');
             localStorage.removeItem('wineBubbles_userCreated');
-            
-            // Update cart count
-            updateCartCount(0);
         }
         
-        // Update cart count display
-        function updateCartCount(count) {
+        // Update cart count display - FIXED VERSION
+        function updateCartCount() {
             const cartBadge = document.getElementById('cartBadge');
-            if (cartBadge) {
+            if (!cartBadge) return;
+            
+            try {
+                // Get cart from localStorage
+                const cartData = localStorage.getItem('wine_cart');
+                let count = 0;
+                
+                if (cartData) {
+                    const cart = JSON.parse(cartData);
+                    if (cart.items && Array.isArray(cart.items)) {
+                        // Calculate total quantity
+                        count = cart.items.reduce((total, item) => {
+                            return total + (item.quantity || 0);
+                        }, 0);
+                    }
+                }
+                
+                console.log(`🛒 Cart badge update: ${count} items`);
+                
                 if (count > 0) {
-                    cartBadge.textContent = count;
+                    cartBadge.textContent = count > 99 ? '99+' : count.toString();
                     cartBadge.style.display = 'flex';
                 } else {
+                    cartBadge.textContent = '0';
                     cartBadge.style.display = 'none';
                 }
+                
+                return count;
+            } catch (error) {
+                console.error('Error updating cart badge:', error);
+                cartBadge.style.display = 'none';
+                return 0;
             }
         }
         
-        // Load cart count from localStorage
-        function loadCartCount() {
-            const cartData = localStorage.getItem('wineBubbles_cart');
-            if (cartData) {
-                try {
-                    const cart = JSON.parse(cartData);
-                    const itemCount = cart.items ? cart.items.length : 0;
-                    updateCartCount(itemCount);
-                } catch (error) {
-                    console.error('Error parsing cart data:', error);
-                    updateCartCount(0);
-                }
-            } else {
-                updateCartCount(0);
+        // Initialize cart if not exists
+        function initializeCart() {
+            if (!localStorage.getItem('wine_cart')) {
+                const emptyCart = {
+                    items: [],
+                    subtotal: 0,
+                    deliveryFee: 0,
+                    total: 0,
+                    updatedAt: new Date().toISOString()
+                };
+                localStorage.setItem('wine_cart', JSON.stringify(emptyCart));
+                console.log('🆕 Created new empty cart');
             }
         }
         
@@ -354,8 +374,9 @@
         const userIconElement = document.getElementById('userIconElement');
         const cartIcon = document.getElementById('cartIcon');
         
-        // Load cart count
-        loadCartCount();
+        // Initialize cart and update badge
+        initializeCart();
+        updateCartCount();
         
         if (isValidToken && userData) {
             console.log('✅ User is logged in on Category Wines page');
@@ -381,18 +402,19 @@
                 // Create appropriate dropdown based on user type
                 createUserDropdown(user, isAdmin, isDriver);
                 
-                // Cart functionality
+                // Cart functionality - FIXED
                 if (cartIcon) {
-                    cartIcon.addEventListener('click', function(e) {
-                        if (isValidToken) {
-                            // Allow cart access for logged in users
-                            window.location.href = '../cart/cart.html';
-                        } else {
+                    // Update href based on login status
+                    if (isValidToken) {
+                        cartIcon.href = '../cart/cart.html';
+                    } else {
+                        cartIcon.href = '#';
+                        cartIcon.addEventListener('click', function(e) {
                             e.preventDefault();
                             alert('Please login to view your cart');
                             window.location.href = '../login/login.html';
-                        }
-                    });
+                        });
+                    }
                 }
                 
             } catch (error) {
@@ -408,6 +430,7 @@
             
             // Cart requires login
             if (cartIcon) {
+                cartIcon.href = '#';
                 cartIcon.addEventListener('click', function(e) {
                     e.preventDefault();
                     alert('Please login to view your cart');
@@ -572,27 +595,20 @@
         
         // Add event listener for cart updates
         window.addEventListener('storage', function(event) {
-            if (event.key === 'wineBubbles_cart') {
-                loadCartCount();
+            if (event.key === 'wine_cart') {
+                console.log('🔄 Cart storage event received');
+                updateCartCount();
             }
         });
         
-        // Initialize cart if not exists
-        function initializeCart() {
-            if (!localStorage.getItem('wineBubbles_cart')) {
-                const emptyCart = {
-                    items: [],
-                    total: 0,
-                    updatedAt: new Date().toISOString()
-                };
-                localStorage.setItem('wineBubbles_cart', JSON.stringify(emptyCart));
-            }
-        }
-        
-        initializeCart();
+        // Listen for cart update events
+        window.addEventListener('cartUpdated', function() {
+            console.log('🔄 Cart update event received');
+            updateCartCount();
+        });
         
         console.log('✅ Category Wines page authentication initialized');
     });
-  </script>
+</script>
 </body>
 </html>

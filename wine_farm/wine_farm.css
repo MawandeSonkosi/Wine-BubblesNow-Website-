@@ -66,6 +66,7 @@
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
+/* ===== IMAGE FIX - UPDATED ===== */
 .wine-farm-image-container {
   height: 200px;
   background: #f8f8f8;
@@ -82,11 +83,13 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+  display: block;
 }
 
 .wine-farm-card:hover .wine-farm-image {
   transform: scale(1.05);
 }
+/* ===== END IMAGE FIX ===== */
 
 .wine-farm-label {
   background: #1b1b1b;

@@ -17,7 +17,173 @@
   <link rel="stylesheet" href="style.css" />
   <script src="/cart/cart-utils.js"></script>
   <style>
-    /* Additional styles for user dropdown */
+    /* Age Verification Modal Styles */
+    .age-verification-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    .age-verification-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .age-verification-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #6b0d2b, #8a1e3d, #6b0d2b);
+    }
+    
+    .age-verification-logo {
+      height: 70px;
+      margin-bottom: 20px;
+    }
+    
+    .age-verification-title {
+      font-family: 'Playfair Display', serif;
+      color: #6b0d2b;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    
+    .age-verification-subtitle {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+    
+    .age-verification-text {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+    
+    .age-verification-warning {
+      background: #f9f2f4;
+      border-left: 4px solid #6b0d2b;
+      padding: 15px;
+      margin-bottom: 30px;
+      text-align: left;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .age-verification-warning i {
+      color: #6b0d2b;
+      margin-right: 10px;
+    }
+    
+    .age-verification-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    
+    .age-btn {
+      padding: 16px 40px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 180px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .age-btn-yes {
+      background: #6b0d2b;
+      color: white;
+    }
+    
+    .age-btn-yes:hover {
+      background: #8a1e3d;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(107, 13, 43, 0.4);
+    }
+    
+    .age-btn-no {
+      background: #f5f5f5;
+      color: #666;
+      border: 2px solid #ddd;
+    }
+    
+    .age-btn-no:hover {
+      background: #e9e9e9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .age-verification-footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      color: #999;
+      font-size: 14px;
+    }
+    
+    /* Responsive adjustments for age modal */
+    @media (max-width: 768px) {
+      .age-verification-content {
+        padding: 30px 20px;
+        width: 95%;
+      }
+      
+      .age-verification-title {
+        font-size: 28px;
+      }
+      
+      .age-verification-subtitle {
+        font-size: 16px;
+      }
+      
+      .age-verification-buttons {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .age-btn {
+        width: 100%;
+        min-width: auto;
+        padding: 14px 20px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .age-verification-title {
+        font-size: 24px;
+      }
+      
+      .age-verification-text {
+        font-size: 14px;
+      }
+    }
+    
     .user-dropdown {
       position: absolute;
       top: 100px;
@@ -137,9 +303,379 @@
       margin-left: 8px;
       vertical-align: middle;
     }
+    
+    /* Banner Carousel Styles - UPDATED WITH TALLER HEIGHT */
+    .banner-carousel-container {
+      position: relative;
+      max-width: 1000px; /* Slightly wider */
+      margin: 0 auto 40px;
+      overflow: hidden;
+      border-radius: 16px; /* More rounded like Flutter */
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15); /* Stronger shadow */
+      background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
+    }
+    
+    .banner-carousel-track {
+      display: flex;
+      transition: transform 0.6s ease-in-out;
+      height: 380px; /* INCREASED HEIGHT - shows more of top part */
+      will-change: transform;
+    }
+    
+    .banner-carousel-slide {
+      min-width: 100%;
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .banner-carousel-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.8s ease;
+    }
+    
+    .banner-carousel-slide:hover .banner-carousel-image {
+      transform: scale(1.05);
+    }
+    
+    .banner-slide-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, 
+        rgba(0,0,0,0.9) 0%, 
+        rgba(0,0,0,0.7) 50%, 
+        rgba(0,0,0,0) 100%);
+      color: white;
+      padding: 25px;
+      padding-top: 60px;
+    }
+    
+    .banner-slide-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    
+    .banner-slide-subtitle {
+      font-size: 18px;
+      opacity: 0.95;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    
+    .banner-slide-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--maroon);
+      background: rgba(255,255,255,0.95);
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 25px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    /* Navigation Buttons */
+    .carousel-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 22px;
+      color: var(--maroon);
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .carousel-nav-btn:hover {
+      background: white;
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    .carousel-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: translateY(-50%) scale(1);
+    }
+    
+    .prev-btn {
+      left: 25px;
+    }
+    
+    .next-btn {
+      right: 25px;
+    }
+    
+    /* Carousel Dots */
+    .carousel-dots {
+      position: absolute;
+      bottom: 25px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      z-index: 10;
+    }
+    
+    .carousel-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .carousel-dot.active {
+      background: var(--maroon);
+      border-color: white;
+      transform: scale(1.3);
+      box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+    }
+    
+    .carousel-dot:hover:not(.active) {
+      background: white;
+      transform: scale(1.2);
+    }
+    
+    /* Loading State for Carousel */
+    .banner-carousel-track .loading-state {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      min-height: 380px; /* MATCHES INCREASED HEIGHT */
+    }
+    
+    .banner-carousel-track .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(107, 13, 43, 0.1);
+      border-top-color: #6b0d2b;
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    /* Error and Empty States */
+    .carousel-error-state,
+    .carousel-empty-state {
+      width: 100%;
+      text-align: center;
+      padding: 60px 40px;
+      min-height: 380px; /* MATCHES INCREASED HEIGHT */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .carousel-error-state i,
+    .carousel-empty-state i {
+      font-size: 56px;
+      margin-bottom: 20px;
+    }
+    
+    .carousel-error-state i {
+      color: #ff6b6b;
+    }
+    
+    .carousel-empty-state i {
+      color: #6b0d2b;
+      opacity: 0.5;
+    }
+    
+    .carousel-error-state h3,
+    .carousel-empty-state h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: #1b1b1b;
+      margin-bottom: 12px;
+    }
+    
+    .carousel-error-state p,
+    .carousel-empty-state p {
+      color: #666;
+      margin-bottom: 25px;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+    
+    .btn-fill {
+      background: #6b0d2b;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-fill:hover {
+      background: #5a0b23;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(107, 13, 43, 0.3);
+    }
+    
+    /* Responsive Design for Carousel */
+    @media (max-width: 1100px) {
+      .banner-carousel-container {
+        max-width: 95%;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .banner-carousel-track {
+        height: 300px; /* ADJUSTED FOR TABLET */
+      }
+      
+      .banner-slide-overlay {
+        padding: 20px;
+        padding-top: 50px;
+      }
+      
+      .banner-slide-title {
+        font-size: 22px;
+      }
+      
+      .banner-slide-subtitle {
+        font-size: 16px;
+      }
+      
+      .banner-slide-price {
+        font-size: 20px;
+        padding: 6px 16px;
+      }
+      
+      .carousel-nav-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+      }
+      
+      .prev-btn {
+        left: 15px;
+      }
+      
+      .next-btn {
+        right: 15px;
+      }
+      
+      .carousel-error-state,
+      .carousel-empty-state {
+        padding: 40px 20px;
+        min-height: 300px; /* ADJUSTED FOR TABLET */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .banner-carousel-track {
+        height: 250px; /* ADJUSTED FOR MOBILE */
+      }
+      
+      .banner-slide-overlay {
+        padding: 15px;
+        padding-top: 40px;
+      }
+      
+      .banner-slide-title {
+        font-size: 19px;
+      }
+      
+      .banner-slide-subtitle {
+        font-size: 14px;
+      }
+      
+      .banner-slide-price {
+        font-size: 18px;
+        padding: 5px 14px;
+      }
+      
+      .carousel-nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      
+      .prev-btn {
+        left: 10px;
+      }
+      
+      .next-btn {
+        right: 10px;
+      }
+      
+      .carousel-dot {
+        width: 12px;
+        height: 12px;
+      }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+  <!-- Age Verification Modal -->
+  <div id="ageVerificationModal" class="age-verification-modal" style="display: none;">
+    <div class="age-verification-content">
+      <img src="assets/categories/Logo_Top.png" alt="Wine & Bubbles" class="age-verification-logo">
+      <h1 class="age-verification-title">Age Verification Required</h1>
+      <h2 class="age-verification-subtitle">Welcome to Wine & Bubbles</h2>
+      
+      <p class="age-verification-text">
+        To access our exclusive collection of wines, champagnes, and spirits, we need to verify that you are of legal drinking age in your country.
+      </p>
+      
+      <div class="age-verification-warning">
+        <p><i class="fas fa-exclamation-triangle"></i> <strong>Important Notice:</strong> By entering this site, you confirm that you are at least 18 years old (or the legal drinking age in your country).</p>
+      </div>
+      
+      <h3 style="color: #6b0d2b; margin-bottom: 20px; font-size: 20px;">Are you 18 years or older?</h3>
+      
+      <div class="age-verification-buttons">
+        <button class="age-btn age-btn-yes" id="ageConfirmYes">
+          <i class="fas fa-check-circle"></i> Yes, I am 18+
+        </button>
+        <button class="age-btn age-btn-no" id="ageConfirmNo">
+          <i class="fas fa-times-circle"></i> No, I am under 18
+        </button>
+      </div>
+      
+      <div class="age-verification-footer">
+        <p><i class="fas fa-info-circle"></i> Alcohol should be consumed responsibly. Please drink responsibly.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Top bar with two sections -->
   <div class="topbar-top">
     <div class="topbar-top-inner">
@@ -183,45 +719,31 @@
       <img src="assets/adverts/deliver_now_banner.png" alt="Wine & Bubbles Banner - Click to view all wines" class="banner-image">
     </a>
   </section>
-  <!-- Curated Selection -->
+  <!-- Curated Selection - Dynamic Banner Carousel -->
   <section class="section curated">
     <div class="container">
       <h2 class="section-title">Curated Selection</h2>
 
-      <div class="cards-row">
-        <article class="card product-card">
-          <div class="card-image-container">
-            <img src="assets/wines/breakfast/Noir.png" alt="The African Diamond Grenache Noir" class="card-image">
+      <!-- Banner Carousel Container -->
+      <div class="banner-carousel-container">
+        <div class="banner-carousel-track" id="bannerCarouselTrack">
+          <!-- Featured banners will be loaded here by JavaScript -->
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading featured wines...</p>
           </div>
-          <div class="card-label">
-            <div class="label-title">The African Diamond</div>
-            <div class="label-sub">Grenache Noir</div>
-          </div>
-        </article>
-
-        <article class="card product-card">
-          <div class="card-image-container">
-            <img src="assets/wines/breakfast/Blanc.png" alt="The African Diamond Grenache Blanc" class="card-image">
-          </div>
-          <div class="card-label">
-            <div class="label-title">The African Diamond</div>
-            <div class="label-sub">Grenache Blanc</div>
-          </div>
-        </article>
-
-        <article class="card product-card">
-          <div class="card-image-container">
-            <img src="assets/wines/breakfast/YBY.png" alt="YBY Crystal Dry" class="card-image">
-          </div>
-          <div class="card-label">
-            <div class="label-title">YBY Crystal Dry</div>
-            <div class="label-sub">Champagne</div>
-          </div>
-        </article>
-      </div>
-
-      <div class="carousel-dots">
-        <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <button class="carousel-nav-btn prev-btn" id="prevBtn">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-nav-btn next-btn" id="nextBtn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <!-- Carousel Dots (will be generated dynamically) -->
+        <div class="carousel-dots" id="carouselDots"></div>
       </div>
 
       <!-- First Icon Row - Discover by Occasion -->
@@ -441,7 +963,7 @@
           <h4 class="footer-heading">&nbsp;</h4>
           <ul class="footer-links">
             <li><a href="/contact_us.html">Contact Us</a></li>
-            <li><a href="#">FAQ</a></li>
+            <li><a href="/faq.html">FAQ</a></li>
             <li><a href="/terms_conditions.html">Terms & Conditions</a></li>
           </ul>
         </div>
@@ -449,9 +971,63 @@
     </div>
   </footer>
 
+  <!-- Age Verification Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user has already confirmed age
+      const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+      
+      if (!ageConfirmed) {
+        // Show age verification modal
+        const ageModal = document.getElementById('ageVerificationModal');
+        ageModal.style.display = 'flex';
+        
+        // Disable scrolling on body
+        document.body.style.overflow = 'hidden';
+        
+        // Yes button - confirm age
+        document.getElementById('ageConfirmYes').addEventListener('click', function() {
+          localStorage.setItem('wineBubbles_ageConfirmed', 'true');
+          ageModal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+          
+          // Optional: Show welcome message
+          console.log('✅ Age verified - user is 18+');
+        });
+        
+        // No button - under age
+        document.getElementById('ageConfirmNo').addEventListener('click', function() {
+          // Show message and redirect to a safe page
+          alert('You must be 18 years or older to access Wine & Bubbles. Redirecting...');
+          
+          // You can redirect to a safe page or show a blocked page
+          // For now, we'll redirect to Google
+          window.location.href = 'https://www.google.com';
+        });
+        
+        // Prevent closing the modal by clicking outside
+        ageModal.addEventListener('click', function(e) {
+          if (e.target === ageModal) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+      }
+    });
+  </script>
+
+  <!-- Homepage authentication script -->
   <script>
     // Homepage authentication logic (Web version)
     document.addEventListener('DOMContentLoaded', function() {
+        // Only proceed with authentication if age is confirmed
+        const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+        
+        if (!ageConfirmed) {
+            console.log('⏳ Waiting for age verification...');
+            return; // Exit if age not confirmed
+        }
+        
         console.log('🏠 Homepage loaded - checking authentication');
         
         // Configuration
@@ -779,6 +1355,403 @@
         
         console.log('✅ Homepage authentication initialized');
     });
+  </script>
+
+  <!-- Banner Carousel JavaScript - AUTO-SCROLLING VERSION -->
+  <script>
+  // Banner Carousel JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check if age is confirmed before loading carousel
+    const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+    
+    if (!ageConfirmed) {
+        console.log('⏳ Age verification pending - delaying carousel initialization');
+        return;
+    }
+    
+    console.log('🎠 Initializing banner carousel...');
+    
+    // Configuration - USE LOCAL PROXY SERVER
+    const API_BASE_URL = 'http://localhost:3000/api'; // Your local proxy server
+    
+    // DOM Elements
+    const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const carouselDots = document.getElementById('carouselDots');
+    
+    // State
+    let featuredWines = [];
+    let currentSlide = 0;
+    let slidesPerView = 1; // For mobile, we'll adjust this later
+    let autoSlideInterval;
+    let isTransitioning = false;
+    let carouselWidth = 0;
+    
+    // Initialize
+    initCarousel();
+    
+    async function initCarousel() {
+      try {
+        console.log('🌐 Fetching featured wines...');
+        
+        // Use your local proxy server endpoint - GET WINES WHERE isFeatured = true
+        const apiUrl = `${API_BASE_URL}/wines/featured`;
+        
+        console.log('📡 Fetching from:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
+          throw new Error(`Failed to fetch featured wines: ${response.status}`);
+        }
+        
+        const wines = await response.json();
+        console.log(`✅ Received ${wines.length} featured wines`);
+        
+        // Filter wines where isFeatured = true (server should already do this, but double-check)
+        featuredWines = wines.filter(wine => wine.isFeatured === true);
+        
+        // If no featured wines, try to get all wines and find featured ones
+        if (featuredWines.length === 0) {
+          console.log('⚠️ No featured wines found, fetching all wines to check...');
+          
+          try {
+            const allWinesResponse = await fetch(`${API_BASE_URL}/wines?all=true`);
+            if (allWinesResponse.ok) {
+              const allWines = await allWinesResponse.json();
+              // Filter for featured wines
+              featuredWines = allWines.filter(wine => wine.isFeatured === true);
+              console.log(`🎯 Found ${featuredWines.length} featured wines from all wines`);
+            }
+          } catch (fallbackError) {
+            console.error('❌ Fallback also failed:', fallbackError);
+          }
+        }
+        
+        // If still no featured wines, use the first 3 wines with banner images
+        if (featuredWines.length === 0) {
+          console.log('⚠️ Still no featured wines, getting first 3 wines with images...');
+          
+          try {
+            const allWinesResponse = await fetch(`${API_BASE_URL}/wines?all=true`);
+            if (allWinesResponse.ok) {
+              const allWines = await allWinesResponse.json();
+              featuredWines = allWines
+                .filter(wine => wine.imageUrl || wine.bannerImageUrl)
+                .slice(0, 3);
+              console.log(`🖼️ Using ${featuredWines.length} wines with images as fallback`);
+            }
+          } catch (fallbackError) {
+            console.error('❌ Final fallback failed:', fallbackError);
+          }
+        }
+        
+        // Ultimate fallback: use static images if API fails completely
+        if (featuredWines.length === 0) {
+          console.log('⚠️ Using ultimate fallback - static wine images');
+          featuredWines = [
+            {
+              id: 1,
+              name: 'The African Diamond Grenache Noir',
+              type: 'Red Wine',
+              price: 299.99,
+              bannerImageUrl: 'assets/wines/breakfast/Noir.png',
+              imageUrl: 'assets/wines/breakfast/Noir.png',
+              isFeatured: true,
+              description: 'Premium Grenache Noir from African Diamond'
+            },
+            {
+              id: 2,
+              name: 'The African Diamond Grenache Blanc',
+              type: 'White Wine',
+              price: 299.99,
+              bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
+              imageUrl: 'assets/wines/breakfast/Blanc.png',
+              isFeatured: true,
+              description: 'Premium Grenache Blanc from African Diamond'
+            },
+            {
+              id: 3,
+              name: 'YBY Crystal Dry',
+              type: 'Champagne',
+              price: 499.99,
+              bannerImageUrl: 'assets/wines/breakfast/YBY.png',
+              imageUrl: 'assets/wines/breakfast/YBY.png',
+              isFeatured: true,
+              description: 'Premium Crystal Dry Champagne'
+            }
+          ];
+        }
+        
+        console.log(`🖼️ Carousel will show ${featuredWines.length} featured wines`);
+        console.log('📊 Featured wines data:', featuredWines.map(w => ({
+          id: w.id,
+          name: w.name,
+          isFeatured: w.isFeatured,
+          hasBanner: !!(w.bannerImageUrl || w.imageUrl)
+        })));
+        
+        if (featuredWines.length === 0) {
+          showEmptyState();
+          return;
+        }
+        
+        // Render the carousel
+        renderCarousel();
+        setupEventListeners();
+        startAutoSlide();
+        
+      } catch (error) {
+        console.error('❌ Error loading featured wines:', error);
+        showErrorState();
+      }
+    }
+    
+    function renderCarousel() {
+      // Clear loading state
+      bannerCarouselTrack.innerHTML = '';
+      carouselDots.innerHTML = '';
+      
+      // Create slides
+      featuredWines.forEach((wine, index) => {
+        createSlide(wine, index);
+      });
+      
+      // Update slides per view based on screen size
+      updateSlidesPerView();
+      
+      // Set initial position
+      setTimeout(() => {
+        updateCarouselPosition();
+        measureCarousel();
+      }, 50);
+    }
+    
+    function createSlide(wine, index) {
+      // Create slide element
+      const slide = document.createElement('div');
+      slide.className = 'banner-carousel-slide';
+      slide.dataset.index = index;
+      slide.dataset.wineId = wine.id;
+      
+      // Use bannerImageUrl if available, otherwise use imageUrl
+      let imageUrl = wine.bannerImageUrl || wine.imageUrl;
+      
+      // Fix image path if needed
+      if (imageUrl) {
+        if (!imageUrl.startsWith('http') && 
+            !imageUrl.startsWith('/') && 
+            !imageUrl.startsWith('assets/') &&
+            !imageUrl.startsWith('../')) {
+          imageUrl = 'assets/' + imageUrl;
+        }
+      } else {
+        imageUrl = 'assets/wines/breakfast/Noir.png'; // Default fallback
+      }
+      
+      // Create slide content
+      slide.innerHTML = `
+        <img src="${imageUrl}" 
+             alt="${wine.name}" 
+             class="banner-carousel-image"
+             loading="lazy"
+             onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png';">
+        <div class="banner-slide-overlay">
+          <div class="banner-slide-title">${wine.name}</div>
+          <div class="banner-slide-subtitle">${wine.type || 'Premium Wine'}</div>
+          <div class="banner-slide-price">R${(wine.price || 0).toFixed(2)}</div>
+        </div>
+      `;
+      
+      // Add click event to navigate to wine detail
+      slide.addEventListener('click', (e) => {
+        if (!isTransitioning) {
+          navigateToWineDetail(wine.id);
+        }
+      });
+      
+      bannerCarouselTrack.appendChild(slide);
+      
+      // Create dot for this slide
+      const dot = document.createElement('span');
+      dot.className = 'carousel-dot';
+      if (index === 0) dot.classList.add('active');
+      dot.dataset.index = index;
+      dot.addEventListener('click', () => {
+        if (!isTransitioning) {
+          clearInterval(autoSlideInterval);
+          goToSlide(index);
+          startAutoSlide();
+        }
+      });
+      carouselDots.appendChild(dot);
+    }
+    
+    function measureCarousel() {
+      if (bannerCarouselTrack.firstChild) {
+        carouselWidth = bannerCarouselTrack.firstChild.offsetWidth;
+      }
+    }
+    
+    function setupEventListeners() {
+      // Previous button
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+          if (!isTransitioning) {
+            clearInterval(autoSlideInterval);
+            prevSlide();
+            startAutoSlide();
+          }
+        });
+      }
+      
+      // Next button
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          if (!isTransitioning) {
+            clearInterval(autoSlideInterval);
+            nextSlide();
+            startAutoSlide();
+          }
+        });
+      }
+      
+      // Update slides per view on window resize
+      window.addEventListener('resize', () => {
+        updateSlidesPerView();
+        measureCarousel();
+        updateCarouselPosition();
+      });
+      
+      // Pause auto-slide on hover
+      bannerCarouselTrack.addEventListener('mouseenter', () => {
+        clearInterval(autoSlideInterval);
+      });
+      
+      bannerCarouselTrack.addEventListener('mouseleave', () => {
+        startAutoSlide();
+      });
+      
+      // Prevent rapid clicking during transitions
+      bannerCarouselTrack.addEventListener('transitionstart', () => {
+        isTransitioning = true;
+      });
+      
+      bannerCarouselTrack.addEventListener('transitionend', () => {
+        isTransitioning = false;
+      });
+    }
+    
+    function updateSlidesPerView() {
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        slidesPerView = 1; // Show 1 on desktop (like Flutter app)
+      } else if (width >= 768) {
+        slidesPerView = 1; // Show 1 on tablet
+      } else {
+        slidesPerView = 1; // Show 1 on mobile
+      }
+    }
+    
+    function nextSlide() {
+      if (isTransitioning) return;
+      
+      const nextSlideIndex = (currentSlide + 1) % featuredWines.length;
+      goToSlide(nextSlideIndex);
+    }
+    
+    function prevSlide() {
+      if (isTransitioning) return;
+      
+      const prevSlideIndex = (currentSlide - 1 + featuredWines.length) % featuredWines.length;
+      goToSlide(prevSlideIndex);
+    }
+    
+    function goToSlide(slideIndex) {
+      if (isTransitioning || slideIndex === currentSlide) return;
+      
+      currentSlide = slideIndex;
+      updateCarouselPosition();
+    }
+    
+    function updateCarouselPosition() {
+      // Calculate translation
+      const translateX = -currentSlide * 100; // 100% per slide
+      
+      // Apply smooth transition
+      bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
+      bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
+      
+      // Update active dot
+      document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+      });
+      
+      // Update button states
+      if (prevBtn) {
+        prevBtn.disabled = currentSlide === 0;
+      }
+      if (nextBtn) {
+        nextBtn.disabled = currentSlide >= featuredWines.length - 1;
+      }
+    }
+    
+    function startAutoSlide() {
+      clearInterval(autoSlideInterval);
+      
+      // Auto-rotate every 4 seconds (similar to Flutter app's 4 seconds)
+      autoSlideInterval = setInterval(() => {
+        if (!isTransitioning) {
+          nextSlide();
+        }
+      }, 4000);
+    }
+    
+    function navigateToWineDetail(wineId) {
+      console.log(`📱 Navigating to wine detail: ${wineId}`);
+      window.location.href = `wine/wine_detail.html?id=${wineId}`;
+    }
+    
+    function showEmptyState() {
+      bannerCarouselTrack.innerHTML = `
+        <div class="carousel-empty-state">
+          <i class="fas fa-wine-bottle"></i>
+          <h3>No Featured Wines Available</h3>
+          <p>Check back soon for curated selections</p>
+        </div>
+      `;
+      
+      // Hide navigation buttons and dots
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      if (carouselDots) carouselDots.style.display = 'none';
+    }
+    
+    function showErrorState() {
+      bannerCarouselTrack.innerHTML = `
+        <div class="carousel-error-state">
+          <i class="fas fa-exclamation-circle"></i>
+          <h3>Unable to Load Featured Wines</h3>
+          <p>Please try again later</p>
+          <button onclick="window.location.reload()" class="btn-fill">
+            Try Again
+          </button>
+        </div>
+      `;
+      
+      // Hide navigation buttons and dots
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.style.display = 'none';
+      if (carouselDots) carouselDots.style.display = 'none';
+    }
+  });
   </script>
 </body>
 </html>
