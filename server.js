@@ -15,7 +15,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'capacitor://localhost',
   'ionic://localhost',
-  // Add Railway domains - EXPLICITLY, no wildcards
+  // Add these exact domains:
   'https://wine-bubblesnow-website-production.up.railway.app',
   'http://wine-bubblesnow-website-production.up.railway.app',
   'https://shop.wineandbubblesnow.co.za',
