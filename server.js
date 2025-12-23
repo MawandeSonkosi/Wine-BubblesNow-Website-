@@ -15,9 +15,11 @@ const allowedOrigins = [
   'http://localhost:3000',
   'capacitor://localhost',
   'ionic://localhost',
-  // Add Railway domains
-  'https://*.up.railway.app',
-  'http://*.up.railway.app'
+  // Add Railway domains - EXPLICITLY, no wildcards
+  'https://wine-bubblesnow-website-production.up.railway.app',
+  'http://wine-bubblesnow-website-production.up.railway.app',
+  'https://shop.wineandbubblesnow.co.za',
+  'http://shop.wineandbubblesnow.co.za'
 ];
 app.use(cors({
   origin: function (origin, callback) {
