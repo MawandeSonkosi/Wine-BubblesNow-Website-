@@ -41,6 +41,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
+app.get('/', (req, res) => {
+  console.log('🏠 Serving index.html for homepage');
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({
@@ -1217,7 +1222,7 @@ app.get('*', (req, res, next) => {
   }
   
   // Otherwise serve index.html for SPA routing
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Error handling
