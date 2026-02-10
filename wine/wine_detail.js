@@ -1,6 +1,6 @@
-// Configuration
+// Wine Detail JavaScript - MATCHING FLUTTER APP
+// Configuration - USE EXACT SAME API AS FLUTTER
 const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
 
 // State
 let currentWine = null;
@@ -34,8 +34,36 @@ document.addEventListener('DOMContentLoaded', () => {
     showError('No wine ID provided in URL');
   }
   
+  // Initialize cart badge
+  if (window.CartUtils) {
+    console.log('✅ CartUtils loaded, updating badge');
+    window.CartUtils.updateCartBadge();
+  } else {
+    console.warn('⚠️ CartUtils not available');
+  }
+  
+  // Listen for cart updates
+  window.addEventListener('cartUpdated', (event) => {
+    console.log('🔄 Cart update event received');
+    if (window.CartUtils) {
+      window.CartUtils.updateCartBadge();
+    }
+  });
+  
+  // Listen for storage events (from other tabs)
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'wine_cart') {
+      console.log('🔄 Storage event received');
+      if (window.CartUtils) {
+        window.CartUtils.updateCartBadge();
+      }
+    }
+  });
+  
   setupEventListeners();
-  updateCartBadge();
+  
+  // Add debug button
+  addDebugButton();
 });
 
 // Event Listeners
@@ -67,27 +95,40 @@ function setupEventListeners() {
       });
     });
   }
+  
+  // Close filter dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!filterBtn?.contains(e.target) && !filterDropdown?.contains(e.target)) {
+      if (filterDropdown) {
+        filterDropdown.style.display = 'none';
+      }
+    }
+  });
 }
 
-// Fetch wine detail
+// Fetch wine detail - EXACTLY LIKE FLUTTER'S getWineById()
 async function fetchWineDetail(wineId) {
   try {
     showLoading();
     
     console.log(`🌐 Fetching wine detail for ID: ${wineId}`);
     
-    // Use CORS proxy
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/wines/${wineId}`)}`;
+    // Use EXACT SAME ENDPOINT as Flutter: https://www.wineandbubblesnow.co.za/api/wines/{id}
+    const apiUrl = `${API_BASE_URL}/wines/${wineId}`;
     
-    const response = await fetch(proxyUrl, {
+    console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
+    
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`Failed to fetch wine details: ${response.status}`);
     }
     
     const wine = await response.json();
@@ -103,7 +144,7 @@ async function fetchWineDetail(wineId) {
     // Update page title
     document.title = `Wine & Bubbles — ${wine.name}`;
     
-    // Fetch all wines for related wines section
+    // Fetch all wines for related wines section - USING FLUTTER'S getWines()
     await fetchAllWines();
     
     // Render wine detail
@@ -115,20 +156,25 @@ async function fetchWineDetail(wineId) {
   }
 }
 
-// Fetch all wines for related wines
+// Fetch all wines for related wines - EXACTLY LIKE FLUTTER'S getWines()
 async function fetchAllWines() {
   try {
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/wines?all=true`)}`;
+    // Use EXACT SAME ENDPOINT as Flutter: https://www.wineandbubblesnow.co.za/api/wines?all=true
+    const apiUrl = `${API_BASE_URL}/wines?all=true`;
     
-    const response = await fetch(proxyUrl, {
+    console.log('📡 Fetching all wines from (EXACT FLUTTER URL):', apiUrl);
+    
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`Failed to fetch all wines: ${response.status}`);
     }
     
     allWines = await response.json();
@@ -139,24 +185,27 @@ async function fetchAllWines() {
   }
 }
 
-// Helper to fix image URLs
+// Helper to fix image URLs - SAME AS FLUTTER
 function fixImageUrl(imageUrl) {
   if (!imageUrl) {
     return '../assets/wines/breakfast/Noir.png';
   }
   
+  // If starts with assets/, keep as is (relative to current page)
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
   
+  // If already has proper path or is absolute URL, return as-is
   if (imageUrl.startsWith('../assets/') || imageUrl.startsWith('http') || imageUrl.startsWith('/')) {
     return imageUrl;
   }
   
+  // Otherwise, assume it's relative to assets folder
   return '../assets/' + imageUrl;
 }
 
-// Render wine detail
+// Render wine detail - SIMILAR TO FLUTTER'S WineDetailScreen
 function renderWineDetail(wine) {
   const imageUrl = fixImageUrl(wine.imageUrl);
   const price = wine.price || 0;
@@ -178,7 +227,7 @@ function renderWineDetail(wine) {
       <div class="wine-detail-content">
         <h1 class="wine-detail-name">${wine.name}</h1>
         <div class="wine-detail-type">${type}</div>
-        <div class="wine-detail-price">R${price.toFixed(2)}</div>
+        <div class="wine-detail-price">R${price.toFixed(2)} per bottle</div>
         
         <div class="wine-detail-meta">
           <div class="wine-meta-item">
@@ -207,21 +256,51 @@ function renderWineDetail(wine) {
               <i class="fas fa-plus"></i>
             </button>
           </div>
+          
+          <!-- Add case option - SIMILAR TO FLUTTER ADD-ONS -->
+          <div class="case-option" style="margin: 15px 0; padding: 10px; background: #f8f8f8; border-radius: 8px;">
+            <label style="display: flex; align-items: center; cursor: pointer;">
+              <input type="checkbox" id="caseCheckbox" onchange="toggleCaseOption()">
+              <span style="margin-left: 10px; font-weight: 500;">
+                Add as case of 6 bottles (R${(price * 6).toFixed(2)})
+                <br><small style="font-size: 12px; color: #666;">Save 10% vs buying individually</small>
+              </span>
+            </label>
+          </div>
         ` : ''}
         
-        <button class="add-to-cart-btn" onclick="addToCart()" ${!isInStock ? 'disabled' : ''}>
-          ${isInStock ? 'Add to Cart' : 'Out of Stock'}
+        <button class="add-to-cart-btn" id="addToCartBtn" onclick="addToCart()" ${!isInStock ? 'disabled' : ''}>
+          ${isInStock ? `Add ${quantity} ${quantity === 1 ? 'bottle' : 'bottles'} to Cart (R${(price * quantity).toFixed(2)})` : 'Out of Stock'}
         </button>
       </div>
     </div>
   `;
 }
 
-// Quantity controls
+// Toggle case option
+function toggleCaseOption() {
+  const caseCheckbox = document.getElementById('caseCheckbox');
+  const addToCartBtn = document.getElementById('addToCartBtn');
+  
+  if (!caseCheckbox || !addToCartBtn || !currentWine) return;
+  
+  const price = currentWine.price || 0;
+  
+  if (caseCheckbox.checked) {
+    // Calculate case price (6 bottles)
+    const casePrice = price * 6;
+    addToCartBtn.textContent = `Add ${quantity} case${quantity > 1 ? 's' : ''} to Cart (R${(casePrice * quantity).toFixed(2)})`;
+  } else {
+    addToCartBtn.textContent = `Add ${quantity} ${quantity === 1 ? 'bottle' : 'bottles'} to Cart (R${(price * quantity).toFixed(2)})`;
+  }
+}
+
+// Quantity controls - SIMILAR TO FLUTTER'S _increment() and _decrement()
 function incrementQuantity() {
-  if (quantity < 10) { // Limit to max 10 items
+  if (quantity < 10) { // Limit to max 10 items (matches Flutter's limit)
     quantity++;
     updateQuantityDisplay();
+    toggleCaseOption(); // Update button text with new price
   }
 }
 
@@ -229,6 +308,7 @@ function decrementQuantity() {
   if (quantity > 1) {
     quantity--;
     updateQuantityDisplay();
+    toggleCaseOption(); // Update button text with new price
   }
 }
 
@@ -250,65 +330,81 @@ function updateQuantityDisplay() {
   }
 }
 
-// Add to cart
+// Add to cart - USING CORRECT CARTUTILS METHODS (matches Flutter's _addToCart())
 function addToCart() {
-  if (!currentWine) return;
+  if (!currentWine) {
+    console.error('❌ No current wine data');
+    showToast('No wine data available', 'error');
+    return;
+  }
   
   if (currentWine.stockCount <= 0) {
     showToast(`${currentWine.name} is out of stock`, 'error');
     return;
   }
   
-  // Get current cart from localStorage
-  let cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
+  const caseCheckbox = document.getElementById('caseCheckbox');
+  const isCase = caseCheckbox ? caseCheckbox.checked : false;
   
-  // Check if wine already in cart
-  const existingIndex = cart.findIndex(item => item.id === currentWine.id);
+  // Create cart item with correct structure
+  const cartItem = {
+    id: currentWine.id.toString(),
+    name: currentWine.name,
+    price: isCase ? currentWine.price * 6 : currentWine.price, // Price for case or single bottle
+    pricePerBottle: currentWine.price, // Store original bottle price for case calculations
+    imageUrl: currentWine.imageUrl,
+    type: 'wine', // Must match CartUtils type checking
+    category: currentWine.category || '',
+    description: currentWine.description || '',
+    quantity: quantity,
+    isCase: isCase // Important flag for case vs bottle
+  };
   
-  if (existingIndex > -1) {
-    // Update quantity
-    cart[existingIndex].quantity += quantity;
+  console.log('🛒 Attempting to add item to cart:', cartItem);
+  console.log('📦 CartUtils available:', !!window.CartUtils);
+  
+  // Add to cart using unified cart system
+  if (window.CartUtils && typeof window.CartUtils.addItem === 'function') {
+    try {
+      console.log('📝 Calling CartUtils.addItem()');
+      const updatedCart = window.CartUtils.addItem(cartItem);
+      console.log('✅ Item added successfully! Updated cart:', updatedCart);
+      
+      // Show success message - SIMILAR TO FLUTTER'S SnackBar
+      let successMessage;
+      if (isCase) {
+        successMessage = `Added ${quantity} case${quantity > 1 ? 's' : ''} of ${currentWine.name} to cart`;
+      } else {
+        successMessage = `Added ${quantity} ${quantity === 1 ? 'bottle' : 'bottles'} of ${currentWine.name} to cart`;
+      }
+      
+      showToast(successMessage, 'success');
+      
+      // Reset quantity
+      quantity = 1;
+      updateQuantityDisplay();
+      
+      // Reset case checkbox
+      if (caseCheckbox) {
+        caseCheckbox.checked = false;
+        toggleCaseOption();
+      }
+      
+      // Update cart badge
+      window.CartUtils.updateCartBadge();
+      
+    } catch (error) {
+      console.error('❌ Error adding to cart:', error);
+      showToast('Failed to add item to cart: ' + error.message, 'error');
+    }
   } else {
-    // Add new item
-    cart.push({
-      id: currentWine.id,
-      name: currentWine.name,
-      price: currentWine.price,
-      imageUrl: currentWine.imageUrl,
-      type: currentWine.type,
-      category: currentWine.category,
-      quantity: quantity
-    });
+    console.error('❌ CartUtils not available or missing addItem method');
+    console.log('CartUtils object:', window.CartUtils);
+    showToast('Cart system is not available. Please refresh the page.', 'error');
   }
-  
-  // Save to localStorage
-  localStorage.setItem('wine_cart', JSON.stringify(cart));
-  
-  // Update cart badge in top navigation
-  updateCartBadge();
-  
-  // Show success message
-  showToast(`Added ${quantity} ${currentWine.name} to cart`);
-  
-  // Reset quantity
-  quantity = 1;
-  updateQuantityDisplay();
 }
 
-// Update cart badge in top navigation
-function updateCartBadge() {
-  const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  
-  // Update cart badges in top navigation
-  const cartBadges = document.querySelectorAll('.cart-badge');
-  cartBadges.forEach(badge => {
-    badge.textContent = totalItems;
-    badge.style.display = totalItems > 0 ? 'flex' : 'none';
-  });
-}
-
-// Show related wines
+// Show related wines - SIMILAR TO FLUTTER'S search functionality
 function showRelatedWines() {
   if (!allWines.length) return;
   
@@ -317,7 +413,7 @@ function showRelatedWines() {
     // Exclude current wine
     if (currentWine && wine.id === currentWine.id) return false;
     
-    // Apply search filter
+    // Apply search filter - SIMILAR TO FLUTTER'S search logic
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
       const matchesName = (wine.name || '').toLowerCase().includes(searchLower);
@@ -414,7 +510,7 @@ function showError(message) {
   `;
 }
 
-// Toast notification
+// Toast notification - SIMILAR TO FLUTTER'S SnackBar
 function showToast(message, type = 'success') {
   // Remove existing toast
   const existingToast = document.querySelector('.toast-notification');
@@ -439,9 +535,55 @@ function showToast(message, type = 'success') {
   }, 3000);
 }
 
+// Debug function
+function debugCart() {
+  console.log('=== DEBUG CART ===');
+  console.log('CartUtils available:', !!window.CartUtils);
+  console.log('CartUtils methods:', Object.keys(window.CartUtils || {}));
+  
+  if (window.CartUtils) {
+    const cart = window.CartUtils.getCart();
+    console.log('Cart contents:', cart);
+    console.log('Cart count:', window.CartUtils.getCartCount());
+    console.log('Cart items:', cart.items);
+    console.log('LocalStorage cart:', localStorage.getItem('wine_cart'));
+  }
+  
+  console.log('Current wine:', currentWine);
+  console.log('Current quantity:', quantity);
+  
+  const caseCheckbox = document.getElementById('caseCheckbox');
+  console.log('Is case:', caseCheckbox?.checked);
+  
+  console.log('=================');
+}
+
+// Add debug button
+function addDebugButton() {
+  const debugBtn = document.createElement('button');
+  debugBtn.textContent = 'Debug Cart';
+  debugBtn.style.cssText = `
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: #6b0d2b;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    z-index: 10000;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  debugBtn.onclick = debugCart;
+  document.body.appendChild(debugBtn);
+}
+
 // Make functions available globally
 window.incrementQuantity = incrementQuantity;
 window.decrementQuantity = decrementQuantity;
 window.addToCart = addToCart;
 window.navigateToWineDetail = navigateToWineDetail;
 window.hideRelatedWines = hideRelatedWines;
+window.toggleCaseOption = toggleCaseOption;
+window.debugCart = debugCart;

@@ -1,82 +1,97 @@
-// login/register.js - UPDATED WITH PROPER PHONE VALIDATION
+// login/forgot-password.js - UPDATED TO USE PRODUCTION API LIKE FLUTTER
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Register page loaded');
+    console.log('🔧 Forgot password page loaded');
     
-    const form = document.getElementById('registerForm');
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
+    // DOM Elements
+    const emailForm = document.getElementById('emailForm');
+    const codeForm = document.getElementById('codeForm');
+    const passwordForm = document.getElementById('passwordForm');
     const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const termsCheckbox = document.getElementById('terms');
+    const verificationInputs = document.querySelectorAll('.verification-input');
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const newPasswordInput = document.getElementById('newPassword');
+    const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
     const errorMessage = document.getElementById('errorMessage');
     const successMessage = document.getElementById('successMessage');
-    const verificationModal = document.getElementById('verificationModal');
-    const verificationEmail = document.getElementById('verificationEmail');
+    const userEmailSpan = document.getElementById('userEmail');
+    const resendLink = document.getElementById('resendLink');
+    const resendTimer = document.getElementById('resendTimer');
+    const timerCountSpan = document.getElementById('timerCount');
     
-    // API base URL - same as login
-    const API_BASE_URL = window.location.origin; // Will be http://localhost:3000
-    console.log('🌐 API Base URL:', API_BASE_URL);
+    // Steps
+    const steps = document.querySelectorAll('.step');
+    
+    // API base URL - SAME AS FLUTTER APP
+    const API_BASE_URL = 'https://www.wineandbubblesnow.co.za';
+    console.log('🌐 Using production API:', API_BASE_URL);
     
     let currentEmail = '';
+    let resetToken = '';
+    let resendTimerInterval;
+    let countdown = 60;
+    let canResend = false;
     
-    // Phone validation function - more lenient for South African numbers
-    function isValidPhoneNumber(phone) {
-        if (!phone || phone.trim() === '') return true; // Phone is optional
+    // Initialize
+    init();
+    
+    function init() {
+        setupEventListeners();
+        startResendTimer();
         
-        // Remove all non-digit characters
-        const cleaned = phone.replace(/\D/g, '');
-        
-        // South African numbers can be:
-        // - 10 digits: 0123456789
-        // - 11 digits: 01234567890
-        // - International: +27123456789 (remove + for validation)
-        
-        if (cleaned.length < 10 || cleaned.length > 13) {
-            return false;
+        // Auto-focus email input
+        if (emailInput) {
+            setTimeout(() => emailInput.focus(), 300);
         }
-        
-        // Check if it starts with valid South African prefixes
-        const validPrefixes = [
-            '27', // South Africa country code
-            '0'   // Local numbers
-        ];
-        
-        // Check if the cleaned number starts with any valid prefix
-        const startsWithValidPrefix = validPrefixes.some(prefix => 
-            cleaned.startsWith(prefix)
-        );
-        
-        if (!startsWithValidPrefix) {
-            // Check if it might be an international number with country code
-            if (cleaned.length >= 11) {
-                return true; // Could be valid international number
-            }
-            return false;
-        }
-        
-        return true;
     }
     
-    function formatPhoneNumber(phone) {
-        if (!phone || phone.trim() === '') return '';
-        
-        // Remove all non-digit characters
-        const cleaned = phone.replace(/\D/g, '');
-        
-        // If it starts with country code 27, format as +27
-        if (cleaned.startsWith('27') && cleaned.length >= 11) {
-            return `+${cleaned}`;
+    function setupEventListeners() {
+        // Email form submission
+        if (emailForm) {
+            emailForm.addEventListener('submit', handleEmailSubmit);
         }
         
-        // If it starts with 0 and is 10 digits, format as local
-        if (cleaned.startsWith('0') && cleaned.length === 10) {
-            return cleaned;
+        // Verification code form submission
+        if (codeForm) {
+            codeForm.addEventListener('submit', handleCodeSubmit);
         }
         
-        // Return cleaned version
-        return cleaned;
+        // Password form submission
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', handlePasswordSubmit);
+        }
+        
+        // Verification code inputs
+        setupVerificationInputs();
+        
+        // Resend link
+        if (resendLink) {
+            resendLink.addEventListener('click', handleResendCode);
+        }
+        
+        // Go to login button
+        const goToLoginBtn = document.getElementById('goToLoginBtn');
+        if (goToLoginBtn) {
+            goToLoginBtn.addEventListener('click', function() {
+                window.location.href = 'login.html';
+            });
+        }
+        
+        // Password toggle buttons
+        setupPasswordToggle('toggleNewPassword', newPasswordInput);
+        setupPasswordToggle('toggleConfirmNewPassword', confirmNewPasswordInput);
+        
+        // Password strength indicator
+        if (newPasswordInput) {
+            newPasswordInput.addEventListener('input', updatePasswordStrength);
+        }
+        
+        // Back button
+        const backButton = document.getElementById('backButton');
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                window.history.back();
+            });
+        }
     }
     
     function showError(message, isSuccess = false) {
@@ -112,24 +127,26 @@ document.addEventListener('DOMContentLoaded', function() {
         if (successMessage) successMessage.style.display = 'none';
     }
     
-    function showVerificationModal(email) {
-        currentEmail = email;
-        if (verificationModal && verificationEmail) {
-            verificationEmail.textContent = email;
-            verificationModal.style.display = 'block';
+    function setLoading(step, isLoading) {
+        let submitBtn, btnText, loadingSpinner;
+        
+        switch(step) {
+            case 1:
+                submitBtn = document.getElementById('submitBtn');
+                btnText = document.getElementById('btnText');
+                loadingSpinner = document.getElementById('loadingSpinner');
+                break;
+            case 2:
+                submitBtn = document.getElementById('verifyBtn');
+                btnText = document.getElementById('verifyBtnText');
+                loadingSpinner = document.getElementById('verifyLoadingSpinner');
+                break;
+            case 3:
+                submitBtn = document.getElementById('resetBtn');
+                btnText = document.getElementById('resetBtnText');
+                loadingSpinner = document.getElementById('resetLoadingSpinner');
+                break;
         }
-    }
-    
-    function hideVerificationModal() {
-        if (verificationModal) {
-            verificationModal.style.display = 'none';
-        }
-    }
-    
-    function setLoading(isLoading) {
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
         
         if (submitBtn && btnText && loadingSpinner) {
             if (isLoading) {
@@ -144,97 +161,72 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function validateForm() {
+    function goToStep(stepNumber) {
+        steps.forEach(step => step.classList.remove('active'));
+        const stepElement = document.getElementById(`step${stepNumber}`);
+        if (stepElement) {
+            stepElement.classList.add('active');
+        }
+    }
+    
+    // Step 1: Send OTP - USING FLUTTER'S API ENDPOINT
+    async function handleEmailSubmit(e) {
+        e.preventDefault();
         hideMessages();
         
-        // Name validation
-        const firstName = firstNameInput.value.trim();
-        const lastName = lastNameInput.value.trim();
-        
-        if (!firstName) {
-            showError('First name is required');
-            firstNameInput.focus();
-            return false;
-        }
-        
-        if (!lastName) {
-            showError('Last name is required');
-            lastNameInput.focus();
-            return false;
-        }
-        
-        // Email validation
         const email = emailInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
+        
+        if (!email || !isValidEmail(email)) {
             showError('Please enter a valid email address');
-            emailInput.focus();
-            return false;
+            return;
         }
         
-        // Phone validation
-        const phone = phoneInput.value.trim();
-        if (phone && !isValidPhoneNumber(phone)) {
-            showError('Please enter a valid phone number (e.g., 0123456789 or +27123456789)');
-            phoneInput.focus();
-            return false;
-        }
+        setLoading(1, true);
         
-        // Password validation
-        const password = passwordInput.value;
-        if (!password || password.length < 6) {
-            showError('Password must be at least 6 characters');
-            passwordInput.focus();
-            return false;
-        }
-        
-        // Confirm password validation
-        if (password !== confirmPasswordInput.value) {
-            showError('Passwords do not match');
-            confirmPasswordInput.focus();
-            return false;
-        }
-        
-        // Terms validation
-        if (!termsCheckbox.checked) {
-            showError('You must agree to the terms and conditions');
-            return false;
-        }
-        
-        return true;
-    }
-    
-    async function checkDuplicateUser(email, phone) {
         try {
-            console.log('🔍 Checking for duplicate user...');
+            const result = await sendPasswordResetOTP(email);
             
-            // We'll check both email and phone by making a request to a dedicated endpoint
-            // or by trying to register and letting backend handle duplication
-            // For now, we'll just log and let backend handle it
-            console.log(`Checking: Email=${email}, Phone=${phone || 'Not provided'}`);
-            
-            // In a real implementation, you might want to call an endpoint like:
-            // /api/auth/check-duplicate?email=${email}&phone=${phone}
-            
-            return { hasDuplicate: false };
-            
+            if (result.success) {
+                currentEmail = email;
+                userEmailSpan.textContent = email;
+                showError(result.message || 'OTP sent successfully', true);
+                goToStep(2);
+                resetVerificationInputs();
+                startResendTimer();
+                
+                // Auto-focus first verification input
+                setTimeout(() => {
+                    if (verificationInputs[0]) {
+                        verificationInputs[0].focus();
+                    }
+                }, 100);
+            } else {
+                showError(result.error || 'Failed to send OTP');
+            }
         } catch (error) {
-            console.error('Error checking duplicate:', error);
-            return { hasDuplicate: false, error: error.message };
+            console.error('Error:', error);
+            showError('An unexpected error occurred');
+        } finally {
+            setLoading(1, false);
         }
     }
     
-    async function registerUser(userData) {
-        console.log('📤 Registering user:', userData);
-        
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    async function sendPasswordResetOTP(email) {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+            console.log('📤 Sending password reset OTP via Flutter API:', email);
+            
+            const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(userData)
+                body: JSON.stringify({ email: email.toLowerCase() })
             });
             
             console.log(`📡 Response status: ${response.status}`);
@@ -247,40 +239,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Failed to parse JSON:', parseError);
                 const text = await response.text();
                 console.error('Raw response:', text);
-                return { 
-                    success: false, 
-                    error: 'Invalid server response format'
-                };
+                return { success: false, error: 'Invalid server response format' };
             }
             
-            if (!response.ok) {
-                console.log('❌ Registration failed:', data);
+            if (response.ok) {
+                return { 
+                    success: true, 
+                    data: data,
+                    message: data.message || 'OTP sent successfully'
+                };
+            } else {
+                // Handle different error responses
+                let errorMsg = data.message || `Failed to send OTP (${response.status})`;
                 
-                // Handle specific error cases
-                let errorMessage = data.message || `Registration failed (${response.status})`;
-                
-                // Check for duplicate email/phone errors
-                const lowerError = errorMessage.toLowerCase();
-                if (lowerError.includes('already exists') || lowerError.includes('duplicate')) {
-                    if (lowerError.includes('email')) {
-                        errorMessage = 'This email is already registered. Please use a different email or try logging in.';
-                    } else if (lowerError.includes('phone')) {
-                        errorMessage = 'This phone number is already registered. Please use a different phone number.';
-                    }
+                // For security, don't reveal if email exists or not
+                if (response.status === 404) {
+                    errorMsg = 'If this email exists in our system, you will receive an OTP';
+                } else if (response.status === 400) {
+                    errorMsg = data.message || 'Invalid request';
                 }
                 
                 return { 
                     success: false, 
-                    error: errorMessage
+                    error: errorMsg 
                 };
             }
-            
-            console.log('✅ Registration successful!');
-            return { 
-                success: true, 
-                data: data,
-                message: data.message || 'Registration successful!'
-            };
             
         } catch (error) {
             console.error('🚨 Network error:', error);
@@ -288,264 +271,222 @@ document.addEventListener('DOMContentLoaded', function() {
             if (error.message.includes('Failed to fetch')) {
                 return { 
                     success: false, 
-                    error: 'Cannot connect to server. Please check if the server is running.'
+                    error: 'Cannot connect to server. Please check your connection.' 
                 };
             }
             
             return { 
                 success: false, 
-                error: `Connection error: ${error.message}`
+                error: `Connection error: ${error.message}` 
             };
         }
     }
     
-    async function verifyEmail(email, code) {
-        console.log(`🔐 Verifying email for: ${email}`);
+    // Step 2: Verify OTP
+    function setupVerificationInputs() {
+        verificationInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                const value = this.value;
+                
+                // Only allow numbers
+                if (value && !/^\d$/.test(value)) {
+                    this.value = '';
+                    return;
+                }
+                
+                // Move to next input if value entered
+                if (value && index < verificationInputs.length - 1) {
+                    verificationInputs[index + 1].focus();
+                }
+                
+                // Update hidden input
+                updateVerificationCode();
+                
+                // Clear any error
+                const codeError = document.getElementById('codeError');
+                if (codeError) {
+                    codeError.style.display = 'none';
+                    codeError.textContent = '';
+                }
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                // Handle backspace
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    verificationInputs[index - 1].focus();
+                }
+                
+                // Handle paste
+                if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+                    setTimeout(() => {
+                        handlePaste(this, e);
+                    }, 10);
+                }
+            });
+            
+            input.addEventListener('paste', handlePaste);
+        });
+    }
+    
+    function handlePaste(input, e) {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        
+        if (!/^\d+$/.test(pastedData)) {
+            return;
+        }
+        
+        const digits = pastedData.split('').slice(0, 6);
+        
+        digits.forEach((digit, index) => {
+            if (verificationInputs[index]) {
+                verificationInputs[index].value = digit;
+            }
+        });
+        
+        // Focus last input
+        const lastIndex = Math.min(digits.length - 1, verificationInputs.length - 1);
+        if (verificationInputs[lastIndex]) {
+            verificationInputs[lastIndex].focus();
+        }
+        
+        updateVerificationCode();
+    }
+    
+    function updateVerificationCode() {
+        let code = '';
+        verificationInputs.forEach(input => {
+            code += input.value;
+        });
+        
+        if (verificationCodeInput) {
+            verificationCodeInput.value = code;
+        }
+    }
+    
+    function resetVerificationInputs() {
+        verificationInputs.forEach(input => {
+            input.value = '';
+        });
+        updateVerificationCode();
+        
+        // Focus first input
+        if (verificationInputs[0]) {
+            verificationInputs[0].focus();
+        }
+    }
+    
+    async function handleCodeSubmit(e) {
+        e.preventDefault();
+        
+        const otp = verificationCodeInput.value;
+        
+        if (!otp || otp.length !== 6) {
+            const codeError = document.getElementById('codeError');
+            if (codeError) {
+                codeError.textContent = 'Please enter the 6-digit OTP code';
+                codeError.style.display = 'block';
+            }
+            return;
+        }
+        
+        setLoading(2, true);
         
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/verify-email`, {
+            const result = await verifyOTP(currentEmail, otp);
+            
+            if (result.success) {
+                resetToken = result.data.resetToken || result.data.token;
+                
+                // Move to step 3
+                goToStep(3);
+                resetPasswordForm();
+                
+                // Focus password input
+                setTimeout(() => {
+                    if (newPasswordInput) {
+                        newPasswordInput.focus();
+                    }
+                }, 100);
+                
+            } else {
+                const codeError = document.getElementById('codeError');
+                if (codeError) {
+                    codeError.textContent = result.error || 'Invalid OTP code';
+                    codeError.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            const codeError = document.getElementById('codeError');
+            if (codeError) {
+                codeError.textContent = 'Verification failed. Please try again.';
+                codeError.style.display = 'block';
+            }
+        } finally {
+            setLoading(2, false);
+        }
+    }
+    
+    // VERIFY OTP - USING FLUTTER'S API ENDPOINT
+    async function verifyOTP(email, otp) {
+        try {
+            console.log('🔐 Verifying OTP via Flutter API:', email);
+            
+            const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    email: email.toLowerCase().trim(),
-                    verificationCode: code
+                body: JSON.stringify({ 
+                    email: email.toLowerCase(),
+                    otp: otp
                 })
             });
             
-            console.log(`📡 Verification response status: ${response.status}`);
+            console.log(`📡 Response status: ${response.status}`);
             
             let data;
             try {
                 data = await response.json();
-                console.log('📦 Verification response:', data);
+                console.log('📦 Response data:', data);
             } catch (parseError) {
-                console.error('Failed to parse verification JSON:', parseError);
-                return { 
-                    success: false, 
-                    error: 'Invalid server response'
-                };
+                console.error('Failed to parse JSON:', parseError);
+                return { success: false, error: 'Invalid server response format' };
             }
             
-            if (!response.ok) {
+            if (response.ok) {
+                return { 
+                    success: true, 
+                    data: data,
+                    message: data.message || 'OTP verified successfully'
+                };
+            } else {
                 return { 
                     success: false, 
-                    error: data.message || 'Verification failed'
+                    error: data.message || 'Invalid or expired OTP' 
                 };
             }
-            
-            return { 
-                success: true, 
-                data: data,
-                message: 'Email verified successfully!'
-            };
             
         } catch (error) {
-            console.error('🚨 Verification error:', error);
+            console.error('🚨 Network error:', error);
             return { 
                 success: false, 
-                error: 'Verification failed. Please try again.'
+                error: 'Cannot connect to server' 
             };
         }
     }
     
-    async function resendVerificationCode(email) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email.toLowerCase().trim()
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                return { success: false, error: data.message || 'Failed to resend code' };
-            }
-            
-            return { success: true, message: data.message || 'New verification code sent!' };
-            
-        } catch (error) {
-            return { success: false, error: 'Failed to resend verification code.' };
-        }
+    // Step 3: Reset password
+    function resetPasswordForm() {
+        if (newPasswordInput) newPasswordInput.value = '';
+        if (confirmNewPasswordInput) confirmNewPasswordInput.value = '';
+        updatePasswordStrength();
     }
     
-    function storeUserData(userData) {
-        console.log('💾 Storing user data...');
-        
-        if (userData.token) {
-            localStorage.setItem('wineBubbles_token', userData.token);
-            localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
-            console.log('✅ Token stored');
-        }
-        
-        if (userData.user) {
-            localStorage.setItem('wineBubbles_user', JSON.stringify(userData.user));
-            localStorage.setItem('wineBubbles_isAdmin', userData.user.isAdmin || 'false');
-            localStorage.setItem('wineBubbles_isDriver', userData.user.isDriver || 'false');
-            localStorage.setItem('wineBubbles_userEmail', userData.user.email);
-            console.log('✅ User data stored:', userData.user.email);
-        }
-    }
-    
-    // Main form submission
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!validateForm()) {
-                return;
-            }
-            
-            setLoading(true);
-            
-            // Get and format values
-            const firstName = firstNameInput.value.trim();
-            const lastName = lastNameInput.value.trim();
-            const email = emailInput.value.trim().toLowerCase();
-            const phone = phoneInput.value.trim();
-            const password = passwordInput.value;
-            
-            // Combine first and last name into fullName for backend
-            const userData = {
-                fullName: `${firstName} ${lastName}`,
-                email: email,
-                phoneNumber: phone ? formatPhoneNumber(phone) : '',
-                password: password
-            };
-            
-            console.log('🚀 Starting registration...');
-            console.log('User data being sent:', userData);
-            
-            try {
-                // Optional: Check for duplicates before submitting
-                // const duplicateCheck = await checkDuplicateUser(email, phone);
-                // if (duplicateCheck.hasDuplicate) {
-                //     showError(duplicateCheck.error || 'This email or phone is already registered');
-                //     setLoading(false);
-                //     return;
-                // }
-                
-                const result = await registerUser(userData);
-                
-                if (result.success) {
-                    // Show verification modal
-                    showVerificationModal(userData.email);
-                    
-                    // Show success message
-                    showError(result.message || 'Registration successful! Please check your email for verification code.', true);
-                    
-                    // Clear password fields
-                    passwordInput.value = '';
-                    confirmPasswordInput.value = '';
-                    
-                } else {
-                    showError(result.error);
-                }
-                
-            } catch (error) {
-                console.error('🚨 Unexpected error:', error);
-                showError('An unexpected error occurred. Please try again.');
-            } finally {
-                setLoading(false);
-            }
-        });
-    }
-    
-    // Phone input formatting
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function() {
-            // Remove error styling when user starts typing
-            this.style.borderColor = '';
-            
-            // Auto-format as user types (optional)
-            const value = this.value;
-            if (value.length > 0 && !value.startsWith('+')) {
-                // If it starts with 0 and is getting long, consider adding +27
-                if (value.startsWith('0') && value.replace(/\D/g, '').length >= 10) {
-                    // User might be typing a local number, that's fine
-                }
-            }
-        });
-        
-        phoneInput.addEventListener('blur', function() {
-            // Format on blur
-            const formatted = formatPhoneNumber(this.value);
-            if (formatted !== this.value) {
-                this.value = formatted;
-            }
-        });
-    }
-    
-    // Verification modal functionality
-    const verificationCodeInput = document.getElementById('verificationCode');
-    const verifyBtn = document.getElementById('verifyBtn');
-    const resendCodeBtn = document.getElementById('resendCodeBtn');
-    
-    if (verifyBtn) {
-        verifyBtn.addEventListener('click', async function() {
-            const code = verificationCodeInput ? verificationCodeInput.value.trim() : '';
-            
-            if (!code || code.length !== 6) {
-                alert('Please enter a valid 6-digit code');
-                return;
-            }
-            
-            verifyBtn.disabled = true;
-            verifyBtn.textContent = 'Verifying...';
-            
-            const result = await verifyEmail(currentEmail, code);
-            
-            if (result.success) {
-                storeUserData(result.data);
-                
-                alert('✓ Email verified successfully! You are now logged in.');
-                
-                // Redirect to homepage
-                setTimeout(() => {
-                    window.location.href = '../index.html?registered=true';
-                }, 1500);
-                
-            } else {
-                alert(result.error || 'Verification failed');
-                verifyBtn.disabled = false;
-                verifyBtn.textContent = 'Verify';
-            }
-        });
-    }
-    
-    if (resendCodeBtn) {
-        resendCodeBtn.addEventListener('click', async function() {
-            resendCodeBtn.disabled = true;
-            resendCodeBtn.textContent = 'Sending...';
-            
-            const result = await resendVerificationCode(currentEmail);
-            
-            if (result.success) {
-                alert(result.message || 'New verification code sent!');
-            } else {
-                alert(result.error || 'Failed to resend code');
-            }
-            
-            setTimeout(() => {
-                resendCodeBtn.disabled = false;
-                resendCodeBtn.textContent = 'Resend Code';
-            }, 2000);
-        });
-    }
-    
-    // Password toggle functionality
-    const togglePassword = document.getElementById('togglePassword');
-    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-    
-    function setupPasswordToggle(toggleBtn, passwordField) {
+    function setupPasswordToggle(toggleId, passwordField) {
+        const toggleBtn = document.getElementById(toggleId);
         if (toggleBtn && passwordField) {
             toggleBtn.addEventListener('click', function() {
                 const icon = this.querySelector('i');
@@ -563,47 +504,244 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    setupPasswordToggle(togglePassword, passwordInput);
-    setupPasswordToggle(toggleConfirmPassword, confirmPasswordInput);
+    function updatePasswordStrength() {
+        const password = newPasswordInput ? newPasswordInput.value : '';
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        
+        if (!strengthFill || !strengthText) return;
+        
+        let strength = 0;
+        let text = 'Password strength';
+        let color = '#e0e0e0';
+        
+        if (password.length >= 6) strength += 25;
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[0-9]/.test(password)) strength += 25;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+        
+        strengthFill.style.width = `${strength}%`;
+        
+        if (password.length === 0) {
+            text = 'Password strength';
+            color = '#e0e0e0';
+        } else if (strength < 50) {
+            text = 'Weak';
+            color = '#dc3545';
+        } else if (strength < 75) {
+            text = 'Fair';
+            color = '#ffc107';
+        } else {
+            text = 'Strong';
+            color = '#28a745';
+        }
+        
+        strengthFill.style.backgroundColor = color;
+        strengthText.textContent = text;
+        strengthText.style.color = color;
+    }
     
-    // Terms link functionality
-    const termsLinks = document.querySelectorAll('.terms-link');
-    termsLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Terms & Conditions and Privacy Policy pages coming soon!');
-        });
-    });
+    async function handlePasswordSubmit(e) {
+        e.preventDefault();
+        hideMessages();
+        
+        const password = newPasswordInput.value;
+        const confirmPassword = confirmNewPasswordInput.value;
+        
+        // Validation
+        if (!password || password.length < 6) {
+            showError('Password must be at least 6 characters');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            showError('Passwords do not match');
+            return;
+        }
+        
+        setLoading(3, true);
+        
+        try {
+            const result = await resetPassword(resetToken, password);
+            
+            if (result.success) {
+                showError(result.message || 'Password reset successfully! You can now log in with your new password.', true);
+                goToStep(4);
+            } else {
+                showError(result.error || 'Failed to reset password');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError('An unexpected error occurred');
+        } finally {
+            setLoading(3, false);
+        }
+    }
     
-    // Login link - No event listener, let HTML link work normally
-    const loginLink = document.getElementById('loginLink');
-    if (loginLink) {
-        console.log('✅ Login link found, will navigate to login.html');
+    // RESET PASSWORD - USING FLUTTER'S API ENDPOINT
+    async function resetPassword(token, newPassword) {
+        try {
+            console.log('🔐 Resetting password via Flutter API');
+            
+            const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    resetToken: token,
+                    newPassword: newPassword
+                })
+            });
+            
+            console.log(`📡 Response status: ${response.status}`);
+            
+            let data;
+            try {
+                data = await response.json();
+                console.log('📦 Response data:', data);
+            } catch (parseError) {
+                console.error('Failed to parse JSON:', parseError);
+                return { success: false, error: 'Invalid server response format' };
+            }
+            
+            if (response.ok) {
+                return { 
+                    success: true, 
+                    data: data,
+                    message: data.message || 'Password reset successfully'
+                };
+            } else {
+                return { 
+                    success: false, 
+                    error: data.message || 'Failed to reset password' 
+                };
+            }
+            
+        } catch (error) {
+            console.error('🚨 Network error:', error);
+            return { 
+                success: false, 
+                error: 'Cannot connect to server' 
+            };
+        }
+    }
+    
+    // Resend code functionality
+    function startResendTimer() {
+        clearInterval(resendTimerInterval);
+        canResend = false;
+        countdown = 60;
+        
+        if (resendLink) {
+            resendLink.classList.add('disabled');
+            resendLink.style.pointerEvents = 'none';
+            resendLink.style.color = '#999';
+            resendLink.style.cursor = 'not-allowed';
+        }
+        
+        if (resendTimer) {
+            resendTimer.style.display = 'block';
+        }
+        
+        updateTimerDisplay();
+        
+        resendTimerInterval = setInterval(() => {
+            countdown--;
+            updateTimerDisplay();
+            
+            if (countdown <= 0) {
+                clearInterval(resendTimerInterval);
+                canResend = true;
+                
+                if (resendLink) {
+                    resendLink.classList.remove('disabled');
+                    resendLink.style.pointerEvents = 'auto';
+                    resendLink.style.color = '#6b0d2b';
+                    resendLink.style.cursor = 'pointer';
+                }
+                
+                if (resendTimer) {
+                    resendTimer.style.display = 'none';
+                }
+            }
+        }, 1000);
+    }
+    
+    function updateTimerDisplay() {
+        if (timerCountSpan) {
+            timerCountSpan.textContent = countdown;
+        }
+    }
+    
+    async function handleResendCode(e) {
+        e.preventDefault();
+        
+        if (!currentEmail) {
+            showError('Please enter your email first');
+            return;
+        }
+        
+        if (!canResend) {
+            return;
+        }
+        
+        setLoading(1, true);
+        
+        try {
+            const result = await sendPasswordResetOTP(currentEmail);
+            
+            if (result.success) {
+                showError('New OTP sent successfully!', true);
+                startResendTimer();
+                resetVerificationInputs();
+                
+                // Focus first verification input
+                setTimeout(() => {
+                    if (verificationInputs[0]) {
+                        verificationInputs[0].focus();
+                    }
+                }, 100);
+            } else {
+                showError(result.error || 'Failed to resend OTP');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError('Failed to resend OTP');
+        } finally {
+            setLoading(1, false);
+        }
     }
     
     // Test connection on load
     async function testConnection() {
         try {
+            console.log('🔗 Testing connection to Flutter API...');
             const response = await fetch(`${API_BASE_URL}/api/health`);
+            
             if (response.ok) {
                 const data = await response.json();
-                console.log('✅ Server is running:', data.message);
+                console.log('✅ Flutter API is running:', data.message);
                 return true;
+            } else {
+                console.log('⚠️ Flutter API returned non-OK status:', response.status);
+                return false;
             }
-            return false;
         } catch (error) {
-            console.error('❌ Server is not reachable:', error);
+            console.error('❌ Cannot connect to Flutter API:', error);
             return false;
         }
     }
     
+    // Test connection on load
     setTimeout(async () => {
         const isConnected = await testConnection();
         if (!isConnected) {
-            console.warn('⚠️ Server is not running');
-            showError('⚠️ Note: Server is not running. Run: npm start');
+            console.warn('⚠️ Flutter API is not reachable');
+            // Don't show error to user, just log it
         }
     }, 1000);
     
-    console.log('✅ Register script initialized');
+    console.log('✅ Forgot password script initialized - using Flutter API endpoints');
 });

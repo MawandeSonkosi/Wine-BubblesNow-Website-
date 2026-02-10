@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wine & Bubbles — Advert Details</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+  <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../style.css">
+  
+  <!-- Cart Utils - ADDED THIS -->
+  <script src="../cart/cart-utils.js"></script>
+  
+  <!-- Wine Detail Specific CSS - USE SAME AS WINE DETAIL -->
+  <style>
+    /* Wine Detail Specific Styles - EXACT SAME AS WINE DETAIL */
+    
+    /* Wine Detail Section */
+    .wine-detail-section {
+      padding: 20px 0 40px;
+    }
+    
+    /* Header with back button */
+    .wine-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    .wine-detail-header .back-button {
+      font-size: 20px;
+      color: var(--maroon);
+      text-decoration: none;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+    }
+    
+    .wine-detail-header .back-button:hover {
+      background-color: rgba(107, 13, 43, 0.1);
+    }
+    
+    .wine-type {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: #1b1b1b;
+      margin: 0;
+      text-align: center;
+      flex-grow: 1;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    /* Detail Search Bar */
+    .detail-search {
+      margin: 20px auto 30px;
+    }
+    
+    /* Wine Detail Container */
+    .wine-detail-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Wine Detail Card */
+    .wine-detail-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      margin-bottom: 30px;
+    }
+    
+    .wine-detail-image-container {
+      height: 350px;
+      background: #f8f8f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
+    
+    .wine-detail-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    
+    .wine-detail-content {
+      padding: 30px;
+    }
+    
+    .wine-detail-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: #1b1b1b;
+      margin: 0 0 10px;
+      text-align: center;
+    }
+    
+    .wine-detail-type {
+      font-size: 16px;
+      color: var(--maroon);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      margin: 0 0 15px;
+      font-weight: 500;
+    }
+    
+    .wine-detail-price {
+      font-size: 24px;
+      color: var(--maroon);
+      font-weight: 600;
+      text-align: center;
+      margin: 0 0 25px;
+    }
+    
+    .wine-detail-description {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #444;
+      margin: 0 0 25px;
+      text-align: center;
+    }
+    
+    .wine-detail-meta {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 0 0 25px;
+    }
+    
+    .wine-meta-item {
+      text-align: center;
+    }
+    
+    .wine-meta-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .wine-meta-value {
+      font-size: 16px;
+      color: #1b1b1b;
+      font-weight: 500;
+    }
+    
+    /* Stock Status */
+    .stock-status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      margin: 0 auto 25px;
+      display: block;
+      width: fit-content;
+    }
+    
+    .stock-in {
+      background-color: rgba(39, 174, 96, 0.1);
+      color: #27ae60;
+    }
+    
+    .stock-out {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+    }
+    
+    /* Quantity Selector */
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin: 0 0 25px;
+    }
+    
+    .quantity-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--maroon);
+      background: white;
+      color: var(--maroon);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    .quantity-btn:hover:not(:disabled) {
+      background: var(--maroon);
+      color: white;
+    }
+    
+    .quantity-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: #ccc;
+      color: #ccc;
+    }
+    
+    .quantity-display {
+      width: 60px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1b1b1b;
+      background: #f8f8f8;
+      border-radius: 8px;
+    }
+    
+    /* Add to Cart Button */
+    .add-to-cart-btn {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      padding: 16px;
+      background: var(--maroon);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .add-to-cart-btn:hover:not(:disabled) {
+      background: #5a0b23;
+    }
+    
+    .add-to-cart-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    /* Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--maroon);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+      max-width: 350px;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .toast-notification.error {
+      background: #e74c3c;
+    }
+    
+    .toast-notification i {
+      font-size: 20px;
+    }
+    
+    /* Loading State */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(107, 13, 43, 0.1);
+      border-top-color: #6b0d2b;
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Error State */
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .error-state i {
+      font-size: 56px;
+      color: #dc3545;
+      margin-bottom: 20px;
+    }
+    
+    .error-state h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: #1b1b1b;
+      margin-bottom: 12px;
+    }
+    
+    /* User dropdown styles - SAME AS WINE DETAIL */
+    .user-dropdown {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 16px;
+      min-width: 200px;
+      z-index: 1000;
+      display: none;
+      border: 1px solid #eee;
+    }
+    
+    .user-dropdown.show {
+      display: block !important;
+    }
+    
+    .user-dropdown a:hover {
+      color: #6b0d2b !important;
+    }
+    
+    .top-icons a {
+      position: relative;
+    }
+    
+    .fas.fa-sign-in-alt {
+      color: #6b0d2b !important;
+    }
+    
+    .fas.fa-user-check {
+      color: #6b0d2b !important;
+    }
+    
+    .user-dropdown-info {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .user-dropdown-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .user-dropdown-email {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .user-dropdown-link {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    
+    .user-dropdown-link i {
+      margin-right: 8px;
+      width: 20px;
+    }
+    
+    .user-dropdown-logout {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #6b0d2b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .user-dropdown-logout:hover {
+      background: #8a1e3d;
+    }
+    
+    /* Cart badge */
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #6b0d2b;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .user-dropdown {
+        position: fixed;
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+      }
+      
+      .wine-detail-image-container {
+        height: 280px;
+        padding: 30px;
+      }
+      
+      .wine-detail-name {
+        font-size: 24px;
+      }
+      
+      .wine-detail-price {
+        font-size: 22px;
+      }
+      
+      .wine-detail-description {
+        font-size: 15px;
+      }
+      
+      .wine-detail-meta {
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      
+      .wine-meta-item {
+        flex: 1;
+        min-width: 120px;
+      }
+      
+      .header-actions {
+        gap: 10px;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .wine-detail-header {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .wine-type {
+        order: 3;
+        width: 100%;
+        margin-top: 10px;
+      }
+      
+      .wine-detail-image-container {
+        height: 220px;
+        padding: 20px;
+      }
+      
+      .wine-detail-content {
+        padding: 20px;
+      }
+      
+      .quantity-selector {
+        gap: 10px;
+      }
+      
+      .quantity-btn {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .quantity-display {
+        width: 50px;
+        height: 40px;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      .wine-detail-image-container {
+        height: 180px;
+      }
+      
+      .wine-detail-name {
+        font-size: 22px;
+      }
+      
+      .wine-detail-price {
+        font-size: 20px;
+      }
+      
+      .add-to-cart-btn {
+        padding: 14px;
+        font-size: 16px;
+      }
+    }
+    
+    /* Admin badge */
+    .admin-badge {
+      display: inline-block;
+      background: #6b0d2b;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    /* Driver badge */
+    .driver-badge {
+      display: inline-block;
+      background: #1e6b0d;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top bar with two sections -->
+  <div class="topbar-top">
+    <div class="topbar-top-inner">
+      <!-- Empty - no content as requested -->
+    </div>
+  </div>
+
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo">
+        <a href="../index.html">
+          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+        </a>
+      </div>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="../wine/all_wines.html">All Wines</a></li>
+          <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
+          <li><a href="../wine_farm/wine_farm.html">Tastings Near Me</a></li>
+          <li><a href="../pairings/pairings.html">Pairings</a></li>
+          <li><a href="../order/track_order.html">Track Order</a></li>
+        </ul>
+      </nav>
+
+      <div class="top-icons">
+        <a href="../cart/cart.html" class="icon cart-icon">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" style="display: none;">0</span>
+        </a>
+        <a href="../user/profile.html" class="icon" id="userIcon">
+          <i class="fas fa-user" id="userIconElement"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advert Detail Content - SAME LAYOUT AS WINE DETAIL -->
+  <section class="section wine-detail-section">
+    <div class="container">
+      <!-- Back button and header -->
+      <div class="wine-detail-header">
+        <a href="javascript:history.back()" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="wine-type" id="advertType">Special Offer</h2>
+      </div>
+
+      <!-- Main Advert Details -->
+      <div class="wine-detail-container" id="advertDetailContainer">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading advert details...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Bottom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+        <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+        <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+        <div class="socials">
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links-grid">
+        <div class="footer-links-column">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="../wine/all_wines.html">All Wines</a></li>
+            <li><a href="../booking/booking.html">Bookings</a></li>
+            <li><a href="../pairings/pairings.html">Tastings</a></li>
+            <li><a href="../index.html#blog">Blog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-column">
+          <h4 class="footer-heading">&nbsp;</h4>
+          <ul class="footer-links">
+            <li><a href="../contact_us.html">Contact Us</a></li>
+            <li><a href="../faq.html">FAQ</a></li>
+            <li><a href="../terms_conditions.html">Terms & Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Profile authentication
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🎪 Advert Detail page loaded');
+        
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        function isTokenValid() {
+            const token = localStorage.getItem('wineBubbles_token');
+            const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
+            if (!token || !timestamp) return false;
+            const tokenAge = Date.now() - parseInt(timestamp);
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+            return tokenAge < sevenDays;
+        }
+        
+        const token = localStorage.getItem('wineBubbles_token');
+        const userData = localStorage.getItem('wineBubbles_user');
+        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+        const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
+        const isValidToken = isTokenValid();
+        
+        const userIcon = document.getElementById('userIcon');
+        const userIconElement = document.getElementById('userIconElement');
+        
+        if (isValidToken && userData) {
+            console.log('✅ User is logged in');
+            
+            try {
+                const user = JSON.parse(userData);
+                
+                if (userIconElement) {
+                    userIconElement.className = 'fas fa-user-check';
+                    userIconElement.style.color = '#6b0d2b';
+                }
+                
+                if (userIcon) {
+                    userIcon.href = '#';
+                    userIcon.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const dropdown = document.querySelector('.user-dropdown');
+                        if (dropdown) dropdown.classList.toggle('show');
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+            
+        } else {
+            console.log('❌ User is not logged in or token expired');
+            if (userIcon) {
+                userIcon.href = '../login/login.html';
+                if (userIconElement) {
+                    userIconElement.className = 'fas fa-sign-in-alt';
+                    userIconElement.style.color = '#6b0d2b';
+                }
+            }
+        }
+        
+        console.log('✅ Advert Detail page authentication initialized');
+    });
+  </script>
+    <script>
+    // Advert Detail JavaScript - USING imageUrl ONLY (like Flutter)
+    // Configuration - USE THE SAME BACKEND AS FLUTTER
+    const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
+    
+    // State
+    let currentAdvert = null;
+    let quantity = 1;
+    let cartUtilsLoaded = false;
+
+    // DOM Elements
+    const advertDetailContainer = document.getElementById('advertDetailContainer');
+    const advertTypeElement = document.getElementById('advertType');
+
+    // Wait for CartUtils to load
+    function waitForCartUtils(callback) {
+      const maxAttempts = 20;
+      let attempts = 0;
+      
+      const check = () => {
+        attempts++;
+        if (window.CartUtils && typeof window.CartUtils.addItem === 'function') {
+          console.log('✅ CartUtils loaded successfully');
+          cartUtilsLoaded = true;
+          callback();
+        } else if (attempts >= maxAttempts) {
+          console.error('❌ CartUtils failed to load after', maxAttempts, 'attempts');
+          showToast('Cart system failed to load. Please refresh the page.', 'error');
+        } else {
+          console.log(`⏳ Waiting for CartUtils... (attempt ${attempts})`);
+          setTimeout(check, 250);
+        }
+      };
+      
+      check();
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🎪 Advert Detail page loaded');
+      
+      // Check age verification
+      const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+      if (!ageConfirmed) {
+        showError('Age verification required. Please return to home page.');
+        return;
+      }
+      
+      // Get advert ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const advertId = urlParams.get('id') || '';
+      
+      if (advertId) {
+        console.log(`🎯 Loading advert with ID: ${advertId}`);
+        fetchAdvertDetail(advertId);
+      } else {
+        showError('No advert ID provided in URL');
+      }
+      
+      // Wait for CartUtils to load
+      waitForCartUtils(() => {
+        // Update cart badge
+        window.CartUtils.updateCartBadge();
+        
+        // Listen for cart updates
+        window.addEventListener('cartUpdated', () => {
+          window.CartUtils.updateCartBadge();
+        });
+      });
+    });
+
+    // Fetch advert detail - MATCHING FLUTTER'S getAdvertById
+    async function fetchAdvertDetail(advertId) {
+      try {
+        showLoading();
+        
+        console.log(`🌐 Fetching advert detail for ID: ${advertId}`);
+        console.log(`📡 API URL: ${API_BASE_URL}/adverts/${advertId}`);
+        
+        // Try to fetch from API - EXACTLY LIKE FLUTTER
+        const response = await fetch(`${API_BASE_URL}/adverts/${advertId}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        console.log(`📊 Response status: ${response.status}`);
+        
+        if (response.ok) {
+          const advert = await response.json();
+          console.log('✅ Advert detail received from backend:', advert);
+          console.log('📸 Advert imageUrl:', advert.imageUrl);
+          console.log('🎯 Advert targetUrl:', advert.targetUrl);
+          
+          currentAdvert = advert;
+          
+          // Update page title
+          document.title = `Wine & Bubbles — ${advert.title}`;
+          
+          // Update header type
+          if (advertTypeElement) {
+            advertTypeElement.textContent = advert.type || 'Special Offer';
+          }
+          
+          // Render advert detail
+          renderAdvertDetail(advert);
+          
+        } else if (response.status === 404) {
+          console.log('🔍 Advert not found (404), using test data');
+          createTestAdvert(advertId);
+        } else {
+          console.error(`❌ API error ${response.status}`);
+          const errorText = await response.text();
+          console.error(`Error details: ${errorText}`);
+          createTestAdvert(advertId);
+        }
+        
+      } catch (error) {
+        console.error('❌ Error fetching advert:', error);
+        console.error('Error details:', error.message);
+        createTestAdvert(advertId);
+      }
+    }
+
+    // Create test advert for development
+    function createTestAdvert(advertId) {
+      console.log('🔄 Creating test advert for development');
+      
+      const testAdverts = {
+        'default-1': {
+          id: 'default-1',
+          title: 'African Diamond Blanc Special Offer',
+          subtitle: 'Premium selection for connoisseurs',
+          // USE imageUrl ONLY (like Flutter)
+          imageUrl: '../assets/adverts/African_Diamond_Blanc.png',
+          price: 299.99,
+          stockCount: 10,
+          isAvailableForPurchase: true,
+          type: 'homepage',
+          category: 'marketing',
+          productType: 'advert',
+          isActive: true
+        },
+        'default-2': {
+          id: 'default-2',
+          title: 'Ferrero Rocher Collection',
+          subtitle: 'Perfect pairing for special moments',
+          // USE imageUrl ONLY (like Flutter)
+          imageUrl: '../assets/adverts/ferrero.png',
+          price: 149.99,
+          stockCount: 5,
+          isAvailableForPurchase: true,
+          type: 'homepage',
+          category: 'marketing',
+          productType: 'advert',
+          isActive: true
+        },
+        'default-3': {
+          id: 'default-3',
+          title: 'Moët & Chandon Rosé',
+          subtitle: 'Celebrate with premium champagne',
+          // USE imageUrl ONLY (like Flutter)
+          imageUrl: '../assets/adverts/moet_rose.png',
+          price: 499.99,
+          stockCount: 3,
+          isAvailableForPurchase: true,
+          type: 'homepage',
+          category: 'marketing',
+          productType: 'advert',
+          isActive: true
+        }
+      };
+      
+      const testAdvert = testAdverts[advertId] || testAdverts['default-1'];
+      currentAdvert = testAdvert;
+      
+      // Update header
+      if (advertTypeElement) {
+        advertTypeElement.textContent = testAdvert.type || 'Special Offer';
+      }
+      
+      renderAdvertDetail(testAdvert);
+    }
+
+    // Helper to fix image URLs - SIMPLIFIED TO USE imageUrl ONLY (like Flutter)
+    function getImageUrl(advert) {
+      // USE imageUrl ONLY (like Flutter's _buildAdvertImage uses advert.imageUrl)
+      let imageUrl = advert.imageUrl || '';
+      
+      console.log(`📸 Image URL check:`, {
+        advertId: advert.id,
+        imageUrl: advert.imageUrl,
+        targetUrl: advert.targetUrl,
+        using: imageUrl
+      });
+      
+      // Fix relative paths for web
+      if (imageUrl && imageUrl.startsWith('assets/')) {
+        // Ensure it's relative to current page
+        imageUrl = '../' + imageUrl;
+      }
+      
+      // Fallback if no valid image URL
+      if (!imageUrl || imageUrl === '') {
+        console.log('⚠️ No imageUrl, using default');
+        imageUrl = '../assets/adverts/default_marketing.jpg';
+      }
+      
+      return imageUrl;
+    }
+
+    // Render advert detail - SIMPLIFIED LIKE FLUTTER'S ADVERT DETAIL
+    function renderAdvertDetail(advert) {
+      // Get image URL using imageUrl ONLY (like Flutter)
+      const imageUrl = getImageUrl(advert);
+      const price = advert.price || 0;
+      const description = advert.subtitle || 'Special offer for our valued customers.';
+      const stockCount = advert.stockCount || 0;
+      
+      // Check if advert can be purchased (like Flutter's canBePurchased)
+      const canBePurchased = advert.isAvailableForPurchase === true && stockCount > 0;
+      
+      console.log(`📊 Rendering advert:`, {
+        title: advert.title,
+        canBePurchased: canBePurchased,
+        isAvailableForPurchase: advert.isAvailableForPurchase,
+        stockCount: stockCount,
+        price: price,
+        imageUrl: imageUrl
+      });
+      
+      // Update page title
+      document.title = `Wine & Bubbles — ${advert.title}`;
+      
+      advertDetailContainer.innerHTML = `
+        <div class="wine-detail-card">
+          <div class="wine-detail-image-container">
+            <img src="${imageUrl}" 
+                 alt="${advert.title}" 
+                 class="wine-detail-image"
+                 loading="lazy"
+                 onerror="this.onerror=null; this.src='../assets/adverts/default_marketing.jpg';">
+          </div>
+          <div class="wine-detail-content">
+            <h1 class="wine-detail-name">${advert.title}</h1>
+            
+            ${description ? `<p class="wine-detail-description">${description}</p>` : ''}
+            
+            ${price > 0 ? `<div class="wine-detail-price">R${price.toFixed(2)}</div>` : ''}
+            
+            <!-- Stock status - only show if purchasable -->
+            ${advert.isAvailableForPurchase ? `
+              <div class="stock-status ${stockCount > 0 ? 'stock-in' : 'stock-out'}">
+                ${stockCount > 0 ? 'In Stock' : 'Out of Stock'}
+              </div>
+            ` : ''}
+            
+            <!-- Quantity selector - only if purchasable and in stock -->
+            ${canBePurchased ? `
+              <div class="quantity-selector">
+                <button class="quantity-btn" onclick="decrementQuantity()" ${quantity <= 1 ? 'disabled' : ''}>
+                  <i class="fas fa-minus"></i>
+                </button>
+                <div class="quantity-display" id="quantityDisplay">${quantity}</div>
+                <button class="quantity-btn" onclick="incrementQuantity()" ${quantity >= stockCount ? 'disabled' : ''}>
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            ` : ''}
+            
+            <!-- Add to Cart Button - only if purchasable -->
+            ${canBePurchased ? `
+              <button class="add-to-cart-btn" id="addToCartBtn" onclick="addToCart()">
+                ${price > 0 ? 
+                  `Add ${quantity} ${quantity === 1 ? 'item' : 'items'} to Cart (R${(price * quantity).toFixed(2)})` :
+                  `Add ${quantity} ${quantity === 1 ? 'item' : 'items'} to Cart`}
+              </button>
+            ` : advert.isAvailableForPurchase === true && stockCount <= 0 ? `
+              <button class="add-to-cart-btn" disabled style="background: #ccc; cursor: not-allowed;">
+                Out of Stock
+              </button>
+            ` : ''}
+            
+            <!-- Link button for non-purchasable adverts -->
+            ${!advert.isAvailableForPurchase && advert.targetUrl && advert.targetUrl !== '#' ? `
+              <button class="add-to-cart-btn" onclick="window.open('${advert.targetUrl}', '_blank')">
+                <i class="fas fa-external-link-alt"></i> View Offer
+              </button>
+            ` : ''}
+            
+            <!-- Info message for non-purchasable adverts -->
+            ${!advert.isAvailableForPurchase && (!advert.targetUrl || advert.targetUrl === '#') ? `
+              <div class="wine-detail-description" style="color: #666; font-style: italic;">
+                This is a promotional advert. Check our wine collection for available products.
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // Quantity controls
+    function incrementQuantity() {
+      if (!currentAdvert) return;
+      
+      const maxQuantity = currentAdvert.stockCount || 10;
+      if (quantity < maxQuantity) {
+        quantity++;
+        updateQuantityDisplay();
+      }
+    }
+
+    function decrementQuantity() {
+      if (quantity > 1) {
+        quantity--;
+        updateQuantityDisplay();
+      }
+    }
+
+    function updateQuantityDisplay() {
+      const quantityDisplay = document.getElementById('quantityDisplay');
+      if (quantityDisplay) {
+        quantityDisplay.textContent = quantity;
+      }
+      
+      const minusBtn = document.querySelector('.quantity-btn:first-child');
+      const plusBtn = document.querySelector('.quantity-btn:last-child');
+      
+      if (minusBtn) {
+        minusBtn.disabled = quantity <= 1;
+      }
+      if (plusBtn && currentAdvert) {
+        const maxQuantity = currentAdvert.stockCount || 10;
+        plusBtn.disabled = quantity >= maxQuantity;
+      }
+    }
+
+    // Add to cart - MATCHING FLUTTER'S addAdvertWithQuantity LOGIC
+    function addToCart() {
+      if (!currentAdvert) {
+        console.error('❌ No current advert data');
+        showToast('No advert data available', 'error');
+        return;
+      }
+      
+      // Check if advert can be purchased (like Flutter)
+      if (currentAdvert.isAvailableForPurchase !== true) {
+        console.log('❌ Advert not available for purchase:', currentAdvert.isAvailableForPurchase);
+        showToast('This advert is not available for purchase', 'error');
+        return;
+      }
+      
+      if (currentAdvert.stockCount <= 0) {
+        showToast(`${currentAdvert.title} is out of stock`, 'error');
+        return;
+      }
+      
+      if (currentAdvert.stockCount < quantity) {
+        showToast(`Only ${currentAdvert.stockCount} available for ${currentAdvert.title}`, 'error');
+        return;
+      }
+      
+      // Check if CartUtils is loaded
+      if (!cartUtilsLoaded || !window.CartUtils) {
+        showToast('Cart system is not available. Please refresh the page.', 'error');
+        return;
+      }
+      
+      // Create cart item matching Flutter's structure
+      const cartItem = {
+        id: currentAdvert.id.toString(),
+        name: currentAdvert.title,
+        price: currentAdvert.price || 0,
+        // USE imageUrl ONLY (like Flutter)
+        imageUrl: currentAdvert.imageUrl,
+        type: 'advert', // Match Flutter's advert type
+        category: currentAdvert.category || 'marketing',
+        description: currentAdvert.subtitle || '',
+        quantity: quantity,
+        stockCount: currentAdvert.stockCount,
+        isAvailableForPurchase: currentAdvert.isAvailableForPurchase,
+        productType: 'advert'
+      };
+      
+      console.log('🛒 Adding advert to cart (Flutter style):', cartItem);
+      
+      try {
+        const updatedCart = window.CartUtils.addItem(cartItem);
+        console.log('✅ Advert added successfully! Cart updated:', updatedCart);
+        
+        // Track purchase to backend (like Flutter's trackPurchase)
+        trackAdvertPurchase(currentAdvert.id, quantity);
+        
+        let successMessage;
+        if (currentAdvert.price > 0) {
+          successMessage = `Added ${quantity} ${quantity === 1 ? 'item' : 'items'} of ${currentAdvert.title} to cart (R${(currentAdvert.price * quantity).toFixed(2)})`;
+        } else {
+          successMessage = `Added ${quantity} ${quantity === 1 ? 'item' : 'items'} of ${currentAdvert.title} to cart`;
+        }
+        
+        showToast(successMessage, 'success');
+        
+        // Reset quantity
+        quantity = 1;
+        updateQuantityDisplay();
+        
+        // Update UI if out of stock
+        if (currentAdvert.stockCount === 1) {
+          const addToCartBtn = document.getElementById('addToCartBtn');
+          if (addToCartBtn) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.textContent = 'Out of Stock';
+            addToCartBtn.style.backgroundColor = '#ccc';
+          }
+          
+          const stockStatus = document.querySelector('.stock-status');
+          if (stockStatus) {
+            stockStatus.className = 'stock-status stock-out';
+            stockStatus.textContent = 'Out of Stock';
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ Error adding to cart:', error);
+        showToast('Failed to add item to cart: ' + error.message, 'error');
+      }
+    }
+
+    // Track advert purchase to backend (like Flutter)
+    async function trackAdvertPurchase(advertId, quantity) {
+      try {
+        const token = localStorage.getItem('wineBubbles_token');
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/adverts/track/purchase`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            advertId: advertId,
+            quantity: quantity
+          })
+        });
+        
+        if (!response.ok) {
+          console.log('⚠️ Could not track purchase to backend');
+        }
+      } catch (error) {
+        console.log('⚠️ Error tracking purchase:', error);
+      }
+    }
+
+    // UI States
+    function showLoading() {
+      advertDetailContainer.innerHTML = `
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading advert details...</p>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      advertDetailContainer.innerHTML = `
+        <div class="error-state">
+          <i class="fas fa-exclamation-circle"></i>
+          <h3>Error Loading Advert</h3>
+          <p>${message}</p>
+          <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+            <button onclick="window.history.back()" class="btn-fill">
+              Go Back
+            </button>
+            <button onclick="location.reload()" class="btn-fill" style="background: #666;">
+              Retry
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Toast notification (like Flutter's SnackBar)
+    function showToast(message, type = 'success') {
+      const existingToast = document.querySelector('.toast-notification');
+      if (existingToast) {
+        existingToast.remove();
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = `toast-notification ${type}`;
+      toast.innerHTML = `
+        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+        <span>${message}</span>
+      `;
+      
+      document.body.appendChild(toast);
+      
+      // Auto-hide after 3 seconds (like Flutter)
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Make functions available globally
+    window.incrementQuantity = incrementQuantity;
+    window.decrementQuantity = decrementQuantity;
+    window.addToCart = addToCart;
+
+    console.log('✅ Advert Detail page script loaded - using imageUrl only (like Flutter)');
+  </script>
+</body>
+</html>

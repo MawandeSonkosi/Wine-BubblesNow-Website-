@@ -1,8 +1,8 @@
 // Booking JavaScript - Main functionality with authentication protection
 
-// Configuration
+// Configuration - UPDATED FOR PRODUCTION
 const CONFIG = {
-    API_BASE_URL: 'http://localhost:3000/api',
+    API_BASE_URL: 'https://www.wineandbubblesnow.co.za/api',
     PRICE_PER_GUEST: 300.00,
     SOMMELIER_PRICE: 250.00
 };
@@ -460,6 +460,7 @@ class UIManager {
             this.showLoading(true);
             const token = localStorage.getItem('wineBubbles_token');
             
+            // UPDATED: Using production API endpoint
             const response = await fetch(`${CONFIG.API_BASE_URL}/addons`, {
                 method: 'GET',
                 headers: {
@@ -769,6 +770,10 @@ class UIManager {
             const bookingData = this.state.toBookingData();
             const token = localStorage.getItem('wineBubbles_token');
             
+            console.log('📋 Submitting booking to:', `${CONFIG.API_BASE_URL}/bookings`);
+            console.log('📋 Booking data:', bookingData);
+            
+            // UPDATED: Using production API endpoint
             const response = await fetch(`${CONFIG.API_BASE_URL}/bookings`, {
                 method: 'POST',
                 headers: {
@@ -783,10 +788,13 @@ class UIManager {
             if (response.ok) {
                 this.showToast('Booking submitted successfully!', 'success');
                 
+                // Send booking confirmation email
+                await this.sendBookingEmail(bookingData);
+                
                 // Store for confirmation page
                 localStorage.setItem('lastBooking', JSON.stringify({
                     ...bookingData,
-                    id: data._id || Date.now().toString()
+                    id: data._id || data.id || Date.now().toString()
                 }));
                 
                 // Redirect to confirmation page in the SAME FOLDER
@@ -801,6 +809,34 @@ class UIManager {
             this.showToast('Network error. Please try again.', 'error');
         } finally {
             this.showLoading(false);
+        }
+    }
+
+    async sendBookingEmail(bookingData) {
+        try {
+            const token = localStorage.getItem('wineBubbles_token');
+            
+            // UPDATED: Using production email API
+            const emailResponse = await fetch(`${CONFIG.API_BASE_URL}/email/send-booking-email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    booking: bookingData,
+                    userEmail: this.state.userEmail,
+                    adminEmail: 'winebubblesnow@gmail.com'
+                })
+            });
+            
+            if (emailResponse.ok) {
+                console.log('✅ Booking email sent successfully');
+            } else {
+                console.warn('⚠️ Failed to send booking email:', emailResponse.status);
+            }
+        } catch (emailError) {
+            console.warn('⚠️ Error sending booking email:', emailError);
         }
     }
 
@@ -824,6 +860,7 @@ class UIManager {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('📋 Booking page loading...');
+    console.log('🌐 API Base URL:', CONFIG.API_BASE_URL);
     
     // Check authentication first
     if (!isAuthenticated()) {
