@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const BACKEND_URL = 'https://www.wineandbubblesnow.co.za';
 
 // Dynamic import for node-fetch
