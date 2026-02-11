@@ -1972,9 +1972,10 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   </script>
   <!-- FIXED: Marketing Banners - MATCHING FLUTTER EXACTLY -->
+<!-- FIXED: Marketing Banners - WORKING WITH YOUR BACKEND -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎪 Starting marketing banners - matching Flutter app exactly');
+  console.log('🎪 Starting marketing banners - backend connected!');
   
   // Check age verification
   const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
@@ -1989,6 +1990,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const marketingNextBtn = document.getElementById('marketingNextBtn');
   const marketingDots = document.getElementById('marketingDots');
   
+  // Check if elements exist
+  if (!marketingBannersTrack) {
+    console.error('❌ Marketing banners track not found!');
+    return;
+  }
+  
   // State
   let marketingAdverts = [];
   let currentMarketingSlide = 0;
@@ -2002,10 +2009,10 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       console.log('🌐 Fetching homepage adverts from proxy');
       
-      // USE PROXY ENDPOINT - matches Flutter
+      // USE YOUR WORKING ENDPOINT
       const apiUrl = `/api/adverts/active?type=homepage`;
       
-      console.log('📡 Fetching from proxy:', apiUrl);
+      console.log('📡 Fetching from:', apiUrl);
       
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -2017,26 +2024,14 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (!response.ok) {
         console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-        
-        // Try without type parameter
-        console.log('🔄 Trying without type parameter...');
-        const altUrl = `/api/adverts/active`;
-        const altResponse = await fetch(altUrl);
-        
-        if (!altResponse.ok) {
-          throw new Error(`Both endpoints failed: ${response.status}, ${altResponse.status}`);
-        }
-        
-        const adverts = await altResponse.json();
-        console.log(`✅ Received ${adverts.length} adverts from backup endpoint`);
-        marketingAdverts = adverts.filter(advert => advert.isActive !== false);
-      } else {
-        marketingAdverts = await response.json();
-        console.log(`✅ Received ${marketingAdverts.length} homepage adverts from API`);
+        throw new Error(`Failed to fetch adverts: ${response.status}`);
       }
       
+      const adverts = await response.json();
+      console.log(`✅ Received ${adverts.length} homepage adverts from API`);
+      
       // Filter for active adverts
-      marketingAdverts = marketingAdverts.filter(advert => 
+      marketingAdverts = adverts.filter(advert => 
         advert.isActive === true || advert.isActive === undefined
       );
       
@@ -2071,7 +2066,7 @@ document.addEventListener('DOMContentLoaded', function() {
         title: 'African Diamond Blanc',
         subtitle: 'Premium selection for connoisseurs',
         imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
-        targetUrl: '#',
+        targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
         isActive: true,
         type: 'homepage'
       },
@@ -2080,7 +2075,7 @@ document.addEventListener('DOMContentLoaded', function() {
         title: 'Ferrero Rocher Collection',
         subtitle: 'Perfect pairing for special moments',
         imageUrl: 'assets/adverts/ferrero.png',
-        targetUrl: '#',
+        targetUrl: 'assets/adverts/ferrero.png',
         isActive: true,
         type: 'homepage'
       },
@@ -2089,7 +2084,7 @@ document.addEventListener('DOMContentLoaded', function() {
         title: 'Moët & Chandon Rosé',
         subtitle: 'Celebrate with premium champagne',
         imageUrl: 'assets/adverts/moet_rose.png',
-        targetUrl: '#',
+        targetUrl: 'assets/adverts/moet_rose.png',
         isActive: true,
         type: 'homepage'
       }
@@ -2102,11 +2097,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🎨 Rendering marketing banners');
     
     // Clear loading state
-    if (!marketingBannersTrack) {
-      console.error('❌ Marketing banners track not found!');
-      return;
-    }
-    
     marketingBannersTrack.innerHTML = '';
     if (marketingDots) marketingDots.innerHTML = '';
     
@@ -2134,24 +2124,12 @@ document.addEventListener('DOMContentLoaded', function() {
     slide.dataset.index = index;
     slide.dataset.advertId = advert.id;
     
-    // HANDLE IMAGE URL - EXACTLY LIKE FLUTTER
-    let imagePath = advert.targetUrl || '';
-    
-    // If targetUrl is empty or not an image, use imageUrl
-    if (imagePath === '' || 
-        (!imagePath.startsWith('assets/') && !imagePath.startsWith('http'))) {
-      imagePath = advert.imageUrl || '';
-    }
-    
-    // Also check if targetUrl contains 'adverts' folder
-    if (advert.targetUrl && advert.targetUrl.includes('adverts/')) {
-      imagePath = advert.targetUrl;
-    }
+    // Get image URL - prefer targetUrl if it exists
+    let imagePath = advert.targetUrl || advert.imageUrl || '';
     
     // Fix relative paths for web
-    if (imagePath && imagePath.startsWith('assets/')) {
-      // Keep as-is, but ensure it's relative to current page
-      imagePath = imagePath;
+    if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+      // Keep as-is, it's relative
     }
     
     // Fallback if no valid image URL
@@ -2170,7 +2148,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       <div class="marketing-banner-overlay">
         <div class="marketing-banner-title">${advert.title}</div>
-        <div class="marketing-banner-subtitle">${advert.subtitle || ''}</div>
+        <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
       </div>
     `;
     
@@ -2274,7 +2252,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function startMarketingAutoSlide() {
     clearInterval(marketingAutoSlideInterval);
-    // Only start auto-slide if there's more than 1 slide
     if (marketingAdverts.length > 1) {
       marketingAutoSlideInterval = setInterval(() => {
         if (!isMarketingTransitioning) {
@@ -2286,31 +2263,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function handleAdvertClick(advert) {
     console.log(`📱 Advert clicked: ${advert.title}`);
-    console.log(`📁 Advert ID: ${advert.id}`);
-    
-    // Track click (optional)
-    if (advert.id && !advert.id.startsWith('fallback-')) {
-      try {
-        fetch(`/api/adverts/track/click`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ advertId: advert.id })
-        }).catch(err => console.log('Could not track click:', err));
-      } catch (err) {
-        console.log('Error tracking click:', err);
-      }
-    }
     
     // Navigate to advert detail page
     if (advert.id) {
       const advertId = encodeURIComponent(advert.id);
-      const advertDetailUrl = `adverts/advert_detail.html?id=${advertId}`;
-      console.log(`📍 Navigating to advert detail: ${advertDetailUrl}`);
-      window.location.href = advertDetailUrl;
-    } else {
-      console.warn('⚠️ No advert ID, cannot navigate');
+      window.location.href = `adverts/advert_detail.html?id=${advertId}`;
     }
   }
   
@@ -2321,9 +2278,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <i class="fas fa-tag"></i>
         <h3>No Special Offers Available</h3>
         <p>Check back soon for exciting promotions</p>
-        <button class="btn-fill" onclick="window.location.href='wine/all_wines.html'">
-          Browse All Wines
-        </button>
       </div>
     `;
     
@@ -2332,7 +2286,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (marketingDots) marketingDots.style.display = 'none';
   }
   
-  console.log('✅ Marketing banners script loaded');
+  console.log('✅ Marketing banners script loaded - ready to show adverts!');
 });
 </script>
 </body>
