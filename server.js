@@ -439,6 +439,74 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         });
     }
 });
+// Add this to server.js - around line 450
+app.get('/api/adverts/active', async (req, res) => {
+  try {
+    console.log('🎪 Fetching active adverts via proxy');
+    
+    // Forward query parameters
+    const queryParams = new URLSearchParams(req.query).toString();
+    const backendUrl = queryParams ? 
+      `${BACKEND_URL}/api/adverts/active?${queryParams}` : 
+      `${BACKEND_URL}/api/adverts/active`;
+    
+    console.log('🎪 Backend URL:', backendUrl);
+    
+    const response = await fetch(backendUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 10000
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`🎪 Adverts response: ${response.status} (${Array.isArray(data) ? data.length : 0} items)`);
+    
+    res.status(response.status).json(data);
+    
+  } catch (error) {
+    console.error('🚨 Adverts proxy error:', error.message);
+    
+    // Return fallback adverts
+    const fallbackAdverts = [
+      {
+        id: 'fallback-1',
+        title: 'African Diamond Blanc',
+        subtitle: 'Premium selection for connoisseurs',
+        imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
+        targetUrl: '#',
+        isActive: true,
+        type: 'homepage'
+      },
+      {
+        id: 'fallback-2',
+        title: 'Ferrero Rocher Collection',
+        subtitle: 'Perfect pairing for special moments',
+        imageUrl: 'assets/adverts/ferrero.png',
+        targetUrl: '#',
+        isActive: true,
+        type: 'homepage'
+      },
+      {
+        id: 'fallback-3',
+        title: 'Moët & Chandon Rosé',
+        subtitle: 'Celebrate with premium champagne',
+        imageUrl: 'assets/adverts/moet_rose.png',
+        targetUrl: '#',
+        isActive: true,
+        type: 'homepage'
+      }
+    ];
+    
+    res.json(fallbackAdverts);
+  }
+});
 
 // Verify OTP
 app.post('/api/auth/verify-otp', async (req, res) => {
@@ -1073,12 +1141,12 @@ app.get('/api/wines', async (req, res) => {
   }
 });
 
-// Get featured wines (special endpoint)
+// Add this to your server.js - around line 400 (after other wine endpoints)
 app.get('/api/wines/featured', async (req, res) => {
   try {
-    console.log('🌟 Fetching featured wines from backend');
+    console.log('🌟 Fetching featured wines via proxy');
     
-    const response = await fetch(`${BACKEND_URL}/api/wines/featured/featured`, {
+    const response = await fetch(`${BACKEND_URL}/api/wines/featured`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -1092,14 +1160,14 @@ app.get('/api/wines/featured', async (req, res) => {
     }
     
     const data = await response.json();
-    console.log(`🌟 Featured wines response: ${response.status} (${Array.isArray(data) ? data.length : 0} wines)`);
+    console.log(`🌟 Featured wines response: ${response.status}`);
     
     res.status(response.status).json(data);
     
   } catch (error) {
     console.error('🚨 Featured wines proxy error:', error.message);
     
-    // Return fallback data if backend fails
+    // Return fallback data
     const fallbackWines = [
       {
         id: 1,
@@ -1130,11 +1198,9 @@ app.get('/api/wines/featured', async (req, res) => {
       }
     ];
     
-    console.log('⚠️ Using fallback featured wines data');
     res.json(fallbackWines);
   }
 });
-
 // Get single wine by ID
 app.get('/api/wines/:id', async (req, res) => {
   try {
