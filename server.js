@@ -1101,9 +1101,10 @@ app.get('/api/deliveries/:id', async (req, res) => {
 // ============ WINE ENDPOINTS ============
 
 // Get all wines
+// All wines with query
 app.get('/api/wines', async (req, res) => {
   try {
-    console.log('🍷 Fetching wines from backend');
+    console.log('🍷 Fetching all wines');
     
     // Forward query parameters
     const queryParams = new URLSearchParams(req.query).toString();
@@ -1119,7 +1120,7 @@ app.get('/api/wines', async (req, res) => {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      timeout: 10000 // 10 second timeout
+      timeout: 10000
     });
     
     if (!response.ok) {
@@ -1127,12 +1128,12 @@ app.get('/api/wines', async (req, res) => {
     }
     
     const data = await response.json();
-    console.log(`🍷 Wines response: ${response.status} (${Array.isArray(data) ? data.length : 'object'})`);
+    console.log(`🍷 All wines response: ${response.status} (${Array.isArray(data) ? data.length : 'object'})`);
     
     res.status(response.status).json(data);
     
   } catch (error) {
-    console.error('🚨 Wines proxy error:', error.message);
+    console.error('🚨 All wines proxy error:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch wines',
@@ -1140,7 +1141,6 @@ app.get('/api/wines', async (req, res) => {
     });
   }
 });
-
 // Add this to your server.js - around line 400 (after other wine endpoints)
 app.get('/api/wines/featured', async (req, res) => {
   try {

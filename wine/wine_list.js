@@ -1,6 +1,5 @@
 // Configuration
-const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
+const API_BASE_URL = '/api';  // Changed to proxy server
 
 // State
 let allWines = [];
@@ -104,25 +103,27 @@ function populateFilterDropdown() {
   });
 }
 
-// Fetch wines
+// Fetch wines - UPDATED TO USE PROXY
 async function fetchWines() {
   try {
     showLoading();
     
     console.log('🌐 Fetching wines from API...');
     
-    // Use CORS proxy
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/wines?all=true`)}`;
+    // Use your proxy server directly - NO CORS PROXY NEEDED
+    const apiUrl = `${API_BASE_URL}/wines?all=true`;
+    console.log('📡 Fetching from:', apiUrl);
     
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const wines = await response.json();
@@ -225,8 +226,6 @@ function renderWines() {
     const type = wine.type || 'Wine';
     const category = wine.category || '';
     
-    // EXACT SAME CARD LAYOUT AS all_wines.html
-    // ADDED onclick TO NAVIGATE TO WINE DETAIL
     return `
       <div class="wine-card" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">

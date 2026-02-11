@@ -1,6 +1,6 @@
 // Wine Detail JavaScript - MATCHING FLUTTER APP
 // Configuration - USE EXACT SAME API AS FLUTTER
-const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
+const API_BASE_URL = '/api';
 
 // State
 let currentWine = null;
