@@ -1205,15 +1205,20 @@ app.get('/api/wines/featured', async (req, res) => {
 app.get('/api/wines/:id', async (req, res) => {
   try {
     console.log('🍷 Fetching wine by ID:', req.params.id);
+    console.log('📡 Backend URL:', `${BACKEND_URL}/api/wines/${req.params.id}`);
     
     const response = await fetch(`${BACKEND_URL}/api/wines/${req.params.id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Origin': 'https://store.wineandbubblesnow.co.za'  // Add origin header
       },
       timeout: 10000
     });
+    
+    console.log('📊 Response status:', response.status);
+    console.log('📊 Response headers:', Object.fromEntries(response.headers.entries()));
     
     if (!response.ok) {
       throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
