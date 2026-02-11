@@ -1257,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🏠 Homepage loaded - checking authentication');
     
     // Configuration
-    const API_BASE_URL = 'http://localhost:3000/api';
+   const API_BASE_URL = '/api';
     
     // Token validation function
     function isTokenValid() {
@@ -1675,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // USE THE SAME ENDPOINT AS FLUTTER APP
       // Flutter uses: https://www.wineandbubblesnow.co.za/api/adverts/active?type=homepage
-      const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
+      const API_BASE_URL = '/api';
       const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage`;
       
       console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
@@ -2060,7 +2060,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🎠 Initializing banner carousel...');
     
     // Configuration - USE EXACT SAME API AS FLUTTER APP
-    const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
+   const API_BASE_URL = '/api';
     
     // DOM Elements
     const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
