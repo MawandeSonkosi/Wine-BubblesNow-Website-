@@ -674,25 +674,24 @@
       });
     }
 
-    // Fetch wine detail
     async function fetchWineDetail(wineId) {
       try {
         showLoading();
         
         console.log(`🌐 Fetching wine detail for ID: ${wineId}`);
         
-        // Use CORS proxy
-        const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/wines/${wineId}`)}`;
-        
-        const response = await fetch(proxyUrl, {
+        // Use local proxy server endpoint (no CORS proxy needed)
+        const response = await fetch(`${API_BASE_URL}/wines/${wineId}`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
+            'Content-Type': 'application/json'
           }
         });
         
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+          console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
+          throw new Error(`Failed to fetch wine details: ${response.status}`);
         }
         
         const wine = await response.json();
@@ -723,17 +722,17 @@
     // Fetch all wines for related wines
     async function fetchAllWines() {
       try {
-        const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/wines?all=true`)}`;
-        
-        const response = await fetch(proxyUrl, {
+        const response = await fetch(`${API_BASE_URL}/wines?all=true`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
+            'Content-Type': 'application/json'
           }
         });
         
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+          console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
+          throw new Error(`Failed to fetch all wines: ${response.status}`);
         }
         
         allWines = await response.json();
@@ -743,7 +742,6 @@
         console.error('Error fetching all wines:', error);
       }
     }
-
     // Helper to fix image URLs
     function fixImageUrl(imageUrl) {
       if (!imageUrl) {
