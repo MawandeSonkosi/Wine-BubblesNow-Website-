@@ -1642,412 +1642,9 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- FIXED: Marketing Banners with correct backend URL -->
-<!-- FIXED: Marketing Banners JavaScript - EXACTLY LIKE FLUTTER APP -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎪 Starting marketing banners - matching Flutter app exactly');
-  
-  // Check age verification
-  const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
-  if (!ageConfirmed) {
-    console.log('⏳ Age not verified');
-    return;
-  }
-  
-  // DOM Elements
-  const marketingBannersTrack = document.getElementById('marketingBannersTrack');
-  const marketingPrevBtn = document.getElementById('marketingPrevBtn');
-  const marketingNextBtn = document.getElementById('marketingNextBtn');
-  const marketingDots = document.getElementById('marketingDots');
-  
-  // State
-  let marketingAdverts = [];
-  let currentMarketingSlide = 0;
-  let isMarketingTransitioning = false;
-  let marketingAutoSlideInterval;
-  
-  // Initialize - EXACTLY LIKE FLUTTER'S homepageAdvertsProvider
-  initMarketingBanners();
-  
-  async function initMarketingBanners() {
-    try {
-      console.log('🌐 Fetching homepage adverts - matching Flutter app');
-      
-      // USE THE SAME ENDPOINT AS FLUTTER APP
-      // Flutter uses: https://www.wineandbubblesnow.co.za/api/adverts/active?type=homepage
-      const API_BASE_URL = '/api';
-      const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage`;
-      
-      console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
-      
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-        
-        // Try without type parameter (like marketingAdvertsProvider)
-        console.log('🔄 Trying without type parameter...');
-        const altUrl = `${API_BASE_URL}/adverts/active`;
-        const altResponse = await fetch(altUrl);
-        
-        if (!altResponse.ok) {
-          throw new Error(`Both endpoints failed: ${response.status}, ${altResponse.status}`);
-        }
-        
-        const adverts = await altResponse.json();
-        console.log(`✅ Received ${adverts.length} adverts from backup endpoint`);
-        marketingAdverts = adverts.filter(advert => advert.isActive !== false);
-      } else {
-        marketingAdverts = await response.json();
-        console.log(`✅ Received ${marketingAdverts.length} homepage adverts from API`);
-      }
-      
-      // Debug: Show first advert structure
-      if (marketingAdverts.length > 0) {
-        console.log('📊 First advert from API:', JSON.stringify(marketingAdverts[0], null, 2));
-      }
-      
-      // Filter for active adverts (should already be filtered by backend)
-      marketingAdverts = marketingAdverts.filter(advert => 
-        advert.isActive === true || advert.isActive === undefined
-      );
-      
-      console.log(`🖼️ Will show ${marketingAdverts.length} active homepage adverts`);
-      
-      if (marketingAdverts.length === 0) {
-        console.log('⚠️ No homepage adverts found, showing fallback');
-        createDefaultAdverts();
-      }
-      
-      // Render the banners
-      renderMarketingBanners();
-      setupMarketingEventListeners();
-      startMarketingAutoSlide();
-      
-    } catch (error) {
-      console.error('❌ Error loading marketing adverts:', error.message || error);
-      console.error('Full error:', error);
-      
-      // Show detailed error message
-      marketingBannersTrack.innerHTML = `
-        <div class="carousel-error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>Connection Error</h3>
-          <p>Cannot connect to: https://www.wineandbubblesnow.co.za/api</p>
-          <p><small>Error: ${error.message}</small></p>
-          <button class="btn-fill" onclick="location.reload()">
-            Retry Connection
-          </button>
-        </div>
-      `;
-      
-      marketingPrevBtn.style.display = 'none';
-      marketingNextBtn.style.display = 'none';
-      marketingDots.style.display = 'none';
-      
-      return;
-    }
-  }
-  
-  function createDefaultAdverts() {
-    console.log('🔄 Creating default adverts (fallback)');
-    
-    marketingAdverts = [
-      {
-        id: 'fallback-1',
-        title: 'African Diamond Blanc',
-        subtitle: 'Premium selection for connoisseurs',
-        imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
-        targetUrl: '#',
-        isActive: true,
-        productType: 'advert',
-        category: 'marketing',
-        type: 'homepage',
-        isAvailableForPurchase: false,
-        stockCount: 0,
-        price: 0
-      },
-      {
-        id: 'fallback-2',
-        title: 'Ferrero Rocher Collection',
-        subtitle: 'Perfect pairing for special moments',
-        imageUrl: 'assets/adverts/ferrero.png',
-        targetUrl: '#',
-        isActive: true,
-        productType: 'advert',
-        category: 'marketing',
-        type: 'homepage',
-        isAvailableForPurchase: false,
-        stockCount: 0,
-        price: 0
-      },
-      {
-        id: 'fallback-3',
-        title: 'Moët & Chandon Rosé',
-        subtitle: 'Celebrate with premium champagne',
-        imageUrl: 'assets/adverts/moet_rose.png',
-        targetUrl: '#',
-        isActive: true,
-        productType: 'advert',
-        category: 'marketing',
-        type: 'homepage',
-        isAvailableForPurchase: false,
-        stockCount: 0,
-        price: 0
-      }
-    ];
-    
-    console.log('✅ Created 3 fallback adverts');
-  }
-  
-  function renderMarketingBanners() {
-    console.log('🎨 Rendering marketing banners');
-    
-    // Clear loading state
-    marketingBannersTrack.innerHTML = '';
-    marketingDots.innerHTML = '';
-    
-    if (marketingAdverts.length === 0) {
-      showMarketingEmptyState();
-      return;
-    }
-    
-    // Create slides - MATCHING FLUTTER'S _buildAdvertImage LOGIC
-    marketingAdverts.forEach((advert, index) => {
-      createMarketingSlide(advert, index);
-    });
-    
-    // Set initial position
-    setTimeout(() => {
-      updateMarketingCarouselPosition();
-    }, 50);
-  }
-  
-  function createMarketingSlide(advert, index) {
-    console.log(`🖼️ Creating slide ${index}: ${advert.title}`);
-    
-    const slide = document.createElement('div');
-    slide.className = 'marketing-banner-slide';
-    slide.dataset.index = index;
-    slide.dataset.advertId = advert.id;
-    
-    // HANDLE IMAGE URL - EXACTLY LIKE FLUTTER'S _buildAdvertImage
-    let imagePath = advert.targetUrl || '';
-    
-    // If targetUrl is empty or not an image, use imageUrl
-    if (imagePath === '' || 
-        (!imagePath.startsWith('assets/') && !imagePath.startsWith('http'))) {
-      imagePath = advert.imageUrl || '';
-    }
-    
-    // Also check if targetUrl contains 'adverts' folder
-    if (advert.targetUrl && advert.targetUrl.includes('adverts/')) {
-      imagePath = advert.targetUrl;
-    }
-    
-    // Debug: Show what image path we're using
-    console.log(`📸 Advert "${advert.title}":`, {
-      targetUrl: advert.targetUrl,
-      imageUrl: advert.imageUrl,
-      using: imagePath
-    });
-    
-    // Fix relative paths for web
-    if (imagePath && imagePath.startsWith('assets/')) {
-      // Keep as-is, but ensure it's relative to current page
-      imagePath = '../' + imagePath;
-    }
-    
-    // Fallback if no valid image URL
-    if (!imagePath || imagePath === '') {
-      imagePath = 'assets/adverts/default_marketing.jpg';
-    }
-    
-    // Create slide HTML - SIMILAR TO FLUTTER'S GESTURE DETECTOR
-    slide.innerHTML = `
-      <img src="${imagePath}" 
-           alt="${advert.title}" 
-           class="marketing-banner-image"
-           loading="eager"  <!-- CHANGED TO EAGER FOR FASTER LOADING -->
-           decoding="async"  <!-- ADDED FOR BETTER PERFORMANCE -->
-           onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg';">
-      
-      <div class="marketing-banner-overlay">
-        <div class="marketing-banner-title">${advert.title}</div>
-        <div class="marketing-banner-subtitle">${advert.subtitle || ''}</div>
-      </div>
-    `;
-    
-    // CLICK HANDLER - EXACTLY LIKE FLUTTER: ALWAYS navigate to AdvertDetailScreen
-    slide.addEventListener('click', (event) => {
-      if (!isMarketingTransitioning) {
-        event.preventDefault();
-        handleAdvertClick(advert);
-      }
-    });
-    
-    // Make the entire slide clickable (like Flutter's GestureDetector)
-    slide.style.cursor = 'pointer';
-    
-    marketingBannersTrack.appendChild(slide);
-    
-    // Create dot
-    const dot = document.createElement('span');
-    dot.className = 'marketing-dot';
-    if (index === 0) dot.classList.add('active');
-    dot.dataset.index = index;
-    dot.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (!isMarketingTransitioning) {
-        clearInterval(marketingAutoSlideInterval);
-        goToMarketingSlide(index);
-        startMarketingAutoSlide();
-      }
-    });
-    marketingDots.appendChild(dot);
-  }
-  
-  function setupMarketingEventListeners() {
-    if (marketingPrevBtn) {
-      marketingPrevBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          prevMarketingSlide();
-          startMarketingAutoSlide();
-        }
-      });
-    }
-    
-    if (marketingNextBtn) {
-      marketingNextBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          nextMarketingSlide();
-          startMarketingAutoSlide();
-        }
-      });
-    }
-    
-    // Pause auto-slide on hover (like Flutter's mouseenter)
-    marketingBannersTrack.addEventListener('mouseenter', () => {
-      clearInterval(marketingAutoSlideInterval);
-    });
-    
-    marketingBannersTrack.addEventListener('mouseleave', () => {
-      startMarketingAutoSlide();
-    });
-  }
-  
-  function nextMarketingSlide() {
-    if (isMarketingTransitioning) return;
-    const nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
-    goToMarketingSlide(nextSlideIndex);
-  }
-  
-  function prevMarketingSlide() {
-    if (isMarketingTransitioning) return;
-    const prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
-    goToMarketingSlide(prevSlideIndex);
-  }
-  
-  function goToMarketingSlide(slideIndex) {
-    if (isMarketingTransitioning || slideIndex === currentMarketingSlide) return;
-    currentMarketingSlide = slideIndex;
-    updateMarketingCarouselPosition();
-  }
-  
-  function updateMarketingCarouselPosition() {
-    const translateX = -currentMarketingSlide * 100;
-    marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
-    marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
-    
-    // Update dots
-    document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
-      dot.classList.toggle('active', index === currentMarketingSlide);
-    });
-  }
-  
-  function startMarketingAutoSlide() {
-    clearInterval(marketingAutoSlideInterval);
-    // 4 seconds like Flutter
-    marketingAutoSlideInterval = setInterval(() => {
-      if (!isMarketingTransitioning) {
-        nextMarketingSlide();
-      }
-    }, 4000);
-  }
-  
-  // CLICK HANDLER - EXACTLY LIKE FLUTTER
-  function handleAdvertClick(advert) {
-    console.log(`📱 Advert clicked: ${advert.title}`);
-    console.log(`📁 Advert ID: ${advert.id}`);
-    console.log(`🏷️ Advert type: ${advert.type}`);
-    console.log(`🛒 Can purchase: ${advert.isAvailableForPurchase}`);
-    
-    // Track click (like Flutter's trackClick)
-    if (advert.id && !advert.id.startsWith('fallback-')) {
-      try {
-        fetch('https://www.wineandbubblesnow.co.za/api/adverts/track/click', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ advertId: advert.id })
-        }).catch(err => console.log('Could not track click:', err));
-      } catch (err) {
-        console.log('Error tracking click:', err);
-      }
-    }
-    
-    // EXACTLY LIKE FLUTTER: ALWAYS navigate to AdvertDetailScreen
-    // The advert detail page is at: adverts/advert_detail.html
-    if (advert.id) {
-      // Encode the ID for URL safety
-      const advertId = encodeURIComponent(advert.id);
-      const advertDetailUrl = `adverts/advert_detail.html?id=${advertId}`;
-      
-      console.log(`📍 Navigating to advert detail: ${advertDetailUrl}`);
-      
-      // Navigate to advert detail page
-      window.location.href = advertDetailUrl;
-    } else {
-      console.warn('⚠️ No advert ID, cannot navigate to detail page');
-      // Fallback: go to all wines
-      window.location.href = 'wine/all_wines.html';
-    }
-  }
-  
-  function showMarketingEmptyState() {
-    marketingBannersTrack.innerHTML = `
-      <div class="carousel-empty-state">
-        <i class="fas fa-tag"></i>
-        <h3>No Special Offers Available</h3>
-        <p>Check back soon for exciting promotions</p>
-        <button class="btn-fill" onclick="window.location.href='wine/all_wines.html'">
-          Browse All Wines
-        </button>
-      </div>
-    `;
-    
-    if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
-    if (marketingNextBtn) marketingNextBtn.style.display = 'none';
-    if (marketingDots) marketingDots.style.display = 'none';
-  }
-  
-  console.log('✅ Marketing banners script loaded - matching Flutter app');
-});
-</script>
-  <!-- FIXED: Wine Feature Banners - MATCHING FLUTTER EXACTLY -->
-< <script>
-  // Banner Carousel JavaScript - UPDATED TO MATCH FLUTTER APP
+  <!-- FIXED: Wine Feature Banners - SHOWS ALL FEATURED WINES WITHOUT LIMIT -->
+  <script>
+  // Banner Carousel JavaScript - SHOWS ALL FEATURED WINES
   document.addEventListener('DOMContentLoaded', function() {
     // Check if age is confirmed before loading carousel
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
@@ -2059,8 +1656,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎠 Initializing banner carousel...');
     
-    // Configuration - USE EXACT SAME API AS FLUTTER APP
-   const API_BASE_URL = '/api';
+    // Configuration
+    const API_BASE_URL = '/api';
     
     // DOM Elements
     const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
@@ -2071,9 +1668,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // State
     let featuredWines = [];
     let currentSlide = 0;
-    let slidesPerView = 1;
-    let autoSlideInterval;
     let isTransitioning = false;
+    let autoSlideInterval;
     
     // Initialize
     initCarousel();
@@ -2082,10 +1678,10 @@ document.addEventListener('DOMContentLoaded', function() {
       try {
         console.log('🌐 Fetching featured wines...');
         
-        // Use EXACT SAME ENDPOINT as Flutter: https://www.wineandbubblesnow.co.za/api/wines/featured
+        // Use EXACT SAME ENDPOINT as Flutter
         const apiUrl = `${API_BASE_URL}/wines/featured`;
         
-        console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
+        console.log('📡 Fetching from:', apiUrl);
         
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -2098,7 +1694,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!response.ok) {
           console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
           
-          // Try alternative endpoint like Flutter's getFeaturedWines()
+          // Try alternative endpoint
           console.log('🔄 Trying featured/featured endpoint...');
           const altUrl = `${API_BASE_URL}/wines/featured/featured`;
           const altResponse = await fetch(altUrl, {
@@ -2114,19 +1710,18 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           const wines = await altResponse.json();
-          console.log(`✅ Received ${wines.length} featured wines from backup endpoint`);
+          console.log(`✅ Received ${wines.length} wines from backup endpoint`);
+          // REMOVED THE .slice(0, 3) - SHOW ALL FEATURED WINES
           featuredWines = wines.filter(wine => wine.isFeatured === true);
         } else {
           featuredWines = await response.json();
           console.log(`✅ Received ${featuredWines.length} featured wines from API`);
         }
         
-        // Filter wines where isFeatured = true (double-check)
-        featuredWines = featuredWines.filter(wine => 
-          wine.isFeatured === true || wine.isFeatured === undefined
-        );
+        // Filter for wines with isFeatured = true
+        featuredWines = featuredWines.filter(wine => wine.isFeatured === true);
         
-        console.log(`🖼️ Will show ${featuredWines.length} featured wines`);
+        console.log(`🖼️ Will show ${featuredWines.length} featured wines (NO LIMIT)`);
         
         // If no featured wines, try to get all wines and find featured ones
         if (featuredWines.length === 0) {
@@ -2143,21 +1738,18 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (allWinesResponse.ok) {
               const allWines = await allWinesResponse.json();
-              // Filter for featured wines or wines with banner images
-              featuredWines = allWines.filter(wine => 
-                wine.isFeatured === true || 
-                (wine.bannerImageUrl || wine.imageUrl)
-              ).slice(0, 3);
-              console.log(`🎯 Found ${featuredWines.length} wines for carousel`);
+              // Filter for featured wines - NO LIMIT
+              featuredWines = allWines.filter(wine => wine.isFeatured === true);
+              console.log(`🎯 Found ${featuredWines.length} featured wines from all wines`);
             }
           } catch (fallbackError) {
             console.error('❌ Fallback also failed:', fallbackError);
           }
         }
         
-        // Ultimate fallback: use static images
+        // Ultimate fallback - only use static featured wines if absolutely no featured wines found
         if (featuredWines.length === 0) {
-          console.log('⚠️ Using ultimate fallback - static wine images');
+          console.log('⚠️ Using ultimate fallback - static featured wines');
           featuredWines = [
             {
               id: 1,
@@ -2192,7 +1784,7 @@ document.addEventListener('DOMContentLoaded', function() {
           ];
         }
         
-        console.log(`🖼️ Carousel will show ${featuredWines.length} featured wines`);
+        console.log(`🖼️ Carousel will show ${featuredWines.length} featured wines (NO LIMIT)`);
         
         if (featuredWines.length === 0) {
           showEmptyState();
@@ -2215,7 +1807,7 @@ document.addEventListener('DOMContentLoaded', function() {
       bannerCarouselTrack.innerHTML = '';
       carouselDots.innerHTML = '';
       
-      // Create slides
+      // Create slides for ALL featured wines - NO LIMIT
       featuredWines.forEach((wine, index) => {
         createSlide(wine, index);
       });
@@ -2224,6 +1816,9 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         updateCarouselPosition();
       }, 50);
+      
+      // Update button states
+      updateButtonStates();
     }
     
     function createSlide(wine, index) {
@@ -2236,10 +1831,9 @@ document.addEventListener('DOMContentLoaded', function() {
       // Use bannerImageUrl if available, otherwise use imageUrl
       let imageUrl = wine.bannerImageUrl || wine.imageUrl;
       
-      // Fix image path if needed - SIMILAR TO FLUTTER
+      // Fix image path if needed
       if (imageUrl) {
         if (imageUrl.startsWith('assets/')) {
-          // Keep relative to current page
           imageUrl = '../' + imageUrl;
         } else if (!imageUrl.startsWith('http') && 
                    !imageUrl.startsWith('/') && 
@@ -2247,7 +1841,7 @@ document.addEventListener('DOMContentLoaded', function() {
           imageUrl = 'assets/' + imageUrl;
         }
       } else {
-        imageUrl = 'assets/wines/breakfast/Noir.png'; // Default fallback
+        imageUrl = 'assets/wines/breakfast/Noir.png';
       }
       
       // Create slide content
@@ -2265,7 +1859,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
       
-      // Add click event to navigate to wine detail - LIKE FLUTTER
+      // Add click event to navigate to wine detail
       slide.addEventListener('click', (e) => {
         if (!isTransitioning) {
           navigateToWineDetail(wine.id);
@@ -2315,7 +1909,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
       
-      // Pause auto-slide on hover (like Flutter)
+      // Pause auto-slide on hover
       bannerCarouselTrack.addEventListener('mouseenter', () => {
         clearInterval(autoSlideInterval);
       });
@@ -2354,6 +1948,10 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       // Update button states
+      updateButtonStates();
+    }
+    
+    function updateButtonStates() {
       if (prevBtn) {
         prevBtn.disabled = currentSlide === 0;
       }
@@ -2364,12 +1962,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function startAutoSlide() {
       clearInterval(autoSlideInterval);
-      // 4 seconds like Flutter
-      autoSlideInterval = setInterval(() => {
-        if (!isTransitioning) {
-          nextSlide();
-        }
-      }, 4000);
+      // Only start auto-slide if there's more than 1 slide
+      if (featuredWines.length > 1) {
+        autoSlideInterval = setInterval(() => {
+          if (!isTransitioning) {
+            nextSlide();
+          }
+        }, 4000);
+      }
     }
     
     function navigateToWineDetail(wineId) {
@@ -2389,7 +1989,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
       
-      // Hide navigation buttons and dots
       if (prevBtn) prevBtn.style.display = 'none';
       if (nextBtn) nextBtn.style.display = 'none';
       if (carouselDots) carouselDots.style.display = 'none';
@@ -2408,7 +2007,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
       
-      // Hide navigation buttons and dots
       if (prevBtn) prevBtn.style.display = 'none';
       if (nextBtn) nextBtn.style.display = 'none';
       if (carouselDots) carouselDots.style.display = 'none';
