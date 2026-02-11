@@ -1161,7 +1161,7 @@ app.get('/api/wines/featured', async (req, res) => {
       
       // Try fallback endpoint
       console.log('🔄 Trying fallback endpoint with query params...');
-      const fallbackResponse = await fetch(`${BACKEND_URL}/api/wines?featured=true&all=true`, {
+     const fallbackResponse = await fetch(`${BACKEND_URL}/api/wines?featured=true&all=true`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
