@@ -1642,8 +1642,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
  <!-- FIXED: Wine Feature Banners - SUPER FAST LOADING + ALL IMAGE FORMATS -->
-  <script>
-  // Banner Carousel JavaScript - OPTIMIZED FOR SPEED + ALL IMAGE TYPES
+   <script>
+  // Banner Carousel JavaScript - OPTIMIZED FOR ALL SCREENS + BROWSERS
   document.addEventListener('DOMContentLoaded', function() {
     // Check if age is confirmed before loading carousel
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
@@ -1653,28 +1653,274 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    console.log('🎠 Initializing banner carousel (ULTRA-FAST MODE)...');
+    console.log('🎠 Initializing banner carousel (UNIVERSAL MODE)...');
     
     // Configuration
     const API_BASE_URL = '/api';
     
-    // DOM Elements
+    // DOM Elements with cross-browser safe selectors
     const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const carouselDots = document.getElementById('carouselDots');
+    
+    // Check if elements exist (for older browsers)
+    if (!bannerCarouselTrack) {
+      console.error('❌ Banner carousel track not found');
+      return;
+    }
     
     // State
     let featuredWines = [];
     let currentSlide = 0;
     let isTransitioning = false;
     let autoSlideInterval;
+    let touchStartX = 0;
+    let touchEndX = 0;
     
-    // ⚡⚡⚡ SHOW FALLBACK IMMEDIATELY (LOAD IN 0 SECONDS) ⚡⚡⚡
-    function showImmediateFallback() {
-      console.log('⚡ INSTANT LOAD: Showing fallback banners');
+    // ===========================================
+    // UNIVERSAL BROWSER DETECTION & POLYFILLS
+    // ===========================================
+    
+    // Check if browser supports modern features
+    const isOldBrowser = !window.CSS || !CSS.supports('display', 'flex');
+    const isIE = /*@cc_on!@*/false || !!document.documentMode;
+    const isEdge = /Edge/.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent) || (isMobile && window.innerWidth >= 768);
+    
+    console.log(`📱 Device: ${isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop'}, Browser: ${isIE ? 'IE' : isEdge ? 'Edge' : isSafari ? 'Safari' : 'Modern'}`);
+    
+    // Polyfill for older browsers
+    if (isIE || isOldBrowser) {
+      console.log('🔄 Adding polyfills for older browser');
       
-      // Ultra-fast fallback wines that load instantly
+      // Add classList polyfill if needed
+      if (!('classList' in document.documentElement)) {
+        // Simple classList polyfill
+        Object.defineProperty(Element.prototype, 'classList', {
+          get: function() {
+            var self = this;
+            return {
+              add: function(className) {
+                self.className += ' ' + className;
+              },
+              remove: function(className) {
+                self.className = self.className.replace(new RegExp('(^|\\s)' + className + '(\\s|$)'), ' ');
+              },
+              contains: function(className) {
+                return (' ' + self.className + ' ').indexOf(' ' + className + ' ') > -1;
+              },
+              toggle: function(className) {
+                if (this.contains(className)) {
+                  this.remove(className);
+                } else {
+                  this.add(className);
+                }
+              }
+            };
+          }
+        });
+      }
+      
+      // Add dataset polyfill
+      if (!('dataset' in document.documentElement)) {
+        Object.defineProperty(Element.prototype, 'dataset', {
+          get: function() {
+            var attrs = this.attributes;
+            var data = {};
+            for (var i = 0; i < attrs.length; i++) {
+              if (attrs[i].name.indexOf('data-') === 0) {
+                var key = attrs[i].name.slice(5).replace(/-([a-z])/g, function(g) {
+                  return g[1].toUpperCase();
+                });
+                data[key] = attrs[i].value;
+              }
+            }
+            return data;
+          }
+        });
+      }
+    }
+    
+    // ===========================================
+    // UNIVERSAL RESPONSIVE SIZING
+    // ===========================================
+    
+    function getOptimalCarouselHeight() {
+      const width = window.innerWidth;
+      
+      // Universal height calculation that works on all screens
+      if (width <= 480) {
+        return 220; // Small phones
+      } else if (width <= 768) {
+        return 280; // Large phones, small tablets
+      } else if (width <= 1024) {
+        return 340; // Tablets, small laptops
+      } else if (width <= 1440) {
+        return 380; // Desktops
+      } else {
+        return 420; // Large desktops, 4K
+      }
+    }
+    
+    function getOptimalFontSizes() {
+      const width = window.innerWidth;
+      
+      return {
+        title: width <= 480 ? '19px' : width <= 768 ? '22px' : width <= 1024 ? '24px' : '28px',
+        subtitle: width <= 480 ? '14px' : width <= 768 ? '16px' : '18px',
+        price: width <= 480 ? '16px' : width <= 768 ? '18px' : '20px'
+      };
+    }
+    
+    // Apply responsive sizing
+    function applyResponsiveStyles() {
+      const container = document.querySelector('.banner-carousel-container');
+      if (container) {
+        const height = getOptimalCarouselHeight();
+        container.style.height = height + 'px';
+        
+        // Ensure track matches container height
+        const track = document.querySelector('.banner-carousel-track');
+        if (track) {
+          track.style.height = height + 'px';
+        }
+      }
+      
+      // Update font sizes via style tag for universal compatibility
+      const fonts = getOptimalFontSizes();
+      const styleId = 'banner-responsive-styles';
+      let styleEl = document.getElementById(styleId);
+      
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = styleId;
+        document.head.appendChild(styleEl);
+      }
+      
+      styleEl.textContent = `
+        .banner-slide-title {
+          font-size: ${fonts.title} !important;
+        }
+        .banner-slide-subtitle {
+          font-size: ${fonts.subtitle} !important;
+        }
+        .banner-slide-price {
+          font-size: ${fonts.price} !important;
+        }
+      `;
+    }
+    
+    // ===========================================
+    // UNIVERSAL TOUCH SUPPORT (Mobile + Tablet)
+    // ===========================================
+    
+    function setupTouchSupport() {
+      if (!bannerCarouselTrack) return;
+      
+      // Touch events for mobile
+      bannerCarouselTrack.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+        clearInterval(autoSlideInterval);
+      }, { passive: true });
+      
+      bannerCarouselTrack.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+        startAutoSlide();
+      }, { passive: true });
+      
+      // Mouse drag for desktop (progressive enhancement)
+      let isDragging = false;
+      let dragStartX = 0;
+      
+      bannerCarouselTrack.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        isDragging = true;
+        dragStartX = e.pageX;
+        clearInterval(autoSlideInterval);
+      });
+      
+      bannerCarouselTrack.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+      });
+      
+      bannerCarouselTrack.addEventListener('mouseup', function(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        const dragEndX = e.pageX;
+        const dragDiff = dragEndX - dragStartX;
+        
+        if (Math.abs(dragDiff) > 50) {
+          if (dragDiff > 0) {
+            prevSlide();
+          } else {
+            nextSlide();
+          }
+        }
+        startAutoSlide();
+      });
+      
+      bannerCarouselTrack.addEventListener('mouseleave', function() {
+        if (isDragging) {
+          isDragging = false;
+          startAutoSlide();
+        }
+      });
+    }
+    
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      if (touchEndX < touchStartX - swipeThreshold) {
+        nextSlide();
+      }
+      if (touchEndX > touchStartX + swipeThreshold) {
+        prevSlide();
+      }
+    }
+    
+    // ===========================================
+    // UNIVERSAL IMAGE LOADING (All formats + fallbacks)
+    // ===========================================
+    
+    function getSafeImageUrl(url, fallbackIndex = 0) {
+      if (!url) return 'assets/wines/breakfast/Noir.png';
+      
+      // Handle data URLs
+      if (url.startsWith('data:')) {
+        return url;
+      }
+      
+      // Handle absolute URLs
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+      
+      // Clean the URL
+      url = url.split('?')[0].split('#')[0];
+      
+      // Check if URL already has extension
+      const hasExtension = /\.(jpe?g|png|webp|gif|bmp|svg|avif|tiff?|ico)$/i.test(url);
+      
+      if (hasExtension) {
+        return url;
+      }
+      
+      // Try different extensions based on fallback index
+      const extensions = ['.png', '.jpg', '.webp', '.jpeg', '.gif'];
+      return url + extensions[fallbackIndex % extensions.length];
+    }
+    
+    // ===========================================
+    // UNIVERSAL FALLBACK (Works immediately)
+    // ===========================================
+    
+    function showImmediateFallback() {
+      console.log('⚡ INSTANT LOAD: Showing universal fallback banners');
+      
       featuredWines = [
         {
           id: 1,
@@ -1708,141 +1954,119 @@ document.addEventListener('DOMContentLoaded', function() {
       renderCarousel();
       setupEventListeners();
       startAutoSlide();
+      applyResponsiveStyles();
+      setupTouchSupport();
     }
     
-    // ⚡ RENDER IMMEDIATELY WITH FALLBACK ⚡
+    // Start immediately
     showImmediateFallback();
     
-    // THEN fetch real data in background and update when ready
-    async function initCarousel() {
-      try {
-        console.log('🌐 BACKGROUND FETCH: Getting featured wines...');
-        
-        // Try multiple endpoints for maximum compatibility
-        const endpoints = [
-          `${API_BASE_URL}/wines/featured`,
-          `${API_BASE_URL}/wines?featured=true`,
-          `${API_BASE_URL}/wines?isFeatured=true`,
-          `${API_BASE_URL}/wines?featured=1`
-        ];
-        
-        let realWines = null;
-        
-        // Try each endpoint until one works
-        for (const endpoint of endpoints) {
-          try {
-            console.log(`📡 Trying: ${endpoint}`);
-            const response = await fetch(endpoint, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json',
-                'Cache-Control': 'no-cache'
-              }
-            });
-            
-            if (response.ok) {
-              const wines = await response.json();
-              // Handle both array response and paginated response
-              const wineArray = Array.isArray(wines) ? wines : (wines.items || wines.data || []);
-              
-              // Filter for featured wines
-              const featured = wineArray.filter(w => w.isFeatured === true);
-              
-              if (featured.length > 0) {
-                realWines = featured;
-                console.log(`✅ Found ${realWines.length} real featured wines`);
-                break;
-              }
-            }
-          } catch (e) {
-            console.log(`❌ Endpoint failed: ${endpoint}`);
-            continue;
-          }
-        }
-        
-        // If we found real wines, update the carousel
-        if (realWines && realWines.length > 0) {
-          featuredWines = realWines;
-          renderCarousel();
-          console.log('🔄 Updated carousel with real wines from API');
-        }
-        
-      } catch (error) {
-        console.error('❌ Background fetch failed, keeping fallback:', error);
-      }
-    }
+    // ===========================================
+    // UNIVERSAL RESIZE HANDLER
+    // ===========================================
     
-    // Start background fetch
-    initCarousel();
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function() {
+        applyResponsiveStyles();
+        
+        // Recalculate slide positions for responsive
+        updateCarouselPosition();
+      }, 100);
+    });
+    
+    // ===========================================
+    // UNIVERSAL RENDER FUNCTIONS
+    // ===========================================
     
     function renderCarousel() {
-      // Clear loading state
-      bannerCarouselTrack.innerHTML = '';
-      carouselDots.innerHTML = '';
+      // Safe innerHTML clear (works in all browsers)
+      while (bannerCarouselTrack.firstChild) {
+        bannerCarouselTrack.removeChild(bannerCarouselTrack.firstChild);
+      }
       
-      // Create slides for ALL featured wines
-      featuredWines.forEach((wine, index) => {
+      if (carouselDots) {
+        while (carouselDots.firstChild) {
+          carouselDots.removeChild(carouselDots.firstChild);
+        }
+      }
+      
+      // Create slides
+      featuredWines.forEach(function(wine, index) {
         createSlide(wine, index);
       });
       
-      // Set initial position
-      setTimeout(() => {
+      // Set initial position with safe setTimeout
+      setTimeout(function() {
         updateCarouselPosition();
       }, 10);
       
-      // Update button states
       updateButtonStates();
     }
     
     function createSlide(wine, index) {
-      // Create slide element
+      // Create elements individually (safer for all browsers)
       const slide = document.createElement('div');
       slide.className = 'banner-carousel-slide';
-      slide.dataset.index = index;
-      slide.dataset.wineId = wine.id;
       
-      // FIXED: Get image URL and support ANY file extension
-      let imageUrl = wine.bannerImageUrl || wine.imageUrl || '';
-      
-      // FIXED: Handle all image types (.jpg, .jpeg, .png, .webp, .gif)
-      if (!imageUrl) {
-        // Default fallback
-        imageUrl = 'assets/wines/breakfast/Noir.png';
-      } else {
-        // Clean the URL - remove any query params for checking extension
-        const cleanUrl = imageUrl.split('?')[0].toLowerCase();
-        const hasValidExtension = /\.(jpg|jpeg|png|webp|gif|bmp|svg|avif|tiff?)$/i.test(cleanUrl);
-        
-        // If no extension, assume it's a valid path or add .png as fallback
-        if (!hasValidExtension && !imageUrl.includes('http')) {
-          // It's likely a path without extension, keep as-is
-          console.log(`📸 Image path without extension: ${imageUrl}`);
-        }
+      // Set attributes safely
+      slide.setAttribute('data-index', index);
+      if (wine.id) {
+        slide.setAttribute('data-wine-id', wine.id);
       }
       
-      // FIXED: Preload image for faster rendering
-      const img = new Image();
+      // Get image URL with universal format support
+      let imageUrl = getSafeImageUrl(wine.bannerImageUrl || wine.imageUrl);
+      
+      // Create image element
+      const img = document.createElement('img');
       img.src = imageUrl;
+      img.alt = wine.name || 'Wine';
+      img.className = 'banner-carousel-image';
+      img.loading = 'eager';
+      img.decoding = 'async';
       
-      // Create slide content with error handling for ALL image types
-      slide.innerHTML = `
-        <img src="${imageUrl}" 
-             alt="${wine.name}" 
-             class="banner-carousel-image"
-             loading="eager"
-             decoding="async"
-             crossorigin="anonymous"
-             onload="this.style.opacity='1'"
-             onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png'; this.onerror=null;">
-        <div class="banner-slide-overlay">
-          <div class="banner-slide-title">${wine.name}</div>
-          <div class="banner-slide-subtitle">${wine.type || 'Premium Wine'}</div>
-          <div class="banner-slide-price">R${(wine.price || 0).toFixed(2)}</div>
-        </div>
-      `;
+      // Universal error handling with multiple fallbacks
+      let fallbackAttempt = 0;
+      img.onerror = function() {
+        fallbackAttempt++;
+        if (fallbackAttempt <= 3) {
+          // Try different extension
+          this.src = getSafeImageUrl(wine.bannerImageUrl || wine.imageUrl, fallbackAttempt);
+        } else {
+          // Ultimate fallback
+          this.src = 'assets/wines/breakfast/Noir.png';
+          this.onerror = null;
+        }
+      };
       
-      // Add click event
-      slide.addEventListener('click', (e) => {
+      // Create overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'banner-slide-overlay';
+      
+      const title = document.createElement('div');
+      title.className = 'banner-slide-title';
+      title.textContent = wine.name || 'Premium Wine';
+      
+      const subtitle = document.createElement('div');
+      subtitle.className = 'banner-slide-subtitle';
+      subtitle.textContent = wine.type || 'Premium Selection';
+      
+      const price = document.createElement('div');
+      price.className = 'banner-slide-price';
+      price.textContent = 'R' + (wine.price || 0).toFixed(2);
+      
+      // Assemble elements
+      overlay.appendChild(title);
+      overlay.appendChild(subtitle);
+      overlay.appendChild(price);
+      
+      slide.appendChild(img);
+      slide.appendChild(overlay);
+      
+      // Universal click handler
+      slide.addEventListener('click', function(e) {
         if (!isTransitioning) {
           navigateToWineDetail(wine.id);
         }
@@ -1850,25 +2074,30 @@ document.addEventListener('DOMContentLoaded', function() {
       
       bannerCarouselTrack.appendChild(slide);
       
-      // Create dot for this slide
-      const dot = document.createElement('span');
-      dot.className = 'carousel-dot';
-      if (index === 0) dot.classList.add('active');
-      dot.dataset.index = index;
-      dot.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isTransitioning) {
-          clearInterval(autoSlideInterval);
-          goToSlide(index);
-          startAutoSlide();
-        }
-      });
-      carouselDots.appendChild(dot);
+      // Create dot
+      if (carouselDots) {
+        const dot = document.createElement('span');
+        dot.className = 'carousel-dot';
+        if (index === 0) dot.classList.add('active');
+        dot.setAttribute('data-index', index);
+        
+        dot.addEventListener('click', function(event) {
+          event.stopPropagation();
+          if (!isTransitioning) {
+            clearInterval(autoSlideInterval);
+            goToSlide(index);
+            startAutoSlide();
+          }
+        });
+        
+        carouselDots.appendChild(dot);
+      }
     }
     
     function setupEventListeners() {
+      // Universal button handlers with null checks
       if (prevBtn) {
-        prevBtn.addEventListener('click', (event) => {
+        prevBtn.addEventListener('click', function(event) {
           event.stopPropagation();
           if (!isTransitioning) {
             clearInterval(autoSlideInterval);
@@ -1879,7 +2108,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       if (nextBtn) {
-        nextBtn.addEventListener('click', (event) => {
+        nextBtn.addEventListener('click', function(event) {
           event.stopPropagation();
           if (!isTransitioning) {
             clearInterval(autoSlideInterval);
@@ -1889,24 +2118,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
       
-      bannerCarouselTrack.addEventListener('mouseenter', () => {
-        clearInterval(autoSlideInterval);
-      });
-      
-      bannerCarouselTrack.addEventListener('mouseleave', () => {
-        startAutoSlide();
-      });
+      // Universal hover handlers
+      if (bannerCarouselTrack) {
+        bannerCarouselTrack.addEventListener('mouseenter', function() {
+          clearInterval(autoSlideInterval);
+        });
+        
+        bannerCarouselTrack.addEventListener('mouseleave', function() {
+          startAutoSlide();
+        });
+      }
     }
     
     function nextSlide() {
       if (isTransitioning || featuredWines.length === 0) return;
-      const nextSlideIndex = (currentSlide + 1) % featuredWines.length;
+      var nextSlideIndex = (currentSlide + 1) % featuredWines.length;
       goToSlide(nextSlideIndex);
     }
     
     function prevSlide() {
       if (isTransitioning || featuredWines.length === 0) return;
-      const prevSlideIndex = (currentSlide - 1 + featuredWines.length) % featuredWines.length;
+      var prevSlideIndex = (currentSlide - 1 + featuredWines.length) % featuredWines.length;
       goToSlide(prevSlideIndex);
     }
     
@@ -1917,13 +2149,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateCarouselPosition() {
-      const translateX = -currentSlide * 100;
-      bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
-      bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
+      var translateX = -currentSlide * 100;
       
-      document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlide);
-      });
+      // Cross-browser transform
+      bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
+      bannerCarouselTrack.style.transform = 'translateX(' + translateX + '%)';
+      bannerCarouselTrack.style.webkitTransform = 'translateX(' + translateX + '%)'; // Safari/older browsers
+      bannerCarouselTrack.style.msTransform = 'translateX(' + translateX + '%)'; // IE
+      bannerCarouselTrack.style.mozTransform = 'translateX(' + translateX + '%)'; // Firefox
+      bannerCarouselTrack.style.oTransform = 'translateX(' + translateX + '%)'; // Opera
+      
+      // Update dots
+      var dots = document.querySelectorAll('.carousel-dot');
+      for (var i = 0; i < dots.length; i++) {
+        var dot = dots[i];
+        if (i === currentSlide) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      }
       
       updateButtonStates();
     }
@@ -1940,7 +2185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function startAutoSlide() {
       clearInterval(autoSlideInterval);
       if (featuredWines.length > 1) {
-        autoSlideInterval = setInterval(() => {
+        autoSlideInterval = setInterval(function() {
           if (!isTransitioning) {
             nextSlide();
           }
@@ -1949,16 +2194,72 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function navigateToWineDetail(wineId) {
-      console.log(`📱 Navigating to wine detail: ${wineId}`);
-      window.location.href = `wine/wine_detail.html?id=${wineId}`;
+      console.log('📱 Navigating to wine detail: ' + wineId);
+      
+      // Cross-browser navigation
+      if (wineId) {
+        window.location.href = 'wine/wine_detail.html?id=' + encodeURIComponent(wineId);
+      }
     }
+    
+    // ===========================================
+    // BACKGROUND FETCH (Non-blocking)
+    // ===========================================
+    
+    function initCarouselBackground() {
+      // Try multiple endpoints for maximum compatibility
+      var endpoints = [
+        API_BASE_URL + '/wines/featured',
+        API_BASE_URL + '/wines?featured=true',
+        API_BASE_URL + '/wines?isFeatured=true',
+        API_BASE_URL + '/featured-wines'
+      ];
+      
+      function tryEndpoint(index) {
+        if (index >= endpoints.length) return;
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', endpoints[index], true);
+        xhr.setRequestHeader('Accept', 'application/json');
+        
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 400) {
+            try {
+              var wines = JSON.parse(xhr.responseText);
+              var wineArray = Array.isArray(wines) ? wines : (wines.items || wines.data || []);
+              var featured = wineArray.filter(function(w) { return w.isFeatured === true; });
+              
+              if (featured.length > 0) {
+                featuredWines = featured;
+                renderCarousel();
+                console.log('🔄 Updated with real wines from API');
+                return;
+              }
+            } catch (e) {
+              console.log('❌ Parse error:', e);
+            }
+          }
+          tryEndpoint(index + 1);
+        };
+        
+        xhr.onerror = function() {
+          tryEndpoint(index + 1);
+        };
+        
+        xhr.send();
+      }
+      
+      tryEndpoint(0);
+    }
+    
+    // Start background fetch after 100ms (non-blocking)
+    setTimeout(initCarouselBackground, 100);
   });
   </script>
-  
 <!-- FIXED: Marketing Banners - SUPER FAST LOADING + ALL IMAGE TYPES -->
   <script>
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎪 Starting marketing banners - ULTRA-FAST MODE!');
+    console.log('🎪 Starting marketing banners (UNIVERSAL MODE)');
     
     // Check age verification
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
@@ -1967,13 +2268,12 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
-    // DOM Elements
+    // DOM Elements with null checks
     const marketingBannersTrack = document.getElementById('marketingBannersTrack');
     const marketingPrevBtn = document.getElementById('marketingPrevBtn');
     const marketingNextBtn = document.getElementById('marketingNextBtn');
     const marketingDots = document.getElementById('marketingDots');
     
-    // Check if elements exist
     if (!marketingBannersTrack) {
       console.error('❌ Marketing banners track not found!');
       return;
@@ -1984,12 +2284,111 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentMarketingSlide = 0;
     let isMarketingTransitioning = false;
     let marketingAutoSlideInterval;
+    let marketingTouchStartX = 0;
+    let marketingTouchEndX = 0;
     
-    // ⚡⚡⚡ SHOW FALLBACK IMMEDIATELY (0 SECONDS) ⚡⚡⚡
-    function showImmediateMarketingFallback() {
-      console.log('⚡ INSTANT LOAD: Showing fallback marketing banners');
+    // ===========================================
+    // UNIVERSAL RESPONSIVE MARKETING
+    // ===========================================
+    
+    function getOptimalMarketingHeight() {
+      const width = window.innerWidth;
       
-      // FIXED: Support ALL image formats (.jpg, .webp, .png, etc.)
+      if (width <= 480) {
+        return 240; // Small phones
+      } else if (width <= 768) {
+        return 300; // Large phones
+      } else if (width <= 1024) {
+        return 380; // Tablets
+      } else {
+        return 420; // Desktop
+      }
+    }
+    
+    function applyMarketingResponsiveStyles() {
+      const container = document.querySelector('.marketing-banners-container');
+      if (container) {
+        const height = getOptimalMarketingHeight();
+        container.style.height = height + 'px';
+        container.style.minHeight = height + 'px';
+        
+        const track = document.querySelector('.marketing-banners-track');
+        if (track) {
+          track.style.height = height + 'px';
+        }
+      }
+    }
+    
+    // ===========================================
+    // UNIVERSAL TOUCH SUPPORT
+    // ===========================================
+    
+    function setupMarketingTouchSupport() {
+      if (!marketingBannersTrack) return;
+      
+      marketingBannersTrack.addEventListener('touchstart', function(e) {
+        marketingTouchStartX = e.changedTouches[0].screenX;
+        clearInterval(marketingAutoSlideInterval);
+      }, { passive: true });
+      
+      marketingBannersTrack.addEventListener('touchend', function(e) {
+        marketingTouchEndX = e.changedTouches[0].screenX;
+        handleMarketingSwipe();
+        startMarketingAutoSlide();
+      }, { passive: true });
+      
+      // Mouse drag
+      let isDragging = false;
+      let dragStartX = 0;
+      
+      marketingBannersTrack.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        isDragging = true;
+        dragStartX = e.pageX;
+        clearInterval(marketingAutoSlideInterval);
+      });
+      
+      marketingBannersTrack.addEventListener('mouseup', function(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        const dragEndX = e.pageX;
+        const dragDiff = dragEndX - dragStartX;
+        
+        if (Math.abs(dragDiff) > 50) {
+          if (dragDiff > 0) {
+            prevMarketingSlide();
+          } else {
+            nextMarketingSlide();
+          }
+        }
+        startMarketingAutoSlide();
+      });
+      
+      marketingBannersTrack.addEventListener('mouseleave', function() {
+        if (isDragging) {
+          isDragging = false;
+          startMarketingAutoSlide();
+        }
+      });
+    }
+    
+    function handleMarketingSwipe() {
+      const swipeThreshold = 50;
+      if (marketingTouchEndX < marketingTouchStartX - swipeThreshold) {
+        nextMarketingSlide();
+      }
+      if (marketingTouchEndX > marketingTouchStartX + swipeThreshold) {
+        prevMarketingSlide();
+      }
+    }
+    
+    // ===========================================
+    // UNIVERSAL MARKETING FALLBACK
+    // ===========================================
+    
+    function showImmediateMarketingFallback() {
+      console.log('⚡ INSTANT LOAD: Showing universal marketing fallback');
+      
       marketingAdverts = [
         {
           id: 'fallback-1',
@@ -1997,8 +2396,7 @@ document.addEventListener('DOMContentLoaded', function() {
           subtitle: 'Premium selection for connoisseurs',
           imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
           targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
-          isActive: true,
-          type: 'homepage'
+          isActive: true
         },
         {
           id: 'fallback-2',
@@ -2006,8 +2404,7 @@ document.addEventListener('DOMContentLoaded', function() {
           subtitle: 'Perfect pairing for special moments',
           imageUrl: 'assets/adverts/ferrero.png',
           targetUrl: 'assets/adverts/ferrero.png',
-          isActive: true,
-          type: 'homepage'
+          isActive: true
         },
         {
           id: 'fallback-3',
@@ -2015,81 +2412,34 @@ document.addEventListener('DOMContentLoaded', function() {
           subtitle: 'Celebrate with premium champagne',
           imageUrl: 'assets/adverts/moet_rose.png',
           targetUrl: 'assets/adverts/moet_rose.png',
-          isActive: true,
-          type: 'homepage'
+          isActive: true
         }
       ];
       
       renderMarketingBanners();
       setupMarketingEventListeners();
       startMarketingAutoSlide();
+      applyMarketingResponsiveStyles();
+      setupMarketingTouchSupport();
     }
     
-    // ⚡ RENDER IMMEDIATELY ⚡
     showImmediateMarketingFallback();
     
-    // THEN fetch real adverts in background
-    async function initMarketingBanners() {
-      try {
-        console.log('🌐 BACKGROUND FETCH: Getting real homepage adverts');
-        
-        // Try multiple endpoints
-        const endpoints = [
-          `/api/adverts/active?type=homepage`,
-          `/api/adverts?type=homepage&active=true`,
-          `/api/adverts/homepage`,
-          `/api/marketing/active`
-        ];
-        
-        let realAdverts = null;
-        
-        for (const endpoint of endpoints) {
-          try {
-            const response = await fetch(endpoint, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json',
-                'Cache-Control': 'no-cache'
-              }
-            });
-            
-            if (response.ok) {
-              const data = await response.json();
-              // Handle both array and object responses
-              const adverts = Array.isArray(data) ? data : (data.items || data.data || []);
-              
-              if (adverts.length > 0) {
-                realAdverts = adverts;
-                console.log(`✅ Found ${realAdverts.length} real adverts from ${endpoint}`);
-                break;
-              }
-            }
-          } catch (e) {
-            continue;
-          }
-        }
-        
-        // Update with real adverts if found
-        if (realAdverts && realAdverts.length > 0) {
-          marketingAdverts = realAdverts;
-          renderMarketingBanners();
-          console.log('🔄 Updated marketing banners with real adverts from API');
-        }
-        
-      } catch (error) {
-        console.error('❌ Background fetch failed, keeping fallback:', error);
-      }
-    }
-    
-    // Start background fetch
-    initMarketingBanners();
+    // ===========================================
+    // UNIVERSAL MARKETING RENDER
+    // ===========================================
     
     function renderMarketingBanners() {
-      console.log('🎨 Rendering marketing banners');
+      // Clear safely
+      while (marketingBannersTrack.firstChild) {
+        marketingBannersTrack.removeChild(marketingBannersTrack.firstChild);
+      }
       
-      // Clear loading state
-      marketingBannersTrack.innerHTML = '';
-      if (marketingDots) marketingDots.innerHTML = '';
+      if (marketingDots) {
+        while (marketingDots.firstChild) {
+          marketingDots.removeChild(marketingDots.firstChild);
+        }
+      }
       
       if (marketingAdverts.length === 0) {
         showMarketingEmptyState();
@@ -2097,12 +2447,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // Create slides
-      marketingAdverts.forEach((advert, index) => {
-        createMarketingSlide(advert, index);
-      });
+      for (var i = 0; i < marketingAdverts.length; i++) {
+        createMarketingSlide(marketingAdverts[i], i);
+      }
       
-      // Set initial position
-      setTimeout(() => {
+      setTimeout(function() {
         updateMarketingCarouselPosition();
       }, 10);
     }
@@ -2110,41 +2459,59 @@ document.addEventListener('DOMContentLoaded', function() {
     function createMarketingSlide(advert, index) {
       const slide = document.createElement('div');
       slide.className = 'marketing-banner-slide';
-      slide.dataset.index = index;
-      slide.dataset.advertId = advert.id;
-      
-      // FIXED: Get image URL and support ANY file extension
-      let imagePath = advert.targetUrl || advert.imageUrl || '';
-      
-      // FIXED: Handle all image types
-      if (!imagePath) {
-        imagePath = 'assets/adverts/default_marketing.jpg';
+      slide.setAttribute('data-index', index);
+      if (advert.id) {
+        slide.setAttribute('data-advert-id', advert.id);
       }
       
-      // Preload image
-      const img = new Image();
-      img.src = imagePath;
+      // Get image URL
+      let imagePath = advert.targetUrl || advert.imageUrl || 'assets/adverts/default_marketing.jpg';
       
-      // Create slide HTML with onerror that tries multiple fallbacks
-      slide.innerHTML = `
-        <img src="${imagePath}" 
-             alt="${advert.title}" 
-             class="marketing-banner-image"
-             loading="eager"
-             decoding="async"
-             crossorigin="anonymous"
-             onerror="this.onerror=null; 
-                      this.src='${imagePath.replace(/\.[^.]+$/, '')}.png'; 
-                      this.onerror=function(){this.src='assets/adverts/default_marketing.jpg'; this.onerror=null};">
-        
-        <div class="marketing-banner-overlay">
-          <div class="marketing-banner-title">${advert.title}</div>
-          <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
-        </div>
-      `;
+      // Create image
+      const img = document.createElement('img');
+      img.src = imagePath;
+      img.alt = advert.title || 'Special Offer';
+      img.className = 'marketing-banner-image';
+      img.loading = 'eager';
+      img.decoding = 'async';
+      
+      // Universal error handling
+      let fallbackAttempt = 0;
+      img.onerror = function() {
+        fallbackAttempt++;
+        if (fallbackAttempt === 1) {
+          // Try PNG
+          this.src = imagePath.replace(/\.(jpe?g|webp|gif)$/i, '.png');
+        } else if (fallbackAttempt === 2) {
+          // Try JPG
+          this.src = imagePath.replace(/\.(png|webp|gif)$/i, '.jpg');
+        } else {
+          // Ultimate fallback
+          this.src = 'assets/adverts/default_marketing.jpg';
+          this.onerror = null;
+        }
+      };
+      
+      // Create overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'marketing-banner-overlay';
+      
+      const title = document.createElement('div');
+      title.className = 'marketing-banner-title';
+      title.textContent = advert.title || 'Special Offer';
+      
+      const subtitle = document.createElement('div');
+      subtitle.className = 'marketing-banner-subtitle';
+      subtitle.textContent = advert.subtitle || 'Limited Time';
+      
+      overlay.appendChild(title);
+      overlay.appendChild(subtitle);
+      
+      slide.appendChild(img);
+      slide.appendChild(overlay);
       
       // Click handler
-      slide.addEventListener('click', (event) => {
+      slide.addEventListener('click', function(event) {
         if (!isMarketingTransitioning) {
           event.preventDefault();
           handleAdvertClick(advert);
@@ -2159,8 +2526,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const dot = document.createElement('span');
         dot.className = 'marketing-dot';
         if (index === 0) dot.classList.add('active');
-        dot.dataset.index = index;
-        dot.addEventListener('click', (event) => {
+        dot.setAttribute('data-index', index);
+        
+        dot.addEventListener('click', function(event) {
           event.stopPropagation();
           if (!isMarketingTransitioning) {
             clearInterval(marketingAutoSlideInterval);
@@ -2168,13 +2536,14 @@ document.addEventListener('DOMContentLoaded', function() {
             startMarketingAutoSlide();
           }
         });
+        
         marketingDots.appendChild(dot);
       }
     }
     
     function setupMarketingEventListeners() {
       if (marketingPrevBtn) {
-        marketingPrevBtn.addEventListener('click', (event) => {
+        marketingPrevBtn.addEventListener('click', function(event) {
           event.stopPropagation();
           if (!isMarketingTransitioning) {
             clearInterval(marketingAutoSlideInterval);
@@ -2185,7 +2554,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       if (marketingNextBtn) {
-        marketingNextBtn.addEventListener('click', (event) => {
+        marketingNextBtn.addEventListener('click', function(event) {
           event.stopPropagation();
           if (!isMarketingTransitioning) {
             clearInterval(marketingAutoSlideInterval);
@@ -2196,11 +2565,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       if (marketingBannersTrack) {
-        marketingBannersTrack.addEventListener('mouseenter', () => {
+        marketingBannersTrack.addEventListener('mouseenter', function() {
           clearInterval(marketingAutoSlideInterval);
         });
         
-        marketingBannersTrack.addEventListener('mouseleave', () => {
+        marketingBannersTrack.addEventListener('mouseleave', function() {
           startMarketingAutoSlide();
         });
       }
@@ -2208,13 +2577,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function nextMarketingSlide() {
       if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-      const nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
+      var nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
       goToMarketingSlide(nextSlideIndex);
     }
     
     function prevMarketingSlide() {
       if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-      const prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
+      var prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
       goToMarketingSlide(prevSlideIndex);
     }
     
@@ -2226,21 +2595,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateMarketingCarouselPosition() {
       if (!marketingBannersTrack) return;
-      const translateX = -currentMarketingSlide * 100;
-      marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
-      marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
       
+      var translateX = -currentMarketingSlide * 100;
+      
+      // Cross-browser transform
+      marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
+      marketingBannersTrack.style.transform = 'translateX(' + translateX + '%)';
+      marketingBannersTrack.style.webkitTransform = 'translateX(' + translateX + '%)';
+      marketingBannersTrack.style.msTransform = 'translateX(' + translateX + '%)';
+      marketingBannersTrack.style.mozTransform = 'translateX(' + translateX + '%)';
+      marketingBannersTrack.style.oTransform = 'translateX(' + translateX + '%)';
+      
+      // Update dots
       if (marketingDots) {
-        document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
-          dot.classList.toggle('active', index === currentMarketingSlide);
-        });
+        var dots = document.querySelectorAll('.marketing-dot');
+        for (var i = 0; i < dots.length; i++) {
+          var dot = dots[i];
+          if (i === currentMarketingSlide) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        }
       }
     }
     
     function startMarketingAutoSlide() {
       clearInterval(marketingAutoSlideInterval);
       if (marketingAdverts.length > 1) {
-        marketingAutoSlideInterval = setInterval(() => {
+        marketingAutoSlideInterval = setInterval(function() {
           if (!isMarketingTransitioning) {
             nextMarketingSlide();
           }
@@ -2249,28 +2632,83 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function handleAdvertClick(advert) {
-      console.log(`📱 Advert clicked: ${advert.title}`);
+      console.log('📱 Advert clicked: ' + advert.title);
       
       if (advert.id) {
-        const advertId = encodeURIComponent(advert.id);
-        window.location.href = `adverts/advert_detail.html?id=${advertId}`;
+        window.location.href = 'adverts/advert_detail.html?id=' + encodeURIComponent(advert.id);
       }
     }
     
     function showMarketingEmptyState() {
       if (!marketingBannersTrack) return;
-      marketingBannersTrack.innerHTML = `
-        <div class="carousel-empty-state">
-          <i class="fas fa-tag"></i>
-          <h3>No Special Offers Available</h3>
-          <p>Check back soon for exciting promotions</p>
-        </div>
-      `;
+      
+      marketingBannersTrack.innerHTML = '';
+      
+      const emptyState = document.createElement('div');
+      emptyState.className = 'carousel-empty-state';
+      emptyState.innerHTML = '<i class="fas fa-tag"></i><h3>No Special Offers Available</h3><p>Check back soon for exciting promotions</p>';
+      
+      marketingBannersTrack.appendChild(emptyState);
       
       if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
       if (marketingNextBtn) marketingNextBtn.style.display = 'none';
       if (marketingDots) marketingDots.style.display = 'none';
     }
+    
+    // Background fetch
+    function initMarketingBackground() {
+      var endpoints = [
+        '/api/adverts/active?type=homepage',
+        '/api/adverts?type=homepage',
+        '/api/marketing/active',
+        '/api/homepage/adverts'
+      ];
+      
+      function tryEndpoint(index) {
+        if (index >= endpoints.length) return;
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', endpoints[index], true);
+        xhr.setRequestHeader('Accept', 'application/json');
+        
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 400) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              var adverts = Array.isArray(data) ? data : (data.items || data.data || []);
+              
+              if (adverts.length > 0) {
+                marketingAdverts = adverts;
+                renderMarketingBanners();
+                console.log('🔄 Updated with real adverts from API');
+                return;
+              }
+            } catch (e) {}
+          }
+          tryEndpoint(index + 1);
+        };
+        
+        xhr.onerror = function() {
+          tryEndpoint(index + 1);
+        };
+        
+        xhr.send();
+      }
+      
+      tryEndpoint(0);
+    }
+    
+    setTimeout(initMarketingBackground, 100);
+    
+    // Responsive resize handler
+    var marketingResizeTimeout;
+    window.addEventListener('resize', function() {
+      clearTimeout(marketingResizeTimeout);
+      marketingResizeTimeout = setTimeout(function() {
+        applyMarketingResponsiveStyles();
+        updateMarketingCarouselPosition();
+      }, 100);
+    });
   });
   </script>
 </body>
