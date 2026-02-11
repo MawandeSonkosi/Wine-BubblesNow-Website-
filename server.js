@@ -18,8 +18,8 @@ const allowedOrigins = [
   // Add these exact domains:
   'https://wine-bubblesnow-website-production.up.railway.app',
   'http://wine-bubblesnow-website-production.up.railway.app',
-  'https://shop.wineandbubblesnow.co.za',
-  'http://shop.wineandbubblesnow.co.za'
+ 'https://store.wineandbubblesnow.co.za', // ADD THIS
+  'http://store.wineandbubblesnow.co.za',
 ];
 app.use(cors({
   origin: function (origin, callback) {
