@@ -1641,10 +1641,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- FIXED: Marketing Banners with correct backend URL -->
-  <!-- FIXED: Wine Feature Banners - SHOWS ALL FEATURED WINES WITHOUT LIMIT -->
+  <!-- FIXED: Wine Feature Banners - USING CORRECT FLUTTER ENDPOINT -->
   <script>
-  // Banner Carousel JavaScript - SHOWS ALL FEATURED WINES
+  // Banner Carousel JavaScript - MATCHING FLUTTER EXACTLY
   document.addEventListener('DOMContentLoaded', function() {
     // Check if age is confirmed before loading carousel
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
@@ -1656,7 +1655,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🎠 Initializing banner carousel...');
     
-    // Configuration
+    // Configuration - USE EXACT SAME API AS FLUTTER APP
     const API_BASE_URL = '/api';
     
     // DOM Elements
@@ -1678,10 +1677,10 @@ document.addEventListener('DOMContentLoaded', function() {
       try {
         console.log('🌐 Fetching featured wines...');
         
-        // Use EXACT SAME ENDPOINT as Flutter
+        // USE EXACT SAME ENDPOINT as Flutter: https://www.wineandbubblesnow.co.za/api/wines/featured
         const apiUrl = `${API_BASE_URL}/wines/featured`;
         
-        console.log('📡 Fetching from:', apiUrl);
+        console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
         
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -1693,100 +1692,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!response.ok) {
           console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-          
-          // Try alternative endpoint
-          console.log('🔄 Trying featured/featured endpoint...');
-          const altUrl = `${API_BASE_URL}/wines/featured/featured`;
-          const altResponse = await fetch(altUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (!altResponse.ok) {
-            throw new Error(`Both endpoints failed: ${response.status}, ${altResponse.status}`);
-          }
-          
-          const wines = await altResponse.json();
-          console.log(`✅ Received ${wines.length} wines from backup endpoint`);
-          // REMOVED THE .slice(0, 3) - SHOW ALL FEATURED WINES
-          featuredWines = wines.filter(wine => wine.isFeatured === true);
-        } else {
-          featuredWines = await response.json();
-          console.log(`✅ Received ${featuredWines.length} featured wines from API`);
+          throw new Error(`Failed to fetch featured wines: ${response.status}`);
         }
         
-        // Filter for wines with isFeatured = true
-        featuredWines = featuredWines.filter(wine => wine.isFeatured === true);
+        const wines = await response.json();
+        console.log(`✅ Received ${wines.length} wines from API`);
+        
+        // Filter for wines with isFeatured = true (backend should already do this)
+        featuredWines = wines.filter(wine => wine.isFeatured === true);
         
         console.log(`🖼️ Will show ${featuredWines.length} featured wines (NO LIMIT)`);
         
-        // If no featured wines, try to get all wines and find featured ones
+        // If no featured wines, show empty state
         if (featuredWines.length === 0) {
-          console.log('⚠️ No featured wines found, fetching all wines...');
-          
-          try {
-            const allWinesResponse = await fetch(`${API_BASE_URL}/wines?all=true`, {
-              method: 'GET',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              }
-            });
-            
-            if (allWinesResponse.ok) {
-              const allWines = await allWinesResponse.json();
-              // Filter for featured wines - NO LIMIT
-              featuredWines = allWines.filter(wine => wine.isFeatured === true);
-              console.log(`🎯 Found ${featuredWines.length} featured wines from all wines`);
-            }
-          } catch (fallbackError) {
-            console.error('❌ Fallback also failed:', fallbackError);
-          }
-        }
-        
-        // Ultimate fallback - only use static featured wines if absolutely no featured wines found
-        if (featuredWines.length === 0) {
-          console.log('⚠️ Using ultimate fallback - static featured wines');
-          featuredWines = [
-            {
-              id: 1,
-              name: 'The African Diamond Grenache Noir',
-              type: 'Red Wine',
-              price: 299.99,
-              bannerImageUrl: 'assets/wines/breakfast/Noir.png',
-              imageUrl: 'assets/wines/breakfast/Noir.png',
-              isFeatured: true,
-              description: 'Premium Grenache Noir from African Diamond'
-            },
-            {
-              id: 2,
-              name: 'The African Diamond Grenache Blanc',
-              type: 'White Wine',
-              price: 299.99,
-              bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
-              imageUrl: 'assets/wines/breakfast/Blanc.png',
-              isFeatured: true,
-              description: 'Premium Grenache Blanc from African Diamond'
-            },
-            {
-              id: 3,
-              name: 'YBY Crystal Dry',
-              type: 'Champagne',
-              price: 499.99,
-              bannerImageUrl: 'assets/wines/breakfast/YBY.png',
-              imageUrl: 'assets/wines/breakfast/YBY.png',
-              isFeatured: true,
-              description: 'Premium Crystal Dry Champagne'
-            }
-          ];
-        }
-        
-        console.log(`🖼️ Carousel will show ${featuredWines.length} featured wines (NO LIMIT)`);
-        
-        if (featuredWines.length === 0) {
+          console.log('⚠️ No featured wines found');
           showEmptyState();
           return;
         }
@@ -1798,7 +1717,64 @@ document.addEventListener('DOMContentLoaded', function() {
         
       } catch (error) {
         console.error('❌ Error loading featured wines:', error);
-        showErrorState(error);
+        
+        // Try fallback endpoint like Flutter does
+        try {
+          console.log('🔄 Trying fallback endpoint...');
+          const fallbackUrl = `${API_BASE_URL}/wines?featured=true&all=true`;
+          const fallbackResponse = await fetch(fallbackUrl);
+          
+          if (fallbackResponse.ok) {
+            const wines = await fallbackResponse.json();
+            featuredWines = wines.filter(wine => wine.isFeatured === true);
+            
+            if (featuredWines.length > 0) {
+              console.log(`✅ Found ${featuredWines.length} featured wines via fallback`);
+              renderCarousel();
+              setupEventListeners();
+              startAutoSlide();
+              return;
+            }
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback also failed:', fallbackError);
+        }
+        
+        // Ultimate fallback - static featured wines
+        console.log('⚠️ Using ultimate fallback - static featured wines');
+        featuredWines = [
+          {
+            id: 1,
+            name: 'The African Diamond Grenache Noir',
+            type: 'Red Wine',
+            price: 299.99,
+            bannerImageUrl: 'assets/wines/breakfast/Noir.png',
+            imageUrl: 'assets/wines/breakfast/Noir.png',
+            isFeatured: true
+          },
+          {
+            id: 2,
+            name: 'The African Diamond Grenache Blanc',
+            type: 'White Wine',
+            price: 299.99,
+            bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
+            imageUrl: 'assets/wines/breakfast/Blanc.png',
+            isFeatured: true
+          },
+          {
+            id: 3,
+            name: 'YBY Crystal Dry',
+            type: 'Champagne',
+            price: 499.99,
+            bannerImageUrl: 'assets/wines/breakfast/YBY.png',
+            imageUrl: 'assets/wines/breakfast/YBY.png',
+            isFeatured: true
+          }
+        ];
+        
+        renderCarousel();
+        setupEventListeners();
+        startAutoSlide();
       }
     }
     
@@ -1828,10 +1804,10 @@ document.addEventListener('DOMContentLoaded', function() {
       slide.dataset.index = index;
       slide.dataset.wineId = wine.id;
       
-      // Use bannerImageUrl if available, otherwise use imageUrl
+      // Use bannerImageUrl if available, otherwise use imageUrl - EXACTLY LIKE FLUTTER
       let imageUrl = wine.bannerImageUrl || wine.imageUrl;
       
-      // Fix image path if needed
+      // Fix image path if needed - EXACTLY LIKE FLUTTER
       if (imageUrl) {
         if (imageUrl.startsWith('assets/')) {
           imageUrl = '../' + imageUrl;
@@ -1859,7 +1835,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
       
-      // Add click event to navigate to wine detail
+      // Add click event to navigate to wine detail - LIKE FLUTTER
       slide.addEventListener('click', (e) => {
         if (!isTransitioning) {
           navigateToWineDetail(wine.id);
@@ -1920,19 +1896,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function nextSlide() {
-      if (isTransitioning) return;
+      if (isTransitioning || featuredWines.length === 0) return;
       const nextSlideIndex = (currentSlide + 1) % featuredWines.length;
       goToSlide(nextSlideIndex);
     }
     
     function prevSlide() {
-      if (isTransitioning) return;
+      if (isTransitioning || featuredWines.length === 0) return;
       const prevSlideIndex = (currentSlide - 1 + featuredWines.length) % featuredWines.length;
       goToSlide(prevSlideIndex);
     }
     
     function goToSlide(slideIndex) {
-      if (isTransitioning || slideIndex === currentSlide) return;
+      if (isTransitioning || slideIndex === currentSlide || featuredWines.length === 0) return;
       currentSlide = slideIndex;
       updateCarouselPosition();
     }
@@ -1985,24 +1961,6 @@ document.addEventListener('DOMContentLoaded', function() {
           <p>Check back soon for curated selections</p>
           <button class="btn-fill" onclick="window.location.href='wine/all_wines.html'">
             Browse All Wines
-          </button>
-        </div>
-      `;
-      
-      if (prevBtn) prevBtn.style.display = 'none';
-      if (nextBtn) nextBtn.style.display = 'none';
-      if (carouselDots) carouselDots.style.display = 'none';
-    }
-    
-    function showErrorState(error) {
-      bannerCarouselTrack.innerHTML = `
-        <div class="carousel-error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>Connection Error</h3>
-          <p>Cannot connect to: ${API_BASE_URL}</p>
-          <p><small>Error: ${error.message}</small></p>
-          <button class="btn-fill" onclick="location.reload()">
-            Retry Connection
           </button>
         </div>
       `;

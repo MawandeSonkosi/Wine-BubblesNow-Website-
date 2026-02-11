@@ -1141,10 +1141,11 @@ app.get('/api/wines', async (req, res) => {
     });
   }
 });
-// Add this to your server.js - around line 400 (after other wine endpoints)
+/// FIXED: Featured wines endpoint - NO LIMIT, PROPERLY FORWARDS RESPONSE
 app.get('/api/wines/featured', async (req, res) => {
   try {
     console.log('🌟 Fetching featured wines via proxy');
+    console.log('📡 Forwarding to backend:', `${BACKEND_URL}/api/wines/featured`);
     
     const response = await fetch(`${BACKEND_URL}/api/wines/featured`, {
       method: 'GET',
@@ -1156,18 +1157,68 @@ app.get('/api/wines/featured', async (req, res) => {
     });
     
     if (!response.ok) {
+      console.error(`❌ Backend responded with ${response.status}: ${response.statusText}`);
+      
+      // Try fallback endpoint
+      console.log('🔄 Trying fallback endpoint with query params...');
+      const fallbackResponse = await fetch(`${BACKEND_URL}/api/wines?featured=true&all=true`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (fallbackResponse.ok) {
+        const data = await fallbackResponse.json();
+        // Filter for featured wines
+        const featuredWines = data.filter(wine => wine.isFeatured === true);
+        console.log(`✅ Found ${featuredWines.length} featured wines via fallback`);
+        return res.status(200).json(featuredWines);
+      }
+      
       throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
     }
     
     const data = await response.json();
-    console.log(`🌟 Featured wines response: ${response.status}`);
+    console.log(`🌟 Featured wines response: ${response.status}, count: ${Array.isArray(data) ? data.length : 'object'}`);
     
+    // IMPORTANT: Send the EXACT data from backend, don't replace with fallback
     res.status(response.status).json(data);
     
   } catch (error) {
     console.error('🚨 Featured wines proxy error:', error.message);
     
-    // Return fallback data
+    // ONLY use fallback if backend is completely unreachable
+    console.log('⚠️ Backend unreachable, using fallback featured wines');
+    
+    // Try to get real wines first as fallback
+    try {
+      console.log('🔄 Attempting to fetch all wines as fallback...');
+      const allWinesResponse = await fetch(`${BACKEND_URL}/api/wines?all=true`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        timeout: 5000
+      });
+      
+      if (allWinesResponse.ok) {
+        const allWines = await allWinesResponse.json();
+        const featuredFromAll = allWines.filter(wine => wine.isFeatured === true);
+        
+        if (featuredFromAll.length > 0) {
+          console.log(`✅ Found ${featuredFromAll.length} featured wines from all wines`);
+          return res.json(featuredFromAll);
+        }
+      }
+    } catch (fallbackError) {
+      console.error('❌ Fallback to all wines also failed:', fallbackError.message);
+    }
+    
+    // ULTIMATE fallback - only when everything else fails
+    console.log('⚠️ Using static fallback featured wines');
     const fallbackWines = [
       {
         id: 1,
