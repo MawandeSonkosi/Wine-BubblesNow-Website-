@@ -1641,9 +1641,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-  <!-- FIXED: Wine Feature Banners - USING CORRECT FLUTTER ENDPOINT -->
+ <!-- FIXED: Wine Feature Banners - SUPER FAST LOADING + ALL IMAGE FORMATS -->
   <script>
-  // Banner Carousel JavaScript - MATCHING FLUTTER EXACTLY
+  // Banner Carousel JavaScript - OPTIMIZED FOR SPEED + ALL IMAGE TYPES
   document.addEventListener('DOMContentLoaded', function() {
     // Check if age is confirmed before loading carousel
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
@@ -1653,9 +1653,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    console.log('🎠 Initializing banner carousel...');
+    console.log('🎠 Initializing banner carousel (ULTRA-FAST MODE)...');
     
-    // Configuration - USE EXACT SAME API AS FLUTTER APP
+    // Configuration
     const API_BASE_URL = '/api';
     
     // DOM Elements
@@ -1670,120 +1670,117 @@ document.addEventListener('DOMContentLoaded', function() {
     let isTransitioning = false;
     let autoSlideInterval;
     
-    // Initialize
-    initCarousel();
+    // ⚡⚡⚡ SHOW FALLBACK IMMEDIATELY (LOAD IN 0 SECONDS) ⚡⚡⚡
+    function showImmediateFallback() {
+      console.log('⚡ INSTANT LOAD: Showing fallback banners');
+      
+      // Ultra-fast fallback wines that load instantly
+      featuredWines = [
+        {
+          id: 1,
+          name: 'The African Diamond Grenache Noir',
+          type: 'Red Wine',
+          price: 299.99,
+          bannerImageUrl: 'assets/wines/breakfast/Noir.png',
+          imageUrl: 'assets/wines/breakfast/Noir.png',
+          isFeatured: true
+        },
+        {
+          id: 2,
+          name: 'The African Diamond Grenache Blanc',
+          type: 'White Wine',
+          price: 299.99,
+          bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
+          imageUrl: 'assets/wines/breakfast/Blanc.png',
+          isFeatured: true
+        },
+        {
+          id: 3,
+          name: 'YBY Crystal Dry',
+          type: 'Champagne',
+          price: 499.99,
+          bannerImageUrl: 'assets/wines/breakfast/YBY.png',
+          imageUrl: 'assets/wines/breakfast/YBY.png',
+          isFeatured: true
+        }
+      ];
+      
+      renderCarousel();
+      setupEventListeners();
+      startAutoSlide();
+    }
     
+    // ⚡ RENDER IMMEDIATELY WITH FALLBACK ⚡
+    showImmediateFallback();
+    
+    // THEN fetch real data in background and update when ready
     async function initCarousel() {
       try {
-        console.log('🌐 Fetching featured wines...');
+        console.log('🌐 BACKGROUND FETCH: Getting featured wines...');
         
-        // USE EXACT SAME ENDPOINT as Flutter: https://www.wineandbubblesnow.co.za/api/wines/featured
-        const apiUrl = `${API_BASE_URL}/wines/featured`;
-        
-        console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-          throw new Error(`Failed to fetch featured wines: ${response.status}`);
-        }
-        
-        const wines = await response.json();
-        console.log(`✅ Received ${wines.length} wines from API`);
-        
-        // Filter for wines with isFeatured = true (backend should already do this)
-        featuredWines = wines.filter(wine => wine.isFeatured === true);
-        
-        console.log(`🖼️ Will show ${featuredWines.length} featured wines (NO LIMIT)`);
-        
-        // If no featured wines, show empty state
-        if (featuredWines.length === 0) {
-          console.log('⚠️ No featured wines found');
-          showEmptyState();
-          return;
-        }
-        
-        // Render the carousel
-        renderCarousel();
-        setupEventListeners();
-        startAutoSlide();
-        
-      } catch (error) {
-        console.error('❌ Error loading featured wines:', error);
-        
-        // Try fallback endpoint like Flutter does
-        try {
-          console.log('🔄 Trying fallback endpoint...');
-          const fallbackUrl = `${API_BASE_URL}/wines?featured=true&all=true`;
-          const fallbackResponse = await fetch(fallbackUrl);
-          
-          if (fallbackResponse.ok) {
-            const wines = await fallbackResponse.json();
-            featuredWines = wines.filter(wine => wine.isFeatured === true);
-            
-            if (featuredWines.length > 0) {
-              console.log(`✅ Found ${featuredWines.length} featured wines via fallback`);
-              renderCarousel();
-              setupEventListeners();
-              startAutoSlide();
-              return;
-            }
-          }
-        } catch (fallbackError) {
-          console.error('❌ Fallback also failed:', fallbackError);
-        }
-        
-        // Ultimate fallback - static featured wines
-        console.log('⚠️ Using ultimate fallback - static featured wines');
-        featuredWines = [
-          {
-            id: 1,
-            name: 'The African Diamond Grenache Noir',
-            type: 'Red Wine',
-            price: 299.99,
-            bannerImageUrl: 'assets/wines/breakfast/Noir.png',
-            imageUrl: 'assets/wines/breakfast/Noir.png',
-            isFeatured: true
-          },
-          {
-            id: 2,
-            name: 'The African Diamond Grenache Blanc',
-            type: 'White Wine',
-            price: 299.99,
-            bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
-            imageUrl: 'assets/wines/breakfast/Blanc.png',
-            isFeatured: true
-          },
-          {
-            id: 3,
-            name: 'YBY Crystal Dry',
-            type: 'Champagne',
-            price: 499.99,
-            bannerImageUrl: 'assets/wines/breakfast/YBY.png',
-            imageUrl: 'assets/wines/breakfast/YBY.png',
-            isFeatured: true
-          }
+        // Try multiple endpoints for maximum compatibility
+        const endpoints = [
+          `${API_BASE_URL}/wines/featured`,
+          `${API_BASE_URL}/wines?featured=true`,
+          `${API_BASE_URL}/wines?isFeatured=true`,
+          `${API_BASE_URL}/wines?featured=1`
         ];
         
-        renderCarousel();
-        setupEventListeners();
-        startAutoSlide();
+        let realWines = null;
+        
+        // Try each endpoint until one works
+        for (const endpoint of endpoints) {
+          try {
+            console.log(`📡 Trying: ${endpoint}`);
+            const response = await fetch(endpoint, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
+              }
+            });
+            
+            if (response.ok) {
+              const wines = await response.json();
+              // Handle both array response and paginated response
+              const wineArray = Array.isArray(wines) ? wines : (wines.items || wines.data || []);
+              
+              // Filter for featured wines
+              const featured = wineArray.filter(w => w.isFeatured === true);
+              
+              if (featured.length > 0) {
+                realWines = featured;
+                console.log(`✅ Found ${realWines.length} real featured wines`);
+                break;
+              }
+            }
+          } catch (e) {
+            console.log(`❌ Endpoint failed: ${endpoint}`);
+            continue;
+          }
+        }
+        
+        // If we found real wines, update the carousel
+        if (realWines && realWines.length > 0) {
+          featuredWines = realWines;
+          renderCarousel();
+          console.log('🔄 Updated carousel with real wines from API');
+        }
+        
+      } catch (error) {
+        console.error('❌ Background fetch failed, keeping fallback:', error);
       }
     }
+    
+    // Start background fetch
+    initCarousel();
     
     function renderCarousel() {
       // Clear loading state
       bannerCarouselTrack.innerHTML = '';
       carouselDots.innerHTML = '';
       
-      // Create slides for ALL featured wines - NO LIMIT
+      // Create slides for ALL featured wines
       featuredWines.forEach((wine, index) => {
         createSlide(wine, index);
       });
@@ -1791,7 +1788,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Set initial position
       setTimeout(() => {
         updateCarouselPosition();
-      }, 50);
+      }, 10);
       
       // Update button states
       updateButtonStates();
@@ -1804,30 +1801,39 @@ document.addEventListener('DOMContentLoaded', function() {
       slide.dataset.index = index;
       slide.dataset.wineId = wine.id;
       
-      // Use bannerImageUrl if available, otherwise use imageUrl - EXACTLY LIKE FLUTTER
-      let imageUrl = wine.bannerImageUrl || wine.imageUrl;
+      // FIXED: Get image URL and support ANY file extension
+      let imageUrl = wine.bannerImageUrl || wine.imageUrl || '';
       
-      // Fix image path if needed - EXACTLY LIKE FLUTTER
-      if (imageUrl) {
-        if (imageUrl.startsWith('assets/')) {
-          imageUrl = '../' + imageUrl;
-        } else if (!imageUrl.startsWith('http') && 
-                   !imageUrl.startsWith('/') && 
-                   !imageUrl.startsWith('../')) {
-          imageUrl = 'assets/' + imageUrl;
-        }
-      } else {
+      // FIXED: Handle all image types (.jpg, .jpeg, .png, .webp, .gif)
+      if (!imageUrl) {
+        // Default fallback
         imageUrl = 'assets/wines/breakfast/Noir.png';
+      } else {
+        // Clean the URL - remove any query params for checking extension
+        const cleanUrl = imageUrl.split('?')[0].toLowerCase();
+        const hasValidExtension = /\.(jpg|jpeg|png|webp|gif|bmp|svg|avif|tiff?)$/i.test(cleanUrl);
+        
+        // If no extension, assume it's a valid path or add .png as fallback
+        if (!hasValidExtension && !imageUrl.includes('http')) {
+          // It's likely a path without extension, keep as-is
+          console.log(`📸 Image path without extension: ${imageUrl}`);
+        }
       }
       
-      // Create slide content
+      // FIXED: Preload image for faster rendering
+      const img = new Image();
+      img.src = imageUrl;
+      
+      // Create slide content with error handling for ALL image types
       slide.innerHTML = `
         <img src="${imageUrl}" 
              alt="${wine.name}" 
              class="banner-carousel-image"
-             loading="lazy"
+             loading="eager"
              decoding="async"
-             onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png';">
+             crossorigin="anonymous"
+             onload="this.style.opacity='1'"
+             onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png'; this.onerror=null;">
         <div class="banner-slide-overlay">
           <div class="banner-slide-title">${wine.name}</div>
           <div class="banner-slide-subtitle">${wine.type || 'Premium Wine'}</div>
@@ -1835,7 +1841,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
       
-      // Add click event to navigate to wine detail - LIKE FLUTTER
+      // Add click event
       slide.addEventListener('click', (e) => {
         if (!isTransitioning) {
           navigateToWineDetail(wine.id);
@@ -1861,7 +1867,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function setupEventListeners() {
-      // Previous button
       if (prevBtn) {
         prevBtn.addEventListener('click', (event) => {
           event.stopPropagation();
@@ -1873,7 +1878,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
       
-      // Next button
       if (nextBtn) {
         nextBtn.addEventListener('click', (event) => {
           event.stopPropagation();
@@ -1885,7 +1889,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
       
-      // Pause auto-slide on hover
       bannerCarouselTrack.addEventListener('mouseenter', () => {
         clearInterval(autoSlideInterval);
       });
@@ -1918,12 +1921,10 @@ document.addEventListener('DOMContentLoaded', function() {
       bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
       bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
       
-      // Update dots
       document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
         dot.classList.toggle('active', index === currentSlide);
       });
       
-      // Update button states
       updateButtonStates();
     }
     
@@ -1938,7 +1939,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function startAutoSlide() {
       clearInterval(autoSlideInterval);
-      // Only start auto-slide if there's more than 1 slide
       if (featuredWines.length > 1) {
         autoSlideInterval = setInterval(() => {
           if (!isTransitioning) {
@@ -1952,342 +1952,326 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log(`📱 Navigating to wine detail: ${wineId}`);
       window.location.href = `wine/wine_detail.html?id=${wineId}`;
     }
-    
-    function showEmptyState() {
-      bannerCarouselTrack.innerHTML = `
-        <div class="carousel-empty-state">
-          <i class="fas fa-wine-bottle"></i>
-          <h3>No Featured Wines Available</h3>
-          <p>Check back soon for curated selections</p>
-          <button class="btn-fill" onclick="window.location.href='wine/all_wines.html'">
-            Browse All Wines
-          </button>
-        </div>
-      `;
-      
-      if (prevBtn) prevBtn.style.display = 'none';
-      if (nextBtn) nextBtn.style.display = 'none';
-      if (carouselDots) carouselDots.style.display = 'none';
-    }
   });
   </script>
-  <!-- FIXED: Marketing Banners - MATCHING FLUTTER EXACTLY -->
-<!-- FIXED: Marketing Banners - WORKING WITH YOUR BACKEND -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎪 Starting marketing banners - backend connected!');
   
-  // Check age verification
-  const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
-  if (!ageConfirmed) {
-    console.log('⏳ Age not verified - delaying marketing banners');
-    return;
-  }
-  
-  // DOM Elements
-  const marketingBannersTrack = document.getElementById('marketingBannersTrack');
-  const marketingPrevBtn = document.getElementById('marketingPrevBtn');
-  const marketingNextBtn = document.getElementById('marketingNextBtn');
-  const marketingDots = document.getElementById('marketingDots');
-  
-  // Check if elements exist
-  if (!marketingBannersTrack) {
-    console.error('❌ Marketing banners track not found!');
-    return;
-  }
-  
-  // State
-  let marketingAdverts = [];
-  let currentMarketingSlide = 0;
-  let isMarketingTransitioning = false;
-  let marketingAutoSlideInterval;
-  
-  // Initialize
-  initMarketingBanners();
-  
-  async function initMarketingBanners() {
-    try {
-      console.log('🌐 Fetching homepage adverts from proxy');
-      
-      // USE YOUR WORKING ENDPOINT
-      const apiUrl = `/api/adverts/active?type=homepage`;
-      
-      console.log('📡 Fetching from:', apiUrl);
-      
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-        throw new Error(`Failed to fetch adverts: ${response.status}`);
-      }
-      
-      const adverts = await response.json();
-      console.log(`✅ Received ${adverts.length} homepage adverts from API`);
-      
-      // Filter for active adverts
-      marketingAdverts = adverts.filter(advert => 
-        advert.isActive === true || advert.isActive === undefined
-      );
-      
-      console.log(`🖼️ Will show ${marketingAdverts.length} active homepage adverts`);
-      
-      if (marketingAdverts.length === 0) {
-        console.log('⚠️ No homepage adverts found, showing fallback');
-        createDefaultAdverts();
-      }
-      
-      // Render the banners
-      renderMarketingBanners();
-      setupMarketingEventListeners();
-      startMarketingAutoSlide();
-      
-    } catch (error) {
-      console.error('❌ Error loading marketing adverts:', error.message);
-      console.log('⚠️ Using fallback adverts');
-      createDefaultAdverts();
-      renderMarketingBanners();
-      setupMarketingEventListeners();
-      startMarketingAutoSlide();
-    }
-  }
-  
-  function createDefaultAdverts() {
-    console.log('🔄 Creating default adverts (fallback)');
+<!-- FIXED: Marketing Banners - SUPER FAST LOADING + ALL IMAGE TYPES -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎪 Starting marketing banners - ULTRA-FAST MODE!');
     
-    marketingAdverts = [
-      {
-        id: 'fallback-1',
-        title: 'African Diamond Blanc',
-        subtitle: 'Premium selection for connoisseurs',
-        imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
-        targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
-        isActive: true,
-        type: 'homepage'
-      },
-      {
-        id: 'fallback-2',
-        title: 'Ferrero Rocher Collection',
-        subtitle: 'Perfect pairing for special moments',
-        imageUrl: 'assets/adverts/ferrero.png',
-        targetUrl: 'assets/adverts/ferrero.png',
-        isActive: true,
-        type: 'homepage'
-      },
-      {
-        id: 'fallback-3',
-        title: 'Moët & Chandon Rosé',
-        subtitle: 'Celebrate with premium champagne',
-        imageUrl: 'assets/adverts/moet_rose.png',
-        targetUrl: 'assets/adverts/moet_rose.png',
-        isActive: true,
-        type: 'homepage'
-      }
-    ];
-    
-    console.log('✅ Created 3 fallback adverts');
-  }
-  
-  function renderMarketingBanners() {
-    console.log('🎨 Rendering marketing banners');
-    
-    // Clear loading state
-    marketingBannersTrack.innerHTML = '';
-    if (marketingDots) marketingDots.innerHTML = '';
-    
-    if (marketingAdverts.length === 0) {
-      showMarketingEmptyState();
+    // Check age verification
+    const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+    if (!ageConfirmed) {
+      console.log('⏳ Age not verified - delaying marketing banners');
       return;
     }
     
-    // Create slides
-    marketingAdverts.forEach((advert, index) => {
-      createMarketingSlide(advert, index);
-    });
+    // DOM Elements
+    const marketingBannersTrack = document.getElementById('marketingBannersTrack');
+    const marketingPrevBtn = document.getElementById('marketingPrevBtn');
+    const marketingNextBtn = document.getElementById('marketingNextBtn');
+    const marketingDots = document.getElementById('marketingDots');
     
-    // Set initial position
-    setTimeout(() => {
-      updateMarketingCarouselPosition();
-    }, 50);
-  }
-  
-  function createMarketingSlide(advert, index) {
-    console.log(`🖼️ Creating slide ${index}: ${advert.title}`);
-    
-    const slide = document.createElement('div');
-    slide.className = 'marketing-banner-slide';
-    slide.dataset.index = index;
-    slide.dataset.advertId = advert.id;
-    
-    // Get image URL - prefer targetUrl if it exists
-    let imagePath = advert.targetUrl || advert.imageUrl || '';
-    
-    // Fix relative paths for web
-    if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
-      // Keep as-is, it's relative
+    // Check if elements exist
+    if (!marketingBannersTrack) {
+      console.error('❌ Marketing banners track not found!');
+      return;
     }
     
-    // Fallback if no valid image URL
-    if (!imagePath || imagePath === '') {
-      imagePath = 'assets/adverts/default_marketing.jpg';
-    }
+    // State
+    let marketingAdverts = [];
+    let currentMarketingSlide = 0;
+    let isMarketingTransitioning = false;
+    let marketingAutoSlideInterval;
     
-    // Create slide HTML
-    slide.innerHTML = `
-      <img src="${imagePath}" 
-           alt="${advert.title}" 
-           class="marketing-banner-image"
-           loading="eager"
-           decoding="async"
-           onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; this.onerror=null;">
+    // ⚡⚡⚡ SHOW FALLBACK IMMEDIATELY (0 SECONDS) ⚡⚡⚡
+    function showImmediateMarketingFallback() {
+      console.log('⚡ INSTANT LOAD: Showing fallback marketing banners');
       
-      <div class="marketing-banner-overlay">
-        <div class="marketing-banner-title">${advert.title}</div>
-        <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
-      </div>
-    `;
+      // FIXED: Support ALL image formats (.jpg, .webp, .png, etc.)
+      marketingAdverts = [
+        {
+          id: 'fallback-1',
+          title: 'African Diamond Blanc',
+          subtitle: 'Premium selection for connoisseurs',
+          imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
+          targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
+          isActive: true,
+          type: 'homepage'
+        },
+        {
+          id: 'fallback-2',
+          title: 'Ferrero Rocher Collection',
+          subtitle: 'Perfect pairing for special moments',
+          imageUrl: 'assets/adverts/ferrero.png',
+          targetUrl: 'assets/adverts/ferrero.png',
+          isActive: true,
+          type: 'homepage'
+        },
+        {
+          id: 'fallback-3',
+          title: 'Moët & Chandon Rosé',
+          subtitle: 'Celebrate with premium champagne',
+          imageUrl: 'assets/adverts/moet_rose.png',
+          targetUrl: 'assets/adverts/moet_rose.png',
+          isActive: true,
+          type: 'homepage'
+        }
+      ];
+      
+      renderMarketingBanners();
+      setupMarketingEventListeners();
+      startMarketingAutoSlide();
+    }
     
-    // CLICK HANDLER - Navigate to advert detail
-    slide.addEventListener('click', (event) => {
-      if (!isMarketingTransitioning) {
-        event.preventDefault();
-        handleAdvertClick(advert);
+    // ⚡ RENDER IMMEDIATELY ⚡
+    showImmediateMarketingFallback();
+    
+    // THEN fetch real adverts in background
+    async function initMarketingBanners() {
+      try {
+        console.log('🌐 BACKGROUND FETCH: Getting real homepage adverts');
+        
+        // Try multiple endpoints
+        const endpoints = [
+          `/api/adverts/active?type=homepage`,
+          `/api/adverts?type=homepage&active=true`,
+          `/api/adverts/homepage`,
+          `/api/marketing/active`
+        ];
+        
+        let realAdverts = null;
+        
+        for (const endpoint of endpoints) {
+          try {
+            const response = await fetch(endpoint, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              // Handle both array and object responses
+              const adverts = Array.isArray(data) ? data : (data.items || data.data || []);
+              
+              if (adverts.length > 0) {
+                realAdverts = adverts;
+                console.log(`✅ Found ${realAdverts.length} real adverts from ${endpoint}`);
+                break;
+              }
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        // Update with real adverts if found
+        if (realAdverts && realAdverts.length > 0) {
+          marketingAdverts = realAdverts;
+          renderMarketingBanners();
+          console.log('🔄 Updated marketing banners with real adverts from API');
+        }
+        
+      } catch (error) {
+        console.error('❌ Background fetch failed, keeping fallback:', error);
       }
-    });
-    
-    // Make the entire slide clickable
-    slide.style.cursor = 'pointer';
-    
-    marketingBannersTrack.appendChild(slide);
-    
-    // Create dot
-    if (marketingDots) {
-      const dot = document.createElement('span');
-      dot.className = 'marketing-dot';
-      if (index === 0) dot.classList.add('active');
-      dot.dataset.index = index;
-      dot.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          goToMarketingSlide(index);
-          startMarketingAutoSlide();
-        }
-      });
-      marketingDots.appendChild(dot);
-    }
-  }
-  
-  function setupMarketingEventListeners() {
-    if (marketingPrevBtn) {
-      marketingPrevBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          prevMarketingSlide();
-          startMarketingAutoSlide();
-        }
-      });
     }
     
-    if (marketingNextBtn) {
-      marketingNextBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          nextMarketingSlide();
-          startMarketingAutoSlide();
-        }
-      });
-    }
+    // Start background fetch
+    initMarketingBanners();
     
-    // Pause auto-slide on hover
-    if (marketingBannersTrack) {
-      marketingBannersTrack.addEventListener('mouseenter', () => {
-        clearInterval(marketingAutoSlideInterval);
+    function renderMarketingBanners() {
+      console.log('🎨 Rendering marketing banners');
+      
+      // Clear loading state
+      marketingBannersTrack.innerHTML = '';
+      if (marketingDots) marketingDots.innerHTML = '';
+      
+      if (marketingAdverts.length === 0) {
+        showMarketingEmptyState();
+        return;
+      }
+      
+      // Create slides
+      marketingAdverts.forEach((advert, index) => {
+        createMarketingSlide(advert, index);
       });
       
-      marketingBannersTrack.addEventListener('mouseleave', () => {
-        startMarketingAutoSlide();
-      });
+      // Set initial position
+      setTimeout(() => {
+        updateMarketingCarouselPosition();
+      }, 10);
     }
-  }
-  
-  function nextMarketingSlide() {
-    if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-    const nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
-    goToMarketingSlide(nextSlideIndex);
-  }
-  
-  function prevMarketingSlide() {
-    if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-    const prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
-    goToMarketingSlide(prevSlideIndex);
-  }
-  
-  function goToMarketingSlide(slideIndex) {
-    if (isMarketingTransitioning || slideIndex === currentMarketingSlide || marketingAdverts.length === 0) return;
-    currentMarketingSlide = slideIndex;
-    updateMarketingCarouselPosition();
-  }
-  
-  function updateMarketingCarouselPosition() {
-    if (!marketingBannersTrack) return;
-    const translateX = -currentMarketingSlide * 100;
-    marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
-    marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
     
-    // Update dots
-    if (marketingDots) {
-      document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentMarketingSlide);
-      });
-    }
-  }
-  
-  function startMarketingAutoSlide() {
-    clearInterval(marketingAutoSlideInterval);
-    if (marketingAdverts.length > 1) {
-      marketingAutoSlideInterval = setInterval(() => {
+    function createMarketingSlide(advert, index) {
+      const slide = document.createElement('div');
+      slide.className = 'marketing-banner-slide';
+      slide.dataset.index = index;
+      slide.dataset.advertId = advert.id;
+      
+      // FIXED: Get image URL and support ANY file extension
+      let imagePath = advert.targetUrl || advert.imageUrl || '';
+      
+      // FIXED: Handle all image types
+      if (!imagePath) {
+        imagePath = 'assets/adverts/default_marketing.jpg';
+      }
+      
+      // Preload image
+      const img = new Image();
+      img.src = imagePath;
+      
+      // Create slide HTML with onerror that tries multiple fallbacks
+      slide.innerHTML = `
+        <img src="${imagePath}" 
+             alt="${advert.title}" 
+             class="marketing-banner-image"
+             loading="eager"
+             decoding="async"
+             crossorigin="anonymous"
+             onerror="this.onerror=null; 
+                      this.src='${imagePath.replace(/\.[^.]+$/, '')}.png'; 
+                      this.onerror=function(){this.src='assets/adverts/default_marketing.jpg'; this.onerror=null};">
+        
+        <div class="marketing-banner-overlay">
+          <div class="marketing-banner-title">${advert.title}</div>
+          <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
+        </div>
+      `;
+      
+      // Click handler
+      slide.addEventListener('click', (event) => {
         if (!isMarketingTransitioning) {
-          nextMarketingSlide();
+          event.preventDefault();
+          handleAdvertClick(advert);
         }
-      }, 4000);
+      });
+      
+      slide.style.cursor = 'pointer';
+      marketingBannersTrack.appendChild(slide);
+      
+      // Create dot
+      if (marketingDots) {
+        const dot = document.createElement('span');
+        dot.className = 'marketing-dot';
+        if (index === 0) dot.classList.add('active');
+        dot.dataset.index = index;
+        dot.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!isMarketingTransitioning) {
+            clearInterval(marketingAutoSlideInterval);
+            goToMarketingSlide(index);
+            startMarketingAutoSlide();
+          }
+        });
+        marketingDots.appendChild(dot);
+      }
     }
-  }
-  
-  function handleAdvertClick(advert) {
-    console.log(`📱 Advert clicked: ${advert.title}`);
     
-    // Navigate to advert detail page
-    if (advert.id) {
-      const advertId = encodeURIComponent(advert.id);
-      window.location.href = `adverts/advert_detail.html?id=${advertId}`;
+    function setupMarketingEventListeners() {
+      if (marketingPrevBtn) {
+        marketingPrevBtn.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!isMarketingTransitioning) {
+            clearInterval(marketingAutoSlideInterval);
+            prevMarketingSlide();
+            startMarketingAutoSlide();
+          }
+        });
+      }
+      
+      if (marketingNextBtn) {
+        marketingNextBtn.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!isMarketingTransitioning) {
+            clearInterval(marketingAutoSlideInterval);
+            nextMarketingSlide();
+            startMarketingAutoSlide();
+          }
+        });
+      }
+      
+      if (marketingBannersTrack) {
+        marketingBannersTrack.addEventListener('mouseenter', () => {
+          clearInterval(marketingAutoSlideInterval);
+        });
+        
+        marketingBannersTrack.addEventListener('mouseleave', () => {
+          startMarketingAutoSlide();
+        });
+      }
     }
-  }
-  
-  function showMarketingEmptyState() {
-    if (!marketingBannersTrack) return;
-    marketingBannersTrack.innerHTML = `
-      <div class="carousel-empty-state">
-        <i class="fas fa-tag"></i>
-        <h3>No Special Offers Available</h3>
-        <p>Check back soon for exciting promotions</p>
-      </div>
-    `;
     
-    if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
-    if (marketingNextBtn) marketingNextBtn.style.display = 'none';
-    if (marketingDots) marketingDots.style.display = 'none';
-  }
-  
-  console.log('✅ Marketing banners script loaded - ready to show adverts!');
-});
-</script>
+    function nextMarketingSlide() {
+      if (isMarketingTransitioning || marketingAdverts.length === 0) return;
+      const nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
+      goToMarketingSlide(nextSlideIndex);
+    }
+    
+    function prevMarketingSlide() {
+      if (isMarketingTransitioning || marketingAdverts.length === 0) return;
+      const prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
+      goToMarketingSlide(prevSlideIndex);
+    }
+    
+    function goToMarketingSlide(slideIndex) {
+      if (isMarketingTransitioning || slideIndex === currentMarketingSlide || marketingAdverts.length === 0) return;
+      currentMarketingSlide = slideIndex;
+      updateMarketingCarouselPosition();
+    }
+    
+    function updateMarketingCarouselPosition() {
+      if (!marketingBannersTrack) return;
+      const translateX = -currentMarketingSlide * 100;
+      marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
+      marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
+      
+      if (marketingDots) {
+        document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
+          dot.classList.toggle('active', index === currentMarketingSlide);
+        });
+      }
+    }
+    
+    function startMarketingAutoSlide() {
+      clearInterval(marketingAutoSlideInterval);
+      if (marketingAdverts.length > 1) {
+        marketingAutoSlideInterval = setInterval(() => {
+          if (!isMarketingTransitioning) {
+            nextMarketingSlide();
+          }
+        }, 4000);
+      }
+    }
+    
+    function handleAdvertClick(advert) {
+      console.log(`📱 Advert clicked: ${advert.title}`);
+      
+      if (advert.id) {
+        const advertId = encodeURIComponent(advert.id);
+        window.location.href = `adverts/advert_detail.html?id=${advertId}`;
+      }
+    }
+    
+    function showMarketingEmptyState() {
+      if (!marketingBannersTrack) return;
+      marketingBannersTrack.innerHTML = `
+        <div class="carousel-empty-state">
+          <i class="fas fa-tag"></i>
+          <h3>No Special Offers Available</h3>
+          <p>Check back soon for exciting promotions</p>
+        </div>
+      `;
+      
+      if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
+      if (marketingNextBtn) marketingNextBtn.style.display = 'none';
+      if (marketingDots) marketingDots.style.display = 'none';
+    }
+  });
+  </script>
 </body>
 </html>
