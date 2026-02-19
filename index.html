@@ -1642,7 +1642,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-  <!-- FIXED: Wine Feature Banners - USING CORRECT FLUTTER ENDPOINT -->
+  <!-- FIXED: Wine Feature Banners - MATCHING FLUTTER EXACTLY -->
   <script>
   // Banner Carousel JavaScript - MATCHING FLUTTER EXACTLY
   document.addEventListener('DOMContentLoaded', function() {
@@ -1678,8 +1678,9 @@ document.addEventListener('DOMContentLoaded', function() {
       try {
         console.log('🌐 Fetching featured wines...');
         
-        // USE EXACT SAME ENDPOINT as Flutter: https://www.wineandbubblesnow.co.za/api/wines/featured
-        const apiUrl = `${API_BASE_URL}/wines/featured`;
+        // FIXED: Use EXACT SAME ENDPOINT as Flutter app
+        // Flutter uses: https://www.wineandbubblesnow.co.za/api/wines/featured/featured
+        const apiUrl = `${API_BASE_URL}/wines/featured/featured`;
         
         console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
         
