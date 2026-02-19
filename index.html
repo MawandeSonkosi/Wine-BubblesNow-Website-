@@ -307,18 +307,18 @@
     /* Banner Carousel Styles - UPDATED WITH TALLER HEIGHT */
     .banner-carousel-container {
       position: relative;
-      max-width: 1000px; /* Slightly wider */
+      max-width: 1000px;
       margin: 0 auto 40px;
       overflow: hidden;
-      border-radius: 16px; /* More rounded like Flutter */
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15); /* Stronger shadow */
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
       background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
     }
     
     .banner-carousel-track {
       display: flex;
       transition: transform 0.6s ease-in-out;
-      height: 380px; /* INCREASED HEIGHT - shows more of top part */
+      height: 380px;
       will-change: transform;
     }
     
@@ -467,7 +467,7 @@
       align-items: center;
       justify-content: center;
       padding: 60px;
-      min-height: 380px; /* MATCHES INCREASED HEIGHT */
+      min-height: 380px;
     }
     
     .banner-carousel-track .loading-spinner {
@@ -486,7 +486,7 @@
       width: 100%;
       text-align: center;
       padding: 60px 40px;
-      min-height: 380px; /* MATCHES INCREASED HEIGHT */
+      min-height: 380px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -552,7 +552,7 @@
     
     @media (max-width: 768px) {
       .banner-carousel-track {
-        height: 300px; /* ADJUSTED FOR TABLET */
+        height: 300px;
       }
       
       .banner-slide-overlay {
@@ -590,13 +590,13 @@
       .carousel-error-state,
       .carousel-empty-state {
         padding: 40px 20px;
-        min-height: 300px; /* ADJUSTED FOR TABLET */
+        min-height: 300px;
       }
     }
     
     @media (max-width: 480px) {
       .banner-carousel-track {
-        height: 250px; /* ADJUSTED FOR MOBILE */
+        height: 250px;
       }
       
       .banner-slide-overlay {
@@ -657,7 +657,7 @@
       border-radius: 16px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.15);
       background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
-      height: 420px; /* INCREASED HEIGHT - shows more of the image */
+      height: 420px;
     }
     
     .marketing-banners-track {
@@ -792,10 +792,10 @@
       transform: scale(1.2);
     }
     
-    /* Responsive adjustments for marketing banners - UPDATED HEIGHTS */
+    /* Responsive adjustments for marketing banners */
     @media (max-width: 768px) {
       .marketing-banners-container {
-        height: 340px; /* ADJUSTED FOR TABLET - TALLER */
+        height: 340px;
       }
       
       .marketing-banner-overlay {
@@ -828,7 +828,7 @@
     
     @media (max-width: 480px) {
       .marketing-banners-container {
-        height: 280px; /* ADJUSTED FOR MOBILE - TALLER */
+        height: 280px;
       }
       
       .marketing-banner-overlay {
@@ -916,28 +916,25 @@
           <span class="cart-badge" style="display: none;">0</span>
         </a>
         <a href="user//profile.html" class="icon" id="userIcon">
-          <!-- Icon will be dynamically set by JavaScript -->
           <i class="fas fa-user" id="userIconElement"></i>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- MARKETING BANNERS SECTION - ADDED AT THE TOP -->
+  <!-- MARKETING BANNERS SECTION -->
   <section class="marketing-banners-section" id="marketingBannersSection">
     <div class="container">
       <h2 class="section-title">Special Offers</h2>
       
       <div class="marketing-banners-container">
         <div class="marketing-banners-track" id="marketingBannersTrack">
-          <!-- Marketing banners will be loaded here by JavaScript -->
           <div class="loading-state">
             <div class="loading-spinner"></div>
             <p>Loading special offers...</p>
           </div>
         </div>
         
-        <!-- Navigation Buttons -->
         <button class="marketing-nav-btn marketing-prev-btn" id="marketingPrevBtn">
           <i class="fas fa-chevron-left"></i>
         </button>
@@ -945,7 +942,6 @@
           <i class="fas fa-chevron-right"></i>
         </button>
         
-        <!-- Carousel Dots -->
         <div class="marketing-dots" id="marketingDots"></div>
       </div>
     </div>
@@ -993,7 +989,6 @@
             <p class="icon-text">Event Wines</p>
           </a>
           
-          <!-- Wine Cases - link to all wines or create a separate page -->
           <a href="wine/wine_cases_list.html" class="icon-box">
             <div class="icon-image-container">
               <img src="assets/categories/WINE_CASES copy.png" alt="Wine Cases" class="icon-image">
@@ -1003,20 +998,17 @@
         </div>
       </div>
 
-      <!-- WINE BANNERS - MOVED HERE (between Occasion and Category) -->
+      <!-- WINE BANNERS -->
       <h2 class="section-title" style="margin-top: 40px;">Curated Selection</h2>
       
-      <!-- Wine Banner Carousel Container -->
       <div class="banner-carousel-container">
         <div class="banner-carousel-track" id="bannerCarouselTrack">
-          <!-- Featured wines will be loaded here by JavaScript -->
           <div class="loading-state">
             <div class="loading-spinner"></div>
             <p>Loading featured wines...</p>
           </div>
         </div>
         
-        <!-- Navigation Buttons -->
         <button class="carousel-nav-btn prev-btn" id="prevBtn">
           <i class="fas fa-chevron-left"></i>
         </button>
@@ -1024,7 +1016,6 @@
           <i class="fas fa-chevron-right"></i>
         </button>
         
-        <!-- Carousel Dots -->
         <div class="carousel-dots" id="carouselDots"></div>
       </div>
 
@@ -1078,16 +1069,16 @@
     </div>
   </section>
 
-  <!-- Pairings Banner with link -->
+  <!-- Pairings Banner -->
   <section class="site-banner pairings-banner">
-    <a href="pairings/pairings.html" class="banner-link"> <!-- ADDED LINK -->
+    <a href="pairings/pairings.html" class="banner-link">
       <img src="assets/adverts/Parings.png" alt="Perfect Pairings - Find Your Wine's Perfect Match" class="banner-image">
     </a>
   </section>
 
-  <!-- Tastings Banner with link -->
+  <!-- Tastings Banner -->
   <section class="site-banner tastings-banner">
-    <a href="wine_farm/wine_farm.html" class="banner-link"> <!-- ADDED LINK -->
+    <a href="wine_farm/wine_farm.html" class="banner-link">
       <img src="assets/adverts/Wine_Farm.png" alt="Tastings & Events Near You" class="banner-image">
     </a>
   </section>
@@ -1199,38 +1190,25 @@
   <!-- Age Verification Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Check if user has already confirmed age
       const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
       
       if (!ageConfirmed) {
-        // Show age verification modal
         const ageModal = document.getElementById('ageVerificationModal');
         ageModal.style.display = 'flex';
-        
-        // Disable scrolling on body
         document.body.style.overflow = 'hidden';
         
-        // Yes button - confirm age
         document.getElementById('ageConfirmYes').addEventListener('click', function() {
           localStorage.setItem('wineBubbles_ageConfirmed', 'true');
           ageModal.style.display = 'none';
           document.body.style.overflow = 'auto';
-          
-          // Optional: Show welcome message
           console.log('✅ Age verified - user is 18+');
         });
         
-        // No button - under age
         document.getElementById('ageConfirmNo').addEventListener('click', function() {
-          // Show message and redirect to a safe page
           alert('You must be 18 years or older to access Wine & Bubbles. Redirecting...');
-          
-          // You can redirect to a safe page or show a blocked page
-          // For now, we'll redirect to Google
           window.location.href = 'https://www.google.com';
         });
         
-        // Prevent closing the modal by clicking outside
         ageModal.addEventListener('click', function(e) {
           if (e.target === ageModal) {
             e.preventDefault();
@@ -1242,22 +1220,17 @@
   </script>
 
   <script>
-    // Homepage authentication script - FIXED CART BADGE ISSUE
+    // Homepage authentication script
     document.addEventListener('DOMContentLoaded', function() {
-      // Only proceed with authentication if age is confirmed
       const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
       
       if (!ageConfirmed) {
           console.log('⏳ Waiting for age verification...');
-          return; // Exit if age not confirmed
+          return;
       }
       
       console.log('🏠 Homepage loaded - checking authentication');
       
-      // Configuration
-      const API_BASE_URL = '/api';
-      
-      // Token validation function
       function isTokenValid() {
           const token = localStorage.getItem('wineBubbles_token');
           const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
@@ -1270,7 +1243,6 @@
           return tokenAge < sevenDays;
       }
       
-      // Clear user session function
       function clearUserSession() {
           localStorage.removeItem('wineBubbles_token');
           localStorage.removeItem('wineBubbles_token_timestamp');
@@ -1284,32 +1256,22 @@
           localStorage.removeItem('wineBubbles_userVerified');
           localStorage.removeItem('wineBubbles_userCreated');
           
-          // Clear all cart-related data
           clearCartData();
-          
-          // Update cart badge to 0
           updateCartBadge(0);
       }
       
-      // Clear all cart data
       function clearCartData() {
           console.log('🧹 Clearing all cart data...');
-          
-          // Remove all cart-related localStorage items
           localStorage.removeItem('wineBubbles_cart');
           localStorage.removeItem('wine_cart');
           localStorage.removeItem('cart');
           localStorage.removeItem('wineBubbles_cart_count');
-          
-          // Remove the "just logged in" flag
           localStorage.removeItem('wineBubbles_justLoggedIn');
       }
       
-      // Update cart badge display
       function updateCartBadge(count) {
           console.log(`🛒 Updating cart badge to: ${count}`);
           
-          // Update all cart badges on the page
           const cartBadges = document.querySelectorAll('.cart-badge');
           
           cartBadges.forEach(badge => {
@@ -1322,31 +1284,24 @@
               }
           });
           
-          // Also update in localStorage for other tabs/pages
           localStorage.setItem('wineBubbles_cart_count', count.toString());
-          
           return count;
       }
       
-      // Load cart count from localStorage - FIXED VERSION
       function loadCartCount() {
           console.log('📊 Loading cart count...');
           
-          // First check if user just logged in
           const justLoggedIn = localStorage.getItem('wineBubbles_justLoggedIn') === 'true';
           
           if (justLoggedIn) {
               console.log('🆕 User just logged in - resetting cart');
-              // Clear the flag and reset cart
               localStorage.removeItem('wineBubbles_justLoggedIn');
               clearCartData();
               return updateCartBadge(0);
           }
           
-          // Check for multiple cart storage keys and get the correct count
           let itemCount = 0;
           
-          // 1. Check wine_cart (used by CartUtils)
           const wineCartData = localStorage.getItem('wine_cart');
           if (wineCartData) {
               try {
@@ -1360,7 +1315,6 @@
               }
           }
           
-          // 2. Check wineBubbles_cart (used by some components)
           const wineBubblesCartData = localStorage.getItem('wineBubbles_cart');
           if (wineBubblesCartData && itemCount === 0) {
               try {
@@ -1374,7 +1328,6 @@
               }
           }
           
-          // 3. Check old cart formats (fallback)
           const oldCartData = localStorage.getItem('cart');
           if (oldCartData && itemCount === 0) {
               try {
@@ -1388,7 +1341,6 @@
               }
           }
           
-          // 4. Check cart count from storage
           const storedCount = localStorage.getItem('wineBubbles_cart_count');
           if (storedCount && itemCount === 0) {
               itemCount = parseInt(storedCount) || 0;
@@ -1399,18 +1351,15 @@
           return updateCartBadge(itemCount);
       }
       
-      // Check if user is logged in
       const token = localStorage.getItem('wineBubbles_token');
       const userData = localStorage.getItem('wineBubbles_user');
       const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
       const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
       const isValidToken = isTokenValid();
       
-      // Get user icon elements
       const userIcon = document.getElementById('userIcon');
       const userIconElement = document.getElementById('userIconElement');
       
-      // Load cart count FIRST (before any other logic)
       loadCartCount();
       
       if (isValidToken && userData) {
@@ -1419,13 +1368,11 @@
           try {
               const user = JSON.parse(userData);
               
-              // Update user icon to show logged-in state (profile icon)
               if (userIconElement) {
                   userIconElement.className = 'fas fa-user-check';
                   userIconElement.style.color = '#6b0d2b';
               }
               
-              // Update user icon link
               if (userIcon) {
                   userIcon.href = '#';
                   userIcon.addEventListener('click', function(e) {
@@ -1434,7 +1381,6 @@
                   });
               }
               
-              // Create appropriate dropdown based on user type
               createUserDropdown(user, isAdmin, isDriver);
               
           } catch (error) {
@@ -1449,19 +1395,16 @@
           resetUserIcon();
       }
       
-      // Reset user icon to login state (sign-in icon)
       function resetUserIcon() {
           if (userIcon) {
               userIcon.href = 'login/login.html';
               if (userIconElement) {
-                  // Change to login/sign-in icon
                   userIconElement.className = 'fas fa-sign-in-alt';
                   userIconElement.style.color = '#6b0d2b';
               }
           }
       }
       
-      // Toggle user dropdown
       function toggleUserDropdown() {
           const dropdown = document.querySelector('.user-dropdown');
           if (dropdown) {
@@ -1469,19 +1412,15 @@
           }
       }
       
-      // Create user dropdown menu
       function createUserDropdown(user, isAdmin, isDriver) {
-          // Remove existing dropdown if any
           const existingDropdown = document.querySelector('.user-dropdown');
           if (existingDropdown) {
               existingDropdown.remove();
           }
           
-          // Create dropdown container
           const dropdown = document.createElement('div');
           dropdown.className = 'user-dropdown';
           
-          // User info
           const userInfo = document.createElement('div');
           userInfo.className = 'user-dropdown-info';
           
@@ -1489,7 +1428,6 @@
           userName.className = 'user-dropdown-name';
           userName.textContent = user.fullName || user.email.split('@')[0];
           
-          // Add badge for admin or driver
           if (isAdmin) {
               const adminBadge = document.createElement('span');
               adminBadge.className = 'admin-badge';
@@ -1510,27 +1448,18 @@
           userInfo.appendChild(userEmail);
           dropdown.appendChild(userInfo);
           
-          // Dropdown items based on user type
           const items = [];
           
-          if (isAdmin) {
-              // Admin items - Only Profile, Logout, Delete Account
-              items.push(
-                  { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
-              );
-          } else if (isDriver) {
-              // Driver items - Only Profile, Logout, Delete Account
+          if (isAdmin || isDriver) {
               items.push(
                   { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
               );
           } else {
-              // Regular user items - Only Profile, Logout, Delete Account
               items.push(
                   { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
               );
           }
           
-          // Add items to dropdown
           items.forEach(item => {
               const link = document.createElement('a');
               link.href = item.href;
@@ -1548,7 +1477,6 @@
               dropdown.appendChild(link);
           });
           
-          // Logout button
           const logoutButton = document.createElement('button');
           logoutButton.className = 'user-dropdown-logout';
           logoutButton.textContent = 'Logout';
@@ -1560,7 +1488,6 @@
           dropdown.appendChild(logoutButton);
           document.body.appendChild(dropdown);
           
-          // Close dropdown when clicking outside
           document.addEventListener('click', function(event) {
               const dropdown = document.querySelector('.user-dropdown');
               if (dropdown && !dropdown.contains(event.target) && 
@@ -1569,7 +1496,6 @@
               }
           });
           
-          // Close dropdown on escape key
           document.addEventListener('keydown', function(event) {
               if (event.key === 'Escape') {
                   const dropdown = document.querySelector('.user-dropdown');
@@ -1580,20 +1506,16 @@
           });
       }
       
-      // Check for welcome message after login
       const urlParams = new URLSearchParams(window.location.search);
       const justLoggedInParam = urlParams.get('login') === 'success';
       
       if (justLoggedInParam) {
-          // Set flag that user just logged in (already done in login script)
-          // Show welcome message
           const userData = localStorage.getItem('wineBubbles_user');
           if (userData) {
               try {
                   const user = JSON.parse(userData);
                   setTimeout(() => {
                       alert(`Welcome back, ${user.fullName || user.email.split('@')[0]}!`);
-                      // Remove the parameter from URL without reloading
                       const url = new URL(window.location);
                       url.searchParams.delete('login');
                       window.history.replaceState({}, '', url);
@@ -1604,7 +1526,6 @@
           }
       }
       
-      // Add event listener for cart updates
       window.addEventListener('storage', function(event) {
           if (event.key === 'wineBubbles_cart' || event.key === 'wine_cart') {
               console.log('🔄 Cart storage event detected');
@@ -1612,13 +1533,11 @@
           }
       });
       
-      // Listen for custom cart update events
       window.addEventListener('cartUpdated', function() {
           console.log('🔄 Custom cart update event received');
           loadCartCount();
       });
       
-      // Initialize cart if not exists
       function initializeCart() {
           if (!localStorage.getItem('wine_cart')) {
               console.log('📦 Initializing empty cart');
@@ -1639,11 +1558,10 @@
     });
   </script>
 
-  <!-- FIXED: Wine Feature Banners - WITH FORCED FALLBACK -->
+  <!-- FIXED: Wine Feature Banners - WITH DIRECT BACKEND URL -->
   <script>
-    // Banner Carousel JavaScript - WITH FORCED FALLBACK
+    // Banner Carousel JavaScript - WITH DIRECT BACKEND URL
     document.addEventListener('DOMContentLoaded', function() {
-      // Check if age is confirmed before loading carousel
       const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
       
       if (!ageConfirmed) {
@@ -1653,41 +1571,28 @@
       
       console.log('🎠 Initializing banner carousel...');
       
-      // Configuration - USE EXACT SAME API AS FLUTTER APP
-      const API_BASE_URL = '/api';
+      // USE DIRECT BACKEND URL
+      const API_BASE_URL = 'https://winebubblesnow-production.up.railway.app/api';
       
-      // DOM Elements
       const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
       const prevBtn = document.getElementById('prevBtn');
       const nextBtn = document.getElementById('nextBtn');
       const carouselDots = document.getElementById('carouselDots');
       
-      // State
       let featuredWines = [];
       let currentSlide = 0;
       let isTransitioning = false;
       let autoSlideInterval;
       
-      // FORCE FALLBACK FOR TESTING - Comment out when proxy is working
-      const FORCE_FALLBACK = true; // Set to false when proxy is working
-      
-      // Initialize
       initCarousel();
       
       async function initCarousel() {
         try {
-          if (FORCE_FALLBACK) {
-            console.log('⚠️ FORCE_FALLBACK is enabled - using static featured wines');
-            useFallbackWines();
-            return;
-          }
+          console.log('🌐 Fetching featured wines from backend directly...');
           
-          console.log('🌐 Fetching featured wines...');
-          
-          // FIXED: Use EXACT SAME ENDPOINT as Flutter app
           const apiUrl = `${API_BASE_URL}/wines/featured/featured`;
           
-          console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
+          console.log('📡 Fetching from:', apiUrl);
           
           const response = await fetch(apiUrl, {
             method: 'GET',
@@ -1703,21 +1608,18 @@
           }
           
           const wines = await response.json();
-          console.log(`✅ Received ${wines.length} wines from API`);
+          console.log(`✅ Received ${wines.length} wines from backend`);
           
-          // Filter for wines with isFeatured = true (backend should already do this)
           featuredWines = wines.filter(wine => wine.isFeatured === true);
           
           console.log(`🖼️ Will show ${featuredWines.length} featured wines`);
           
-          // If no featured wines, use fallback
           if (featuredWines.length === 0) {
             console.log('⚠️ No featured wines found, using fallback');
             useFallbackWines();
             return;
           }
           
-          // Render the carousel
           renderCarousel();
           setupEventListeners();
           startAutoSlide();
@@ -1766,38 +1668,31 @@
       }
       
       function renderCarousel() {
-        // Clear loading state
         bannerCarouselTrack.innerHTML = '';
         carouselDots.innerHTML = '';
         
-        // Create slides for ALL featured wines
         featuredWines.forEach((wine, index) => {
           createSlide(wine, index);
         });
         
-        // Set initial position
         setTimeout(() => {
           updateCarouselPosition();
         }, 50);
         
-        // Update button states
         updateButtonStates();
       }
       
       function createSlide(wine, index) {
-        // Create slide element
         const slide = document.createElement('div');
         slide.className = 'banner-carousel-slide';
         slide.dataset.index = index;
         slide.dataset.wineId = wine.id;
         
-        // Use bannerImageUrl if available, otherwise use imageUrl
         let imageUrl = wine.bannerImageUrl || wine.imageUrl;
         
-        // Fix image path if needed
         if (imageUrl) {
           if (imageUrl.startsWith('assets/')) {
-            imageUrl = imageUrl; // Keep as is
+            imageUrl = imageUrl;
           } else if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/') && !imageUrl.startsWith('../')) {
             imageUrl = 'assets/' + imageUrl;
           }
@@ -1805,7 +1700,6 @@
           imageUrl = 'assets/wines/breakfast/Noir.png';
         }
         
-        // Create slide content
         slide.innerHTML = `
           <img src="${imageUrl}" 
                alt="${wine.name}" 
@@ -1820,7 +1714,6 @@
           </div>
         `;
         
-        // Add click event to navigate to wine detail
         slide.addEventListener('click', (e) => {
           if (!isTransitioning) {
             navigateToWineDetail(wine.id);
@@ -1829,7 +1722,6 @@
         
         bannerCarouselTrack.appendChild(slide);
         
-        // Create dot for this slide
         const dot = document.createElement('span');
         dot.className = 'carousel-dot';
         if (index === 0) dot.classList.add('active');
@@ -1846,7 +1738,6 @@
       }
       
       function setupEventListeners() {
-        // Previous button
         if (prevBtn) {
           prevBtn.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -1858,7 +1749,6 @@
           });
         }
         
-        // Next button
         if (nextBtn) {
           nextBtn.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -1870,7 +1760,6 @@
           });
         }
         
-        // Pause auto-slide on hover
         bannerCarouselTrack.addEventListener('mouseenter', () => {
           clearInterval(autoSlideInterval);
         });
@@ -1903,12 +1792,10 @@
         bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
         bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
         
-        // Update dots
         document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
           dot.classList.toggle('active', index === currentSlide);
         });
         
-        // Update button states
         updateButtonStates();
       }
       
@@ -1923,7 +1810,6 @@
       
       function startAutoSlide() {
         clearInterval(autoSlideInterval);
-        // Only start auto-slide if there's more than 1 slide
         if (featuredWines.length > 1) {
           autoSlideInterval = setInterval(() => {
             if (!isTransitioning) {
@@ -1940,53 +1826,42 @@
     });
   </script>
 
-  <!-- FIXED: Marketing Banners - WITH FORCED FALLBACK -->
+  <!-- FIXED: Marketing Banners - WITH DIRECT BACKEND URL -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🎪 Starting marketing banners');
       
-      // Check age verification
       const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
       if (!ageConfirmed) {
         console.log('⏳ Age not verified - delaying marketing banners');
         return;
       }
       
-      // DOM Elements
       const marketingBannersTrack = document.getElementById('marketingBannersTrack');
       const marketingPrevBtn = document.getElementById('marketingPrevBtn');
       const marketingNextBtn = document.getElementById('marketingNextBtn');
       const marketingDots = document.getElementById('marketingDots');
       
-      // Check if elements exist
       if (!marketingBannersTrack) {
         console.error('❌ Marketing banners track not found!');
         return;
       }
       
-      // State
+      // USE DIRECT BACKEND URL
+      const API_BASE_URL = 'https://winebubblesnow-production.up.railway.app/api';
+      
       let marketingAdverts = [];
       let currentMarketingSlide = 0;
       let isMarketingTransitioning = false;
       let marketingAutoSlideInterval;
       
-      // FORCE FALLBACK FOR TESTING
-      const FORCE_FALLBACK = true; // Set to false when proxy is working
-      
-      // Initialize
       initMarketingBanners();
       
       async function initMarketingBanners() {
         try {
-          if (FORCE_FALLBACK) {
-            console.log('⚠️ FORCE_FALLBACK is enabled - using static adverts');
-            useFallbackAdverts();
-            return;
-          }
+          console.log('🌐 Fetching homepage adverts from backend directly...');
           
-          console.log('🌐 Fetching homepage adverts from proxy');
-          
-          const apiUrl = `/api/adverts/active?type=homepage`;
+          const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage`;
           
           console.log('📡 Fetching from:', apiUrl);
           
@@ -2004,9 +1879,8 @@
           }
           
           const adverts = await response.json();
-          console.log(`✅ Received ${adverts.length} homepage adverts from API`);
+          console.log(`✅ Received ${adverts.length} homepage adverts from backend`);
           
-          // Filter for active adverts
           marketingAdverts = adverts.filter(advert => 
             advert.isActive === true || advert.isActive === undefined
           );
@@ -2019,7 +1893,6 @@
             return;
           }
           
-          // Render the banners
           renderMarketingBanners();
           setupMarketingEventListeners();
           startMarketingAutoSlide();
@@ -2073,7 +1946,6 @@
       function renderMarketingBanners() {
         console.log('🎨 Rendering marketing banners');
         
-        // Clear loading state
         marketingBannersTrack.innerHTML = '';
         if (marketingDots) marketingDots.innerHTML = '';
         
@@ -2082,12 +1954,10 @@
           return;
         }
         
-        // Create slides
         marketingAdverts.forEach((advert, index) => {
           createMarketingSlide(advert, index);
         });
         
-        // Set initial position
         setTimeout(() => {
           updateMarketingCarouselPosition();
         }, 50);
@@ -2101,15 +1971,12 @@
         slide.dataset.index = index;
         slide.dataset.advertId = advert.id;
         
-        // Get image URL - prefer targetUrl if it exists
         let imagePath = advert.targetUrl || advert.imageUrl || '';
         
-        // Fallback if no valid image URL
         if (!imagePath || imagePath === '') {
           imagePath = 'assets/adverts/default_marketing.jpg';
         }
         
-        // Create slide HTML
         slide.innerHTML = `
           <img src="${imagePath}" 
                alt="${advert.title}" 
@@ -2124,7 +1991,6 @@
           </div>
         `;
         
-        // CLICK HANDLER - Navigate to advert detail
         slide.addEventListener('click', (event) => {
           if (!isMarketingTransitioning) {
             event.preventDefault();
@@ -2132,12 +1998,10 @@
           }
         });
         
-        // Make the entire slide clickable
         slide.style.cursor = 'pointer';
         
         marketingBannersTrack.appendChild(slide);
         
-        // Create dot
         if (marketingDots) {
           const dot = document.createElement('span');
           dot.className = 'marketing-dot';
@@ -2178,7 +2042,6 @@
           });
         }
         
-        // Pause auto-slide on hover
         if (marketingBannersTrack) {
           marketingBannersTrack.addEventListener('mouseenter', () => {
             clearInterval(marketingAutoSlideInterval);
@@ -2214,7 +2077,6 @@
         marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
         marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
         
-        // Update dots
         if (marketingDots) {
           document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
             dot.classList.toggle('active', index === currentMarketingSlide);
@@ -2236,7 +2098,6 @@
       function handleAdvertClick(advert) {
         console.log(`📱 Advert clicked: ${advert.title}`);
         
-        // Navigate to advert detail page
         if (advert.id) {
           const advertId = encodeURIComponent(advert.id);
           window.location.href = `adverts/advert_detail.html?id=${advertId}`;
@@ -2260,14 +2121,15 @@
     });
   </script>
 
-  <!-- DEBUGGING SCRIPT - Add this to see what's happening -->
+  <!-- DEBUGGING SCRIPT -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('🔍 DEBUG: Starting API endpoint tests...');
+      console.log('🔍 DEBUG: Testing direct backend connections...');
+      
+      const BACKEND_URL = 'https://winebubblesnow-production.up.railway.app/api';
       
       setTimeout(() => {
-        // Test featured wines endpoint
-        fetch('/api/wines/featured/featured')
+        fetch(`${BACKEND_URL}/wines/featured/featured`)
           .then(response => {
             console.log('🔍 DEBUG: Featured wines response status:', response.status);
             return response.json().catch(() => null);
@@ -2280,8 +2142,7 @@
             console.error('🔍 DEBUG: Featured wines fetch error:', error.message);
           });
         
-        // Test adverts endpoint
-        fetch('/api/adverts/active?type=homepage')
+        fetch(`${BACKEND_URL}/adverts/active?type=homepage`)
           .then(response => {
             console.log('🔍 DEBUG: Adverts response status:', response.status);
             return response.json().catch(() => null);
@@ -2294,8 +2155,7 @@
             console.error('🔍 DEBUG: Adverts fetch error:', error.message);
           });
         
-        // Test backend health
-        fetch('/api/health')
+        fetch(`${BACKEND_URL}/health`)
           .then(response => {
             console.log('🔍 DEBUG: Health check status:', response.status);
             return response.json();
