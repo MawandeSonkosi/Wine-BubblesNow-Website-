@@ -12,14 +12,14 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const allowedOrigins = [
   'https://www.wineandbubblesnow.co.za',
   'https://wineandbubblesnow.co.za',
-  'https://app.wineandbubblesnow.co.za',           // YOUR NEW FAST SITE
-  'https://wine-bubblesnow-website.pages.dev',      // Cloudflare Pages URL
+  'https://app.wineandbubblesnow.co.za',           // ← YOUR NEW DOMAIN - ADD THIS
+  'https://wine-bubblesnow-website.pages.dev',      // ← Cloudflare Pages URL
   'http://localhost:3000',
   'capacitor://localhost',
   'ionic://localhost',
   'https://wine-bubblesnow-website-production.up.railway.app',
   'http://wine-bubblesnow-website-production.up.railway.app',
-  'https://store.wineandbubblesnow.co.za',          // Keep for backward compatibility
+  'https://store.wineandbubblesnow.co.za',
   'http://store.wineandbubblesnow.co.za'
 ];
 
@@ -39,7 +39,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin']
 }));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
