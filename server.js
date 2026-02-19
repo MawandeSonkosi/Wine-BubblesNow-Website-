@@ -20,6 +20,8 @@ const allowedOrigins = [
   'http://wine-bubblesnow-website-production.up.railway.app',
  'https://store.wineandbubblesnow.co.za', // ADD THIS
   'http://store.wineandbubblesnow.co.za',
+  'https://app.wineandbubblesnow.co.za',
+  'https://wine-bubblesnow-website.pages.dev'
 ];
 app.use(cors({
   origin: function (origin, callback) {
