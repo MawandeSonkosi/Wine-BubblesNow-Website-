@@ -689,85 +689,38 @@ app.get('/api/wines', async (req, res) => {
 app.get('/api/wines/featured/featured', async (req, res) => {
   try {
     console.log('🌟 Fetching featured wines via proxy');
-    console.log('📡 Forwarding to backend:', `${BACKEND_URL}/api/wines/featured/featured`);
-    
     const response = await fetch(`${BACKEND_URL}/api/wines/featured/featured`, {
-      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-      },
-      timeout: 10000
+      }
     });
     
-    if (!response.ok) {
-      console.error(`❌ Backend responded with ${response.status}: ${response.statusText}`);
-      
-      // Try fallback endpoint
-      console.log('🔄 Trying fallback endpoint with query params...');
-      const fallbackResponse = await fetch(`${BACKEND_URL}/api/wines?featured=true&all=true`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-      
-      if (fallbackResponse.ok) {
-        const data = await fallbackResponse.json();
-        // Filter for featured wines
-        const featuredWines = data.filter(wine => wine.isFeatured === true);
-        console.log(`✅ Found ${featuredWines.length} featured wines via fallback`);
-        return res.status(200).json(featuredWines);
-      }
-      
-      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
-    }
-    
     const data = await response.json();
-    console.log(`🌟 Featured wines response: ${response.status}, count: ${Array.isArray(data) ? data.length : 'object'}`);
-    
-    res.status(response.status).json(data);
-    
+    res.json(data);
   } catch (error) {
-    console.error('🚨 Featured wines proxy error:', error.message);
-    
-    // ULTIMATE fallback - only when everything else fails
-    console.log('⚠️ Using static fallback featured wines');
-    const fallbackWines = [
-      {
-        id: 1,
-        name: 'The African Diamond Grenache Noir',
-        type: 'Red Wine',
-        price: 299.99,
-        bannerImageUrl: '/assets/wines/breakfast/Noir.png',
-        imageUrl: '/assets/wines/breakfast/Noir.png',
-        isFeatured: true
-      },
-      {
-        id: 2,
-        name: 'The African Diamond Grenache Blanc',
-        type: 'White Wine',
-        price: 299.99,
-        bannerImageUrl: '/assets/wines/breakfast/Blanc.png',
-        imageUrl: '/assets/wines/breakfast/Blanc.png',
-        isFeatured: true
-      },
-      {
-        id: 3,
-        name: 'YBY Crystal Dry',
-        type: 'Champagne',
-        price: 499.99,
-        bannerImageUrl: '/assets/wines/breakfast/YBY.png',
-        imageUrl: '/assets/wines/breakfast/YBY.png',
-        isFeatured: true
-      }
-    ];
-    
-    res.json(fallbackWines);
+    console.error('🚨 Featured wines proxy error:', error);
+    res.status(500).json({ message: 'Proxy error' });
   }
 });
 
+app.get('/api/adverts/active', async (req, res) => {
+  try {
+    console.log('🎪 Fetching adverts via proxy');
+    const response = await fetch(`${BACKEND_URL}/api/adverts/active?type=homepage`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('🚨 Adverts proxy error:', error);
+    res.status(500).json({ message: 'Proxy error' });
+  }
+});
 // Get single wine by ID
 app.get('/api/wines/:id', async (req, res) => {
   try {
