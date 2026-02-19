@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const BACKEND_URL = 'https://www.wineandbubblesnow.co.za';
+const BACKEND_URL = 'https://winebubblesnow-production.up.railway.app';
 
 // Dynamic import for node-fetch
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
