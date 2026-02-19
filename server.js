@@ -685,7 +685,6 @@ app.get('/api/wines', async (req, res) => {
   }
 });
 
-// Get featured wines
 app.get('/api/wines/featured/featured', async (req, res) => {
   try {
     console.log('🌟 Fetching featured wines via proxy');
@@ -704,6 +703,7 @@ app.get('/api/wines/featured/featured', async (req, res) => {
   }
 });
 
+// Get adverts - CORRECT ENDPOINT
 app.get('/api/adverts/active', async (req, res) => {
   try {
     console.log('🎪 Fetching adverts via proxy');
