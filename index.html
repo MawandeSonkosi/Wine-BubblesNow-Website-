@@ -375,7 +375,7 @@
     .banner-slide-price {
       font-size: 24px;
       font-weight: 700;
-      color: var(--maroon);
+      color: #6b0d2b;
       background: rgba(255,255,255,0.95);
       display: inline-block;
       padding: 8px 20px;
@@ -399,7 +399,7 @@
       justify-content: center;
       cursor: pointer;
       font-size: 22px;
-      color: var(--maroon);
+      color: #6b0d2b;
       transition: all 0.3s ease;
       z-index: 10;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -448,7 +448,7 @@
     }
     
     .carousel-dot.active {
-      background: var(--maroon);
+      background: #6b0d2b;
       border-color: white;
       transform: scale(1.3);
       box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
@@ -732,7 +732,7 @@
       justify-content: center;
       cursor: pointer;
       font-size: 22px;
-      color: var(--maroon);
+      color: #6b0d2b;
       transition: all 0.3s ease;
       z-index: 10;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -781,7 +781,7 @@
     }
     
     .marketing-dot.active {
-      background: var(--maroon);
+      background: #6b0d2b;
       border-color: white;
       transform: scale(1.3);
       box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
@@ -911,10 +911,10 @@
       </nav>
 
       <div class="top-icons">
-   <a href="/cart/cart.html" class="icon cart-icon">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-badge" style="display: none;">0</span>
-  </a>
+        <a href="/cart/cart.html" class="icon cart-icon">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" style="display: none;">0</span>
+        </a>
         <a href="user//profile.html" class="icon" id="userIcon">
           <!-- Icon will be dynamically set by JavaScript -->
           <i class="fas fa-user" id="userIconElement"></i>
@@ -1131,7 +1131,6 @@
     </div>
   </section>
 
-
   <!-- App promo -->
   <section class="section app-promo">
     <div class="container app-inner">
@@ -1178,10 +1177,10 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="wine/all_wines.html">All Wines</a></li> <!-- Updated link -->
-            <li><a href="wine/wine_cases_list.html">Wine Cases</a></li> <!-- Added Wine Cases link -->
-            <li><a href="pairings/pairings.html">Pairings</a></li> <!-- Updated link -->
-            <li><a href="wine_farm/wine_farm.html">Tastings</a></li> <!-- Updated link -->
+            <li><a href="wine/all_wines.html">All Wines</a></li>
+            <li><a href="wine/wine_cases_list.html">Wine Cases</a></li>
+            <li><a href="pairings/pairings.html">Pairings</a></li>
+            <li><a href="wine_farm/wine_farm.html">Tastings</a></li>
           </ul>
         </div>
 
@@ -1198,7 +1197,6 @@
   </footer>
 
   <!-- Age Verification Script -->
- <!-- Age Verification Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Check if user has already confirmed age
@@ -1243,507 +1241,495 @@
     });
   </script>
 
-<script>
-  // Homepage authentication script - FIXED CART BADGE ISSUE
- // Homepage authentication script - FIXED CART BADGE ISSUE
-document.addEventListener('DOMContentLoaded', function() {
-    // Only proceed with authentication if age is confirmed
-    const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
-    
-    if (!ageConfirmed) {
-        console.log('⏳ Waiting for age verification...');
-        return; // Exit if age not confirmed
-    }
-    
-    console.log('🏠 Homepage loaded - checking authentication');
-    
-    // Configuration
-   const API_BASE_URL = '/api';
-    
-    // Token validation function
-    function isTokenValid() {
-        const token = localStorage.getItem('wineBubbles_token');
-        const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
-        
-        if (!token || !timestamp) return false;
-        
-        const tokenAge = Date.now() - parseInt(timestamp);
-        const sevenDays = 7 * 24 * 60 * 60 * 1000;
-        
-        return tokenAge < sevenDays;
-    }
-    
-    // Clear user session function
-    function clearUserSession() {
-        localStorage.removeItem('wineBubbles_token');
-        localStorage.removeItem('wineBubbles_token_timestamp');
-        localStorage.removeItem('wineBubbles_user');
-        localStorage.removeItem('wineBubbles_isAdmin');
-        localStorage.removeItem('wineBubbles_isDriver');
-        localStorage.removeItem('wineBubbles_userFullName');
-        localStorage.removeItem('wineBubbles_userEmail');
-        localStorage.removeItem('wineBubbles_userPhone');
-        localStorage.removeItem('wineBubbles_userImage');
-        localStorage.removeItem('wineBubbles_userVerified');
-        localStorage.removeItem('wineBubbles_userCreated');
-        
-        // Clear all cart-related data
-        clearCartData();
-        
-        // Update cart badge to 0
-        updateCartBadge(0);
-    }
-    
-    // Clear all cart data
-    function clearCartData() {
-        console.log('🧹 Clearing all cart data...');
-        
-        // Remove all cart-related localStorage items
-        localStorage.removeItem('wineBubbles_cart');
-        localStorage.removeItem('wine_cart');
-        localStorage.removeItem('cart');
-        localStorage.removeItem('wineBubbles_cart_count');
-        
-        // Remove the "just logged in" flag
-        localStorage.removeItem('wineBubbles_justLoggedIn');
-    }
-    
-    // Update cart badge display
-    function updateCartBadge(count) {
-        console.log(`🛒 Updating cart badge to: ${count}`);
-        
-        // Update all cart badges on the page
-        const cartBadges = document.querySelectorAll('.cart-badge');
-        
-        cartBadges.forEach(badge => {
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.textContent = '0';
-                badge.style.display = 'none';
-            }
-        });
-        
-        // Also update in localStorage for other tabs/pages
-        localStorage.setItem('wineBubbles_cart_count', count.toString());
-        
-        return count;
-    }
-    
-    // Load cart count from localStorage - FIXED VERSION
-    function loadCartCount() {
-        console.log('📊 Loading cart count...');
-        
-        // First check if user just logged in
-        const justLoggedIn = localStorage.getItem('wineBubbles_justLoggedIn') === 'true';
-        
-        if (justLoggedIn) {
-            console.log('🆕 User just logged in - resetting cart');
-            // Clear the flag and reset cart
-            localStorage.removeItem('wineBubbles_justLoggedIn');
-            clearCartData();
-            return updateCartBadge(0);
-        }
-        
-        // Check for multiple cart storage keys and get the correct count
-        let itemCount = 0;
-        
-        // 1. Check wine_cart (used by CartUtils)
-        const wineCartData = localStorage.getItem('wine_cart');
-        if (wineCartData) {
-            try {
-                const wineCart = JSON.parse(wineCartData);
-                if (wineCart.items && Array.isArray(wineCart.items)) {
-                    itemCount = wineCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                    console.log(`📦 wine_cart has ${itemCount} items`);
-                }
-            } catch (error) {
-                console.error('Error parsing wine_cart:', error);
-            }
-        }
-        
-        // 2. Check wineBubbles_cart (used by some components)
-        const wineBubblesCartData = localStorage.getItem('wineBubbles_cart');
-        if (wineBubblesCartData && itemCount === 0) {
-            try {
-                const wineBubblesCart = JSON.parse(wineBubblesCartData);
-                if (wineBubblesCart.items && Array.isArray(wineBubblesCart.items)) {
-                    itemCount = wineBubblesCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                    console.log(`📦 wineBubbles_cart has ${itemCount} items`);
-                }
-            } catch (error) {
-                console.error('Error parsing wineBubbles_cart:', error);
-            }
-        }
-        
-        // 3. Check old cart formats (fallback)
-        const oldCartData = localStorage.getItem('cart');
-        if (oldCartData && itemCount === 0) {
-            try {
-                const oldCart = JSON.parse(oldCartData);
-                if (Array.isArray(oldCart)) {
-                    itemCount = oldCart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                    console.log(`📦 Old cart has ${itemCount} items`);
-                }
-            } catch (error) {
-                console.error('Error parsing old cart data:', error);
-            }
-        }
-        
-        // 4. Check cart count from storage
-        const storedCount = localStorage.getItem('wineBubbles_cart_count');
-        if (storedCount && itemCount === 0) {
-            itemCount = parseInt(storedCount) || 0;
-            console.log(`📦 Stored count: ${itemCount}`);
-        }
-        
-        console.log(`📊 Final cart count: ${itemCount}`);
-        return updateCartBadge(itemCount);
-    }
-    
-    // Check if user is logged in
-    const token = localStorage.getItem('wineBubbles_token');
-    const userData = localStorage.getItem('wineBubbles_user');
-    const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
-    const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
-    const isValidToken = isTokenValid();
-    
-    // Get user icon elements
-    const userIcon = document.getElementById('userIcon');
-    const userIconElement = document.getElementById('userIconElement');
-    
-    // Load cart count FIRST (before any other logic)
-    loadCartCount();
-    
-    if (isValidToken && userData) {
-        console.log('✅ User is logged in');
-        
-        try {
-            const user = JSON.parse(userData);
-            
-            // Update user icon to show logged-in state (profile icon)
-            if (userIconElement) {
-                userIconElement.className = 'fas fa-user-check';
-                userIconElement.style.color = '#6b0d2b';
-            }
-            
-            // Update user icon link
-            if (userIcon) {
-                userIcon.href = '#';
-                userIcon.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    toggleUserDropdown();
-                });
-            }
-            
-            // Create appropriate dropdown based on user type
-            createUserDropdown(user, isAdmin, isDriver);
-            
-        } catch (error) {
-            console.error('Error parsing user data:', error);
-            clearUserSession();
-            resetUserIcon();
-        }
-        
-    } else {
-        console.log('❌ User is not logged in or token expired');
-        clearUserSession();
-        resetUserIcon();
-    }
-    
-    // Reset user icon to login state (sign-in icon)
-    function resetUserIcon() {
-        if (userIcon) {
-            userIcon.href = 'login/login.html';
-            if (userIconElement) {
-                // Change to login/sign-in icon
-                userIconElement.className = 'fas fa-sign-in-alt';
-                userIconElement.style.color = '#6b0d2b';
-            }
-        }
-    }
-    
-    // Toggle user dropdown
-    function toggleUserDropdown() {
-        const dropdown = document.querySelector('.user-dropdown');
-        if (dropdown) {
-            dropdown.classList.toggle('show');
-        }
-    }
-    
-    // Create user dropdown menu
-    function createUserDropdown(user, isAdmin, isDriver) {
-        // Remove existing dropdown if any
-        const existingDropdown = document.querySelector('.user-dropdown');
-        if (existingDropdown) {
-            existingDropdown.remove();
-        }
-        
-        // Create dropdown container
-        const dropdown = document.createElement('div');
-        dropdown.className = 'user-dropdown';
-        
-        // User info
-        const userInfo = document.createElement('div');
-        userInfo.className = 'user-dropdown-info';
-        
-        const userName = document.createElement('div');
-        userName.className = 'user-dropdown-name';
-        userName.textContent = user.fullName || user.email.split('@')[0];
-        
-        // Add badge for admin or driver
-        if (isAdmin) {
-            const adminBadge = document.createElement('span');
-            adminBadge.className = 'admin-badge';
-            adminBadge.textContent = 'ADMIN';
-            userName.appendChild(adminBadge);
-        } else if (isDriver) {
-            const driverBadge = document.createElement('span');
-            driverBadge.className = 'driver-badge';
-            driverBadge.textContent = 'DRIVER';
-            userName.appendChild(driverBadge);
-        }
-        
-        const userEmail = document.createElement('div');
-        userEmail.className = 'user-dropdown-email';
-        userEmail.textContent = user.email;
-        
-        userInfo.appendChild(userName);
-        userInfo.appendChild(userEmail);
-        dropdown.appendChild(userInfo);
-        
-        // Dropdown items based on user type
-        const items = [];
-        
-        if (isAdmin) {
-            // Admin items - Only Profile, Logout, Delete Account
-            items.push(
-                { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
-            );
-        } else if (isDriver) {
-            // Driver items - Only Profile, Logout, Delete Account
-            items.push(
-                { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
-            );
-        } else {
-            // Regular user items - Only Profile, Logout, Delete Account
-            items.push(
-                { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
-            );
-        }
-        
-        // Add items to dropdown
-        items.forEach(item => {
-            const link = document.createElement('a');
-            link.href = item.href;
-            link.className = 'user-dropdown-link';
-            link.innerHTML = `
-                <i class="${item.icon}"></i>
-                <span>${item.text}</span>
-            `;
-            link.addEventListener('mouseenter', () => {
-                link.style.color = '#6b0d2b';
-            });
-            link.addEventListener('mouseleave', () => {
-                link.style.color = '#333';
-            });
-            dropdown.appendChild(link);
-        });
-        
-        // Logout button
-        const logoutButton = document.createElement('button');
-        logoutButton.className = 'user-dropdown-logout';
-        logoutButton.textContent = 'Logout';
-        logoutButton.addEventListener('click', function() {
-            clearUserSession();
-            window.location.href = 'index.html';
-        });
-        
-        dropdown.appendChild(logoutButton);
-        document.body.appendChild(dropdown);
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.querySelector('.user-dropdown');
-            if (dropdown && !dropdown.contains(event.target) && 
-                userIcon && !userIcon.contains(event.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
-        
-        // Close dropdown on escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                const dropdown = document.querySelector('.user-dropdown');
-                if (dropdown) {
-                    dropdown.classList.remove('show');
-                }
-            }
-        });
-    }
-    
-    // Check for welcome message after login
-    const urlParams = new URLSearchParams(window.location.search);
-    const justLoggedInParam = urlParams.get('login') === 'success';
-    
-    if (justLoggedInParam) {
-        // Set flag that user just logged in (already done in login script)
-        // Show welcome message
-        const userData = localStorage.getItem('wineBubbles_user');
-        if (userData) {
-            try {
-                const user = JSON.parse(userData);
-                setTimeout(() => {
-                    alert(`Welcome back, ${user.fullName || user.email.split('@')[0]}!`);
-                    // Remove the parameter from URL without reloading
-                    const url = new URL(window.location);
-                    url.searchParams.delete('login');
-                    window.history.replaceState({}, '', url);
-                }, 500);
-            } catch (error) {
-                console.error('Error parsing user data for welcome:', error);
-            }
-        }
-    }
-    
-    // Add event listener for cart updates
-    window.addEventListener('storage', function(event) {
-        if (event.key === 'wineBubbles_cart' || event.key === 'wine_cart') {
-            console.log('🔄 Cart storage event detected');
-            loadCartCount();
-        }
-    });
-    
-    // Listen for custom cart update events
-    window.addEventListener('cartUpdated', function() {
-        console.log('🔄 Custom cart update event received');
-        loadCartCount();
-    });
-    
-    // Initialize cart if not exists
-    function initializeCart() {
-        if (!localStorage.getItem('wine_cart')) {
-            console.log('📦 Initializing empty cart');
-            const emptyCart = {
-                items: [],
-                subtotal: 0,
-                deliveryFee: 0,
-                total: 0,
-                updatedAt: new Date().toISOString()
-            };
-            localStorage.setItem('wine_cart', JSON.stringify(emptyCart));
-        }
-    }
-    
-    initializeCart();
-    
-    console.log('✅ Homepage authentication initialized');
-});
-</script>
-
-  <!-- FIXED: Wine Feature Banners - MATCHING FLUTTER EXACTLY -->
   <script>
-  // Banner Carousel JavaScript - MATCHING FLUTTER EXACTLY
-  document.addEventListener('DOMContentLoaded', function() {
-    // Check if age is confirmed before loading carousel
-    const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
-    
-    if (!ageConfirmed) {
-        console.log('⏳ Age verification pending - delaying carousel initialization');
-        return;
-    }
-    
-    console.log('🎠 Initializing banner carousel...');
-    
-    // Configuration - USE EXACT SAME API AS FLUTTER APP
-    const API_BASE_URL = '/api';
-    
-    // DOM Elements
-    const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const carouselDots = document.getElementById('carouselDots');
-    
-    // State
-    let featuredWines = [];
-    let currentSlide = 0;
-    let isTransitioning = false;
-    let autoSlideInterval;
-    
-    // Initialize
-    initCarousel();
-    
-    async function initCarousel() {
-      try {
-        console.log('🌐 Fetching featured wines...');
-        
-        // FIXED: Use EXACT SAME ENDPOINT as Flutter app
-        // Flutter uses: https://www.wineandbubblesnow.co.za/api/wines/featured/featured
-        const apiUrl = `${API_BASE_URL}/wines/featured/featured`;
-        
-        console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-          throw new Error(`Failed to fetch featured wines: ${response.status}`);
-        }
-        
-        const wines = await response.json();
-        console.log(`✅ Received ${wines.length} wines from API`);
-        
-        // Filter for wines with isFeatured = true (backend should already do this)
-        featuredWines = wines.filter(wine => wine.isFeatured === true);
-        
-        console.log(`🖼️ Will show ${featuredWines.length} featured wines (NO LIMIT)`);
-        
-        // If no featured wines, show empty state
-        if (featuredWines.length === 0) {
-          console.log('⚠️ No featured wines found');
-          showEmptyState();
-          return;
-        }
-        
-        // Render the carousel
-        renderCarousel();
-        setupEventListeners();
-        startAutoSlide();
-        
-      } catch (error) {
-        console.error('❌ Error loading featured wines:', error);
-        
-        // Try fallback endpoint like Flutter does
-        try {
-          console.log('🔄 Trying fallback endpoint...');
-          const fallbackUrl = `${API_BASE_URL}/wines?featured=true&all=true`;
-          const fallbackResponse = await fetch(fallbackUrl);
+    // Homepage authentication script - FIXED CART BADGE ISSUE
+    document.addEventListener('DOMContentLoaded', function() {
+      // Only proceed with authentication if age is confirmed
+      const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+      
+      if (!ageConfirmed) {
+          console.log('⏳ Waiting for age verification...');
+          return; // Exit if age not confirmed
+      }
+      
+      console.log('🏠 Homepage loaded - checking authentication');
+      
+      // Configuration
+      const API_BASE_URL = '/api';
+      
+      // Token validation function
+      function isTokenValid() {
+          const token = localStorage.getItem('wineBubbles_token');
+          const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
           
-          if (fallbackResponse.ok) {
-            const wines = await fallbackResponse.json();
-            featuredWines = wines.filter(wine => wine.isFeatured === true);
-            
-            if (featuredWines.length > 0) {
-              console.log(`✅ Found ${featuredWines.length} featured wines via fallback`);
-              renderCarousel();
-              setupEventListeners();
-              startAutoSlide();
-              return;
-            }
+          if (!token || !timestamp) return false;
+          
+          const tokenAge = Date.now() - parseInt(timestamp);
+          const sevenDays = 7 * 24 * 60 * 60 * 1000;
+          
+          return tokenAge < sevenDays;
+      }
+      
+      // Clear user session function
+      function clearUserSession() {
+          localStorage.removeItem('wineBubbles_token');
+          localStorage.removeItem('wineBubbles_token_timestamp');
+          localStorage.removeItem('wineBubbles_user');
+          localStorage.removeItem('wineBubbles_isAdmin');
+          localStorage.removeItem('wineBubbles_isDriver');
+          localStorage.removeItem('wineBubbles_userFullName');
+          localStorage.removeItem('wineBubbles_userEmail');
+          localStorage.removeItem('wineBubbles_userPhone');
+          localStorage.removeItem('wineBubbles_userImage');
+          localStorage.removeItem('wineBubbles_userVerified');
+          localStorage.removeItem('wineBubbles_userCreated');
+          
+          // Clear all cart-related data
+          clearCartData();
+          
+          // Update cart badge to 0
+          updateCartBadge(0);
+      }
+      
+      // Clear all cart data
+      function clearCartData() {
+          console.log('🧹 Clearing all cart data...');
+          
+          // Remove all cart-related localStorage items
+          localStorage.removeItem('wineBubbles_cart');
+          localStorage.removeItem('wine_cart');
+          localStorage.removeItem('cart');
+          localStorage.removeItem('wineBubbles_cart_count');
+          
+          // Remove the "just logged in" flag
+          localStorage.removeItem('wineBubbles_justLoggedIn');
+      }
+      
+      // Update cart badge display
+      function updateCartBadge(count) {
+          console.log(`🛒 Updating cart badge to: ${count}`);
+          
+          // Update all cart badges on the page
+          const cartBadges = document.querySelectorAll('.cart-badge');
+          
+          cartBadges.forEach(badge => {
+              if (count > 0) {
+                  badge.textContent = count;
+                  badge.style.display = 'inline-block';
+              } else {
+                  badge.textContent = '0';
+                  badge.style.display = 'none';
+              }
+          });
+          
+          // Also update in localStorage for other tabs/pages
+          localStorage.setItem('wineBubbles_cart_count', count.toString());
+          
+          return count;
+      }
+      
+      // Load cart count from localStorage - FIXED VERSION
+      function loadCartCount() {
+          console.log('📊 Loading cart count...');
+          
+          // First check if user just logged in
+          const justLoggedIn = localStorage.getItem('wineBubbles_justLoggedIn') === 'true';
+          
+          if (justLoggedIn) {
+              console.log('🆕 User just logged in - resetting cart');
+              // Clear the flag and reset cart
+              localStorage.removeItem('wineBubbles_justLoggedIn');
+              clearCartData();
+              return updateCartBadge(0);
           }
-        } catch (fallbackError) {
-          console.error('❌ Fallback also failed:', fallbackError);
+          
+          // Check for multiple cart storage keys and get the correct count
+          let itemCount = 0;
+          
+          // 1. Check wine_cart (used by CartUtils)
+          const wineCartData = localStorage.getItem('wine_cart');
+          if (wineCartData) {
+              try {
+                  const wineCart = JSON.parse(wineCartData);
+                  if (wineCart.items && Array.isArray(wineCart.items)) {
+                      itemCount = wineCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                      console.log(`📦 wine_cart has ${itemCount} items`);
+                  }
+              } catch (error) {
+                  console.error('Error parsing wine_cart:', error);
+              }
+          }
+          
+          // 2. Check wineBubbles_cart (used by some components)
+          const wineBubblesCartData = localStorage.getItem('wineBubbles_cart');
+          if (wineBubblesCartData && itemCount === 0) {
+              try {
+                  const wineBubblesCart = JSON.parse(wineBubblesCartData);
+                  if (wineBubblesCart.items && Array.isArray(wineBubblesCart.items)) {
+                      itemCount = wineBubblesCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                      console.log(`📦 wineBubbles_cart has ${itemCount} items`);
+                  }
+              } catch (error) {
+                  console.error('Error parsing wineBubbles_cart:', error);
+              }
+          }
+          
+          // 3. Check old cart formats (fallback)
+          const oldCartData = localStorage.getItem('cart');
+          if (oldCartData && itemCount === 0) {
+              try {
+                  const oldCart = JSON.parse(oldCartData);
+                  if (Array.isArray(oldCart)) {
+                      itemCount = oldCart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                      console.log(`📦 Old cart has ${itemCount} items`);
+                  }
+              } catch (error) {
+                  console.error('Error parsing old cart data:', error);
+              }
+          }
+          
+          // 4. Check cart count from storage
+          const storedCount = localStorage.getItem('wineBubbles_cart_count');
+          if (storedCount && itemCount === 0) {
+              itemCount = parseInt(storedCount) || 0;
+              console.log(`📦 Stored count: ${itemCount}`);
+          }
+          
+          console.log(`📊 Final cart count: ${itemCount}`);
+          return updateCartBadge(itemCount);
+      }
+      
+      // Check if user is logged in
+      const token = localStorage.getItem('wineBubbles_token');
+      const userData = localStorage.getItem('wineBubbles_user');
+      const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+      const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
+      const isValidToken = isTokenValid();
+      
+      // Get user icon elements
+      const userIcon = document.getElementById('userIcon');
+      const userIconElement = document.getElementById('userIconElement');
+      
+      // Load cart count FIRST (before any other logic)
+      loadCartCount();
+      
+      if (isValidToken && userData) {
+          console.log('✅ User is logged in');
+          
+          try {
+              const user = JSON.parse(userData);
+              
+              // Update user icon to show logged-in state (profile icon)
+              if (userIconElement) {
+                  userIconElement.className = 'fas fa-user-check';
+                  userIconElement.style.color = '#6b0d2b';
+              }
+              
+              // Update user icon link
+              if (userIcon) {
+                  userIcon.href = '#';
+                  userIcon.addEventListener('click', function(e) {
+                      e.preventDefault();
+                      toggleUserDropdown();
+                  });
+              }
+              
+              // Create appropriate dropdown based on user type
+              createUserDropdown(user, isAdmin, isDriver);
+              
+          } catch (error) {
+              console.error('Error parsing user data:', error);
+              clearUserSession();
+              resetUserIcon();
+          }
+          
+      } else {
+          console.log('❌ User is not logged in or token expired');
+          clearUserSession();
+          resetUserIcon();
+      }
+      
+      // Reset user icon to login state (sign-in icon)
+      function resetUserIcon() {
+          if (userIcon) {
+              userIcon.href = 'login/login.html';
+              if (userIconElement) {
+                  // Change to login/sign-in icon
+                  userIconElement.className = 'fas fa-sign-in-alt';
+                  userIconElement.style.color = '#6b0d2b';
+              }
+          }
+      }
+      
+      // Toggle user dropdown
+      function toggleUserDropdown() {
+          const dropdown = document.querySelector('.user-dropdown');
+          if (dropdown) {
+              dropdown.classList.toggle('show');
+          }
+      }
+      
+      // Create user dropdown menu
+      function createUserDropdown(user, isAdmin, isDriver) {
+          // Remove existing dropdown if any
+          const existingDropdown = document.querySelector('.user-dropdown');
+          if (existingDropdown) {
+              existingDropdown.remove();
+          }
+          
+          // Create dropdown container
+          const dropdown = document.createElement('div');
+          dropdown.className = 'user-dropdown';
+          
+          // User info
+          const userInfo = document.createElement('div');
+          userInfo.className = 'user-dropdown-info';
+          
+          const userName = document.createElement('div');
+          userName.className = 'user-dropdown-name';
+          userName.textContent = user.fullName || user.email.split('@')[0];
+          
+          // Add badge for admin or driver
+          if (isAdmin) {
+              const adminBadge = document.createElement('span');
+              adminBadge.className = 'admin-badge';
+              adminBadge.textContent = 'ADMIN';
+              userName.appendChild(adminBadge);
+          } else if (isDriver) {
+              const driverBadge = document.createElement('span');
+              driverBadge.className = 'driver-badge';
+              driverBadge.textContent = 'DRIVER';
+              userName.appendChild(driverBadge);
+          }
+          
+          const userEmail = document.createElement('div');
+          userEmail.className = 'user-dropdown-email';
+          userEmail.textContent = user.email;
+          
+          userInfo.appendChild(userName);
+          userInfo.appendChild(userEmail);
+          dropdown.appendChild(userInfo);
+          
+          // Dropdown items based on user type
+          const items = [];
+          
+          if (isAdmin) {
+              // Admin items - Only Profile, Logout, Delete Account
+              items.push(
+                  { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
+              );
+          } else if (isDriver) {
+              // Driver items - Only Profile, Logout, Delete Account
+              items.push(
+                  { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
+              );
+          } else {
+              // Regular user items - Only Profile, Logout, Delete Account
+              items.push(
+                  { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
+              );
+          }
+          
+          // Add items to dropdown
+          items.forEach(item => {
+              const link = document.createElement('a');
+              link.href = item.href;
+              link.className = 'user-dropdown-link';
+              link.innerHTML = `
+                  <i class="${item.icon}"></i>
+                  <span>${item.text}</span>
+              `;
+              link.addEventListener('mouseenter', () => {
+                  link.style.color = '#6b0d2b';
+              });
+              link.addEventListener('mouseleave', () => {
+                  link.style.color = '#333';
+              });
+              dropdown.appendChild(link);
+          });
+          
+          // Logout button
+          const logoutButton = document.createElement('button');
+          logoutButton.className = 'user-dropdown-logout';
+          logoutButton.textContent = 'Logout';
+          logoutButton.addEventListener('click', function() {
+              clearUserSession();
+              window.location.href = 'index.html';
+          });
+          
+          dropdown.appendChild(logoutButton);
+          document.body.appendChild(dropdown);
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', function(event) {
+              const dropdown = document.querySelector('.user-dropdown');
+              if (dropdown && !dropdown.contains(event.target) && 
+                  userIcon && !userIcon.contains(event.target)) {
+                  dropdown.classList.remove('show');
+              }
+          });
+          
+          // Close dropdown on escape key
+          document.addEventListener('keydown', function(event) {
+              if (event.key === 'Escape') {
+                  const dropdown = document.querySelector('.user-dropdown');
+                  if (dropdown) {
+                      dropdown.classList.remove('show');
+                  }
+              }
+          });
+      }
+      
+      // Check for welcome message after login
+      const urlParams = new URLSearchParams(window.location.search);
+      const justLoggedInParam = urlParams.get('login') === 'success';
+      
+      if (justLoggedInParam) {
+          // Set flag that user just logged in (already done in login script)
+          // Show welcome message
+          const userData = localStorage.getItem('wineBubbles_user');
+          if (userData) {
+              try {
+                  const user = JSON.parse(userData);
+                  setTimeout(() => {
+                      alert(`Welcome back, ${user.fullName || user.email.split('@')[0]}!`);
+                      // Remove the parameter from URL without reloading
+                      const url = new URL(window.location);
+                      url.searchParams.delete('login');
+                      window.history.replaceState({}, '', url);
+                  }, 500);
+              } catch (error) {
+                  console.error('Error parsing user data for welcome:', error);
+              }
+          }
+      }
+      
+      // Add event listener for cart updates
+      window.addEventListener('storage', function(event) {
+          if (event.key === 'wineBubbles_cart' || event.key === 'wine_cart') {
+              console.log('🔄 Cart storage event detected');
+              loadCartCount();
+          }
+      });
+      
+      // Listen for custom cart update events
+      window.addEventListener('cartUpdated', function() {
+          console.log('🔄 Custom cart update event received');
+          loadCartCount();
+      });
+      
+      // Initialize cart if not exists
+      function initializeCart() {
+          if (!localStorage.getItem('wine_cart')) {
+              console.log('📦 Initializing empty cart');
+              const emptyCart = {
+                  items: [],
+                  subtotal: 0,
+                  deliveryFee: 0,
+                  total: 0,
+                  updatedAt: new Date().toISOString()
+              };
+              localStorage.setItem('wine_cart', JSON.stringify(emptyCart));
+          }
+      }
+      
+      initializeCart();
+      
+      console.log('✅ Homepage authentication initialized');
+    });
+  </script>
+
+  <!-- FIXED: Wine Feature Banners - WITH FORCED FALLBACK -->
+  <script>
+    // Banner Carousel JavaScript - WITH FORCED FALLBACK
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if age is confirmed before loading carousel
+      const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+      
+      if (!ageConfirmed) {
+          console.log('⏳ Age verification pending - delaying carousel initialization');
+          return;
+      }
+      
+      console.log('🎠 Initializing banner carousel...');
+      
+      // Configuration - USE EXACT SAME API AS FLUTTER APP
+      const API_BASE_URL = '/api';
+      
+      // DOM Elements
+      const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const carouselDots = document.getElementById('carouselDots');
+      
+      // State
+      let featuredWines = [];
+      let currentSlide = 0;
+      let isTransitioning = false;
+      let autoSlideInterval;
+      
+      // FORCE FALLBACK FOR TESTING - Comment out when proxy is working
+      const FORCE_FALLBACK = true; // Set to false when proxy is working
+      
+      // Initialize
+      initCarousel();
+      
+      async function initCarousel() {
+        try {
+          if (FORCE_FALLBACK) {
+            console.log('⚠️ FORCE_FALLBACK is enabled - using static featured wines');
+            useFallbackWines();
+            return;
+          }
+          
+          console.log('🌐 Fetching featured wines...');
+          
+          // FIXED: Use EXACT SAME ENDPOINT as Flutter app
+          const apiUrl = `${API_BASE_URL}/wines/featured/featured`;
+          
+          console.log('📡 Fetching from (EXACT FLUTTER URL):', apiUrl);
+          
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (!response.ok) {
+            console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
+            throw new Error(`Failed to fetch featured wines: ${response.status}`);
+          }
+          
+          const wines = await response.json();
+          console.log(`✅ Received ${wines.length} wines from API`);
+          
+          // Filter for wines with isFeatured = true (backend should already do this)
+          featuredWines = wines.filter(wine => wine.isFeatured === true);
+          
+          console.log(`🖼️ Will show ${featuredWines.length} featured wines`);
+          
+          // If no featured wines, use fallback
+          if (featuredWines.length === 0) {
+            console.log('⚠️ No featured wines found, using fallback');
+            useFallbackWines();
+            return;
+          }
+          
+          // Render the carousel
+          renderCarousel();
+          setupEventListeners();
+          startAutoSlide();
+          
+        } catch (error) {
+          console.error('❌ Error loading featured wines:', error);
+          useFallbackWines();
         }
-        
-        // Ultimate fallback - static featured wines
-        console.log('⚠️ Using ultimate fallback - static featured wines');
+      }
+      
+      function useFallbackWines() {
+        console.log('🍷 Using fallback featured wines');
         featuredWines = [
           {
             id: 1,
@@ -1778,519 +1764,550 @@ document.addEventListener('DOMContentLoaded', function() {
         setupEventListeners();
         startAutoSlide();
       }
-    }
-    
-    function renderCarousel() {
-      // Clear loading state
-      bannerCarouselTrack.innerHTML = '';
-      carouselDots.innerHTML = '';
       
-      // Create slides for ALL featured wines - NO LIMIT
-      featuredWines.forEach((wine, index) => {
-        createSlide(wine, index);
-      });
-      
-      // Set initial position
-      setTimeout(() => {
-        updateCarouselPosition();
-      }, 50);
-      
-      // Update button states
-      updateButtonStates();
-    }
-    
-    function createSlide(wine, index) {
-      // Create slide element
-      const slide = document.createElement('div');
-      slide.className = 'banner-carousel-slide';
-      slide.dataset.index = index;
-      slide.dataset.wineId = wine.id;
-      
-      // Use bannerImageUrl if available, otherwise use imageUrl - EXACTLY LIKE FLUTTER
-      let imageUrl = wine.bannerImageUrl || wine.imageUrl;
-      
-      // Fix image path if needed - EXACTLY LIKE FLUTTER
-      if (imageUrl) {
-        if (imageUrl.startsWith('assets/')) {
-          imageUrl = '../' + imageUrl;
-        } else if (!imageUrl.startsWith('http') && 
-                   !imageUrl.startsWith('/') && 
-                   !imageUrl.startsWith('../')) {
-          imageUrl = 'assets/' + imageUrl;
-        }
-      } else {
-        imageUrl = 'assets/wines/breakfast/Noir.png';
+      function renderCarousel() {
+        // Clear loading state
+        bannerCarouselTrack.innerHTML = '';
+        carouselDots.innerHTML = '';
+        
+        // Create slides for ALL featured wines
+        featuredWines.forEach((wine, index) => {
+          createSlide(wine, index);
+        });
+        
+        // Set initial position
+        setTimeout(() => {
+          updateCarouselPosition();
+        }, 50);
+        
+        // Update button states
+        updateButtonStates();
       }
       
-      // Create slide content
-      slide.innerHTML = `
-        <img src="${imageUrl}" 
-             alt="${wine.name}" 
-             class="banner-carousel-image"
-             loading="lazy"
-             decoding="async"
-             onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png';">
-        <div class="banner-slide-overlay">
-          <div class="banner-slide-title">${wine.name}</div>
-          <div class="banner-slide-subtitle">${wine.type || 'Premium Wine'}</div>
-          <div class="banner-slide-price">R${(wine.price || 0).toFixed(2)}</div>
-        </div>
-      `;
-      
-      // Add click event to navigate to wine detail - LIKE FLUTTER
-      slide.addEventListener('click', (e) => {
-        if (!isTransitioning) {
-          navigateToWineDetail(wine.id);
+      function createSlide(wine, index) {
+        // Create slide element
+        const slide = document.createElement('div');
+        slide.className = 'banner-carousel-slide';
+        slide.dataset.index = index;
+        slide.dataset.wineId = wine.id;
+        
+        // Use bannerImageUrl if available, otherwise use imageUrl
+        let imageUrl = wine.bannerImageUrl || wine.imageUrl;
+        
+        // Fix image path if needed
+        if (imageUrl) {
+          if (imageUrl.startsWith('assets/')) {
+            imageUrl = imageUrl; // Keep as is
+          } else if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/') && !imageUrl.startsWith('../')) {
+            imageUrl = 'assets/' + imageUrl;
+          }
+        } else {
+          imageUrl = 'assets/wines/breakfast/Noir.png';
         }
-      });
+        
+        // Create slide content
+        slide.innerHTML = `
+          <img src="${imageUrl}" 
+               alt="${wine.name}" 
+               class="banner-carousel-image"
+               loading="lazy"
+               decoding="async"
+               onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png';">
+          <div class="banner-slide-overlay">
+            <div class="banner-slide-title">${wine.name}</div>
+            <div class="banner-slide-subtitle">${wine.type || 'Premium Wine'}</div>
+            <div class="banner-slide-price">R${(wine.price || 0).toFixed(2)}</div>
+          </div>
+        `;
+        
+        // Add click event to navigate to wine detail
+        slide.addEventListener('click', (e) => {
+          if (!isTransitioning) {
+            navigateToWineDetail(wine.id);
+          }
+        });
+        
+        bannerCarouselTrack.appendChild(slide);
+        
+        // Create dot for this slide
+        const dot = document.createElement('span');
+        dot.className = 'carousel-dot';
+        if (index === 0) dot.classList.add('active');
+        dot.dataset.index = index;
+        dot.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!isTransitioning) {
+            clearInterval(autoSlideInterval);
+            goToSlide(index);
+            startAutoSlide();
+          }
+        });
+        carouselDots.appendChild(dot);
+      }
       
-      bannerCarouselTrack.appendChild(slide);
-      
-      // Create dot for this slide
-      const dot = document.createElement('span');
-      dot.className = 'carousel-dot';
-      if (index === 0) dot.classList.add('active');
-      dot.dataset.index = index;
-      dot.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isTransitioning) {
+      function setupEventListeners() {
+        // Previous button
+        if (prevBtn) {
+          prevBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!isTransitioning) {
+              clearInterval(autoSlideInterval);
+              prevSlide();
+              startAutoSlide();
+            }
+          });
+        }
+        
+        // Next button
+        if (nextBtn) {
+          nextBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!isTransitioning) {
+              clearInterval(autoSlideInterval);
+              nextSlide();
+              startAutoSlide();
+            }
+          });
+        }
+        
+        // Pause auto-slide on hover
+        bannerCarouselTrack.addEventListener('mouseenter', () => {
           clearInterval(autoSlideInterval);
-          goToSlide(index);
+        });
+        
+        bannerCarouselTrack.addEventListener('mouseleave', () => {
           startAutoSlide();
+        });
+      }
+      
+      function nextSlide() {
+        if (isTransitioning || featuredWines.length === 0) return;
+        const nextSlideIndex = (currentSlide + 1) % featuredWines.length;
+        goToSlide(nextSlideIndex);
+      }
+      
+      function prevSlide() {
+        if (isTransitioning || featuredWines.length === 0) return;
+        const prevSlideIndex = (currentSlide - 1 + featuredWines.length) % featuredWines.length;
+        goToSlide(prevSlideIndex);
+      }
+      
+      function goToSlide(slideIndex) {
+        if (isTransitioning || slideIndex === currentSlide || featuredWines.length === 0) return;
+        currentSlide = slideIndex;
+        updateCarouselPosition();
+      }
+      
+      function updateCarouselPosition() {
+        const translateX = -currentSlide * 100;
+        bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
+        bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
+        
+        // Update dots
+        document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
+          dot.classList.toggle('active', index === currentSlide);
+        });
+        
+        // Update button states
+        updateButtonStates();
+      }
+      
+      function updateButtonStates() {
+        if (prevBtn) {
+          prevBtn.disabled = currentSlide === 0;
         }
-      });
-      carouselDots.appendChild(dot);
-    }
-    
-    function setupEventListeners() {
-      // Previous button
-      if (prevBtn) {
-        prevBtn.addEventListener('click', (event) => {
-          event.stopPropagation();
-          if (!isTransitioning) {
-            clearInterval(autoSlideInterval);
-            prevSlide();
-            startAutoSlide();
-          }
-        });
+        if (nextBtn) {
+          nextBtn.disabled = currentSlide >= featuredWines.length - 1;
+        }
       }
       
-      // Next button
-      if (nextBtn) {
-        nextBtn.addEventListener('click', (event) => {
-          event.stopPropagation();
-          if (!isTransitioning) {
-            clearInterval(autoSlideInterval);
-            nextSlide();
-            startAutoSlide();
-          }
-        });
-      }
-      
-      // Pause auto-slide on hover
-      bannerCarouselTrack.addEventListener('mouseenter', () => {
+      function startAutoSlide() {
         clearInterval(autoSlideInterval);
-      });
-      
-      bannerCarouselTrack.addEventListener('mouseleave', () => {
-        startAutoSlide();
-      });
-    }
-    
-    function nextSlide() {
-      if (isTransitioning || featuredWines.length === 0) return;
-      const nextSlideIndex = (currentSlide + 1) % featuredWines.length;
-      goToSlide(nextSlideIndex);
-    }
-    
-    function prevSlide() {
-      if (isTransitioning || featuredWines.length === 0) return;
-      const prevSlideIndex = (currentSlide - 1 + featuredWines.length) % featuredWines.length;
-      goToSlide(prevSlideIndex);
-    }
-    
-    function goToSlide(slideIndex) {
-      if (isTransitioning || slideIndex === currentSlide || featuredWines.length === 0) return;
-      currentSlide = slideIndex;
-      updateCarouselPosition();
-    }
-    
-    function updateCarouselPosition() {
-      const translateX = -currentSlide * 100;
-      bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
-      bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
-      
-      // Update dots
-      document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlide);
-      });
-      
-      // Update button states
-      updateButtonStates();
-    }
-    
-    function updateButtonStates() {
-      if (prevBtn) {
-        prevBtn.disabled = currentSlide === 0;
+        // Only start auto-slide if there's more than 1 slide
+        if (featuredWines.length > 1) {
+          autoSlideInterval = setInterval(() => {
+            if (!isTransitioning) {
+              nextSlide();
+            }
+          }, 4000);
+        }
       }
-      if (nextBtn) {
-        nextBtn.disabled = currentSlide >= featuredWines.length - 1;
-      }
-    }
-    
-    function startAutoSlide() {
-      clearInterval(autoSlideInterval);
-      // Only start auto-slide if there's more than 1 slide
-      if (featuredWines.length > 1) {
-        autoSlideInterval = setInterval(() => {
-          if (!isTransitioning) {
-            nextSlide();
-          }
-        }, 4000);
-      }
-    }
-    
-    function navigateToWineDetail(wineId) {
-      console.log(`📱 Navigating to wine detail: ${wineId}`);
-      window.location.href = `wine/wine_detail.html?id=${wineId}`;
-    }
-    
-    function showEmptyState() {
-      bannerCarouselTrack.innerHTML = `
-        <div class="carousel-empty-state">
-          <i class="fas fa-wine-bottle"></i>
-          <h3>No Featured Wines Available</h3>
-          <p>Check back soon for curated selections</p>
-          <button class="btn-fill" onclick="window.location.href='wine/all_wines.html'">
-            Browse All Wines
-          </button>
-        </div>
-      `;
       
-      if (prevBtn) prevBtn.style.display = 'none';
-      if (nextBtn) nextBtn.style.display = 'none';
-      if (carouselDots) carouselDots.style.display = 'none';
-    }
-  });
+      function navigateToWineDetail(wineId) {
+        console.log(`📱 Navigating to wine detail: ${wineId}`);
+        window.location.href = `wine/wine_detail.html?id=${wineId}`;
+      }
+    });
   </script>
-  <!-- FIXED: Marketing Banners - MATCHING FLUTTER EXACTLY -->
-<!-- FIXED: Marketing Banners - WORKING WITH YOUR BACKEND -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎪 Starting marketing banners - backend connected!');
-  
-  // Check age verification
-  const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
-  if (!ageConfirmed) {
-    console.log('⏳ Age not verified - delaying marketing banners');
-    return;
-  }
-  
-  // DOM Elements
-  const marketingBannersTrack = document.getElementById('marketingBannersTrack');
-  const marketingPrevBtn = document.getElementById('marketingPrevBtn');
-  const marketingNextBtn = document.getElementById('marketingNextBtn');
-  const marketingDots = document.getElementById('marketingDots');
-  
-  // Check if elements exist
-  if (!marketingBannersTrack) {
-    console.error('❌ Marketing banners track not found!');
-    return;
-  }
-  
-  // State
-  let marketingAdverts = [];
-  let currentMarketingSlide = 0;
-  let isMarketingTransitioning = false;
-  let marketingAutoSlideInterval;
-  
-  // Initialize
-  initMarketingBanners();
-  
-  async function initMarketingBanners() {
-    try {
-      console.log('🌐 Fetching homepage adverts from proxy');
+
+  <!-- FIXED: Marketing Banners - WITH FORCED FALLBACK -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🎪 Starting marketing banners');
       
-      // USE YOUR WORKING ENDPOINT
-      const apiUrl = `/api/adverts/active?type=homepage`;
-      
-      console.log('📡 Fetching from:', apiUrl);
-      
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-        throw new Error(`Failed to fetch adverts: ${response.status}`);
+      // Check age verification
+      const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+      if (!ageConfirmed) {
+        console.log('⏳ Age not verified - delaying marketing banners');
+        return;
       }
       
-      const adverts = await response.json();
-      console.log(`✅ Received ${adverts.length} homepage adverts from API`);
+      // DOM Elements
+      const marketingBannersTrack = document.getElementById('marketingBannersTrack');
+      const marketingPrevBtn = document.getElementById('marketingPrevBtn');
+      const marketingNextBtn = document.getElementById('marketingNextBtn');
+      const marketingDots = document.getElementById('marketingDots');
       
-      // Filter for active adverts
-      marketingAdverts = adverts.filter(advert => 
-        advert.isActive === true || advert.isActive === undefined
-      );
-      
-      console.log(`🖼️ Will show ${marketingAdverts.length} active homepage adverts`);
-      
-      if (marketingAdverts.length === 0) {
-        console.log('⚠️ No homepage adverts found, showing fallback');
-        createDefaultAdverts();
+      // Check if elements exist
+      if (!marketingBannersTrack) {
+        console.error('❌ Marketing banners track not found!');
+        return;
       }
       
-      // Render the banners
-      renderMarketingBanners();
-      setupMarketingEventListeners();
-      startMarketingAutoSlide();
+      // State
+      let marketingAdverts = [];
+      let currentMarketingSlide = 0;
+      let isMarketingTransitioning = false;
+      let marketingAutoSlideInterval;
       
-    } catch (error) {
-      console.error('❌ Error loading marketing adverts:', error.message);
-      console.log('⚠️ Using fallback adverts');
-      createDefaultAdverts();
-      renderMarketingBanners();
-      setupMarketingEventListeners();
-      startMarketingAutoSlide();
-    }
-  }
-  
-  function createDefaultAdverts() {
-    console.log('🔄 Creating default adverts (fallback)');
-    
-    marketingAdverts = [
-      {
-        id: 'fallback-1',
-        title: 'African Diamond Blanc',
-        subtitle: 'Premium selection for connoisseurs',
-        imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
-        targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
-        isActive: true,
-        type: 'homepage'
-      },
-      {
-        id: 'fallback-2',
-        title: 'Ferrero Rocher Collection',
-        subtitle: 'Perfect pairing for special moments',
-        imageUrl: 'assets/adverts/ferrero.png',
-        targetUrl: 'assets/adverts/ferrero.png',
-        isActive: true,
-        type: 'homepage'
-      },
-      {
-        id: 'fallback-3',
-        title: 'Moët & Chandon Rosé',
-        subtitle: 'Celebrate with premium champagne',
-        imageUrl: 'assets/adverts/moet_rose.png',
-        targetUrl: 'assets/adverts/moet_rose.png',
-        isActive: true,
-        type: 'homepage'
-      }
-    ];
-    
-    console.log('✅ Created 3 fallback adverts');
-  }
-  
-  function renderMarketingBanners() {
-    console.log('🎨 Rendering marketing banners');
-    
-    // Clear loading state
-    marketingBannersTrack.innerHTML = '';
-    if (marketingDots) marketingDots.innerHTML = '';
-    
-    if (marketingAdverts.length === 0) {
-      showMarketingEmptyState();
-      return;
-    }
-    
-    // Create slides
-    marketingAdverts.forEach((advert, index) => {
-      createMarketingSlide(advert, index);
-    });
-    
-    // Set initial position
-    setTimeout(() => {
-      updateMarketingCarouselPosition();
-    }, 50);
-  }
-  
-  function createMarketingSlide(advert, index) {
-    console.log(`🖼️ Creating slide ${index}: ${advert.title}`);
-    
-    const slide = document.createElement('div');
-    slide.className = 'marketing-banner-slide';
-    slide.dataset.index = index;
-    slide.dataset.advertId = advert.id;
-    
-    // Get image URL - prefer targetUrl if it exists
-    let imagePath = advert.targetUrl || advert.imageUrl || '';
-    
-    // Fix relative paths for web
-    if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
-      // Keep as-is, it's relative
-    }
-    
-    // Fallback if no valid image URL
-    if (!imagePath || imagePath === '') {
-      imagePath = 'assets/adverts/default_marketing.jpg';
-    }
-    
-    // Create slide HTML
-    slide.innerHTML = `
-      <img src="${imagePath}" 
-           alt="${advert.title}" 
-           class="marketing-banner-image"
-           loading="eager"
-           decoding="async"
-           onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; this.onerror=null;">
+      // FORCE FALLBACK FOR TESTING
+      const FORCE_FALLBACK = true; // Set to false when proxy is working
       
-      <div class="marketing-banner-overlay">
-        <div class="marketing-banner-title">${advert.title}</div>
-        <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
-      </div>
-    `;
-    
-    // CLICK HANDLER - Navigate to advert detail
-    slide.addEventListener('click', (event) => {
-      if (!isMarketingTransitioning) {
-        event.preventDefault();
-        handleAdvertClick(advert);
-      }
-    });
-    
-    // Make the entire slide clickable
-    slide.style.cursor = 'pointer';
-    
-    marketingBannersTrack.appendChild(slide);
-    
-    // Create dot
-    if (marketingDots) {
-      const dot = document.createElement('span');
-      dot.className = 'marketing-dot';
-      if (index === 0) dot.classList.add('active');
-      dot.dataset.index = index;
-      dot.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          goToMarketingSlide(index);
+      // Initialize
+      initMarketingBanners();
+      
+      async function initMarketingBanners() {
+        try {
+          if (FORCE_FALLBACK) {
+            console.log('⚠️ FORCE_FALLBACK is enabled - using static adverts');
+            useFallbackAdverts();
+            return;
+          }
+          
+          console.log('🌐 Fetching homepage adverts from proxy');
+          
+          const apiUrl = `/api/adverts/active?type=homepage`;
+          
+          console.log('📡 Fetching from:', apiUrl);
+          
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (!response.ok) {
+            console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
+            throw new Error(`Failed to fetch adverts: ${response.status}`);
+          }
+          
+          const adverts = await response.json();
+          console.log(`✅ Received ${adverts.length} homepage adverts from API`);
+          
+          // Filter for active adverts
+          marketingAdverts = adverts.filter(advert => 
+            advert.isActive === true || advert.isActive === undefined
+          );
+          
+          console.log(`🖼️ Will show ${marketingAdverts.length} active homepage adverts`);
+          
+          if (marketingAdverts.length === 0) {
+            console.log('⚠️ No homepage adverts found, using fallback');
+            useFallbackAdverts();
+            return;
+          }
+          
+          // Render the banners
+          renderMarketingBanners();
+          setupMarketingEventListeners();
           startMarketingAutoSlide();
+          
+        } catch (error) {
+          console.error('❌ Error loading marketing adverts:', error.message);
+          useFallbackAdverts();
         }
-      });
-      marketingDots.appendChild(dot);
-    }
-  }
-  
-  function setupMarketingEventListeners() {
-    if (marketingPrevBtn) {
-      marketingPrevBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          prevMarketingSlide();
-          startMarketingAutoSlide();
-        }
-      });
-    }
-    
-    if (marketingNextBtn) {
-      marketingNextBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isMarketingTransitioning) {
-          clearInterval(marketingAutoSlideInterval);
-          nextMarketingSlide();
-          startMarketingAutoSlide();
-        }
-      });
-    }
-    
-    // Pause auto-slide on hover
-    if (marketingBannersTrack) {
-      marketingBannersTrack.addEventListener('mouseenter', () => {
-        clearInterval(marketingAutoSlideInterval);
-      });
+      }
       
-      marketingBannersTrack.addEventListener('mouseleave', () => {
+      function useFallbackAdverts() {
+        console.log('🔄 Using fallback adverts');
+        
+        marketingAdverts = [
+          {
+            id: 'fallback-1',
+            title: 'African Diamond Blanc',
+            subtitle: 'Premium selection for connoisseurs',
+            imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
+            targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
+            isActive: true,
+            type: 'homepage'
+          },
+          {
+            id: 'fallback-2',
+            title: 'Ferrero Rocher Collection',
+            subtitle: 'Perfect pairing for special moments',
+            imageUrl: 'assets/adverts/ferrero.png',
+            targetUrl: 'assets/adverts/ferrero.png',
+            isActive: true,
+            type: 'homepage'
+          },
+          {
+            id: 'fallback-3',
+            title: 'Moët & Chandon Rosé',
+            subtitle: 'Celebrate with premium champagne',
+            imageUrl: 'assets/adverts/moet_rose.png',
+            targetUrl: 'assets/adverts/moet_rose.png',
+            isActive: true,
+            type: 'homepage'
+          }
+        ];
+        
+        console.log('✅ Created 3 fallback adverts');
+        
+        renderMarketingBanners();
+        setupMarketingEventListeners();
         startMarketingAutoSlide();
-      });
-    }
-  }
-  
-  function nextMarketingSlide() {
-    if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-    const nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
-    goToMarketingSlide(nextSlideIndex);
-  }
-  
-  function prevMarketingSlide() {
-    if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-    const prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
-    goToMarketingSlide(prevSlideIndex);
-  }
-  
-  function goToMarketingSlide(slideIndex) {
-    if (isMarketingTransitioning || slideIndex === currentMarketingSlide || marketingAdverts.length === 0) return;
-    currentMarketingSlide = slideIndex;
-    updateMarketingCarouselPosition();
-  }
-  
-  function updateMarketingCarouselPosition() {
-    if (!marketingBannersTrack) return;
-    const translateX = -currentMarketingSlide * 100;
-    marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
-    marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
-    
-    // Update dots
-    if (marketingDots) {
-      document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentMarketingSlide);
-      });
-    }
-  }
-  
-  function startMarketingAutoSlide() {
-    clearInterval(marketingAutoSlideInterval);
-    if (marketingAdverts.length > 1) {
-      marketingAutoSlideInterval = setInterval(() => {
-        if (!isMarketingTransitioning) {
-          nextMarketingSlide();
+      }
+      
+      function renderMarketingBanners() {
+        console.log('🎨 Rendering marketing banners');
+        
+        // Clear loading state
+        marketingBannersTrack.innerHTML = '';
+        if (marketingDots) marketingDots.innerHTML = '';
+        
+        if (marketingAdverts.length === 0) {
+          showMarketingEmptyState();
+          return;
         }
-      }, 4000);
-    }
-  }
-  
-  function handleAdvertClick(advert) {
-    console.log(`📱 Advert clicked: ${advert.title}`);
-    
-    // Navigate to advert detail page
-    if (advert.id) {
-      const advertId = encodeURIComponent(advert.id);
-      window.location.href = `adverts/advert_detail.html?id=${advertId}`;
-    }
-  }
-  
-  function showMarketingEmptyState() {
-    if (!marketingBannersTrack) return;
-    marketingBannersTrack.innerHTML = `
-      <div class="carousel-empty-state">
-        <i class="fas fa-tag"></i>
-        <h3>No Special Offers Available</h3>
-        <p>Check back soon for exciting promotions</p>
-      </div>
-    `;
-    
-    if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
-    if (marketingNextBtn) marketingNextBtn.style.display = 'none';
-    if (marketingDots) marketingDots.style.display = 'none';
-  }
-  
-  console.log('✅ Marketing banners script loaded - ready to show adverts!');
-});
-</script>
-  
+        
+        // Create slides
+        marketingAdverts.forEach((advert, index) => {
+          createMarketingSlide(advert, index);
+        });
+        
+        // Set initial position
+        setTimeout(() => {
+          updateMarketingCarouselPosition();
+        }, 50);
+      }
+      
+      function createMarketingSlide(advert, index) {
+        console.log(`🖼️ Creating slide ${index}: ${advert.title}`);
+        
+        const slide = document.createElement('div');
+        slide.className = 'marketing-banner-slide';
+        slide.dataset.index = index;
+        slide.dataset.advertId = advert.id;
+        
+        // Get image URL - prefer targetUrl if it exists
+        let imagePath = advert.targetUrl || advert.imageUrl || '';
+        
+        // Fallback if no valid image URL
+        if (!imagePath || imagePath === '') {
+          imagePath = 'assets/adverts/default_marketing.jpg';
+        }
+        
+        // Create slide HTML
+        slide.innerHTML = `
+          <img src="${imagePath}" 
+               alt="${advert.title}" 
+               class="marketing-banner-image"
+               loading="eager"
+               decoding="async"
+               onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; this.onerror=null;">
+          
+          <div class="marketing-banner-overlay">
+            <div class="marketing-banner-title">${advert.title}</div>
+            <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
+          </div>
+        `;
+        
+        // CLICK HANDLER - Navigate to advert detail
+        slide.addEventListener('click', (event) => {
+          if (!isMarketingTransitioning) {
+            event.preventDefault();
+            handleAdvertClick(advert);
+          }
+        });
+        
+        // Make the entire slide clickable
+        slide.style.cursor = 'pointer';
+        
+        marketingBannersTrack.appendChild(slide);
+        
+        // Create dot
+        if (marketingDots) {
+          const dot = document.createElement('span');
+          dot.className = 'marketing-dot';
+          if (index === 0) dot.classList.add('active');
+          dot.dataset.index = index;
+          dot.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!isMarketingTransitioning) {
+              clearInterval(marketingAutoSlideInterval);
+              goToMarketingSlide(index);
+              startMarketingAutoSlide();
+            }
+          });
+          marketingDots.appendChild(dot);
+        }
+      }
+      
+      function setupMarketingEventListeners() {
+        if (marketingPrevBtn) {
+          marketingPrevBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!isMarketingTransitioning) {
+              clearInterval(marketingAutoSlideInterval);
+              prevMarketingSlide();
+              startMarketingAutoSlide();
+            }
+          });
+        }
+        
+        if (marketingNextBtn) {
+          marketingNextBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!isMarketingTransitioning) {
+              clearInterval(marketingAutoSlideInterval);
+              nextMarketingSlide();
+              startMarketingAutoSlide();
+            }
+          });
+        }
+        
+        // Pause auto-slide on hover
+        if (marketingBannersTrack) {
+          marketingBannersTrack.addEventListener('mouseenter', () => {
+            clearInterval(marketingAutoSlideInterval);
+          });
+          
+          marketingBannersTrack.addEventListener('mouseleave', () => {
+            startMarketingAutoSlide();
+          });
+        }
+      }
+      
+      function nextMarketingSlide() {
+        if (isMarketingTransitioning || marketingAdverts.length === 0) return;
+        const nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
+        goToMarketingSlide(nextSlideIndex);
+      }
+      
+      function prevMarketingSlide() {
+        if (isMarketingTransitioning || marketingAdverts.length === 0) return;
+        const prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
+        goToMarketingSlide(prevSlideIndex);
+      }
+      
+      function goToMarketingSlide(slideIndex) {
+        if (isMarketingTransitioning || slideIndex === currentMarketingSlide || marketingAdverts.length === 0) return;
+        currentMarketingSlide = slideIndex;
+        updateMarketingCarouselPosition();
+      }
+      
+      function updateMarketingCarouselPosition() {
+        if (!marketingBannersTrack) return;
+        const translateX = -currentMarketingSlide * 100;
+        marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
+        marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
+        
+        // Update dots
+        if (marketingDots) {
+          document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentMarketingSlide);
+          });
+        }
+      }
+      
+      function startMarketingAutoSlide() {
+        clearInterval(marketingAutoSlideInterval);
+        if (marketingAdverts.length > 1) {
+          marketingAutoSlideInterval = setInterval(() => {
+            if (!isMarketingTransitioning) {
+              nextMarketingSlide();
+            }
+          }, 4000);
+        }
+      }
+      
+      function handleAdvertClick(advert) {
+        console.log(`📱 Advert clicked: ${advert.title}`);
+        
+        // Navigate to advert detail page
+        if (advert.id) {
+          const advertId = encodeURIComponent(advert.id);
+          window.location.href = `adverts/advert_detail.html?id=${advertId}`;
+        }
+      }
+      
+      function showMarketingEmptyState() {
+        if (!marketingBannersTrack) return;
+        marketingBannersTrack.innerHTML = `
+          <div class="carousel-empty-state">
+            <i class="fas fa-tag"></i>
+            <h3>No Special Offers Available</h3>
+            <p>Check back soon for exciting promotions</p>
+          </div>
+        `;
+        
+        if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
+        if (marketingNextBtn) marketingNextBtn.style.display = 'none';
+        if (marketingDots) marketingDots.style.display = 'none';
+      }
+    });
+  </script>
+
+  <!-- DEBUGGING SCRIPT - Add this to see what's happening -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🔍 DEBUG: Starting API endpoint tests...');
+      
+      setTimeout(() => {
+        // Test featured wines endpoint
+        fetch('/api/wines/featured/featured')
+          .then(response => {
+            console.log('🔍 DEBUG: Featured wines response status:', response.status);
+            return response.json().catch(() => null);
+          })
+          .then(data => {
+            console.log('🔍 DEBUG: Featured wines data:', data ? 
+              (Array.isArray(data) ? `Array with ${data.length} items` : 'Object received') : 'No data');
+          })
+          .catch(error => {
+            console.error('🔍 DEBUG: Featured wines fetch error:', error.message);
+          });
+        
+        // Test adverts endpoint
+        fetch('/api/adverts/active?type=homepage')
+          .then(response => {
+            console.log('🔍 DEBUG: Adverts response status:', response.status);
+            return response.json().catch(() => null);
+          })
+          .then(data => {
+            console.log('🔍 DEBUG: Adverts data:', data ? 
+              (Array.isArray(data) ? `Array with ${data.length} items` : 'Object received') : 'No data');
+          })
+          .catch(error => {
+            console.error('🔍 DEBUG: Adverts fetch error:', error.message);
+          });
+        
+        // Test backend health
+        fetch('/api/health')
+          .then(response => {
+            console.log('🔍 DEBUG: Health check status:', response.status);
+            return response.json();
+          })
+          .then(data => {
+            console.log('🔍 DEBUG: Health check data:', data);
+          })
+          .catch(error => {
+            console.error('🔍 DEBUG: Health check error:', error.message);
+          });
+      }, 2000);
+    });
+  </script>
 </body>
 </html>

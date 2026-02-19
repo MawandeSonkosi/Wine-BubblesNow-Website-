@@ -12,8 +12,8 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const allowedOrigins = [
   'https://www.wineandbubblesnow.co.za',
   'https://wineandbubblesnow.co.za',
-  'https://app.wineandbubblesnow.co.za',           // ← YOUR NEW DOMAIN - ADD THIS
-  'https://wine-bubblesnow-website.pages.dev',      // ← Cloudflare Pages URL
+  'https://app.wineandbubblesnow.co.za',
+  'https://wine-bubblesnow-website.pages.dev',
   'http://localhost:3000',
   'capacitor://localhost',
   'ionic://localhost',
@@ -25,9 +25,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, etc)
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -41,11 +39,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Note: Static file serving removed since Cloudflare Pages handles this now
-// Keep only if you want Railway to still serve files as fallback
-// app.use(express.static(__dirname));
-// app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -77,12 +70,10 @@ app.get('/api/test-backend', async (req, res) => {
 });
 
 // ============ AUTH ENDPOINTS ============
-
 // Login
 app.post('/api/auth/login', async (req, res) => {
     try {
         console.log('🔐 Login attempt:', req.body.email);
-        
         const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
@@ -94,19 +85,11 @@ app.post('/api/auth/login', async (req, res) => {
                 password: req.body.password
             })
         });
-        
         const data = await response.json();
-        console.log(`📤 Login response: ${response.status}`, data.message || '');
-        
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Login proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -114,7 +97,6 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
     try {
         console.log('📝 Register attempt:', req.body.email);
-        
         const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
@@ -123,19 +105,11 @@ app.post('/api/auth/register', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
-        console.log(`📤 Register response: ${response.status}`, data.message || '');
-        
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Register proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -150,15 +124,10 @@ app.post('/api/auth/verify-email', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
         res.status(response.status).json(data);
-        
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Verification failed'
-        });
+        res.status(500).json({ success: false, message: 'Verification failed' });
     }
 });
 
@@ -173,15 +142,10 @@ app.post('/api/auth/resend-verification', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
         res.status(response.status).json(data);
-        
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Failed to resend code'
-        });
+        res.status(500).json({ success: false, message: 'Failed to resend code' });
     }
 });
 
@@ -189,7 +153,6 @@ app.post('/api/auth/resend-verification', async (req, res) => {
 app.post('/api/auth/forgot-password', async (req, res) => {
     try {
         console.log('📧 Forgot password request:', req.body.email);
-        
         const response = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
             method: 'POST',
             headers: {
@@ -198,19 +161,11 @@ app.post('/api/auth/forgot-password', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
-        console.log(`📤 Forgot password response: ${response.status}`, data.message || '');
-        
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Forgot password proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -218,7 +173,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 app.post('/api/auth/verify-otp', async (req, res) => {
     try {
         console.log('🔐 Verify OTP request:', req.body.email);
-        
         const response = await fetch(`${BACKEND_URL}/api/auth/verify-otp`, {
             method: 'POST',
             headers: {
@@ -227,19 +181,11 @@ app.post('/api/auth/verify-otp', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
-        console.log(`📤 Verify OTP response: ${response.status}`, data.message || '');
-        
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Verify OTP proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -247,7 +193,6 @@ app.post('/api/auth/verify-otp', async (req, res) => {
 app.post('/api/auth/reset-password', async (req, res) => {
     try {
         console.log('🔄 Reset password request');
-        
         const response = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
             method: 'POST',
             headers: {
@@ -256,37 +201,22 @@ app.post('/api/auth/reset-password', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
-        console.log(`📤 Reset password response: ${response.status}`, data.message || '');
-        
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Reset password proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
 // ============ PROFILE ENDPOINTS ============
-
 // Get current user profile
 app.get('/api/profile/me', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No token provided'
-            });
+            return res.status(401).json({ success: false, message: 'No token provided' });
         }
-        
-        console.log('👤 Get current user profile request');
-        
         const response = await fetch(`${BACKEND_URL}/api/profile/me`, {
             method: 'GET',
             headers: {
@@ -295,17 +225,11 @@ app.get('/api/profile/me', async (req, res) => {
                 'Accept': 'application/json'
             }
         });
-        
         const data = await response.json();
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Get user profile proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -314,14 +238,8 @@ app.put('/api/profile/update', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No token provided'
-            });
+            return res.status(401).json({ success: false, message: 'No token provided' });
         }
-        
-        console.log('✏️ Update user profile request');
-        
         const response = await fetch(`${BACKEND_URL}/api/profile/update`, {
             method: 'PUT',
             headers: {
@@ -331,17 +249,11 @@ app.put('/api/profile/update', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Update user profile proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -350,14 +262,8 @@ app.post('/api/profile/change-password', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No token provided'
-            });
+            return res.status(401).json({ success: false, message: 'No token provided' });
         }
-        
-        console.log('🔑 Change password request');
-        
         const response = await fetch(`${BACKEND_URL}/api/profile/change-password`, {
             method: 'POST',
             headers: {
@@ -367,17 +273,11 @@ app.post('/api/profile/change-password', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Change password proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -386,14 +286,8 @@ app.put('/api/profile/update-phone', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No token provided'
-            });
+            return res.status(401).json({ success: false, message: 'No token provided' });
         }
-        
-        console.log('📱 Update phone number request');
-        
         const response = await fetch(`${BACKEND_URL}/api/profile/update-phone`, {
             method: 'PUT',
             headers: {
@@ -403,17 +297,11 @@ app.put('/api/profile/update-phone', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
-        
         const data = await response.json();
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Update phone proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -422,14 +310,8 @@ app.get('/api/profile/bookings', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No token provided'
-            });
+            return res.status(401).json({ success: false, message: 'No token provided' });
         }
-        
-        console.log('📅 Get user bookings request');
-        
         const response = await fetch(`${BACKEND_URL}/api/profile/bookings`, {
             method: 'GET',
             headers: {
@@ -438,17 +320,11 @@ app.get('/api/profile/bookings', async (req, res) => {
                 'Accept': 'application/json'
             }
         });
-        
         const data = await response.json();
         res.status(response.status).json(data);
-        
     } catch (error) {
         console.error('🚨 Get bookings proxy error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Proxy server error',
-            error: error.message
-        });
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
     }
 });
 
@@ -457,14 +333,8 @@ app.delete('/api/profile/delete-account', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'No token provided'
-            });
+            return res.status(401).json({ success: false, message: 'No token provided' });
         }
-        
-        console.log('🗑️ Delete user account request');
-        
         const response = await fetch(`${BACKEND_URL}/api/profile/delete-account`, {
             method: 'DELETE',
             headers: {
@@ -474,95 +344,113 @@ app.delete('/api/profile/delete-account', async (req, res) => {
             },
             body: JSON.stringify(req.body)
         });
+        const data = await response.json();
+        res.status(response.status).json(data);
+    } catch (error) {
+        console.error('🚨 Delete account proxy error:', error);
+        res.status(500).json({ success: false, message: 'Proxy server error', error: error.message });
+    }
+});
+
+// ============ ADVERTS ENDPOINTS ============
+// Get active adverts by type
+app.get('/api/adverts/active', async (req, res) => {
+    try {
+        console.log('🎪 Fetching active adverts via proxy');
+        console.log('📡 Query params:', req.query);
+        
+        // Forward query parameters
+        const queryParams = new URLSearchParams(req.query).toString();
+        const backendUrl = queryParams ? 
+            `${BACKEND_URL}/api/adverts/active?${queryParams}` : 
+            `${BACKEND_URL}/api/adverts/active`;
+        
+        console.log('🎪 Backend URL:', backendUrl);
+        
+        const response = await fetch(backendUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            timeout: 10000
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log(`🎪 Adverts response: ${response.status} (${Array.isArray(data) ? data.length : 0} items)`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Adverts proxy error:', error.message);
+        
+        // Return fallback adverts if backend fails
+        console.log('⚠️ Using fallback adverts');
+        const fallbackAdverts = [
+            {
+                id: 'fallback-1',
+                title: 'African Diamond Blanc',
+                subtitle: 'Premium selection for connoisseurs',
+                imageUrl: '/assets/adverts/African_Diamond_Blanc.png',
+                targetUrl: '#',
+                isActive: true,
+                type: 'homepage'
+            },
+            {
+                id: 'fallback-2',
+                title: 'Ferrero Rocher Collection',
+                subtitle: 'Perfect pairing for special moments',
+                imageUrl: '/assets/adverts/ferrero.png',
+                targetUrl: '#',
+                isActive: true,
+                type: 'homepage'
+            },
+            {
+                id: 'fallback-3',
+                title: 'Moët & Chandon Rosé',
+                subtitle: 'Celebrate with premium champagne',
+                imageUrl: '/assets/adverts/moet_rose.png',
+                targetUrl: '#',
+                isActive: true,
+                type: 'homepage'
+            }
+        ];
+        
+        res.json(fallbackAdverts);
+    }
+});
+
+// Get single advert by ID
+app.get('/api/adverts/:id', async (req, res) => {
+    try {
+        console.log('🎪 Fetching advert by ID:', req.params.id);
+        
+        const response = await fetch(`${BACKEND_URL}/api/adverts/${req.params.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
         
         const data = await response.json();
         res.status(response.status).json(data);
         
     } catch (error) {
-        console.error('🚨 Delete account proxy error:', error);
+        console.error('🚨 Advert by ID proxy error:', error);
         res.status(500).json({
             success: false,
-            message: 'Proxy server error',
+            message: 'Failed to fetch advert',
             error: error.message
         });
     }
 });
 
-// ============ ADVERTS ENDPOINTS ============
-
-// Get active adverts by type
-app.get('/api/adverts/active', async (req, res) => {
-  try {
-    console.log('🎪 Fetching active adverts via proxy');
-    console.log('📡 Query params:', req.query);
-    
-    // Forward query parameters
-    const queryParams = new URLSearchParams(req.query).toString();
-    const backendUrl = queryParams ? 
-      `${BACKEND_URL}/api/adverts/active?${queryParams}` : 
-      `${BACKEND_URL}/api/adverts/active`;
-    
-    console.log('🎪 Backend URL:', backendUrl);
-    
-    const response = await fetch(backendUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      timeout: 10000
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    console.log(`🎪 Adverts response: ${response.status} (${Array.isArray(data) ? data.length : 0} items)`);
-    
-    res.status(response.status).json(data);
-    
-  } catch (error) {
-    console.error('🚨 Adverts proxy error:', error.message);
-    
-    // Return fallback adverts if backend fails
-    console.log('⚠️ Using fallback adverts');
-    const fallbackAdverts = [
-      {
-        id: 'fallback-1',
-        title: 'African Diamond Blanc',
-        subtitle: 'Premium selection for connoisseurs',
-        imageUrl: '/assets/adverts/African_Diamond_Blanc.png',
-        targetUrl: '#',
-        isActive: true,
-        type: 'homepage'
-      },
-      {
-        id: 'fallback-2',
-        title: 'Ferrero Rocher Collection',
-        subtitle: 'Perfect pairing for special moments',
-        imageUrl: '/assets/adverts/ferrero.png',
-        targetUrl: '#',
-        isActive: true,
-        type: 'homepage'
-      },
-      {
-        id: 'fallback-3',
-        title: 'Moët & Chandon Rosé',
-        subtitle: 'Celebrate with premium champagne',
-        imageUrl: '/assets/adverts/moet_rose.png',
-        targetUrl: '#',
-        isActive: true,
-        type: 'homepage'
-      }
-    ];
-    
-    res.json(fallbackAdverts);
-  }
-});
-
 // ============ ADD-ONS ENDPOINTS ============
-
 // Get all add-ons
 app.get('/api/addons', async (req, res) => {
     try {
@@ -643,120 +531,239 @@ app.get('/api/addons/category/:category', async (req, res) => {
 });
 
 // ============ WINE ENDPOINTS ============
-
 // Get all wines
 app.get('/api/wines', async (req, res) => {
-  try {
-    console.log('🍷 Fetching all wines');
-    
-    // Forward query parameters
-    const queryParams = new URLSearchParams(req.query).toString();
-    const backendUrl = queryParams ? 
-      `${BACKEND_URL}/api/wines?${queryParams}` : 
-      `${BACKEND_URL}/api/wines`;
-    
-    console.log('🍷 Backend URL:', backendUrl);
-    
-    const response = await fetch(backendUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      timeout: 10000
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+    try {
+        console.log('🍷 Fetching all wines');
+        
+        const queryParams = new URLSearchParams(req.query).toString();
+        const backendUrl = queryParams ? 
+            `${BACKEND_URL}/api/wines?${queryParams}` : 
+            `${BACKEND_URL}/api/wines`;
+        
+        console.log('🍷 Backend URL:', backendUrl);
+        
+        const response = await fetch(backendUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            timeout: 10000
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log(`🍷 All wines response: ${response.status} (${Array.isArray(data) ? data.length : 'object'})`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 All wines proxy error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch wines',
+            error: error.message
+        });
     }
-    
-    const data = await response.json();
-    console.log(`🍷 All wines response: ${response.status} (${Array.isArray(data) ? data.length : 'object'})`);
-    
-    res.status(response.status).json(data);
-    
-  } catch (error) {
-    console.error('🚨 All wines proxy error:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch wines',
-      error: error.message
-    });
-  }
 });
 
+// Get featured wines - FIXED: Proper endpoint
 app.get('/api/wines/featured/featured', async (req, res) => {
-  try {
-    console.log('🌟 Fetching featured wines via proxy');
-    const response = await fetch(`${BACKEND_URL}/api/wines/featured/featured`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-    
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('🚨 Featured wines proxy error:', error);
-    res.status(500).json({ message: 'Proxy error' });
-  }
+    try {
+        console.log('🌟 Fetching featured wines via proxy');
+        const backendUrl = `${BACKEND_URL}/api/wines/featured/featured`;
+        console.log('📡 Backend URL:', backendUrl);
+        
+        const response = await fetch(backendUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            timeout: 10000
+        });
+        
+        if (!response.ok) {
+            console.error(`❌ Backend responded with ${response.status}`);
+            
+            // Try fallback
+            const fallbackUrl = `${BACKEND_URL}/api/wines?featured=true&all=true`;
+            console.log('🔄 Trying fallback:', fallbackUrl);
+            
+            const fallbackResponse = await fetch(fallbackUrl);
+            if (fallbackResponse.ok) {
+                const data = await fallbackResponse.json();
+                res.json(data);
+                return;
+            }
+            
+            throw new Error(`Backend responded with ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log(`📤 Featured wines response: ${response.status} (${Array.isArray(data) ? data.length : 0} items)`);
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Featured wines proxy error:', error);
+        
+        // Ultimate fallback
+        console.log('⚠️ Using fallback featured wines');
+        const fallbackWines = [
+            {
+                id: 1,
+                name: 'The African Diamond Grenache Noir',
+                type: 'Red Wine',
+                price: 299.99,
+                imageUrl: 'assets/wines/breakfast/Noir.png',
+                bannerImageUrl: 'assets/wines/breakfast/Noir.png',
+                isFeatured: true
+            },
+            {
+                id: 2,
+                name: 'The African Diamond Grenache Blanc',
+                type: 'White Wine',
+                price: 299.99,
+                imageUrl: 'assets/wines/breakfast/Blanc.png',
+                bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
+                isFeatured: true
+            },
+            {
+                id: 3,
+                name: 'YBY Crystal Dry',
+                type: 'Champagne',
+                price: 499.99,
+                imageUrl: 'assets/wines/breakfast/YBY.png',
+                bannerImageUrl: 'assets/wines/breakfast/YBY.png',
+                isFeatured: true
+            }
+        ];
+        res.json(fallbackWines);
+    }
 });
 
-// Get adverts - CORRECT ENDPOINT
-app.get('/api/adverts/active', async (req, res) => {
-  try {
-    console.log('🎪 Fetching adverts via proxy');
-    const response = await fetch(`${BACKEND_URL}/api/adverts/active?type=homepage`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-    
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('🚨 Adverts proxy error:', error);
-    res.status(500).json({ message: 'Proxy error' });
-  }
-});
 // Get single wine by ID
 app.get('/api/wines/:id', async (req, res) => {
-  try {
-    console.log('🍷 Fetching wine by ID:', req.params.id);
-    console.log('📡 Backend URL:', `${BACKEND_URL}/api/wines/${req.params.id}`);
-    
-    const response = await fetch(`${BACKEND_URL}/api/wines/${req.params.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      timeout: 10000
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+    try {
+        console.log('🍷 Fetching wine by ID:', req.params.id);
+        
+        const response = await fetch(`${BACKEND_URL}/api/wines/${req.params.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            timeout: 10000
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log(`🍷 Wine by ID response: ${response.status}`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Wine by ID proxy error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch wine',
+            error: error.message
+        });
     }
-    
-    const data = await response.json();
-    console.log(`🍷 Wine by ID response: ${response.status}`);
-    
-    res.status(response.status).json(data);
-    
-  } catch (error) {
-    console.error('🚨 Wine by ID proxy error:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch wine',
-      error: error.message
-    });
-  }
+});
+
+// Get wines by category
+app.get('/api/wines/category/:category', async (req, res) => {
+    try {
+        console.log('🍷 Fetching wines by category:', req.params.category);
+        
+        const response = await fetch(`${BACKEND_URL}/api/wines/category/${req.params.category}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        console.log(`🍷 Wines by category response: ${response.status}`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Wines by category proxy error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch wines by category',
+            error: error.message
+        });
+    }
+});
+
+// Get gifting wines
+app.get('/api/wines/gifting/gifting', async (req, res) => {
+    try {
+        console.log('🎁 Fetching gifting wines');
+        
+        const response = await fetch(`${BACKEND_URL}/api/wines/gifting/gifting`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        console.log(`📤 Gifting wines response: ${response.status}`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Gifting wines proxy error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch gifting wines',
+            error: error.message
+        });
+    }
+});
+
+// Get event wines
+app.get('/api/wines/events/events', async (req, res) => {
+    try {
+        console.log('🎉 Fetching event wines');
+        
+        const response = await fetch(`${BACKEND_URL}/api/wines/events/events`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        console.log(`📤 Event wines response: ${response.status}`);
+        
+        res.status(response.status).json(data);
+        
+    } catch (error) {
+        console.error('🚨 Event wines proxy error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch event wines',
+            error: error.message
+        });
+    }
 });
 
 // ============ BOOKINGS ENDPOINTS ============
-
 // Create booking
 app.post('/api/bookings', async (req, res) => {
     try {
@@ -899,7 +906,6 @@ app.get('/api/bookings/:id', async (req, res) => {
 });
 
 // ============ DELIVERY ENDPOINTS ============
-
 // Create delivery
 app.post('/api/deliveries', async (req, res) => {
     try {
@@ -1007,7 +1013,6 @@ app.get('/api/deliveries/:id', async (req, res) => {
 });
 
 // ============ EMAIL ENDPOINTS ============
-
 // Send delivery confirmation email
 app.post('/api/email/send-delivery-confirmation', async (req, res) => {
     try {
@@ -1045,7 +1050,6 @@ app.post('/api/email/send-delivery-confirmation', async (req, res) => {
 });
 
 // ============ TEST ENDPOINTS ============
-
 // Test add-ons endpoint
 app.get('/api/test/addons', async (req, res) => {
     try {
@@ -1074,6 +1078,74 @@ app.get('/api/test/addons', async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Cannot connect to backend add-ons endpoint',
+            error: error.message,
+            backendUrl: BACKEND_URL
+        });
+    }
+});
+
+// Test featured wines endpoint
+app.get('/api/test/featured-wines', async (req, res) => {
+    try {
+        console.log('🧪 Testing featured wines connection to backend');
+        
+        const response = await fetch(`${BACKEND_URL}/api/wines/featured/featured`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        res.json({
+            success: true,
+            backendUrl: BACKEND_URL,
+            status: response.status,
+            winesCount: Array.isArray(data) ? data.length : 0,
+            sampleWine: Array.isArray(data) && data.length > 0 ? data[0] : null
+        });
+        
+    } catch (error) {
+        console.error('🧪 Featured wines test failed:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Cannot connect to backend featured wines endpoint',
+            error: error.message,
+            backendUrl: BACKEND_URL
+        });
+    }
+});
+
+// Test wines endpoint
+app.get('/api/test/wines', async (req, res) => {
+    try {
+        console.log('🧪 Testing wines connection to backend');
+        
+        const response = await fetch(`${BACKEND_URL}/api/wines?all=true`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        res.json({
+            success: true,
+            backendUrl: BACKEND_URL,
+            status: response.status,
+            winesCount: Array.isArray(data) ? data.length : 0,
+            sampleWine: Array.isArray(data) && data.length > 0 ? data[0] : null
+        });
+        
+    } catch (error) {
+        console.error('🧪 Wines test failed:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Cannot connect to backend wines endpoint',
             error: error.message,
             backendUrl: BACKEND_URL
         });
@@ -1130,38 +1202,38 @@ app.get('/api/test/deliveries', async (req, res) => {
     }
 });
 
-// Test wines endpoint
-app.get('/api/test/wines', async (req, res) => {
-  try {
-    console.log('🧪 Testing wines connection to backend');
-    
-    const response = await fetch(`${BACKEND_URL}/api/wines?all=true`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-    
-    const data = await response.json();
-    
-    res.json({
-      success: true,
-      backendUrl: BACKEND_URL,
-      status: response.status,
-      winesCount: Array.isArray(data) ? data.length : 0,
-      sampleWine: Array.isArray(data) && data.length > 0 ? data[0] : null
-    });
-    
-  } catch (error) {
-    console.error('🧪 Wines test failed:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Cannot connect to backend wines endpoint',
-      error: error.message,
-      backendUrl: BACKEND_URL
-    });
-  }
+// Test adverts endpoint
+app.get('/api/test/adverts', async (req, res) => {
+    try {
+        console.log('🧪 Testing adverts connection to backend');
+        
+        const response = await fetch(`${BACKEND_URL}/api/adverts/active?type=homepage`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        res.json({
+            success: true,
+            backendUrl: BACKEND_URL,
+            status: response.status,
+            advertsCount: Array.isArray(data) ? data.length : 0,
+            sampleAdvert: Array.isArray(data) && data.length > 0 ? data[0] : null
+        });
+        
+    } catch (error) {
+        console.error('🧪 Adverts test failed:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Cannot connect to backend adverts endpoint',
+            error: error.message,
+            backendUrl: BACKEND_URL
+        });
+    }
 });
 
 // Handle preflight requests
@@ -1209,6 +1281,6 @@ app.listen(PORT, () => {
     `);
     console.log('📂 Available Endpoints:');
     console.log(`   Health: http://localhost:${PORT}/api/health`);
-    console.log(`   Adverts: http://localhost:${PORT}/api/adverts/active`);
-    console.log(`   Featured Wines: http://localhost:${PORT}/api/wines/featured`);
+    console.log(`   Featured Wines: http://localhost:${PORT}/api/wines/featured/featured`);
+    console.log(`   Adverts: http://localhost:${PORT}/api/adverts/active?type=homepage`);
 });
