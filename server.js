@@ -686,12 +686,12 @@ app.get('/api/wines', async (req, res) => {
 });
 
 // Get featured wines
-app.get('/api/wines/featured', async (req, res) => {
+app.get('/api/wines/featured/featured', async (req, res) => {
   try {
     console.log('🌟 Fetching featured wines via proxy');
-    console.log('📡 Forwarding to backend:', `${BACKEND_URL}/api/wines/featured`);
+    console.log('📡 Forwarding to backend:', `${BACKEND_URL}/api/wines/featured/featured`);
     
-    const response = await fetch(`${BACKEND_URL}/api/wines/featured`, {
+    const response = await fetch(`${BACKEND_URL}/api/wines/featured/featured`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
