@@ -1,4 +1,4 @@
-// Advert Detail JavaScript - EXACTLY THE SAME AS WORKING VERSION
+// Advert Detail JavaScript - USING IMAGE URL ONLY, NO CATEGORY/TYPE, NO DEBUG BUTTON
 const API_BASE_URL = '/api';
 
 // State
@@ -71,7 +71,8 @@ async function fetchAdvertDetail(advertId) {
     // Update page title
     document.title = `Wine & Bubbles — ${advert.title}`;
     if (advertTypeElement) {
-      advertTypeElement.textContent = advert.type || 'Special Offer';
+      // Just show "Special Offer" not the type
+      advertTypeElement.textContent = 'Special Offer';
     }
     
     // Track impression
@@ -128,16 +129,18 @@ async function fetchAllAdverts() {
   }
 }
 
-// Helper to fix image URLs - USING IMAGE URL
+// Helper to fix image URLs - USING ONLY IMAGE URL (not targetUrl or imagePath)
 function fixImageUrl(advert) {
   if (!advert) return '../assets/adverts/default_marketing.jpg';
   
+  // USE ONLY imageUrl as specified in the model
   let imageUrl = advert.imageUrl || '';
   
   if (!imageUrl) {
     return '../assets/adverts/default_marketing.jpg';
   }
   
+  // Fix path for website
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
@@ -149,7 +152,7 @@ function fixImageUrl(advert) {
   return '../assets/' + imageUrl;
 }
 
-// Render advert detail - EXACTLY LIKE WINE DETAIL BUT WITHOUT CATEGORY/TYPE
+// Render advert detail - NO CATEGORY/TYPE FIELDS
 function renderAdvertDetail(advert) {
   const imageUrl = fixImageUrl(advert);
   const price = advert.price || 0;
@@ -172,7 +175,7 @@ function renderAdvertDetail(advert) {
         <div class="advert-detail-subtitle">${subtitle}</div>
         <div class="advert-detail-price">R${price.toFixed(2)}</div>
         
-        <!-- NO CATEGORY/TYPE FIELDS - removed completely -->
+        <!-- NO CATEGORY/TYPE FIELDS - completely removed -->
         
         ${isAvailable ? `
           <div class="stock-status ${stockCount > 5 ? 'stock-in' : stockCount > 0 ? 'stock-low' : 'stock-out'}">
@@ -247,7 +250,7 @@ function updateQuantityDisplay() {
   if (plusBtn && currentAdvert) plusBtn.disabled = quantity >= currentAdvert.stockCount;
 }
 
-// Add to cart
+// Add to cart - USING IMAGE URL ONLY
 function addToCart() {
   if (!currentAdvert) {
     showToast('No offer data available', 'error');
@@ -264,15 +267,15 @@ function addToCart() {
     return;
   }
   
+  // Create cart item - USING ONLY IMAGE URL
   const cartItem = {
     id: currentAdvert.id.toString(),
     name: currentAdvert.title,
     price: currentAdvert.price,
-    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg',
+    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg', // Using imageUrl only
     type: 'advert',
-    category: currentAdvert.category || '',
-    description: currentAdvert.subtitle || '',
     quantity: quantity
+    // Removed category and description fields as they're not needed
   };
   
   if (window.CartUtils && typeof window.CartUtils.addItem === 'function') {
@@ -414,3 +417,5 @@ window.decrementQuantity = decrementQuantity;
 window.addToCart = addToCart;
 window.navigateToAdvertDetail = navigateToAdvertDetail;
 window.hideRelatedAdverts = hideRelatedAdverts;
+
+// NO DEBUG BUTTON FUNCTION - completely removed
