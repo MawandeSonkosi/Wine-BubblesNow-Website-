@@ -1558,8 +1558,8 @@
     });
   </script>
 
-  <script>
-  // FEATURED WINES BANNER - FIXED VERSION
+ <!-- FEATURED WINES BANNER - SHOW ALL WITH NO LIMIT -->
+<script>
   document.addEventListener('DOMContentLoaded', function() {
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
     
@@ -1568,9 +1568,9 @@
         return;
     }
     
-    console.log('🎠 Initializing wine banner carousel...');
+    console.log('🎠 Initializing wine banner carousel (SHOWING ALL)...');
     
-    const API_BASE_URL = '/api';  // Use relative URL through proxy
+    const API_BASE_URL = '/api';
     
     const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
     const prevBtn = document.getElementById('prevBtn');
@@ -1586,9 +1586,10 @@
     
     async function initCarousel() {
       try {
-        console.log('🌐 Fetching featured wines...');
+        console.log('🌐 Fetching ALL featured wines...');
         
-        const apiUrl = `${API_BASE_URL}/wines/featured/featured`;
+        // Get ALL featured wines - no limit
+        const apiUrl = `${API_BASE_URL}/wines/featured/featured?all=true`;
         console.log('📡 Fetching from:', apiUrl);
         
         const response = await fetch(apiUrl, {
@@ -1606,10 +1607,10 @@
         const wines = await response.json();
         console.log('✅ Raw wines response:', wines);
         
-        // Filter featured wines
-        featuredWines = wines.filter(wine => wine.isFeatured === true);
+        // Get ALL featured wines - no filtering by isFeatured since endpoint already returns featured
+        featuredWines = wines;
         
-        console.log(`🖼️ Found ${featuredWines.length} featured wines`);
+        console.log(`🖼️ Found ${featuredWines.length} featured wines (NO LIMIT)`);
         
         if (featuredWines.length === 0) {
           console.log('⚠️ No featured wines found, using fallback');
@@ -1652,6 +1653,14 @@
           type: 'Champagne',
           price: 499.99,
           imageUrl: 'assets/wines/breakfast/YBY.png',
+          isFeatured: true
+        },
+        {
+          id: 4,
+          name: 'Montpellier MCC Brut Chardonnay',
+          type: 'Champagne',
+          price: 255.00,
+          imageUrl: 'assets/wines/breakfast/Montpellier_MCC.png',
           isFeatured: true
         }
       ];
@@ -1836,10 +1845,10 @@
     }
   });
 </script>
-<!-- MARKETING BANNERS - USING IMAGE PATH -->
+<!-- MARKETING BANNERS - USING TARGET URL -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎪 Starting marketing banners (USING IMAGE PATH)');
+    console.log('🎪 Starting marketing banners (USING TARGET URL)');
     
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
     if (!ageConfirmed) {
@@ -1896,9 +1905,13 @@
         const adverts = await response.json();
         console.log('✅ BACKEND RESPONSE:', adverts);
         
+        // Filter only active homepage adverts
         if (Array.isArray(adverts) && adverts.length > 0) {
-          console.log('✅ GOT REAL DATA FROM BACKEND:', adverts.length, 'items');
-          marketingAdverts = adverts;
+          // Filter for active adverts only
+          marketingAdverts = adverts.filter(advert => 
+            advert.isActive === true || advert.isActive === undefined
+          );
+          console.log(`✅ GOT ${marketingAdverts.length} ACTIVE ADVERTS FROM BACKEND`);
         } else if (Array.isArray(adverts) && adverts.length === 0) {
           console.log('⚠️ Backend returned empty array');
           marketingAdverts = [];
@@ -1909,7 +1922,7 @@
         }
         
         if (marketingAdverts.length === 0) {
-          console.log('⚠️ No adverts found');
+          console.log('⚠️ No active adverts found');
           showEmptyState();
           return;
         }
@@ -1942,9 +1955,7 @@
           id: 'fallback-1',
           title: 'African Diamond Blanc',
           subtitle: 'Premium selection for connoisseurs',
-          imagePath: 'assets/adverts/African_Diamond_Blanc.png',
-          imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
-          targetUrl: '#',
+          targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
           isActive: true,
           type: 'homepage'
         },
@@ -1952,9 +1963,7 @@
           id: 'fallback-2',
           title: 'Ferrero Rocher Collection',
           subtitle: 'Perfect pairing for special moments',
-          imagePath: 'assets/adverts/ferrero.png',
-          imageUrl: 'assets/adverts/ferrero.png',
-          targetUrl: '#',
+          targetUrl: 'assets/adverts/ferrero.png',
           isActive: true,
           type: 'homepage'
         },
@@ -1962,9 +1971,7 @@
           id: 'fallback-3',
           title: 'Moët & Chandon Rosé',
           subtitle: 'Celebrate with premium champagne',
-          imagePath: 'assets/adverts/moet_rose.png',
-          imageUrl: 'assets/adverts/moet_rose.png',
-          targetUrl: '#',
+          targetUrl: 'assets/adverts/moet_rose.png',
           isActive: true,
           type: 'homepage'
         }
@@ -2010,34 +2017,16 @@
       slide.dataset.index = index;
       slide.dataset.advertId = advert.id;
       
-      // PRIORITIZE imagePath for marketing banners (as per your Advert.js model)
-      // The virtual combinedImageUrl uses imagePath for marketing banners
-      let imagePath = '';
+      // USE TARGET URL for the image (as requested)
+      let imagePath = advert.targetUrl || '';
       
-      // Check if this is a marketing banner and has imagePath
-      if (advert.type === 'homepage' || advert.category === 'marketing') {
-        // First try imagePath (as per your schema's virtual field)
-        if (advert.imagePath) {
-          imagePath = advert.imagePath;
-          console.log(`🖼️ SLIDE ${index} USING imagePath:`, imagePath);
-        } 
-        // Then try the combined virtual field
-        else if (advert.combinedImageUrl) {
-          imagePath = advert.combinedImageUrl;
-          console.log(`🖼️ SLIDE ${index} USING combinedImageUrl:`, imagePath);
-        }
-        // Fallback to imageUrl
-        else if (advert.imageUrl) {
-          imagePath = advert.imageUrl;
-          console.log(`🖼️ SLIDE ${index} USING imageUrl:`, imagePath);
-        }
-      } else {
-        // For non-marketing banners, use imageUrl
-        imagePath = advert.imageUrl || '';
-        console.log(`🖼️ SLIDE ${index} USING imageUrl (non-marketing):`, imagePath);
+      console.log(`🖼️ SLIDE ${index} USING TARGET URL:`, imagePath);
+      
+      // If targetUrl is empty, fallback to imageUrl or imagePath
+      if (!imagePath) {
+        imagePath = advert.imageUrl || advert.imagePath || '';
+        console.log(`🖼️ SLIDE ${index} FALLBACK TO imageUrl/imagePath:`, imagePath);
       }
-      
-      console.log(`🖼️ SLIDE ${index} ORIGINAL IMAGE PATH:`, imagePath);
       
       // Make sure the path is correct for the website
       if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
