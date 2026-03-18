@@ -6,7 +6,6 @@ const API_BASE_URL = '/api';
 let currentAdvert = null;
 let allAdverts = [];
 let searchQuery = '';
-let currentFilter = '';
 let quantity = 1;
 
 // DOM Elements
@@ -14,9 +13,6 @@ const advertDetailContainer = document.getElementById('advertDetailContainer');
 const relatedAdvertsSection = document.getElementById('relatedAdvertsSection');
 const relatedAdvertsGrid = document.getElementById('relatedAdvertsGrid');
 const searchInput = document.getElementById('searchInput');
-const filterBtn = document.getElementById('filterBtn');
-const filterDropdown = document.getElementById('filterDropdown');
-const advertTypeElement = document.getElementById('advertType');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -60,14 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   setupEventListeners();
-  
-  // Add debug button
-  addDebugButton();
 });
 
 // Event Listeners
 function setupEventListeners() {
-  // Search input
+  // Search input - only search, no filter
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value.toLowerCase();
@@ -78,31 +71,6 @@ function setupEventListeners() {
       }
     });
   }
-  
-  // Filter dropdown
-  if (filterDropdown) {
-    filterDropdown.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        currentFilter = link.dataset.filter;
-        if (filterBtn) {
-          filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${currentFilter || 'Filter'}`;
-        }
-        if (searchQuery) {
-          showRelatedAdverts();
-        }
-      });
-    });
-  }
-  
-  // Close filter dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!filterBtn?.contains(e.target) && !filterDropdown?.contains(e.target)) {
-      if (filterDropdown) {
-        filterDropdown.style.display = 'none';
-      }
-    }
-  });
 }
 
 // Fetch advert detail - EXACTLY LIKE FLUTTER'S getAdvertById()
@@ -134,11 +102,6 @@ async function fetchAdvertDetail(advertId) {
     console.log('✅ Advert detail received:', advert);
     
     currentAdvert = advert;
-    
-    // Update page title and advert type
-    if (advertTypeElement) {
-      advertTypeElement.textContent = advert.type || 'Special Offer';
-    }
     
     // Update page title
     document.title = `Wine & Bubbles — ${advert.title}`;
@@ -212,22 +175,12 @@ async function fetchAllAdverts() {
   }
 }
 
-// Helper to fix image URLs - PRIORITIZE TARGET URL like Flutter
+// Helper to fix image URLs - USING IMAGE URL (not targetUrl)
 function fixImageUrl(advert) {
   if (!advert) return '../assets/adverts/default_marketing.jpg';
   
-  // First try targetUrl (as per Flutter's implementation)
-  let imageUrl = advert.targetUrl || '';
-  
-  // If targetUrl is empty, try imageUrl
-  if (!imageUrl) {
-    imageUrl = advert.imageUrl || '';
-  }
-  
-  // If still empty, try imagePath
-  if (!imageUrl) {
-    imageUrl = advert.imagePath || '';
-  }
+  // USE IMAGE URL as requested (not targetUrl)
+  let imageUrl = advert.imageUrl || '';
   
   if (!imageUrl) {
     return '../assets/adverts/default_marketing.jpg';
@@ -249,8 +202,6 @@ function fixImageUrl(advert) {
 function renderAdvertDetail(advert) {
   const imageUrl = fixImageUrl(advert);
   const price = advert.price || 0;
-  const type = advert.type || 'Special Offer';
-  const category = advert.category || 'Marketing';
   const subtitle = advert.subtitle || '';
   const stockCount = advert.stockCount || 0;
   const isAvailable = advert.isAvailableForPurchase || false;
@@ -270,16 +221,7 @@ function renderAdvertDetail(advert) {
         <div class="advert-detail-subtitle">${subtitle}</div>
         <div class="advert-detail-price">R${price.toFixed(2)}</div>
         
-        <div class="advert-detail-meta">
-          <div class="advert-meta-item">
-            <div class="advert-meta-label">Category</div>
-            <div class="advert-meta-value">${category}</div>
-          </div>
-          <div class="advert-meta-item">
-            <div class="advert-meta-label">Type</div>
-            <div class="advert-meta-value">${type}</div>
-          </div>
-        </div>
+        <!-- NO CATEGORY/TYPE FIELDS - removed completely -->
         
         ${isAvailable ? `
           <div class="stock-status ${stockCount > 5 ? 'stock-in' : stockCount > 0 ? 'stock-low' : 'stock-out'}">
@@ -377,12 +319,12 @@ function addToCart() {
     return;
   }
   
-  // Create cart item with correct structure
+  // Create cart item with correct structure - USING IMAGE URL
   const cartItem = {
     id: currentAdvert.id.toString(),
     name: currentAdvert.title,
     price: currentAdvert.price,
-    imageUrl: currentAdvert.imageUrl || currentAdvert.targetUrl,
+    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg',
     type: 'advert',
     category: currentAdvert.category || '',
     description: currentAdvert.subtitle || '',
@@ -400,7 +342,7 @@ function addToCart() {
       // Show success message
       showToast(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} of ${currentAdvert.title} to cart`, 'success');
       
-      // Track purchase (like Flutter)
+      // Track click (like Flutter)
       trackClick(currentAdvert.id);
       
       // Reset quantity
@@ -439,32 +381,22 @@ async function trackClick(advertId) {
   }
 }
 
-// Show related adverts
+// Show related adverts - NO FILTER, only search
 function showRelatedAdverts() {
   if (!allAdverts.length) return;
   
-  // Filter adverts
+  // Filter adverts by search only
   let related = allAdverts.filter(advert => {
     // Exclude current advert
     if (currentAdvert && advert.id === currentAdvert.id) return false;
     
-    // Apply search filter
+    // Apply search filter only
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
       const matchesTitle = (advert.title || '').toLowerCase().includes(searchLower);
       const matchesSubtitle = (advert.subtitle || '').toLowerCase().includes(searchLower);
-      const matchesCategory = (advert.category || '').toLowerCase().includes(searchLower);
       
-      if (!(matchesTitle || matchesSubtitle || matchesCategory)) return false;
-    }
-    
-    // Apply type filter
-    if (currentFilter) {
-      const matchesType = (advert.type || '').toLowerCase().includes(currentFilter.toLowerCase());
-      const matchesCategory = (advert.category || '').toLowerCase().includes(currentFilter.toLowerCase());
-      const matchesSubtitle = (advert.subtitle || '').toLowerCase().includes(currentFilter.toLowerCase());
-      
-      if (!(matchesType || matchesCategory || matchesSubtitle)) return false;
+      if (!(matchesTitle || matchesSubtitle)) return false;
     }
     
     return true;
@@ -475,7 +407,7 @@ function showRelatedAdverts() {
       <div class="empty-state">
         <i class="fas fa-search"></i>
         <h3>No related offers found</h3>
-        <p>Try changing your search or filter</p>
+        <p>Try changing your search</p>
       </div>
     `;
   } else {
@@ -517,10 +449,6 @@ function hideRelatedAdverts() {
   relatedAdvertsSection.style.display = 'none';
   searchInput.value = '';
   searchQuery = '';
-  currentFilter = '';
-  if (filterBtn) {
-    filterBtn.innerHTML = '<i class="fas fa-filter"></i> Filter';
-  }
 }
 
 // Navigate to advert detail
@@ -584,27 +512,6 @@ function debugAdvert() {
   console.log('Quantity:', quantity);
   console.log('CartUtils available:', !!window.CartUtils);
   console.log('==================');
-}
-
-// Add debug button
-function addDebugButton() {
-  const debugBtn = document.createElement('button');
-  debugBtn.textContent = 'Debug Advert';
-  debugBtn.style.cssText = `
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    background: #6b0d2b;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    z-index: 10000;
-    cursor: pointer;
-    font-size: 12px;
-  `;
-  debugBtn.onclick = debugAdvert;
-  document.body.appendChild(debugBtn);
 }
 
 // Make functions available globally

@@ -260,31 +260,19 @@
   <!-- Advert Detail Content -->
   <section class="section advert-detail-section">
     <div class="container">
-      <!-- Back button and header -->
+      <!-- Back button and header - NO TYPE DISPLAYED -->
       <div class="advert-detail-header">
         <a href="javascript:history.back()" class="back-button">
           <i class="fas fa-arrow-left"></i>
         </a>
-        <h2 class="advert-type" id="advertType">Special Offer</h2>
+        <!-- No type displayed here - matches wine_detail screen -->
       </div>
 
-      <!-- Search Bar (for related adverts) -->
-      <div class="search-filter-bar detail-search">
+      <!-- Search Bar - EXACTLY matching wine_detail screen (no filter) -->
+      <div class="search-bar detail-search">
         <div class="search-box">
           <i class="fas fa-search"></i>
           <input type="text" id="searchInput" placeholder="Search related offers..." class="search-input">
-        </div>
-        <div class="filter-dropdown">
-          <button class="filter-btn" id="filterBtn">
-            <i class="fas fa-filter"></i>
-            Filter
-          </button>
-          <div class="filter-dropdown-content" id="filterDropdown">
-            <a href="#" data-filter="">All</a>
-            <a href="#" data-filter="Champagne">Champagne</a>
-            <a href="#" data-filter="Red Wine">Red Wine</a>
-            <a href="#" data-filter="White Wine">White Wine</a>
-          </div>
         </div>
       </div>
 
