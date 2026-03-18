@@ -1826,11 +1826,10 @@
     }
   });
 </script>
-  <!-- REPLACE your marketing banners script with this: -->
-<!-- MARKETING BANNERS - DEBUG VERSION -->
+<!-- MARKETING BANNERS - COMPLETELY FIXED VERSION -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎪 Starting marketing banners (DEBUG MODE)');
+    console.log('🎪 Starting marketing banners (FIXED VERSION)');
     
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
     if (!ageConfirmed) {
@@ -1848,7 +1847,8 @@
       return;
     }
     
-    const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
+    // IMPORTANT: Use RELATIVE URL so it goes through your proxy server
+    const API_BASE_URL = '/api';  // This will use the current domain's proxy
     
     let marketingAdverts = [];
     let currentMarketingSlide = 0;
@@ -1860,7 +1860,6 @@
       <div class="loading-state">
         <div class="loading-spinner"></div>
         <p>Loading special offers from backend...</p>
-        <p style="font-size: 12px; color: #999;">Fetching from: ${API_BASE_URL}/adverts/active?type=homepage</p>
       </div>
     `;
     
@@ -1868,8 +1867,9 @@
     
     async function initMarketingBanners() {
       try {
+        // Use relative URL - this goes through your proxy server
         const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage`;
-        console.log('🌐 FETCHING FROM:', apiUrl);
+        console.log('🌐 FETCHING FROM PROXY:', apiUrl);
         
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -1880,51 +1880,30 @@
         });
         
         console.log('📡 RESPONSE STATUS:', response.status);
-        console.log('📡 RESPONSE OK:', response.ok);
         
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const adverts = await response.json();
-        console.log('✅ RAW BACKEND RESPONSE:', adverts);
-        console.log('✅ RESPONSE TYPE:', Array.isArray(adverts) ? 'Array' : typeof adverts);
-        console.log('✅ RESPONSE LENGTH:', Array.isArray(adverts) ? adverts.length : 'N/A');
+        console.log('✅ BACKEND RESPONSE:', adverts);
         
+        // Check if we got actual data or fallback
         if (Array.isArray(adverts) && adverts.length > 0) {
-          console.log('✅ FIRST ADVERT:', JSON.stringify(adverts[0], null, 2));
-          console.log('✅ FIRST ADVERT FIELDS:', Object.keys(adverts[0]));
-          console.log('✅ FIRST ADVERT imageUrl:', adverts[0].imageUrl);
-          console.log('✅ FIRST ADVERT targetUrl:', adverts[0].targetUrl);
-          console.log('✅ FIRST ADVERT isActive:', adverts[0].isActive);
-          console.log('✅ FIRST ADVERT type:', adverts[0].type);
+          console.log('✅ GOT REAL DATA FROM BACKEND:', adverts.length, 'items');
+          marketingAdverts = adverts;
+        } else if (Array.isArray(adverts) && adverts.length === 0) {
+          console.log('⚠️ Backend returned empty array');
+          marketingAdverts = [];
+        } else {
+          console.log('⚠️ Unexpected response format, using fallback');
+          useFallbackAdverts();
+          return;
         }
         
-        // FILTER EXACTLY LIKE FLUTTER
-        // Flutter's homepageAdvertsProvider just calls getActiveAdverts(type: 'homepage')
-        // The backend already filters by type=homepage, so we don't need to filter further
-        
-        marketingAdverts = adverts;
-        
-        console.log(`🖼️ FINAL ADVERTS COUNT: ${marketingAdverts.length}`);
-        
         if (marketingAdverts.length === 0) {
-          console.log('⚠️ No adverts found, checking if any exist in DB...');
-          
-          // Try to fetch all adverts to see what's available
-          try {
-            const allResponse = await fetch(`${API_BASE_URL}/adverts/active`);
-            const allAdverts = await allResponse.json();
-            console.log('📊 ALL ACTIVE ADVERTS (no type filter):', allAdverts);
-            
-            if (Array.isArray(allAdverts) && allAdverts.length > 0) {
-              console.log('📊 ALL ADVERTS TYPES:', allAdverts.map(a => a.type));
-            }
-          } catch (e) {
-            console.log('Could not fetch all adverts');
-          }
-          
-          useFallbackAdverts();
+          console.log('⚠️ No adverts found');
+          showEmptyState();
           return;
         }
         
@@ -1934,10 +1913,7 @@
         
       } catch (error) {
         console.error('❌ ERROR LOADING ADVERTS:', error);
-        console.error('❌ ERROR MESSAGE:', error.message);
-        console.error('❌ ERROR STACK:', error.stack);
         
-        // Show error in the banner
         marketingBannersTrack.innerHTML = `
           <div class="carousel-error-state">
             <i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i>
@@ -1989,6 +1965,20 @@
       startMarketingAutoSlide();
     }
     
+    function showEmptyState() {
+      marketingBannersTrack.innerHTML = `
+        <div class="carousel-empty-state">
+          <i class="fas fa-tag"></i>
+          <h3>No Special Offers Available</h3>
+          <p>Check back soon for exciting promotions</p>
+        </div>
+      `;
+      
+      if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
+      if (marketingNextBtn) marketingNextBtn.style.display = 'none';
+      if (marketingDots) marketingDots.style.display = 'none';
+    }
+    
     function renderMarketingBanners() {
       console.log('🎨 RENDERING BANNERS:', marketingAdverts.length);
       
@@ -2010,14 +2000,19 @@
       slide.dataset.index = index;
       slide.dataset.advertId = advert.id;
       
-      // FLUTTER USES imageUrl
+      // Use imageUrl from backend
       let imagePath = advert.imageUrl || '';
       
-      console.log(`🖼️ SLIDE ${index} IMAGE PATH:`, imagePath);
+      console.log(`🖼️ SLIDE ${index} IMAGE:`, imagePath);
       
-      if (!imagePath || imagePath === '') {
+      // If it's a full URL from backend, use it directly
+      if (imagePath.startsWith('http')) {
+        // It's already a full URL, use as is
+      } else if (imagePath.startsWith('assets/')) {
+        // It's a local asset path
+      } else {
+        // Fallback
         imagePath = 'assets/adverts/default_marketing.jpg';
-        console.log(`⚠️ SLIDE ${index} USING DEFAULT IMAGE`);
       }
       
       slide.innerHTML = `
@@ -2026,7 +2021,7 @@
              class="marketing-banner-image"
              loading="eager"
              decoding="async"
-             onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; console.log('❌ Image failed to load: ${imagePath}');">
+             onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg';">
         
         <div class="marketing-banner-overlay">
           <div class="marketing-banner-title">${advert.title}</div>
@@ -2142,7 +2137,7 @@
       console.log(`📱 Advert clicked:`, advert);
       
       if (advert.id && !advert.id.toString().startsWith('fallback')) {
-        // Track click
+        // Track click through proxy
         fetch(`${API_BASE_URL}/adverts/track/click`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2157,54 +2152,6 @@
     }
   });
 </script>
-
-  <!-- DEBUGGING SCRIPT -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🔍 DEBUG: Testing direct backend connections...');
-      
-      const BACKEND_URL = 'https://winebubblesnow-production.up.railway.app/api';
-      
-      setTimeout(() => {
-        fetch(`${BACKEND_URL}/wines/featured/featured`)
-          .then(response => {
-            console.log('🔍 DEBUG: Featured wines response status:', response.status);
-            return response.json().catch(() => null);
-          })
-          .then(data => {
-            console.log('🔍 DEBUG: Featured wines data:', data ? 
-              (Array.isArray(data) ? `Array with ${data.length} items` : 'Object received') : 'No data');
-          })
-          .catch(error => {
-            console.error('🔍 DEBUG: Featured wines fetch error:', error.message);
-          });
-        
-        fetch(`${BACKEND_URL}/adverts/active?type=homepage`)
-          .then(response => {
-            console.log('🔍 DEBUG: Adverts response status:', response.status);
-            return response.json().catch(() => null);
-          })
-          .then(data => {
-            console.log('🔍 DEBUG: Adverts data:', data ? 
-              (Array.isArray(data) ? `Array with ${data.length} items` : 'Object received') : 'No data');
-          })
-          .catch(error => {
-            console.error('🔍 DEBUG: Adverts fetch error:', error.message);
-          });
-        
-        fetch(`${BACKEND_URL}/health`)
-          .then(response => {
-            console.log('🔍 DEBUG: Health check status:', response.status);
-            return response.json();
-          })
-          .then(data => {
-            console.log('🔍 DEBUG: Health check data:', data);
-          })
-          .catch(error => {
-            console.error('🔍 DEBUG: Health check error:', error.message);
-          });
-      }, 2000);
-    });
-  </script>
+ 
 </body>
 </html>
