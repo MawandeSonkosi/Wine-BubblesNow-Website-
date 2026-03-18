@@ -1,39 +1,122 @@
-/* Advert Detail Specific Styles */
+/* Advert Detail Specific Styles - All CSS moved from HTML */
 
-/* Advert Detail Section */
-.advert-detail-section {
-  padding: 20px 0 40px;
-}
-
-/* Header with back button only */
-.advert-detail-header {
+/* Toast notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #323232;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 1001;
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
-  position: relative;
-  min-height: 40px;
+  gap: 10px;
+  max-width: 400px;
+  animation: slideIn 0.3s ease;
 }
 
-.advert-detail-header .back-button {
-  font-size: 20px;
-  color: var(--maroon);
-  text-decoration: none;
-  padding: 8px;
+.toast-notification.success {
+  background: #27ae60;
+}
+
+.toast-notification.error {
+  background: #e74c3c;
+}
+
+.toast-notification.info {
+  background: #3498db;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(107, 13, 43, 0.1);
   border-radius: 50%;
-  transition: background-color 0.3s;
+  border-top-color: #6b0d2b;
+  animation: spin 1s ease-in-out infinite;
 }
 
-.advert-detail-header .back-button:hover {
-  background-color: rgba(107, 13, 43, 0.1);
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-/* Advert Detail Container */
-.advert-detail-container {
-  max-width: 800px;
-  margin: 0 auto;
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
 }
 
-/* Advert Detail Card */
+/* Error State */
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.error-state i {
+  font-size: 48px;
+  color: #e74c3c;
+  margin-bottom: 15px;
+}
+
+.error-state h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.error-state p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.error-state .btn-fill {
+  display: inline-block;
+  padding: 12px 30px;
+  background: var(--maroon);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #666;
+}
+
+/* Advert Detail Card Styles */
 .advert-detail-card {
   background: white;
   border-radius: 16px;
@@ -87,8 +170,6 @@
   text-align: center;
   margin: 0 0 25px;
 }
-
-/* NO CATEGORY/TYPE FIELDS - completely removed */
 
 /* Stock Status */
 .stock-status {
@@ -288,118 +369,6 @@
   font-weight: 600;
   text-align: center;
   margin: 0;
-}
-
-/* Toast Notification */
-.toast-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--maroon);
-  color: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: slideIn 0.3s ease;
-  max-width: 350px;
-}
-
-.toast-notification.error {
-  background: #e74c3c;
-}
-
-.toast-notification i {
-  font-size: 20px;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Loading State */
-.loading-state {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.loading-spinner {
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(107, 13, 43, 0.1);
-  border-radius: 50%;
-  border-top-color: var(--maroon);
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Error State */
-.error-state {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.error-state i {
-  font-size: 48px;
-  color: #e74c3c;
-  margin-bottom: 15px;
-}
-
-.error-state h3 {
-  font-size: 20px;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.error-state p {
-  color: #666;
-  margin-bottom: 20px;
-}
-
-.error-state .btn-fill {
-  display: inline-block;
-  padding: 12px 30px;
-  background: var(--maroon);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-}
-
-.empty-state i {
-  font-size: 48px;
-  margin-bottom: 15px;
-  opacity: 0.5;
-}
-
-.empty-state h3 {
-  font-size: 20px;
-  margin-bottom: 10px;
-  color: #666;
 }
 
 /* Responsive Design */

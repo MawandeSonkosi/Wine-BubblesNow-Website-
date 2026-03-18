@@ -1,4 +1,4 @@
-// Advert Detail JavaScript - NO DEBUG BUTTON, USING IMAGE URL ONLY
+// Advert Detail JavaScript - EXACTLY THE SAME AS WORKING VERSION
 const API_BASE_URL = '/api';
 
 // State
@@ -10,6 +10,7 @@ let quantity = 1;
 const advertDetailContainer = document.getElementById('advertDetailContainer');
 const relatedAdvertsSection = document.getElementById('relatedAdvertsSection');
 const relatedAdvertsGrid = document.getElementById('relatedAdvertsGrid');
+const advertTypeElement = document.getElementById('advertType');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,6 +70,9 @@ async function fetchAdvertDetail(advertId) {
     
     // Update page title
     document.title = `Wine & Bubbles — ${advert.title}`;
+    if (advertTypeElement) {
+      advertTypeElement.textContent = advert.type || 'Special Offer';
+    }
     
     // Track impression
     trackImpression(advert.id);
@@ -78,9 +82,6 @@ async function fetchAdvertDetail(advertId) {
     
     // Render advert detail
     renderAdvertDetail(advert);
-    
-    // Show related adverts
-    showRelatedAdverts();
     
   } catch (error) {
     console.error('Error:', error);
@@ -116,7 +117,6 @@ async function fetchAllAdverts() {
     if (!response.ok) return;
     
     const adverts = await response.json();
-    // Filter only active adverts
     allAdverts = adverts.filter(advert => 
       advert.isActive === true || advert.isActive === undefined
     );
@@ -128,18 +128,16 @@ async function fetchAllAdverts() {
   }
 }
 
-// Helper to fix image URLs - USING ONLY IMAGE URL (NO TARGET URL)
+// Helper to fix image URLs - USING IMAGE URL
 function fixImageUrl(advert) {
   if (!advert) return '../assets/adverts/default_marketing.jpg';
   
-  // USE ONLY imageUrl - NO targetUrl
   let imageUrl = advert.imageUrl || '';
   
   if (!imageUrl) {
     return '../assets/adverts/default_marketing.jpg';
   }
   
-  // Fix path for website
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
@@ -151,7 +149,7 @@ function fixImageUrl(advert) {
   return '../assets/' + imageUrl;
 }
 
-// Render advert detail - NO CATEGORY/TYPE FIELDS
+// Render advert detail - EXACTLY LIKE WINE DETAIL BUT WITHOUT CATEGORY/TYPE
 function renderAdvertDetail(advert) {
   const imageUrl = fixImageUrl(advert);
   const price = advert.price || 0;
@@ -174,7 +172,7 @@ function renderAdvertDetail(advert) {
         <div class="advert-detail-subtitle">${subtitle}</div>
         <div class="advert-detail-price">R${price.toFixed(2)}</div>
         
-        <!-- NO CATEGORY/TYPE FIELDS - completely removed -->
+        <!-- NO CATEGORY/TYPE FIELDS - removed completely -->
         
         ${isAvailable ? `
           <div class="stock-status ${stockCount > 5 ? 'stock-in' : stockCount > 0 ? 'stock-low' : 'stock-out'}">
@@ -266,15 +264,15 @@ function addToCart() {
     return;
   }
   
-  // Create cart item - USING IMAGE URL
   const cartItem = {
     id: currentAdvert.id.toString(),
     name: currentAdvert.title,
     price: currentAdvert.price,
-    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg', // Using imageUrl
+    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg',
     type: 'advert',
+    category: currentAdvert.category || '',
+    description: currentAdvert.subtitle || '',
     quantity: quantity
-    // Removed category and description as they're not needed
   };
   
   if (window.CartUtils && typeof window.CartUtils.addItem === 'function') {
