@@ -1995,68 +1995,72 @@
     }
     
     function createMarketingSlide(advert, index) {
-      const slide = document.createElement('div');
-      slide.className = 'marketing-banner-slide';
-      slide.dataset.index = index;
-      slide.dataset.advertId = advert.id;
-      
-      // Use imageUrl from backend
-      let imagePath = advert.imageUrl || '';
-      
-      console.log(`🖼️ SLIDE ${index} IMAGE:`, imagePath);
-      
-      // If it's a full URL from backend, use it directly
-      if (imagePath.startsWith('http')) {
-        // It's already a full URL, use as is
-      } else if (imagePath.startsWith('assets/')) {
-        // It's a local asset path
-      } else {
-        // Fallback
-        imagePath = 'assets/adverts/default_marketing.jpg';
-      }
-      
-      slide.innerHTML = `
-        <img src="${imagePath}" 
-             alt="${advert.title}" 
-             class="marketing-banner-image"
-             loading="eager"
-             decoding="async"
-             onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg';">
-        
-        <div class="marketing-banner-overlay">
-          <div class="marketing-banner-title">${advert.title}</div>
-          <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
-        </div>
-      `;
-      
-      slide.addEventListener('click', (event) => {
-        if (!isMarketingTransitioning) {
-          event.preventDefault();
-          handleAdvertClick(advert);
-        }
-      });
-      
-      slide.style.cursor = 'pointer';
-      
-      marketingBannersTrack.appendChild(slide);
-      
-      if (marketingDots) {
-        const dot = document.createElement('span');
-        dot.className = 'marketing-dot';
-        if (index === 0) dot.classList.add('active');
-        dot.dataset.index = index;
-        dot.addEventListener('click', (event) => {
-          event.stopPropagation();
-          if (!isMarketingTransitioning) {
-            clearInterval(marketingAutoSlideInterval);
-            goToMarketingSlide(index);
-            startMarketingAutoSlide();
-          }
-        });
-        marketingDots.appendChild(dot);
-      }
-    }
+  const slide = document.createElement('div');
+  slide.className = 'marketing-banner-slide';
+  slide.dataset.index = index;
+  slide.dataset.advertId = advert.id;
+  
+  // Get the image URL from the backend
+  let imagePath = advert.imageUrl || '';
+  
+  console.log(`🖼️ SLIDE ${index} ORIGINAL IMAGE PATH:`, imagePath);
+  
+  // Fix the path - remove "assets/" prefix if it exists since we're already in the root
+  if (imagePath.startsWith('assets/')) {
+    // Keep as is - it's already correct for the website
+    imagePath = imagePath;
+  } else if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+    imagePath = 'assets/' + imagePath;
+  }
+  
+  // If still no image, use fallback
+  if (!imagePath) {
+    imagePath = 'assets/adverts/default_marketing.jpg';
+  }
+  
+  console.log(`🖼️ SLIDE ${index} FINAL IMAGE PATH:`, imagePath);
+  
+  slide.innerHTML = `
+    <img src="${imagePath}" 
+         alt="${advert.title}" 
+         class="marketing-banner-image"
+         loading="eager"
+         decoding="async"
+         onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; console.log('❌ Failed to load: ${imagePath}');">
     
+    <div class="marketing-banner-overlay">
+      <div class="marketing-banner-title">${advert.title}</div>
+      <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
+    </div>
+  `;
+  
+  slide.addEventListener('click', (event) => {
+    if (!isMarketingTransitioning) {
+      event.preventDefault();
+      handleAdvertClick(advert);
+    }
+  });
+  
+  slide.style.cursor = 'pointer';
+  
+  marketingBannersTrack.appendChild(slide);
+  
+  if (marketingDots) {
+    const dot = document.createElement('span');
+    dot.className = 'marketing-dot';
+    if (index === 0) dot.classList.add('active');
+    dot.dataset.index = index;
+    dot.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (!isMarketingTransitioning) {
+        clearInterval(marketingAutoSlideInterval);
+        goToMarketingSlide(index);
+        startMarketingAutoSlide();
+      }
+    });
+    marketingDots.appendChild(dot);
+  }
+}
     function setupMarketingEventListeners() {
       if (marketingPrevBtn) {
         marketingPrevBtn.addEventListener('click', (event) => {
