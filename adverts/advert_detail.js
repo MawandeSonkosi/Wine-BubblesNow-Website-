@@ -79,6 +79,9 @@ async function fetchAdvertDetail(advertId) {
     // Render advert detail
     renderAdvertDetail(advert);
     
+    // Show related adverts
+    showRelatedAdverts();
+    
   } catch (error) {
     console.error('Error:', error);
     showError(`Failed to load offer details: ${error.message}`);

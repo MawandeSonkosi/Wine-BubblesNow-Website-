@@ -1,17 +1,17 @@
-/* Advert Detail Specific Styles - MATCHING WINE DETAIL */
+/* Advert Detail Specific Styles - All CSS moved here */
 
 /* Advert Detail Section */
 .advert-detail-section {
   padding: 20px 0 40px;
 }
 
-/* Header with back button */
+/* Header with back button only - NO TYPE */
 .advert-detail-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 20px;
   position: relative;
+  min-height: 40px;
 }
 
 .advert-detail-header .back-button {
@@ -25,15 +25,6 @@
 
 .advert-detail-header .back-button:hover {
   background-color: rgba(107, 13, 43, 0.1);
-}
-
-.advert-type {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
-  color: #1b1b1b;
-  margin: 0;
-  text-align: center;
-  flex-grow: 1;
 }
 
 /* Advert Detail Container */
@@ -96,8 +87,6 @@
   text-align: center;
   margin: 0 0 25px;
 }
-
-/* NO CATEGORY/TYPE FIELDS - removed */
 
 /* Stock Status */
 .stock-status {
@@ -228,6 +217,14 @@
   border-top: 1px solid #eee;
 }
 
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: #1b1b1b;
+  text-align: center;
+  margin: 0 0 10px;
+}
+
 .advert-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -291,23 +288,41 @@
   margin: 0;
 }
 
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--maroon);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideIn 0.3s ease;
+  max-width: 350px;
 }
 
-.empty-state i {
-  font-size: 48px;
-  margin-bottom: 15px;
-  opacity: 0.5;
+.toast-notification.error {
+  background: #e74c3c;
 }
 
-.empty-state h3 {
+.toast-notification i {
   font-size: 20px;
-  margin-bottom: 10px;
-  color: #666;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* Loading State */
@@ -354,41 +369,35 @@
   margin-bottom: 20px;
 }
 
-/* Toast Notification */
-.toast-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+.error-state .btn-fill {
+  display: inline-block;
+  padding: 12px 30px;
   background: var(--maroon);
   color: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: slideIn 0.3s ease;
-  max-width: 350px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
 }
 
-.toast-notification.error {
-  background: #e74c3c;
+.empty-state i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
 }
 
-.toast-notification i {
+.empty-state h3 {
   font-size: 20px;
+  margin-bottom: 10px;
+  color: #666;
 }
 
 /* Responsive Design */
@@ -410,20 +419,13 @@
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 15px;
   }
+  
+  .section-title {
+    font-size: 24px;
+  }
 }
 
 @media (max-width: 600px) {
-  .advert-detail-header {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .advert-type {
-    order: 3;
-    width: 100%;
-    margin-top: 10px;
-  }
-  
   .advert-detail-image-container {
     height: 220px;
     padding: 20px;
@@ -445,6 +447,10 @@
   .quantity-display {
     width: 50px;
     height: 40px;
+  }
+  
+  .add-to-cart-btn {
+    max-width: 100%;
   }
 }
 
