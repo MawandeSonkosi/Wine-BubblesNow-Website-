@@ -661,21 +661,20 @@
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.15);
   background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
-  /* Use percentage-based height with min-height for better control */
   height: auto;
   min-height: 400px;
   max-height: 500px;
-  aspect-ratio: 16/9; /* Consistent aspect ratio across browsers */
+  aspect-ratio: 16/9; 
 }
 
 /* Safari-specific fixes */
 @supports (-webkit-touch-callout: none) {
   .marketing-banners-container {
     height: 0;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio (9/16 = 0.5625) */
-    background: #f5f5f5; /* Fallback color */
+    padding-bottom: 56.25%;
+    background: #f5f5f5;
   }
-  
+
   .marketing-banners-track {
     position: absolute;
     top: 0;
@@ -688,6 +687,7 @@
 .marketing-banners-track {
   display: flex;
   transition: transform 0.6s ease-in-out;
+  -webkit-transition: -webkit-transform 0.6s ease-in-out;
   height: 100%;
   width: 100%;
   will-change: transform;
@@ -701,37 +701,40 @@
   border-radius: 16px;
   overflow: hidden;
   height: 100%;
-  background: #f5f5f5; /* Fallback background */
+  background: #f5f5f5;
 }
 
 .marketing-banner-image {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Changed from cover to contain for Safari */
-  object-position: center; /* Center the image */
+  object-fit: contain;
+  object-position: center;
   display: block;
   transition: transform 0.8s ease;
-  background: #f5f5f5; /* Fallback background */
+  -webkit-transition: -webkit-transform 0.8s ease;
+  background: #f5f5f5;
 }
 
-/* Chrome, Edge, Firefox - use cover for better fill */
+/* Chrome, Edge, Firefox */
 @media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
   .marketing-banner-image {
-    object-fit: cover; /* Keep cover for Chrome */
+    object-fit: cover;
   }
 }
 
 /* Firefox specific */
 @-moz-document url-prefix() {
   .marketing-banner-image {
-    object-fit: cover; /* Keep cover for Firefox */
+    object-fit: cover;
   }
 }
 
 .marketing-banner-slide:hover .marketing-banner-image {
   transform: scale(1.05);
+  -webkit-transform: scale(1.05);
 }
 
+/* Overlay */
 .marketing-banner-overlay {
   position: absolute;
   bottom: 0;
@@ -747,6 +750,7 @@
   box-sizing: border-box;
 }
 
+/* Title */
 .marketing-banner-title {
   font-family: 'Playfair Display', serif;
   font-size: 32px;
@@ -756,6 +760,7 @@
   line-height: 1.2;
 }
 
+/* Subtitle */
 .marketing-banner-subtitle {
   font-size: 20px;
   opacity: 0.95;
@@ -769,6 +774,10 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.9);
   border: none;
   width: 55px;
@@ -789,6 +798,7 @@
 .marketing-nav-btn:hover {
   background: white;
   transform: translateY(-50%) scale(1.15);
+  -webkit-transform: translateY(-50%) scale(1.15);
   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
@@ -796,6 +806,7 @@
   opacity: 0.4;
   cursor: not-allowed;
   transform: translateY(-50%) scale(1);
+  -webkit-transform: translateY(-50%) scale(1);
   pointer-events: none;
 }
 
@@ -807,7 +818,7 @@
   right: 25px;
 }
 
-/* Dots Navigation */
+/* Dots */
 .marketing-dots {
   position: absolute;
   bottom: 25px;
@@ -837,15 +848,17 @@
   background: #6b0d2b;
   border-color: white;
   transform: scale(1.3);
+  -webkit-transform: scale(1.3);
   box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
 }
 
 .marketing-dot:hover:not(.active) {
   background: white;
   transform: scale(1.2);
+  -webkit-transform: scale(1.2);
 }
 
-/* RESPONSIVE BREAKPOINTS - Matches your original design */
+/* RESPONSIVE — unchanged from your original */
 
 /* Large Desktop */
 @media (min-width: 1400px) {
@@ -855,7 +868,7 @@
   }
 }
 
-/* Desktop - Original Chrome size */
+/* Desktop */
 @media (max-width: 1200px) {
   .marketing-banners-container {
     min-height: 380px;
@@ -863,129 +876,84 @@
   }
 }
 
-/* Tablet Landscape - Original */
+/* Tablet Landscape */
 @media (max-width: 992px) {
   .marketing-banners-container {
     min-height: 350px;
     max-height: 400px;
   }
-  
-  .marketing-banner-title {
-    font-size: 28px;
-  }
-  
-  .marketing-banner-subtitle {
-    font-size: 18px;
-  }
+  .marketing-banner-title { font-size: 28px; }
+  .marketing-banner-subtitle { font-size: 18px; }
 }
 
-/* Tablet Portrait - Original */
+/* Tablet Portrait */
 @media (max-width: 768px) {
   .marketing-banners-container {
     min-height: 300px;
     max-height: 350px;
   }
-  
   .marketing-banner-overlay {
     padding: 25px;
     padding-top: 60px;
   }
-  
-  .marketing-banner-title {
-    font-size: 24px;
-  }
-  
-  .marketing-banner-subtitle {
-    font-size: 16px;
-  }
-  
+  .marketing-banner-title { font-size: 24px; }
+  .marketing-banner-subtitle { font-size: 16px; }
   .marketing-nav-btn {
     width: 45px;
     height: 45px;
     font-size: 20px;
   }
-  
-  .marketing-prev-btn {
-    left: 15px;
-  }
-  
-  .marketing-next-btn {
-    right: 15px;
-  }
+  .marketing-prev-btn { left: 15px; }
+  .marketing-next-btn { right: 15px; }
 }
 
-/* Mobile Large - Original */
+/* Mobile Large */
 @media (max-width: 576px) {
   .marketing-banners-container {
     min-height: 250px;
     max-height: 300px;
     border-radius: 12px;
   }
-  
   .marketing-banner-overlay {
     padding: 20px;
     padding-top: 50px;
   }
-  
-  .marketing-banner-title {
-    font-size: 20px;
-  }
-  
-  .marketing-banner-subtitle {
-    font-size: 14px;
-  }
-  
+  .marketing-banner-title { font-size: 20px; }
+  .marketing-banner-subtitle { font-size: 14px; }
   .marketing-nav-btn {
     width: 40px;
     height: 40px;
     font-size: 18px;
   }
-  
-  .marketing-prev-btn {
-    left: 10px;
-  }
-  
-  .marketing-next-btn {
-    right: 10px;
-  }
-  
+  .marketing-prev-btn { left: 10px; }
+  .marketing-next-btn { right: 10px; }
   .marketing-dots {
     bottom: 15px;
     gap: 8px;
   }
-  
   .marketing-dot {
     width: 12px;
     height: 12px;
   }
 }
 
-/* Mobile Small - Original */
+/* Mobile Small */
 @media (max-width: 375px) {
   .marketing-banners-container {
     min-height: 200px;
     max-height: 250px;
   }
-  
   .marketing-banner-overlay {
     padding: 15px;
     padding-top: 40px;
   }
-  
-  .marketing-banner-title {
-    font-size: 18px;
-  }
-  
-  .marketing-banner-subtitle {
-    font-size: 12px;
-  }
-  
+  .marketing-banner-title { font-size: 18px; }
+  .marketing-banner-subtitle { font-size: 12px; }
   .marketing-nav-btn {
     width: 35px;
     height: 35px;
     font-size: 16px;
   }
-  
   .marketing-dot {
     width: 10px;
     height: 10px;
@@ -994,13 +962,8 @@
 
 /* Safari gap fix */
 @supports (-webkit-touch-callout: none) {
-  .marketing-dots {
-    gap: 8px;
-  }
-  
-  .marketing-dot {
-    margin: 0 2px;
-  }
+  .marketing-dots { gap: 8px; }
+  .marketing-dot { margin: 0 2px; }
 }
 
 /* Force arrows and dots to show */
@@ -1017,7 +980,6 @@
   visibility: visible !important;
   opacity: 1 !important;
 }
-
   </style>
 </head>
 <body>
