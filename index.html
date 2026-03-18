@@ -372,7 +372,7 @@
       -webkit-justify-content: center;
     }
     
-    /* ========== BANNER CAROUSEL STYLES - CHROME ========== */
+    /* ========== BANNER CAROUSEL STYLES - CHROME ZOOMED, SAFARI FULL ========== */
     .banner-carousel-container {
       position: relative;
       max-width: 1000px;
@@ -430,7 +430,7 @@
       padding: 0;
     }
     
-    /* Chrome - use cover */
+    /* Chrome - use cover (zoomed) */
     .banner-carousel-image {
       width: 100%;
       height: 100%;
@@ -450,7 +450,7 @@
       transition: transform 0.8s ease;
     }
     
-    /* Safari - use contain to prevent zooming */
+    /* Safari - use contain (full image, no zoom) */
     @media not all and (min-resolution: 0.001dpcm) {
       @supports (-webkit-appearance: none) {
         .banner-carousel-image {
@@ -669,7 +669,7 @@
       transform: scale(1.2);
     }
     
-    /* ========== MARKETING BANNERS SECTION - CHROME ========== */
+    /* ========== MARKETING BANNERS SECTION - CHROME ZOOMED, SAFARI FULL ========== */
     .marketing-banners-section {
       margin: 0 auto 40px;
       max-width: 1000px;
@@ -735,7 +735,7 @@
       padding: 0;
     }
     
-    /* Chrome - use cover */
+    /* Chrome - use cover (zoomed) */
     .marketing-banner-image {
       width: 100%;
       height: 100%;
@@ -755,7 +755,7 @@
       transition: transform 0.8s ease;
     }
     
-    /* Safari - use contain to prevent zooming */
+    /* Safari - use contain (full image, no zoom) */
     @media not all and (min-resolution: 0.001dpcm) {
       @supports (-webkit-appearance: none) {
         .marketing-banner-image {
