@@ -1827,10 +1827,10 @@
   });
 </script>
   <!-- REPLACE your marketing banners script with this: -->
+<!-- MARKETING BANNERS - DEBUG VERSION -->
 <script>
-  // MARKETING BANNERS - EXACTLY LIKE FLUTTER FETCHES THEM
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎪 Starting marketing banners (Flutter-compatible mode)');
+    console.log('🎪 Starting marketing banners (DEBUG MODE)');
     
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
     if (!ageConfirmed) {
@@ -1848,7 +1848,6 @@
       return;
     }
     
-    // EXACT same base URL as Flutter uses
     const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
     
     let marketingAdverts = [];
@@ -1856,16 +1855,21 @@
     let isMarketingTransitioning = false;
     let marketingAutoSlideInterval;
     
+    // Show loading state
+    marketingBannersTrack.innerHTML = `
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading special offers from backend...</p>
+        <p style="font-size: 12px; color: #999;">Fetching from: ${API_BASE_URL}/adverts/active?type=homepage</p>
+      </div>
+    `;
+    
     initMarketingBanners();
     
     async function initMarketingBanners() {
       try {
-        console.log('🌐 Fetching homepage adverts from backend (Flutter style)...');
-        
-        // EXACT same endpoint as Flutter's homepageAdvertsProvider
         const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage`;
-        
-        console.log('📡 Fetching from:', apiUrl);
+        console.log('🌐 FETCHING FROM:', apiUrl);
         
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -1875,23 +1879,51 @@
           }
         });
         
+        console.log('📡 RESPONSE STATUS:', response.status);
+        console.log('📡 RESPONSE OK:', response.ok);
+        
         if (!response.ok) {
-          console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
-          throw new Error(`Failed to fetch adverts: ${response.status}`);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const adverts = await response.json();
-        console.log(`✅ Received ${adverts.length} homepage adverts from backend`);
+        console.log('✅ RAW BACKEND RESPONSE:', adverts);
+        console.log('✅ RESPONSE TYPE:', Array.isArray(adverts) ? 'Array' : typeof adverts);
+        console.log('✅ RESPONSE LENGTH:', Array.isArray(adverts) ? adverts.length : 'N/A');
         
-        // Filter active adverts - exactly like Flutter's homepageAdvertsProvider
-        marketingAdverts = adverts.filter(advert => 
-          advert.isActive === true || advert.isActive === undefined
-        );
+        if (Array.isArray(adverts) && adverts.length > 0) {
+          console.log('✅ FIRST ADVERT:', JSON.stringify(adverts[0], null, 2));
+          console.log('✅ FIRST ADVERT FIELDS:', Object.keys(adverts[0]));
+          console.log('✅ FIRST ADVERT imageUrl:', adverts[0].imageUrl);
+          console.log('✅ FIRST ADVERT targetUrl:', adverts[0].targetUrl);
+          console.log('✅ FIRST ADVERT isActive:', adverts[0].isActive);
+          console.log('✅ FIRST ADVERT type:', adverts[0].type);
+        }
         
-        console.log(`🖼️ Will show ${marketingAdverts.length} active homepage adverts`);
+        // FILTER EXACTLY LIKE FLUTTER
+        // Flutter's homepageAdvertsProvider just calls getActiveAdverts(type: 'homepage')
+        // The backend already filters by type=homepage, so we don't need to filter further
+        
+        marketingAdverts = adverts;
+        
+        console.log(`🖼️ FINAL ADVERTS COUNT: ${marketingAdverts.length}`);
         
         if (marketingAdverts.length === 0) {
-          console.log('⚠️ No homepage adverts found, using fallback');
+          console.log('⚠️ No adverts found, checking if any exist in DB...');
+          
+          // Try to fetch all adverts to see what's available
+          try {
+            const allResponse = await fetch(`${API_BASE_URL}/adverts/active`);
+            const allAdverts = await allResponse.json();
+            console.log('📊 ALL ACTIVE ADVERTS (no type filter):', allAdverts);
+            
+            if (Array.isArray(allAdverts) && allAdverts.length > 0) {
+              console.log('📊 ALL ADVERTS TYPES:', allAdverts.map(a => a.type));
+            }
+          } catch (e) {
+            console.log('Could not fetch all adverts');
+          }
+          
           useFallbackAdverts();
           return;
         }
@@ -1901,21 +1933,33 @@
         startMarketingAutoSlide();
         
       } catch (error) {
-        console.error('❌ Error loading marketing adverts:', error.message);
+        console.error('❌ ERROR LOADING ADVERTS:', error);
+        console.error('❌ ERROR MESSAGE:', error.message);
+        console.error('❌ ERROR STACK:', error.stack);
+        
+        // Show error in the banner
+        marketingBannersTrack.innerHTML = `
+          <div class="carousel-error-state">
+            <i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i>
+            <h3>Failed to Load Offers</h3>
+            <p style="color: #666; margin-bottom: 20px;">${error.message}</p>
+            <button class="btn-fill" onclick="location.reload()">Retry</button>
+          </div>
+        `;
+        
         useFallbackAdverts();
       }
     }
     
     function useFallbackAdverts() {
-      console.log('🔄 Using fallback adverts (same as Flutter fallback)');
+      console.log('🔄 USING FALLBACK ADVERTS');
       
-      // EXACT same fallback as Flutter's _buildDefaultAdverts
       marketingAdverts = [
         {
           id: 'fallback-1',
           title: 'African Diamond Blanc',
           subtitle: 'Premium selection for connoisseurs',
-          imageUrl: 'assets/adverts/African_Diamond_Blanc.png', // Flutter uses imageUrl
+          imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
           targetUrl: '#',
           isActive: true,
           type: 'homepage'
@@ -1924,7 +1968,7 @@
           id: 'fallback-2',
           title: 'Ferrero Rocher Collection',
           subtitle: 'Perfect pairing for special moments',
-          imageUrl: 'assets/adverts/ferrero.png', // Flutter uses imageUrl
+          imageUrl: 'assets/adverts/ferrero.png',
           targetUrl: '#',
           isActive: true,
           type: 'homepage'
@@ -1933,14 +1977,12 @@
           id: 'fallback-3',
           title: 'Moët & Chandon Rosé',
           subtitle: 'Celebrate with premium champagne',
-          imageUrl: 'assets/adverts/moet_rose.png', // Flutter uses imageUrl
+          imageUrl: 'assets/adverts/moet_rose.png',
           targetUrl: '#',
           isActive: true,
           type: 'homepage'
         }
       ];
-      
-      console.log('✅ Created 3 fallback adverts');
       
       renderMarketingBanners();
       setupMarketingEventListeners();
@@ -1948,15 +1990,10 @@
     }
     
     function renderMarketingBanners() {
-      console.log('🎨 Rendering marketing banners');
+      console.log('🎨 RENDERING BANNERS:', marketingAdverts.length);
       
       marketingBannersTrack.innerHTML = '';
       if (marketingDots) marketingDots.innerHTML = '';
-      
-      if (marketingAdverts.length === 0) {
-        showMarketingEmptyState();
-        return;
-      }
       
       marketingAdverts.forEach((advert, index) => {
         createMarketingSlide(advert, index);
@@ -1968,19 +2005,19 @@
     }
     
     function createMarketingSlide(advert, index) {
-      console.log(`🖼️ Creating slide ${index}: ${advert.title}`);
-      
       const slide = document.createElement('div');
       slide.className = 'marketing-banner-slide';
       slide.dataset.index = index;
       slide.dataset.advertId = advert.id;
       
-      // FLUTTER USES imageUrl - NOT targetUrl for images
-      // In Flutter's _buildAdvertImage: it prioritizes imageUrl
+      // FLUTTER USES imageUrl
       let imagePath = advert.imageUrl || '';
+      
+      console.log(`🖼️ SLIDE ${index} IMAGE PATH:`, imagePath);
       
       if (!imagePath || imagePath === '') {
         imagePath = 'assets/adverts/default_marketing.jpg';
+        console.log(`⚠️ SLIDE ${index} USING DEFAULT IMAGE`);
       }
       
       slide.innerHTML = `
@@ -1989,7 +2026,7 @@
              class="marketing-banner-image"
              loading="eager"
              decoding="async"
-             onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg';">
+             onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; console.log('❌ Image failed to load: ${imagePath}');">
         
         <div class="marketing-banner-overlay">
           <div class="marketing-banner-title">${advert.title}</div>
@@ -2102,41 +2139,21 @@
     }
     
     function handleAdvertClick(advert) {
-      console.log(`📱 Advert clicked: ${advert.title}`);
-      
-      // Track click like Flutter does
-      const userId = localStorage.getItem('wineBubbles_userId') || 'guest';
-      const sessionId = `session_${Date.now()}`;
-      
-      // Track click (optional - you can implement this)
-      fetch(`${API_BASE_URL}/adverts/track/click`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ advertId: advert.id })
-      }).catch(err => console.log('Click tracking error:', err));
+      console.log(`📱 Advert clicked:`, advert);
       
       if (advert.id && !advert.id.toString().startsWith('fallback')) {
+        // Track click
+        fetch(`${API_BASE_URL}/adverts/track/click`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ advertId: advert.id })
+        }).catch(err => console.log('Click tracking error:', err));
+        
         const advertId = encodeURIComponent(advert.id);
         window.location.href = `adverts/advert_detail.html?id=${advertId}`;
       } else {
-        // For fallback adverts, just show a message
         alert(`Special Offer: ${advert.title}\n${advert.subtitle || ''}`);
       }
-    }
-    
-    function showMarketingEmptyState() {
-      if (!marketingBannersTrack) return;
-      marketingBannersTrack.innerHTML = `
-        <div class="carousel-empty-state">
-          <i class="fas fa-tag"></i>
-          <h3>No Special Offers Available</h3>
-          <p>Check back soon for exciting promotions</p>
-        </div>
-      `;
-      
-      if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
-      if (marketingNextBtn) marketingNextBtn.style.display = 'none';
-      if (marketingDots) marketingDots.style.display = 'none';
     }
   });
 </script>
