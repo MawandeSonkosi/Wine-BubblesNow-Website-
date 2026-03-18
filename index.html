@@ -372,986 +372,454 @@
       -webkit-justify-content: center;
     }
     
-    /* ========== BANNER CAROUSEL STYLES - CHROME ZOOMED, SAFARI FULL ========== */
-    .banner-carousel-container {
-      position: relative;
-      max-width: 1000px;
-      margin: 0 auto 40px;
-      overflow: hidden;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-      
-      /* Cross-browser gradient */
-      background: #f9f9f9;
-      background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      
-      /* Fixed height for consistency */
-      height: 380px;
-    }
-    
-    .banner-carousel-track {
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      
-      -webkit-transition: -webkit-transform 0.6s ease-in-out;
-      -moz-transition: -moz-transform 0.6s ease-in-out;
-      -o-transition: -o-transform 0.6s ease-in-out;
-      transition: transform 0.6s ease-in-out;
-      
-      height: 100%;
-      width: 100%;
-      will-change: transform;
-      
-      margin: 0;
-      padding: 0;
-    }
-    
-    .banner-carousel-slide {
-      min-width: 100%;
-      -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-      flex-shrink: 0;
-      
-      position: relative;
-      cursor: pointer;
-      border-radius: 16px;
-      overflow: hidden;
-      height: 100%;
-      background: #f8f8f8;
-      
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    /* Chrome - use cover (zoomed) */
+   /* ========== BANNER CAROUSEL STYLES - CHROME ZOOMED, SAFARI FULL LEFT-ALIGNED ========== */
+.banner-carousel-container {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto 40px;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  
+  /* Cross-browser gradient */
+  background: #f9f9f9;
+  background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  
+  /* Fixed height for consistency */
+  height: 380px;
+}
+
+.banner-carousel-track {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  
+  -webkit-transition: -webkit-transform 0.6s ease-in-out;
+  -moz-transition: -moz-transform 0.6s ease-in-out;
+  -o-transition: -o-transform 0.6s ease-in-out;
+  transition: transform 0.6s ease-in-out;
+  
+  height: 100%;
+  width: 100%;
+  will-change: transform;
+  
+  margin: 0;
+  padding: 0;
+}
+
+.banner-carousel-slide {
+  min-width: 100%;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  
+  position: relative;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+  background: #f8f8f8;
+  
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Chrome - use cover (zoomed) */
+.banner-carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-object-fit: cover;
+  -moz-object-fit: cover;
+  -o-object-fit: cover;
+  object-position: center center;
+  -webkit-object-position: center center;
+  -moz-object-position: center center;
+  -o-object-position: center center;
+  display: block;
+  
+  -webkit-transition: -webkit-transform 0.8s ease;
+  -moz-transition: -moz-transform 0.8s ease;
+  -o-transition: -o-transform 0.8s ease;
+  transition: transform 0.8s ease;
+}
+
+/* Safari - use contain with LEFT alignment */
+@media not all and (min-resolution: 0.001dpcm) {
+  @supports (-webkit-appearance: none) {
     .banner-carousel-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      -webkit-object-fit: cover;
-      -moz-object-fit: cover;
-      -o-object-fit: cover;
-      object-position: center center;
-      -webkit-object-position: center center;
-      -moz-object-position: center center;
-      -o-object-position: center center;
-      display: block;
-      
-      -webkit-transition: -webkit-transform 0.8s ease;
-      -moz-transition: -moz-transform 0.8s ease;
-      -o-transition: -o-transform 0.8s ease;
-      transition: transform 0.8s ease;
-    }
-    
-    /* Safari - use contain (full image, no zoom) */
-    @media not all and (min-resolution: 0.001dpcm) {
-      @supports (-webkit-appearance: none) {
-        .banner-carousel-image {
-          object-fit: contain !important;
-          -webkit-object-fit: contain !important;
-          object-position: center center !important;
-          -webkit-object-position: center center !important;
-          width: 100% !important;
-          height: 100% !important;
-          background-color: #f8f8f8;
-        }
-      }
-    }
-    
-    /* Alternative Safari detection */
-    _::-webkit-full-page-media, _:future, :root .banner-carousel-image {
       object-fit: contain !important;
-      object-position: center center !important;
+      -webkit-object-fit: contain !important;
+      object-position: left center !important;
+      -webkit-object-position: left center !important;
       width: 100% !important;
       height: 100% !important;
       background-color: #f8f8f8;
     }
-    
-    .banner-carousel-slide:hover .banner-carousel-image {
-      -webkit-transform: scale(1.05);
-      -moz-transform: scale(1.05);
-      -ms-transform: scale(1.05);
-      -o-transform: scale(1.05);
-      transform: scale(1.05);
-    }
-    
-    .banner-slide-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
-      
-      /* Cross-browser gradient */
-      background: rgba(0,0,0,0.7);
-      background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      
-      color: white;
-      padding: 25px;
-      padding-top: 60px;
-    }
-    
-    .banner-slide-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    }
-    
-    .banner-slide-subtitle {
-      font-size: 18px;
-      opacity: 0.95;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-    
-    .banner-slide-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: #6b0d2b;
-      background: rgba(255,255,255,0.95);
-      display: inline-block;
-      padding: 8px 20px;
-      border-radius: 25px;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    
-    /* Navigation Buttons */
-    .carousel-nav-btn {
-      position: absolute;
-      top: 50%;
-      -webkit-transform: translateY(-50%);
-      -moz-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-      -o-transform: translateY(-50%);
-      transform: translateY(-50%);
-      
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      
-      -webkit-box-align: center;
-      -moz-box-align: center;
-      -ms-flex-align: center;
-      -webkit-align-items: center;
-      align-items: center;
-      
-      -webkit-box-pack: center;
-      -moz-box-pack: center;
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      
-      cursor: pointer;
-      font-size: 22px;
-      color: #6b0d2b;
-      
-      -webkit-transition: all 0.3s ease;
-      -moz-transition: all 0.3s ease;
-      -o-transition: all 0.3s ease;
-      transition: all 0.3s ease;
-      
-      z-index: 100;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      -webkit-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      -moz-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      outline: none;
-    }
-    
-    .carousel-nav-btn:hover {
-      background: white;
-      -webkit-transform: translateY(-50%) scale(1.15);
-      -moz-transform: translateY(-50%) scale(1.15);
-      -ms-transform: translateY(-50%) scale(1.15);
-      -o-transform: translateY(-50%) scale(1.15);
-      transform: translateY(-50%) scale(1.15);
-      
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      -webkit-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      -moz-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-    
-    .carousel-nav-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      -webkit-transform: translateY(-50%) scale(1);
-      -moz-transform: translateY(-50%) scale(1);
-      -ms-transform: translateY(-50%) scale(1);
-      -o-transform: translateY(-50%) scale(1);
-      transform: translateY(-50%) scale(1);
-      pointer-events: none;
-    }
-    
-    .prev-btn {
-      left: 25px;
-    }
-    
-    .next-btn {
-      right: 25px;
-    }
-    
-    .carousel-dots {
-      position: absolute;
-      bottom: 25px;
-      left: 0;
-      right: 0;
-      
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      
-      -webkit-box-pack: center;
-      -moz-box-pack: center;
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      
-      gap: 12px;
-      z-index: 10;
-    }
-    
-    .carousel-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.6);
-      border: 2px solid transparent;
-      cursor: pointer;
-      
-      -webkit-transition: all 0.3s ease;
-      -moz-transition: all 0.3s ease;
-      -o-transition: all 0.3s ease;
-      transition: all 0.3s ease;
-    }
-    
-    .carousel-dot.active {
-      background: #6b0d2b;
-      border-color: white;
-      -webkit-transform: scale(1.3);
-      -moz-transform: scale(1.3);
-      -ms-transform: scale(1.3);
-      -o-transform: scale(1.3);
-      transform: scale(1.3);
-      
-      box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-      -webkit-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-      -moz-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-    }
-    
-    .carousel-dot:hover:not(.active) {
-      background: white;
-      -webkit-transform: scale(1.2);
-      -moz-transform: scale(1.2);
-      -ms-transform: scale(1.2);
-      -o-transform: scale(1.2);
-      transform: scale(1.2);
-    }
-    
-    /* ========== MARKETING BANNERS SECTION - CHROME ZOOMED, SAFARI FULL ========== */
-    .marketing-banners-section {
-      margin: 0 auto 40px;
-      max-width: 1000px;
-      position: relative;
-      width: 100%;
-    }
-    
-    .marketing-banners-container {
-      position: relative;
-      width: 100%;
-      max-width: 1000px;
-      margin: 0 auto;
-      overflow: hidden;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-      
-      /* Cross-browser gradient */
-      background: #f9f9f9;
-      background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      
-      /* Fixed height for consistency */
-      height: 450px;
-    }
-    
-    .marketing-banners-track {
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      
-      -webkit-transition: -webkit-transform 0.6s ease-in-out;
-      -moz-transition: -moz-transform 0.6s ease-in-out;
-      -o-transition: -o-transform 0.6s ease-in-out;
-      transition: transform 0.6s ease-in-out;
-      
-      height: 100%;
-      width: 100%;
-      will-change: transform;
-      
-      margin: 0;
-      padding: 0;
-    }
-    
-    .marketing-banner-slide {
-      min-width: 100%;
-      -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-      flex-shrink: 0;
-      
-      position: relative;
-      cursor: pointer;
-      border-radius: 16px;
-      overflow: hidden;
-      height: 100%;
-      background: #f5f5f5;
-      
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    /* Chrome - use cover (zoomed) */
+  }
+}
+
+/* Alternative Safari detection */
+_::-webkit-full-page-media, _:future, :root .banner-carousel-image {
+  object-fit: contain !important;
+  object-position: left center !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #f8f8f8;
+}
+
+.banner-carousel-slide:hover .banner-carousel-image {
+  -webkit-transform: scale(1.05);
+  -moz-transform: scale(1.05);
+  -ms-transform: scale(1.05);
+  -o-transform: scale(1.05);
+  transform: scale(1.05);
+}
+
+.banner-slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  
+  /* Cross-browser gradient */
+  background: rgba(0,0,0,0.7);
+  background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  
+  color: white;
+  padding: 25px;
+  padding-top: 60px;
+}
+
+.banner-slide-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.banner-slide-subtitle {
+  font-size: 18px;
+  opacity: 0.95;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.banner-slide-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #6b0d2b;
+  background: rgba(255,255,255,0.95);
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 25px;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Navigation Buttons */
+.carousel-nav-btn {
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
+  
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  
+  -webkit-box-pack: center;
+  -moz-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  
+  cursor: pointer;
+  font-size: 22px;
+  color: #6b0d2b;
+  
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  -webkit-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  outline: none;
+}
+
+.carousel-nav-btn:hover {
+  background: white;
+  -webkit-transform: translateY(-50%) scale(1.15);
+  -moz-transform: translateY(-50%) scale(1.15);
+  -ms-transform: translateY(-50%) scale(1.15);
+  -o-transform: translateY(-50%) scale(1.15);
+  transform: translateY(-50%) scale(1.15);
+  
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  -moz-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.carousel-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  -webkit-transform: translateY(-50%) scale(1);
+  -moz-transform: translateY(-50%) scale(1);
+  -ms-transform: translateY(-50%) scale(1);
+  -o-transform: translateY(-50%) scale(1);
+  transform: translateY(-50%) scale(1);
+  pointer-events: none;
+}
+
+.prev-btn {
+  left: 25px;
+}
+
+.next-btn {
+  right: 25px;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  right: 0;
+  
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  
+  -webkit-box-pack: center;
+  -moz-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  
+  gap: 12px;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid transparent;
+  cursor: pointer;
+  
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+  background: #6b0d2b;
+  border-color: white;
+  -webkit-transform: scale(1.3);
+  -moz-transform: scale(1.3);
+  -ms-transform: scale(1.3);
+  -o-transform: scale(1.3);
+  transform: scale(1.3);
+  
+  box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+  -webkit-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+  -moz-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+}
+
+.carousel-dot:hover:not(.active) {
+  background: white;
+  -webkit-transform: scale(1.2);
+  -moz-transform: scale(1.2);
+  -ms-transform: scale(1.2);
+  -o-transform: scale(1.2);
+  transform: scale(1.2);
+}
+
+/* ========== MARKETING BANNERS SECTION - CHROME ZOOMED, SAFARI FULL LEFT-ALIGNED ========== */
+.marketing-banners-section {
+  margin: 0 auto 40px;
+  max-width: 1000px;
+  position: relative;
+  width: 100%;
+}
+
+.marketing-banners-container {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  
+  /* Cross-browser gradient */
+  background: #f9f9f9;
+  background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
+  
+  /* Fixed height for consistency */
+  height: 450px;
+}
+
+.marketing-banners-track {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  
+  -webkit-transition: -webkit-transform 0.6s ease-in-out;
+  -moz-transition: -moz-transform 0.6s ease-in-out;
+  -o-transition: -o-transform 0.6s ease-in-out;
+  transition: transform 0.6s ease-in-out;
+  
+  height: 100%;
+  width: 100%;
+  will-change: transform;
+  
+  margin: 0;
+  padding: 0;
+}
+
+.marketing-banner-slide {
+  min-width: 100%;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  
+  position: relative;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+  background: #f5f5f5;
+  
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Chrome - use cover (zoomed) */
+.marketing-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-object-fit: cover;
+  -moz-object-fit: cover;
+  -o-object-fit: cover;
+  object-position: center center;
+  -webkit-object-position: center center;
+  -moz-object-position: center center;
+  -o-object-position: center center;
+  display: block;
+  
+  -webkit-transition: -webkit-transform 0.8s ease;
+  -moz-transition: -moz-transform 0.8s ease;
+  -o-transition: -o-transform 0.8s ease;
+  transition: transform 0.8s ease;
+}
+
+/* Safari - use contain with LEFT alignment */
+@media not all and (min-resolution: 0.001dpcm) {
+  @supports (-webkit-appearance: none) {
     .marketing-banner-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      -webkit-object-fit: cover;
-      -moz-object-fit: cover;
-      -o-object-fit: cover;
-      object-position: center center;
-      -webkit-object-position: center center;
-      -moz-object-position: center center;
-      -o-object-position: center center;
-      display: block;
-      
-      -webkit-transition: -webkit-transform 0.8s ease;
-      -moz-transition: -moz-transform 0.8s ease;
-      -o-transition: -o-transform 0.8s ease;
-      transition: transform 0.8s ease;
-    }
-    
-    /* Safari - use contain (full image, no zoom) */
-    @media not all and (min-resolution: 0.001dpcm) {
-      @supports (-webkit-appearance: none) {
-        .marketing-banner-image {
-          object-fit: contain !important;
-          -webkit-object-fit: contain !important;
-          object-position: center center !important;
-          -webkit-object-position: center center !important;
-          width: 100% !important;
-          height: 100% !important;
-          background-color: #f5f5f5;
-        }
-      }
-    }
-    
-    /* Alternative Safari detection */
-    _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
       object-fit: contain !important;
-      object-position: center center !important;
+      -webkit-object-fit: contain !important;
+      object-position: left center !important;
+      -webkit-object-position: left center !important;
       width: 100% !important;
       height: 100% !important;
       background-color: #f5f5f5;
     }
-    
-    .marketing-banner-slide:hover .marketing-banner-image {
-      -webkit-transform: scale(1.05);
-      -moz-transform: scale(1.05);
-      -ms-transform: scale(1.05);
-      -o-transform: scale(1.05);
-      transform: scale(1.05);
-    }
-    
-    .marketing-banner-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 10;
-      
-      /* Cross-browser gradient */
-      background: rgba(0,0,0,0.7);
-      background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-      
-      color: white;
-      padding: 30px;
-      padding-top: 80px;
-    }
-    
-    .marketing-banner-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    }
-    
-    .marketing-banner-subtitle {
-      font-size: 20px;
-      opacity: 0.95;
-      margin-bottom: 15px;
-      font-weight: 500;
-    }
-    
-    /* Marketing navigation buttons */
-    .marketing-nav-btn {
-      position: absolute;
-      top: 50%;
-      -webkit-transform: translateY(-50%);
-      -moz-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-      -o-transform: translateY(-50%);
-      transform: translateY(-50%);
-      
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      
-      -webkit-box-align: center;
-      -moz-box-align: center;
-      -ms-flex-align: center;
-      -webkit-align-items: center;
-      align-items: center;
-      
-      -webkit-box-pack: center;
-      -moz-box-pack: center;
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      
-      cursor: pointer;
-      font-size: 22px;
-      color: #6b0d2b;
-      
-      -webkit-transition: all 0.3s ease;
-      -moz-transition: all 0.3s ease;
-      -o-transition: all 0.3s ease;
-      transition: all 0.3s ease;
-      
-      z-index: 100;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      -webkit-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      -moz-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      outline: none;
-    }
-    
-    .marketing-nav-btn:hover {
-      background: white;
-      -webkit-transform: translateY(-50%) scale(1.15);
-      -moz-transform: translateY(-50%) scale(1.15);
-      -ms-transform: translateY(-50%) scale(1.15);
-      -o-transform: translateY(-50%) scale(1.15);
-      transform: translateY(-50%) scale(1.15);
-      
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      -webkit-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      -moz-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-    
-    .marketing-nav-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      -webkit-transform: translateY(-50%) scale(1);
-      -moz-transform: translateY(-50%) scale(1);
-      -ms-transform: translateY(-50%) scale(1);
-      -o-transform: translateY(-50%) scale(1);
-      transform: translateY(-50%) scale(1);
-      pointer-events: none;
-    }
-    
-    .marketing-prev-btn {
-      left: 25px;
-    }
-    
-    .marketing-next-btn {
-      right: 25px;
-    }
-    
-    .marketing-dots {
-      position: absolute;
-      bottom: 25px;
-      left: 0;
-      right: 0;
-      
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      
-      -webkit-box-pack: center;
-      -moz-box-pack: center;
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      
-      gap: 12px;
-      z-index: 10;
-    }
-    
-    .marketing-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.6);
-      border: 2px solid transparent;
-      cursor: pointer;
-      
-      -webkit-transition: all 0.3s ease;
-      -moz-transition: all 0.3s ease;
-      -o-transition: all 0.3s ease;
-      transition: all 0.3s ease;
-    }
-    
-    .marketing-dot.active {
-      background: #6b0d2b;
-      border-color: white;
-      -webkit-transform: scale(1.3);
-      -moz-transform: scale(1.3);
-      -ms-transform: scale(1.3);
-      -o-transform: scale(1.3);
-      transform: scale(1.3);
-      
-      box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-      -webkit-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-      -moz-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-    }
-    
-    .marketing-dot:hover:not(.active) {
-      background: white;
-      -webkit-transform: scale(1.2);
-      -moz-transform: scale(1.2);
-      -ms-transform: scale(1.2);
-      -o-transform: scale(1.2);
-      transform: scale(1.2);
-    }
-    
-    /* ========== LOADING STATES ========== */
-    .loading-state {
-      width: 100%;
-      display: flex;
-      display: -webkit-flex;
-      display: -moz-flex;
-      display: -ms-flex;
-      flex-direction: column;
-      -webkit-flex-direction: column;
-      align-items: center;
-      -webkit-align-items: center;
-      justify-content: center;
-      -webkit-justify-content: center;
-      padding: 60px;
-      min-height: 380px;
-    }
-    
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid rgba(107, 13, 43, 0.1);
-      border-top-color: #6b0d2b;
-      border-radius: 50%;
-      
-      -webkit-animation: spin 1.2s linear infinite;
-      -moz-animation: spin 1.2s linear infinite;
-      -o-animation: spin 1.2s linear infinite;
-      animation: spin 1.2s linear infinite;
-      
-      margin-bottom: 20px;
-    }
-    
-    @-webkit-keyframes spin {
-      0% { -webkit-transform: rotate(0deg); }
-      100% { -webkit-transform: rotate(360deg); }
-    }
-    
-    @-moz-keyframes spin {
-      0% { -moz-transform: rotate(0deg); }
-      100% { -moz-transform: rotate(360deg); }
-    }
-    
-    @-o-keyframes spin {
-      0% { -o-transform: rotate(0deg); }
-      100% { -o-transform: rotate(360deg); }
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* ========== ERROR AND EMPTY STATES ========== */
-    .carousel-error-state,
-    .carousel-empty-state {
-      width: 100%;
-      text-align: center;
-      padding: 60px 40px;
-      min-height: 380px;
-      
-      display: flex;
-      display: -webkit-flex;
-      display: -moz-flex;
-      display: -ms-flex;
-      flex-direction: column;
-      -webkit-flex-direction: column;
-      align-items: center;
-      -webkit-align-items: center;
-      justify-content: center;
-      -webkit-justify-content: center;
-    }
-    
-    .carousel-error-state i,
-    .carousel-empty-state i {
-      font-size: 56px;
-      margin-bottom: 20px;
-    }
-    
-    .carousel-error-state i {
-      color: #ff6b6b;
-    }
-    
-    .carousel-empty-state i {
-      color: #6b0d2b;
-      opacity: 0.5;
-    }
-    
-    .carousel-error-state h3,
-    .carousel-empty-state h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 26px;
-      color: #1b1b1b;
-      margin-bottom: 12px;
-    }
-    
-    .carousel-error-state p,
-    .carousel-empty-state p {
-      color: #666;
-      margin-bottom: 25px;
-      max-width: 400px;
-      line-height: 1.6;
-    }
-    
-    .btn-fill {
-      background: #6b0d2b;
-      color: white;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 10px;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
-      font-size: 15px;
-      cursor: pointer;
-      
-      -webkit-transition: all 0.3s ease;
-      -moz-transition: all 0.3s ease;
-      -o-transition: all 0.3s ease;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-fill:hover {
-      background: #5a0b23;
-      -webkit-transform: translateY(-2px);
-      -moz-transform: translateY(-2px);
-      -ms-transform: translateY(-2px);
-      -o-transform: translateY(-2px);
-      transform: translateY(-2px);
-      
-      box-shadow: 0 6px 15px rgba(107, 13, 43, 0.3);
-      -webkit-box-shadow: 0 6px 15px rgba(107, 13, 43, 0.3);
-      -moz-box-shadow: 0 6px 15px rgba(107, 13, 43, 0.3);
-    }
-    
-    /* ========== RESPONSIVE DESIGN - ALL DEVICES ========== */
-    
-    /* Large Desktop */
-    @media (min-width: 1400px) {
-      .marketing-banners-container {
-        height: 500px;
-      }
-      
-      .marketing-banner-title {
-        font-size: 36px;
-      }
-      
-      .marketing-banner-subtitle {
-        font-size: 22px;
-      }
-    }
-    
-    /* Desktop */
-    @media (max-width: 1200px) {
-      .marketing-banners-container {
-        height: 420px;
-      }
-      
-      .banner-carousel-container {
-        height: 350px;
-      }
-    }
-    
-    /* Tablet Landscape */
-    @media (max-width: 992px) {
-      .marketing-banners-container {
-        height: 380px;
-      }
-      
-      .banner-carousel-container {
-        height: 320px;
-      }
-      
-      .marketing-banner-title {
-        font-size: 28px;
-      }
-      
-      .marketing-banner-subtitle {
-        font-size: 18px;
-      }
-      
-      .banner-slide-title {
-        font-size: 24px;
-      }
-    }
-    
-    /* Tablet Portrait */
-    @media (max-width: 768px) {
-      .marketing-banners-container {
-        height: 340px;
-      }
-      
-      .banner-carousel-container {
-        height: 280px;
-      }
-      
-      .marketing-banner-overlay {
-        padding: 25px;
-        padding-top: 60px;
-      }
-      
-      .banner-slide-overlay {
-        padding: 20px;
-        padding-top: 50px;
-      }
-      
-      .marketing-banner-title {
-        font-size: 24px;
-      }
-      
-      .marketing-banner-subtitle {
-        font-size: 16px;
-      }
-      
-      .banner-slide-title {
-        font-size: 22px;
-      }
-      
-      .banner-slide-subtitle {
-        font-size: 16px;
-      }
-      
-      .marketing-nav-btn,
-      .carousel-nav-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
-      }
-      
-      .marketing-prev-btn,
-      .prev-btn {
-        left: 15px;
-      }
-      
-      .marketing-next-btn,
-      .next-btn {
-        right: 15px;
-      }
-    }
-    
-    /* Mobile Large */
-    @media (max-width: 576px) {
-      .marketing-banners-container {
-        height: 280px;
-      }
-      
-      .banner-carousel-container {
-        height: 240px;
-      }
-      
-      .marketing-banner-overlay {
-        padding: 20px;
-        padding-top: 50px;
-      }
-      
-      .banner-slide-overlay {
-        padding: 15px;
-        padding-top: 40px;
-      }
-      
-      .marketing-banner-title {
-        font-size: 20px;
-      }
-      
-      .marketing-banner-subtitle {
-        font-size: 14px;
-      }
-      
-      .banner-slide-title {
-        font-size: 19px;
-      }
-      
-      .banner-slide-subtitle {
-        font-size: 14px;
-      }
-      
-      .marketing-nav-btn,
-      .carousel-nav-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-      }
-      
-      .marketing-prev-btn,
-      .prev-btn {
-        left: 10px;
-      }
-      
-      .marketing-next-btn,
-      .next-btn {
-        right: 10px;
-      }
-      
-      .marketing-dots,
-      .carousel-dots {
-        bottom: 15px;
-        gap: 8px;
-      }
-      
-      .marketing-dot,
-      .carousel-dot {
-        width: 12px;
-        height: 12px;
-      }
-    }
-    
-    /* Mobile Small */
-    @media (max-width: 375px) {
-      .marketing-banners-container {
-        height: 240px;
-      }
-      
-      .banner-carousel-container {
-        height: 200px;
-      }
-      
-      .marketing-banner-overlay {
-        padding: 15px;
-        padding-top: 40px;
-      }
-      
-      .banner-slide-overlay {
-        padding: 12px;
-        padding-top: 35px;
-      }
-      
-      .marketing-banner-title {
-        font-size: 18px;
-      }
-      
-      .marketing-banner-subtitle {
-        font-size: 12px;
-      }
-      
-      .banner-slide-title {
-        font-size: 17px;
-      }
-      
-      .banner-slide-subtitle {
-        font-size: 12px;
-      }
-      
-      .marketing-nav-btn,
-      .carousel-nav-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-      }
-      
-      .marketing-dot,
-      .carousel-dot {
-        width: 10px;
-        height: 10px;
-      }
-    }
-    
-    /* Safari gap fix for flexbox */
-    @supports (-webkit-touch-callout: none) {
-      .marketing-dots,
-      .carousel-dots {
-        gap: 8px;
-      }
-      
-      .marketing-dot,
-      .carousel-dot {
-        margin: 0 2px;
-      }
-    }
-    
-    /* Force arrows to show */
-    #marketingPrevBtn,
-    #marketingNextBtn,
-    #prevBtn,
-    #nextBtn {
-      display: -webkit-box !important;
-      display: -moz-box !important;
-      display: -ms-flexbox !important;
-      display: -webkit-flex !important;
-      display: flex !important;
-      z-index: 1000 !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-    
-    .marketing-dots,
-    .carousel-dots {
-      display: -webkit-box !important;
-      display: -moz-box !important;
-      display: -ms-flexbox !important;
-      display: -webkit-flex !important;
-      display: flex !important;
-    }
+  }
+}
+
+/* Alternative Safari detection */
+_::-webkit-full-page-media, _:future, :root .marketing-banner-image {
+  object-fit: contain !important;
+  object-position: left center !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #f5f5f5;
+}
+
+.marketing-banner-slide:hover .marketing-banner-image {
+  -webkit-transform: scale(1.05);
+  -moz-transform: scale(1.05);
+  -ms-transform: scale(1.05);
+  -o-transform: scale(1.05);
+  transform: scale(1.05);
+}
+
+.marketing-banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  
+  /* Cross-browser gradient */
+  background: rgba(0,0,0,0.7);
+  background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+  
+  color: white;
+  padding: 30px;
+  padding-top: 80px;
+}
+
+.marketing-banner-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.marketing-banner-subtitle {
+  font-size: 20px;
+  opacity: 0.95;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
   </style>
 </head>
 <body>
