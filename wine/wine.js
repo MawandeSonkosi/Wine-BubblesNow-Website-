@@ -50,7 +50,7 @@ function setupEventListeners() {
   }
 }
 
-// Extract wine types - REMOVED "White Wine" from default types
+// Extract wine types - REMOVED "White Wine" completely
 function extractWineTypes(wines) {
   const defaultTypes = [
     'All',
@@ -64,7 +64,10 @@ function extractWineTypes(wines) {
   const uniqueTypes = new Set();
   wines.forEach(wine => {
     if (wine.type && wine.type.trim() !== '') {
-      uniqueTypes.add(wine.type);
+      // Only add if it's not "White Wine"
+      if (wine.type !== 'White Wine') {
+        uniqueTypes.add(wine.type);
+      }
     }
   });
   
@@ -74,16 +77,31 @@ function extractWineTypes(wines) {
 
 // Check if item is a wine (not a banner or advert)
 function isWine(item) {
-  // Check if it has wine-specific properties
-  return (
-    item && 
-    item.type && 
-    item.price && 
-    // Exclude items that are clearly adverts
-    !item.productType === 'advert' && 
-    !item.type.toLowerCase().includes('advert') &&
-    !item.category === 'marketing'
+  // Check if it has a valid wine type
+  const validWineTypes = ['Red Wine', 'White Wine', 'Champagne', 'Sparkling', 'Rosé', 'Rose', 'Dessert Wine'];
+  
+  // Check if it has a price (adverts might have price but different structure)
+  const hasPrice = item.price && item.price > 0;
+  
+  // Check if it has a valid wine type
+  const hasValidType = item.type && validWineTypes.some(type => 
+    item.type.toLowerCase().includes(type.toLowerCase())
   );
+  
+  // Check if it has a wine-like name (not "Special Offer", "Advertisement", etc.)
+  const hasWineName = item.name && 
+                     !item.name.toLowerCase().includes('special') &&
+                     !item.name.toLowerCase().includes('offer') &&
+                     !item.name.toLowerCase().includes('advert');
+  
+  // Check if it has a description that suggests it's a wine
+  const hasWineDescription = item.description && 
+                            (item.description.toLowerCase().includes('wine') ||
+                             item.description.toLowerCase().includes('vintage') ||
+                             item.description.toLowerCase().includes('bottle'));
+  
+  // Return true if it meets wine criteria
+  return hasPrice && (hasValidType || hasWineName || hasWineDescription);
 }
 
 // Populate filter dropdown
@@ -144,36 +162,27 @@ async function fetchWines() {
       throw new Error(`HTTP ${response.status}`);
     }
     
-    const wines = await response.json();
-    console.log(`✅ Received ${wines.length} items from API`);
+    const items = await response.json();
+    console.log(`✅ Received ${items.length} items from API`);
     
     // Filter out non-wine items (banners, adverts, etc.)
-    const filteredItems = wines.filter(item => {
-      // Keep only items that are actual wines
-      // Check if it has a type that matches wine categories
-      const validWineTypes = ['Red Wine', 'White Wine', 'Champagne', 'Sparkling', 'Rose', 'Dessert Wine'];
-      const hasValidType = item.type && validWineTypes.some(type => 
-        item.type.toLowerCase().includes(type.toLowerCase())
-      );
-      
-      // Exclude items that are clearly adverts
-      const isNotAdvert = !item.productType === 'advert' && 
-                          !item.category === 'marketing' && 
-                          !item.title?.toLowerCase().includes('advert');
-      
-      // Include if it has a price and valid wine characteristics
-      return item.price && (hasValidType || isNotAdvert);
-    });
+    const wines = items.filter(item => isWine(item));
     
-    console.log(`🍷 Filtered to ${filteredItems.length} actual wines`);
+    console.log(`🍷 Filtered to ${wines.length} actual wines`);
     
-    allWines = filteredItems;
-    filteredWines = filteredItems;
+    // Log what was filtered out for debugging
+    const filteredOut = items.length - wines.length;
+    if (filteredOut > 0) {
+      console.log(`🚫 Filtered out ${filteredOut} non-wine items`);
+    }
     
-    if (filteredItems.length === 0) {
+    allWines = wines;
+    filteredWines = wines;
+    
+    if (wines.length === 0) {
       showEmptyState('No wines found');
     } else {
-      populateFilterDropdown(filteredItems);
+      populateFilterDropdown(wines);
       renderWines();
     }
     
