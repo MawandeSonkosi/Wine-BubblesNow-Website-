@@ -10,7 +10,6 @@ let quantity = 1;
 const advertDetailContainer = document.getElementById('advertDetailContainer');
 const relatedAdvertsSection = document.getElementById('relatedAdvertsSection');
 const relatedAdvertsGrid = document.getElementById('relatedAdvertsGrid');
-const advertTypeElement = document.getElementById('advertType');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -70,10 +69,6 @@ async function fetchAdvertDetail(advertId) {
     
     // Update page title
     document.title = `Wine & Bubbles — ${advert.title}`;
-    if (advertTypeElement) {
-      // Just show "Special Offer" not the type
-      advertTypeElement.textContent = 'Special Offer';
-    }
     
     // Track impression
     trackImpression(advert.id);
@@ -175,8 +170,6 @@ function renderAdvertDetail(advert) {
         <div class="advert-detail-subtitle">${subtitle}</div>
         <div class="advert-detail-price">R${price.toFixed(2)}</div>
         
-        <!-- NO CATEGORY/TYPE FIELDS - completely removed -->
-        
         ${isAvailable ? `
           <div class="stock-status ${stockCount > 5 ? 'stock-in' : stockCount > 0 ? 'stock-low' : 'stock-out'}">
             ${stockCount > 5 ? 'In Stock' : stockCount > 0 ? `Only ${stockCount} left!` : 'Out of Stock'}
@@ -272,10 +265,9 @@ function addToCart() {
     id: currentAdvert.id.toString(),
     name: currentAdvert.title,
     price: currentAdvert.price,
-    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg', // Using imageUrl only
+    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg',
     type: 'advert',
     quantity: quantity
-    // Removed category and description fields as they're not needed
   };
   
   if (window.CartUtils && typeof window.CartUtils.addItem === 'function') {
@@ -417,5 +409,3 @@ window.decrementQuantity = decrementQuantity;
 window.addToCart = addToCart;
 window.navigateToAdvertDetail = navigateToAdvertDetail;
 window.hideRelatedAdverts = hideRelatedAdverts;
-
-// NO DEBUG BUTTON FUNCTION - completely removed
