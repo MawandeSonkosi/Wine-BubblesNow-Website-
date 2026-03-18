@@ -1,5 +1,5 @@
-// Configuration - EXACTLY like Flutter app
-const API_BASE_URL = '/api'; // Use relative URL through proxy
+// Configuration - USE RELATIVE URL FOR CLOUDFLARE
+const API_BASE_URL = '/api'; // This works on both localhost and app.wineandbubblesnow.co.za
 
 // State
 let allWines = [];
@@ -33,7 +33,7 @@ function setupEventListeners() {
   document.addEventListener('click', (e) => {
     if (!filterBtn?.contains(e.target) && !filterDropdown?.contains(e.target)) {
       if (filterDropdown) {
-        filterDropdown.style.display = 'none';
+        filterDropdown.classList.remove('show');
       }
     }
   });
@@ -43,16 +43,14 @@ function setupEventListeners() {
     filterBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (filterDropdown) {
-        const isVisible = filterDropdown.style.display === 'block';
-        filterDropdown.style.display = isVisible ? 'none' : 'block';
+        filterDropdown.classList.toggle('show');
       }
     });
   }
 }
 
-// Extract wine types - EXACTLY like Flutter's filterTypes list
+// Extract wine types - matching Flutter's filter list
 function extractWineTypes(wines) {
-  // Match Flutter's filterTypes list
   const defaultTypes = [
     'All',
     'White Wine',
@@ -63,7 +61,6 @@ function extractWineTypes(wines) {
     'Cognac'
   ];
   
-  // Get unique types from wines
   const uniqueTypes = new Set();
   wines.forEach(wine => {
     if (wine.type && wine.type.trim() !== '') {
@@ -71,12 +68,11 @@ function extractWineTypes(wines) {
     }
   });
   
-  // Combine with default types and sort
   const allTypes = [...new Set([...defaultTypes.filter(t => t !== 'All'), ...uniqueTypes])].sort();
   return ['All', ...allTypes];
 }
 
-// Populate filter dropdown - MATCHES FLUTTER'S FILTER MENU
+// Populate filter dropdown
 function populateFilterDropdown(wines) {
   if (!filterDropdown) return;
   
@@ -100,25 +96,25 @@ function populateFilterDropdown(wines) {
       }
       filterWines();
       
-      // Show snackbar-like notification (matching Flutter)
+      // Show toast notification
       if (wineType !== 'All') {
         showToast(`Filtering by: ${wineType}`, 'info');
       }
       
       // Close dropdown
-      filterDropdown.style.display = 'none';
+      filterDropdown.classList.remove('show');
     });
     filterDropdown.appendChild(link);
   });
 }
 
-// Fetch wines - EXACTLY like Flutter's getWines()
+// Fetch wines - USING PROXY SERVER (NO CORS PROXY)
 async function fetchWines() {
   try {
     showLoading();
     
-    // Use EXACT same endpoint as Flutter: /api/wines?all=true
-    const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`; // Cache busting
+    // Use relative URL through your proxy server - works on both localhost and live site
+    const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
     console.log('🌐 Fetching wines from:', apiUrl);
     
     const response = await fetch(apiUrl, {
@@ -131,21 +127,14 @@ async function fetchWines() {
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch wines: ${response.status}`);
+      throw new Error(`HTTP ${response.status}`);
     }
     
     const wines = await response.json();
     console.log(`✅ Received ${wines.length} wines`);
     
-    // Log wine details like Flutter does
+    // Log wine details for debugging
     console.log('📊 ALL WINES LOADED:', wines.length);
-    for (var i = 0; i < wines.length && i < 5; i++) {
-      console.log(`  - ${wines[i].name}: isCase=${wines[i].isCase || false}, type=${wines[i].type}`);
-    }
-    
-    // Print all wine types like Flutter
-    const allTypes = [...new Set(wines.map(w => w.type).filter(Boolean))];
-    console.log('📋 Available wine types:', allTypes);
     
     allWines = wines;
     filteredWines = wines;
@@ -163,13 +152,12 @@ async function fetchWines() {
   }
 }
 
-// Fix image URLs - MATCHES FLUTTER'S _buildWineImage
+// Fix image URLs
 function fixImageUrl(imageUrl) {
   if (!imageUrl) {
     return '../assets/wines/breakfast/Noir.png';
   }
   
-  // Flutter uses startsWith('assets/') check
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
@@ -181,7 +169,7 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render wines - MATCHING FLUTTER'S _buildWineCard layout
+// Render wines
 function renderWines() {
   console.log('🎨 Rendering wines...');
   
@@ -196,13 +184,8 @@ function renderWines() {
     const type = wine.type || 'Wine';
     const isInStock = (wine.stockCount || 0) > 0;
     
-    // MATCH FLUTTER'S LAYOUT:
-    // - Image at top
-    // - Name and type
-    // - Description (truncated)
-    // - Price and stock badge
     return `
-      <div class="wine-card" onclick="navigateToWineDetail(${wine.id})">
+      <div class="wine-card ${!isInStock ? 'out-of-stock' : ''}" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${wine.name}" 
@@ -213,11 +196,8 @@ function renderWines() {
         <div class="wine-label">
           <div class="wine-title">${wine.name}</div>
           <div class="wine-sub">${type}</div>
-          <div class="wine-description">${wine.description || ''}</div>
-          <div class="wine-price-row">
-            <span class="wine-price">R${price.toFixed(2)}</span>
-            ${!isInStock ? '<span class="out-of-stock-badge">Out of Stock</span>' : ''}
-          </div>
+          ${wine.description ? `<div class="wine-description">${wine.description.substring(0, 100)}${wine.description.length > 100 ? '...' : ''}</div>` : ''}
+          <div class="wine-price">R${price.toFixed(2)}</div>
         </div>
       </div>
     `;
@@ -226,7 +206,7 @@ function renderWines() {
   console.log('✅ Render complete');
 }
 
-// Filter wines - MATCHES FLUTTER'S SEARCH LOGIC
+// Filter wines based on search and filter
 function filterWines() {
   filteredWines = allWines.filter(wine => {
     // Apply type filter
@@ -234,7 +214,7 @@ function filterWines() {
       return false;
     }
     
-    // Apply search filter (matches Flutter's search logic)
+    // Apply search filter
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase().trim();
       if (searchLower === '') return true;
@@ -250,9 +230,15 @@ function filterWines() {
   });
   
   renderWines();
+  
+  // Update results count if element exists
+  const resultsCount = document.querySelector('.results-count');
+  if (resultsCount) {
+    resultsCount.textContent = `Showing ${filteredWines.length} of ${allWines.length} wines`;
+  }
 }
 
-// Show toast notification (matching Flutter's SnackBar)
+// Show toast notification (like Flutter's SnackBar)
 function showToast(message, type = 'success') {
   const existingToast = document.querySelector('.toast-notification');
   if (existingToast) existingToast.remove();
@@ -310,9 +296,7 @@ function showEmptyState(message) {
       <h3>${message}</h3>
       <p>Try changing your search or filter</p>
       <div class="available-types">
-        <p style="font-size: 12px; color: #999; margin-top: 10px;">
-          Available types: ${allTypes.join(', ')}
-        </p>
+        <p>Available types: ${allTypes.join(', ')}</p>
       </div>
       <button onclick="resetFilters()" class="btn-fill" style="margin-top: 20px;">
         Show All Wines
@@ -321,7 +305,7 @@ function showEmptyState(message) {
   `;
 }
 
-// Reset filters
+// Reset all filters
 function resetFilters() {
   currentFilter = '';
   searchQuery = '';
