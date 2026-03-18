@@ -642,214 +642,139 @@
       100% { transform: rotate(360deg); }
     }
     
-    /* MARKETING BANNERS SECTION STYLES - UPDATED HEIGHT */
-    .marketing-banners-section {
-      margin: 0 auto 40px;
-      max-width: 1000px;
-      position: relative;
-    }
-    
-    .marketing-banners-container {
-      position: relative;
-      max-width: 1000px;
-      margin: 0 auto;
-      overflow: hidden;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-      background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
-      height: 420px;
-    }
-    
-    .marketing-banners-track {
-      display: flex;
-      transition: transform 0.6s ease-in-out;
-      height: 100%;
-      will-change: transform;
-    }
-    
-    .marketing-banner-slide {
-      min-width: 100%;
-      flex-shrink: 0;
-      position: relative;
-      cursor: pointer;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    
-    .marketing-banner-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.8s ease;
-    }
-    
-    .marketing-banner-slide:hover .marketing-banner-image {
-      transform: scale(1.05);
-    }
-    
-    .marketing-banner-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(to top, 
-        rgba(0,0,0,0.9) 0%, 
-        rgba(0,0,0,0.7) 50%, 
-        rgba(0,0,0,0) 100%);
-      color: white;
-      padding: 25px;
-      padding-top: 60px;
-    }
-    
-    .marketing-banner-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-    }
-    
-    .marketing-banner-subtitle {
-      font-size: 18px;
-      opacity: 0.95;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-    
-    /* Marketing banner navigation buttons */
-    .marketing-nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 22px;
-      color: #6b0d2b;
-      transition: all 0.3s ease;
-      z-index: 10;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    
-    .marketing-nav-btn:hover {
-      background: white;
-      transform: translateY(-50%) scale(1.15);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-    
-    .marketing-nav-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: translateY(-50%) scale(1);
-    }
-    
-    .marketing-prev-btn {
-      left: 25px;
-    }
-    
-    .marketing-next-btn {
-      right: 25px;
-    }
-    
-    /* Marketing banner dots */
-    .marketing-dots {
-      position: absolute;
-      bottom: 25px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      z-index: 10;
-    }
-    
-    .marketing-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.6);
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .marketing-dot.active {
-      background: #6b0d2b;
-      border-color: white;
-      transform: scale(1.3);
-      box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-    }
-    
-    .marketing-dot:hover:not(.active) {
-      background: white;
-      transform: scale(1.2);
-    }
-    
-    /* Responsive adjustments for marketing banners */
-    @media (max-width: 768px) {
-      .marketing-banners-container {
-        height: 340px;
-      }
-      
-      .marketing-banner-overlay {
-        padding: 20px;
-        padding-top: 50px;
-      }
-      
-      .marketing-banner-title {
-        font-size: 22px;
-      }
-      
-      .marketing-banner-subtitle {
-        font-size: 16px;
-      }
-      
-      .marketing-nav-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
-      }
-      
-      .marketing-prev-btn {
-        left: 15px;
-      }
-      
-      .marketing-next-btn {
-        right: 15px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .marketing-banners-container {
-        height: 280px;
-      }
-      
-      .marketing-banner-overlay {
-        padding: 15px;
-        padding-top: 40px;
-      }
-      
-      .marketing-banner-title {
-        font-size: 19px;
-      }
-      
-      .marketing-banner-subtitle {
-        font-size: 14px;
-      }
-      
-      .marketing-nav-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-      }
-    }
+   /* MARKETING BANNERS SECTION STYLES - INCREASED HEIGHT */
+.marketing-banners-section {
+  margin: 0 auto 40px;
+  max-width: 1000px;
+  position: relative;
+}
+
+.marketing-banners-container {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
+  height: 500px; /* INCREASED from 420px to 500px */
+}
+
+.marketing-banners-track {
+  display: flex;
+  transition: transform 0.6s ease-in-out;
+  height: 100%;
+  will-change: transform;
+}
+
+.marketing-banner-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.marketing-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This ensures the image covers the entire area without distortion */
+  display: block;
+  transition: transform 0.8s ease;
+}
+
+.marketing-banner-slide:hover .marketing-banner-image {
+  transform: scale(1.05);
+}
+
+.marketing-banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, 
+    rgba(0,0,0,0.9) 0%, 
+    rgba(0,0,0,0.7) 50%, 
+    rgba(0,0,0,0) 100%);
+  color: white;
+  padding: 30px; /* INCREASED padding */
+  padding-top: 80px; /* INCREASED top padding */
+}
+
+.marketing-banner-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px; /* INCREASED font size */
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.marketing-banner-subtitle {
+  font-size: 20px; /* INCREASED font size */
+  opacity: 0.95;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+/* Responsive adjustments for marketing banners */
+@media (max-width: 768px) {
+  .marketing-banners-container {
+    height: 400px; /* INCREASED from 340px to 400px */
+  }
+  
+  .marketing-banner-overlay {
+    padding: 25px;
+    padding-top: 60px;
+  }
+  
+  .marketing-banner-title {
+    font-size: 26px;
+  }
+  
+  .marketing-banner-subtitle {
+    font-size: 18px;
+  }
+  
+  .marketing-nav-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .marketing-prev-btn {
+    left: 15px;
+  }
+  
+  .marketing-next-btn {
+    right: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marketing-banners-container {
+    height: 350px; /* INCREASED from 280px to 350px */
+  }
+  
+  .marketing-banner-overlay {
+    padding: 20px;
+    padding-top: 50px;
+  }
+  
+  .marketing-banner-title {
+    font-size: 22px;
+  }
+  
+  .marketing-banner-subtitle {
+    font-size: 16px;
+  }
+  
+  .marketing-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
   </style>
 </head>
 <body>
