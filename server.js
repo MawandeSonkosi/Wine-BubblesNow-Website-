@@ -354,10 +354,13 @@ app.delete('/api/profile/delete-account', async (req, res) => {
 
 // ============ ADVERTS ENDPOINTS ============
 // Get active adverts by type
+// Get active adverts by type - DEBUG VERSION
 app.get('/api/adverts/active', async (req, res) => {
     try {
+        console.log('🎪 ========== ADVERTS DEBUG ==========');
         console.log('🎪 Fetching active adverts via proxy');
         console.log('📡 Query params:', req.query);
+        console.log('📡 Headers received:', req.headers);
         
         // Forward query parameters
         const queryParams = new URLSearchParams(req.query).toString();
@@ -367,60 +370,63 @@ app.get('/api/adverts/active', async (req, res) => {
         
         console.log('🎪 Backend URL:', backendUrl);
         
+        console.log('🎪 Making fetch request to backend...');
         const response = await fetch(backendUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Origin': 'https://www.wineandbubblesnow.co.za'
             },
             timeout: 10000
         });
         
+        console.log('🎪 Backend response status:', response.status);
+        console.log('🎪 Backend response headers:', response.headers);
+        
         if (!response.ok) {
-            throw new Error(`Backend responded with ${response.status}: ${response.statusText}`);
+            console.error(`❌ Backend responded with ${response.status}: ${response.statusText}`);
+            
+            // Try to get error response body
+            const errorText = await response.text();
+            console.error('❌ Error response body:', errorText);
+            
+            // Return actual error, not fallback
+            return res.status(response.status).json({ 
+                error: `Backend error: ${response.status}`,
+                message: errorText 
+            });
         }
         
         const data = await response.json();
-        console.log(`🎪 Adverts response: ${response.status} (${Array.isArray(data) ? data.length : 0} items)`);
+        console.log(`🎪 Adverts response success! Got ${Array.isArray(data) ? data.length : 0} items`);
+        
+        if (Array.isArray(data) && data.length > 0) {
+            console.log('🎪 First advert:', JSON.stringify(data[0], null, 2));
+            console.log('🎪 First advert imageUrl:', data[0].imageUrl);
+            console.log('🎪 First advert type:', data[0].type);
+            console.log('🎪 First advert isActive:', data[0].isActive);
+        } else {
+            console.log('🎪 No adverts found in response');
+        }
+        
+        console.log('🎪 ========== END ADVERTS DEBUG ==========');
         
         res.status(response.status).json(data);
         
     } catch (error) {
+        console.error('🚨 ========== ADVERTS ERROR ==========');
         console.error('🚨 Adverts proxy error:', error.message);
+        console.error('🚨 Error name:', error.name);
+        console.error('🚨 Error stack:', error.stack);
+        console.error('🚨 ========== END ERROR ==========');
         
-        // Return fallback adverts if backend fails
-        console.log('⚠️ Using fallback adverts');
-        const fallbackAdverts = [
-            {
-                id: 'fallback-1',
-                title: 'African Diamond Blanc',
-                subtitle: 'Premium selection for connoisseurs',
-                imageUrl: '/assets/adverts/African_Diamond_Blanc.png',
-                targetUrl: '#',
-                isActive: true,
-                type: 'homepage'
-            },
-            {
-                id: 'fallback-2',
-                title: 'Ferrero Rocher Collection',
-                subtitle: 'Perfect pairing for special moments',
-                imageUrl: '/assets/adverts/ferrero.png',
-                targetUrl: '#',
-                isActive: true,
-                type: 'homepage'
-            },
-            {
-                id: 'fallback-3',
-                title: 'Moët & Chandon Rosé',
-                subtitle: 'Celebrate with premium champagne',
-                imageUrl: '/assets/adverts/moet_rose.png',
-                targetUrl: '#',
-                isActive: true,
-                type: 'homepage'
-            }
-        ];
-        
-        res.json(fallbackAdverts);
+        // Return error instead of fallback
+        res.status(500).json({ 
+            error: 'Proxy server error', 
+            message: error.message,
+            type: error.name 
+        });
     }
 });
 
