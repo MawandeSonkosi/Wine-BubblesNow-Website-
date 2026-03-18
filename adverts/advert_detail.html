@@ -24,7 +24,7 @@
   <script src="../cart/cart-utils.js"></script>
   
   <style>
-    /* Additional styles for user dropdown */
+    /* Only user dropdown styles remain in HTML */
     .user-dropdown {
       position: absolute;
       top: 100px;
@@ -51,7 +51,6 @@
       position: relative;
     }
     
-    /* Login icon style */
     .fas.fa-sign-in-alt {
       color: #6b0d2b !important;
     }
@@ -110,7 +109,6 @@
       background: #8a1e3d;
     }
     
-    /* Mobile responsive adjustments */
     @media (max-width: 768px) {
       .user-dropdown {
         position: fixed;
@@ -121,7 +119,6 @@
       }
     }
     
-    /* Admin badge */
     .admin-badge {
       display: inline-block;
       background: #6b0d2b;
@@ -133,7 +130,6 @@
       vertical-align: middle;
     }
     
-    /* Driver badge */
     .driver-badge {
       display: inline-block;
       background: #1e6b0d;
@@ -145,7 +141,6 @@
       vertical-align: middle;
     }
     
-    /* Cart badge style */
     .cart-badge {
       position: absolute;
       top: -5px;
@@ -159,62 +154,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    
-    /* Toast notification */
-    .toast-notification {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #323232;
-      color: white;
-      padding: 16px 24px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 1001;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      max-width: 400px;
-      animation: slideIn 0.3s ease;
-    }
-    
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    
-    .toast-notification.success {
-      background: #27ae60;
-    }
-    
-    .toast-notification.error {
-      background: #e74c3c;
-    }
-    
-    .toast-notification.info {
-      background: #3498db;
-    }
-    
-    /* Loading spinner */
-    .loading-spinner {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(107, 13, 43, 0.1);
-      border-radius: 50%;
-      border-top-color: #6b0d2b;
-      animation: spin 1s ease-in-out infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -259,15 +198,13 @@
   <!-- Advert Detail Content -->
   <section class="section advert-detail-section">
     <div class="container">
-      <!-- Back button and header - EXACTLY LIKE WINE DETAIL -->
+      <!-- Back button only - NO TYPE DISPLAYED -->
       <div class="advert-detail-header">
         <a href="javascript:history.back()" class="back-button">
           <i class="fas fa-arrow-left"></i>
         </a>
-        <h2 class="advert-type" id="advertType">Special Offer</h2>
+        <!-- No type displayed here - just back button -->
       </div>
-
-      <!-- NO SEARCH BAR - removed as requested -->
 
       <!-- Main Advert Details -->
       <div class="advert-detail-container" id="advertDetailContainer">
@@ -326,589 +263,9 @@
   </footer>
 
   <!-- Authentication Script -->
-  <script>
-    // Authentication script (same as wine detail)
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🎪 Advert Detail page loaded - checking authentication');
-        
-        const API_BASE_URL = '/api';
-        
-        function isTokenValid() {
-            const token = localStorage.getItem('wineBubbles_token');
-            const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
-            
-            if (!token || !timestamp) return false;
-            
-            const tokenAge = Date.now() - parseInt(timestamp);
-            const sevenDays = 7 * 24 * 60 * 60 * 1000;
-            
-            return tokenAge < sevenDays;
-        }
-        
-        function clearUserSession() {
-            localStorage.removeItem('wineBubbles_token');
-            localStorage.removeItem('wineBubbles_token_timestamp');
-            localStorage.removeItem('wineBubbles_user');
-            localStorage.removeItem('wineBubbles_isAdmin');
-            localStorage.removeItem('wineBubbles_isDriver');
-            localStorage.removeItem('wineBubbles_userFullName');
-            localStorage.removeItem('wineBubbles_userEmail');
-            localStorage.removeItem('wineBubbles_userPhone');
-            localStorage.removeItem('wineBubbles_userImage');
-            localStorage.removeItem('wineBubbles_userVerified');
-            localStorage.removeItem('wineBubbles_userCreated');
-        }
-        
-        const token = localStorage.getItem('wineBubbles_token');
-        const userData = localStorage.getItem('wineBubbles_user');
-        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
-        const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
-        const isValidToken = isTokenValid();
-        
-        const userIcon = document.getElementById('userIcon');
-        const userIconElement = document.getElementById('userIconElement');
-        
-        if (isValidToken && userData) {
-            console.log('✅ User is logged in on Advert Detail page');
-            
-            try {
-                const user = JSON.parse(userData);
-                
-                if (userIconElement) {
-                    userIconElement.className = 'fas fa-user-check';
-                    userIconElement.style.color = '#6b0d2b';
-                }
-                
-                if (userIcon) {
-                    userIcon.href = '#';
-                    userIcon.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        toggleUserDropdown();
-                    });
-                }
-                
-                createUserDropdown(user, isAdmin, isDriver);
-                
-            } catch (error) {
-                console.error('Error parsing user data:', error);
-                clearUserSession();
-                resetUserIcon();
-            }
-            
-        } else {
-            console.log('❌ User is not logged in or token expired');
-            clearUserSession();
-            resetUserIcon();
-        }
-        
-        function resetUserIcon() {
-            if (userIcon) {
-                userIcon.href = '../login/login.html';
-                if (userIconElement) {
-                    userIconElement.className = 'fas fa-sign-in-alt';
-                    userIconElement.style.color = '#6b0d2b';
-                }
-            }
-        }
-        
-        function toggleUserDropdown() {
-            const dropdown = document.querySelector('.user-dropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('show');
-            }
-        }
-        
-        function createUserDropdown(user, isAdmin, isDriver) {
-            const existingDropdown = document.querySelector('.user-dropdown');
-            if (existingDropdown) {
-                existingDropdown.remove();
-            }
-            
-            const dropdown = document.createElement('div');
-            dropdown.className = 'user-dropdown';
-            
-            const userInfo = document.createElement('div');
-            userInfo.className = 'user-dropdown-info';
-            
-            const userName = document.createElement('div');
-            userName.className = 'user-dropdown-name';
-            userName.textContent = user.fullName || user.email.split('@')[0];
-            
-            if (isAdmin) {
-                const adminBadge = document.createElement('span');
-                adminBadge.className = 'admin-badge';
-                adminBadge.textContent = 'ADMIN';
-                userName.appendChild(adminBadge);
-            } else if (isDriver) {
-                const driverBadge = document.createElement('span');
-                driverBadge.className = 'driver-badge';
-                driverBadge.textContent = 'DRIVER';
-                userName.appendChild(driverBadge);
-            }
-            
-            const userEmail = document.createElement('div');
-            userEmail.className = 'user-dropdown-email';
-            userEmail.textContent = user.email;
-            
-            userInfo.appendChild(userName);
-            userInfo.appendChild(userEmail);
-            dropdown.appendChild(userInfo);
-            
-            const items = [
-                { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
-            ];
-            
-            items.forEach(item => {
-                const link = document.createElement('a');
-                link.href = item.href;
-                link.className = 'user-dropdown-link';
-                link.innerHTML = `
-                    <i class="${item.icon}"></i>
-                    <span>${item.text}</span>
-                `;
-                dropdown.appendChild(link);
-            });
-            
-            const logoutButton = document.createElement('button');
-            logoutButton.className = 'user-dropdown-logout';
-            logoutButton.textContent = 'Logout';
-            logoutButton.addEventListener('click', function() {
-                clearUserSession();
-                window.location.href = '../index.html';
-            });
-            
-            dropdown.appendChild(logoutButton);
-            document.body.appendChild(dropdown);
-            
-            document.addEventListener('click', function(event) {
-                const dropdown = document.querySelector('.user-dropdown');
-                if (dropdown && !dropdown.contains(event.target) && 
-                    userIcon && !userIcon.contains(event.target)) {
-                    dropdown.classList.remove('show');
-                }
-            });
-        }
-    });
-  </script>
+  <script src="../js/auth.js"></script>
   
   <!-- Advert Detail JavaScript - NO DEBUG BUTTON -->
-  <script>
-    // Advert Detail JavaScript - MATCHING WINE DETAIL LAYOUT
-    const API_BASE_URL = '/api';
-
-    // State
-    let currentAdvert = null;
-    let allAdverts = [];
-    let quantity = 1;
-
-    // DOM Elements
-    const advertDetailContainer = document.getElementById('advertDetailContainer');
-    const relatedAdvertsSection = document.getElementById('relatedAdvertsSection');
-    const relatedAdvertsGrid = document.getElementById('relatedAdvertsGrid');
-    const advertTypeElement = document.getElementById('advertType');
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🎪 Advert Detail page loaded');
-      
-      // Get advert ID from URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const advertId = urlParams.get('id') || '';
-      
-      if (advertId) {
-        console.log(`🎯 Loading advert with ID: ${advertId}`);
-        fetchAdvertDetail(advertId);
-      } else {
-        showError('No advert ID provided in URL');
-      }
-      
-      // Initialize cart badge
-      if (window.CartUtils) {
-        console.log('✅ CartUtils loaded, updating badge');
-        window.CartUtils.updateCartBadge();
-      }
-      
-      // Listen for cart updates
-      window.addEventListener('cartUpdated', () => {
-        if (window.CartUtils) {
-          window.CartUtils.updateCartBadge();
-        }
-      });
-    });
-
-    // Fetch advert detail
-    async function fetchAdvertDetail(advertId) {
-      try {
-        showLoading();
-        
-        console.log(`🌐 Fetching advert detail for ID: ${advertId}`);
-        
-        const apiUrl = `${API_BASE_URL}/adverts/${advertId}`;
-        console.log('📡 Fetching from:', apiUrl);
-        
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch advert details: ${response.status}`);
-        }
-        
-        const advert = await response.json();
-        console.log('✅ Advert detail received:', advert);
-        
-        currentAdvert = advert;
-        
-        // Update page title
-        document.title = `Wine & Bubbles — ${advert.title}`;
-        if (advertTypeElement) {
-          advertTypeElement.textContent = advert.type || 'Special Offer';
-        }
-        
-        // Track impression
-        trackImpression(advert.id);
-        
-        // Fetch all adverts for related section
-        await fetchAllAdverts();
-        
-        // Render advert detail
-        renderAdvertDetail(advert);
-        
-      } catch (error) {
-        console.error('Error:', error);
-        showError(`Failed to load offer details: ${error.message}`);
-      }
-    }
-
-    // Track impression
-    async function trackImpression(advertId) {
-      try {
-        await fetch(`${API_BASE_URL}/adverts/track/impression`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ advertId })
-        });
-      } catch (error) {
-        console.log('Failed to track impression:', error);
-      }
-    }
-
-    // Fetch all adverts for related offers
-    async function fetchAllAdverts() {
-      try {
-        const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage`;
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) return;
-        
-        const adverts = await response.json();
-        allAdverts = adverts.filter(advert => 
-          advert.isActive === true || advert.isActive === undefined
-        );
-        
-        console.log(`✅ All adverts received: ${allAdverts.length} active adverts`);
-        
-      } catch (error) {
-        console.error('Error fetching all adverts:', error);
-      }
-    }
-
-    // Helper to fix image URLs - USING IMAGE URL
-    function fixImageUrl(advert) {
-      if (!advert) return '../assets/adverts/default_marketing.jpg';
-      
-      let imageUrl = advert.imageUrl || '';
-      
-      if (!imageUrl) {
-        return '../assets/adverts/default_marketing.jpg';
-      }
-      
-      if (imageUrl.startsWith('assets/')) {
-        return '../' + imageUrl;
-      }
-      
-      if (imageUrl.startsWith('../assets/') || imageUrl.startsWith('http') || imageUrl.startsWith('/')) {
-        return imageUrl;
-      }
-      
-      return '../assets/' + imageUrl;
-    }
-
-    // Render advert detail - EXACTLY LIKE WINE DETAIL BUT WITHOUT CATEGORY/TYPE
-    function renderAdvertDetail(advert) {
-      const imageUrl = fixImageUrl(advert);
-      const price = advert.price || 0;
-      const subtitle = advert.subtitle || '';
-      const stockCount = advert.stockCount || 0;
-      const isAvailable = advert.isAvailableForPurchase || false;
-      const isInStock = isAvailable && stockCount > 0;
-      
-      advertDetailContainer.innerHTML = `
-        <div class="advert-detail-card">
-          <div class="advert-detail-image-container">
-            <img src="${imageUrl}" 
-                 alt="${advert.title}" 
-                 class="advert-detail-image"
-                 loading="lazy"
-                 onerror="this.onerror=null; this.src='../assets/adverts/default_marketing.jpg';">
-          </div>
-          <div class="advert-detail-content">
-            <h1 class="advert-detail-name">${advert.title}</h1>
-            <div class="advert-detail-subtitle">${subtitle}</div>
-            <div class="advert-detail-price">R${price.toFixed(2)}</div>
-            
-            <!-- NO CATEGORY/TYPE FIELDS - removed completely -->
-            
-            ${isAvailable ? `
-              <div class="stock-status ${stockCount > 5 ? 'stock-in' : stockCount > 0 ? 'stock-low' : 'stock-out'}">
-                ${stockCount > 5 ? 'In Stock' : stockCount > 0 ? `Only ${stockCount} left!` : 'Out of Stock'}
-              </div>
-            ` : ''}
-            
-            ${isInStock ? `
-              <div class="quantity-selector">
-                <button class="quantity-btn" onclick="decrementQuantity()" ${quantity <= 1 ? 'disabled' : ''}>
-                  <i class="fas fa-minus"></i>
-                </button>
-                <div class="quantity-display" id="quantityDisplay">${quantity}</div>
-                <button class="quantity-btn" onclick="incrementQuantity()" ${quantity >= stockCount ? 'disabled' : ''}>
-                  <i class="fas fa-plus"></i>
-                </button>
-              </div>
-            ` : ''}
-            
-            ${isInStock ? `
-              <button class="add-to-cart-btn" id="addToCartBtn" onclick="addToCart()">
-                Add ${quantity} to Cart (R${(price * quantity).toFixed(2)})
-              </button>
-            ` : isAvailable ? `
-              <div class="not-available-message">
-                <i class="fas fa-times-circle"></i>
-                <p>This offer is currently out of stock</p>
-              </div>
-            ` : `
-              <div class="not-available-message">
-                <i class="fas fa-info-circle"></i>
-                <p>This is a promotional offer and cannot be purchased</p>
-              </div>
-            `}
-          </div>
-        </div>
-      `;
-    }
-
-    // Quantity controls
-    function incrementQuantity() {
-      if (currentAdvert && quantity < currentAdvert.stockCount) {
-        quantity++;
-        updateQuantityDisplay();
-      }
-    }
-
-    function decrementQuantity() {
-      if (quantity > 1) {
-        quantity--;
-        updateQuantityDisplay();
-      }
-    }
-
-    function updateQuantityDisplay() {
-      const quantityDisplay = document.getElementById('quantityDisplay');
-      const addToCartBtn = document.getElementById('addToCartBtn');
-      
-      if (quantityDisplay) {
-        quantityDisplay.textContent = quantity;
-      }
-      
-      if (addToCartBtn && currentAdvert) {
-        const price = currentAdvert.price || 0;
-        addToCartBtn.textContent = `Add ${quantity} to Cart (R${(price * quantity).toFixed(2)})`;
-      }
-      
-      const minusBtn = document.querySelector('.quantity-btn:first-child');
-      const plusBtn = document.querySelector('.quantity-btn:last-child');
-      
-      if (minusBtn) minusBtn.disabled = quantity <= 1;
-      if (plusBtn && currentAdvert) plusBtn.disabled = quantity >= currentAdvert.stockCount;
-    }
-
-    // Add to cart
-    function addToCart() {
-      if (!currentAdvert) {
-        showToast('No offer data available', 'error');
-        return;
-      }
-      
-      if (!currentAdvert.isAvailableForPurchase) {
-        showToast(`${currentAdvert.title} is not available for purchase`, 'error');
-        return;
-      }
-      
-      if (currentAdvert.stockCount < quantity) {
-        showToast(`Only ${currentAdvert.stockCount} placements available`, 'error');
-        return;
-      }
-      
-      const cartItem = {
-        id: currentAdvert.id.toString(),
-        name: currentAdvert.title,
-        price: currentAdvert.price,
-        imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg',
-        type: 'advert',
-        category: currentAdvert.category || '',
-        description: currentAdvert.subtitle || '',
-        quantity: quantity
-      };
-      
-      if (window.CartUtils && typeof window.CartUtils.addItem === 'function') {
-        try {
-          window.CartUtils.addItem(cartItem);
-          showToast(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} of ${currentAdvert.title} to cart`, 'success');
-          
-          // Track click
-          trackClick(currentAdvert.id);
-          
-          // Reset quantity
-          quantity = 1;
-          updateQuantityDisplay();
-          window.CartUtils.updateCartBadge();
-          
-        } catch (error) {
-          showToast('Failed to add item to cart', 'error');
-        }
-      }
-    }
-
-    // Track click
-    async function trackClick(advertId) {
-      try {
-        await fetch(`${API_BASE_URL}/adverts/track/click`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ advertId })
-        });
-      } catch (error) {
-        console.log('Failed to track click:', error);
-      }
-    }
-
-    // Show related adverts
-    function showRelatedAdverts() {
-      if (!allAdverts.length) return;
-      
-      let related = allAdverts.filter(advert => {
-        if (currentAdvert && advert.id === currentAdvert.id) return false;
-        return true;
-      });
-      
-      if (related.length === 0) {
-        relatedAdvertsGrid.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-tag"></i>
-            <h3>No related offers found</h3>
-          </div>
-        `;
-      } else {
-        related = related.slice(0, 6);
-        
-        relatedAdvertsGrid.innerHTML = related.map(advert => {
-          const imageUrl = fixImageUrl(advert);
-          const price = advert.price || 0;
-          const isAvailable = advert.isAvailableForPurchase || false;
-          
-          return `
-            <div class="advert-card" onclick="navigateToAdvertDetail('${advert.id}')">
-              <div class="advert-card-image-container">
-                <img src="${imageUrl}" 
-                     alt="${advert.title}" 
-                     class="advert-card-image"
-                     loading="lazy"
-                     onerror="this.onerror=null; this.src='../assets/adverts/default_marketing.jpg';">
-              </div>
-              <div class="advert-card-content">
-                <div class="advert-card-title">${advert.title}</div>
-                <div class="advert-card-subtitle">${advert.subtitle || 'Special Offer'}</div>
-                ${isAvailable ? `
-                  <div class="advert-card-price">R${price.toFixed(2)}</div>
-                ` : ''}
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-      
-      relatedAdvertsSection.style.display = 'block';
-    }
-
-    // Hide related adverts
-    function hideRelatedAdverts() {
-      relatedAdvertsSection.style.display = 'none';
-    }
-
-    // Navigate to advert detail
-    function navigateToAdvertDetail(advertId) {
-      window.location.href = `advert_detail.html?id=${advertId}`;
-    }
-
-    // UI States
-    function showLoading() {
-      advertDetailContainer.innerHTML = `
-        <div class="loading-state">
-          <div class="loading-spinner"></div>
-          <p>Loading offer details...</p>
-        </div>
-      `;
-    }
-
-    function showError(message) {
-      advertDetailContainer.innerHTML = `
-        <div class="error-state">
-          <i class="fas fa-exclamation-circle"></i>
-          <h3>Error</h3>
-          <p>${message}</p>
-          <button onclick="window.history.back()" class="btn-fill" style="margin-top: 20px;">
-            Go Back
-          </button>
-        </div>
-      `;
-    }
-
-    // Toast notification
-    function showToast(message, type = 'success') {
-      const existingToast = document.querySelector('.toast-notification');
-      if (existingToast) existingToast.remove();
-      
-      const toast = document.createElement('div');
-      toast.className = `toast-notification ${type}`;
-      toast.innerHTML = `
-        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
-        <span>${message}</span>
-      `;
-      
-      document.body.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.style.animation = 'slideIn 0.3s ease reverse';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-
-    // Make functions available globally
-    window.incrementQuantity = incrementQuantity;
-    window.decrementQuantity = decrementQuantity;
-    window.addToCart = addToCart;
-    window.navigateToAdvertDetail = navigateToAdvertDetail;
-    window.hideRelatedAdverts = hideRelatedAdverts;
-  </script>
+  <script src="advert_detail.js"></script>
 </body>
 </html>
