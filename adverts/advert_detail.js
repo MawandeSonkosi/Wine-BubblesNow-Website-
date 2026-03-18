@@ -1,4 +1,4 @@
-// Advert Detail JavaScript - NO DEBUG BUTTON
+// Advert Detail JavaScript - NO DEBUG BUTTON, USING IMAGE URL
 const API_BASE_URL = '/api';
 
 // State
@@ -127,16 +127,18 @@ async function fetchAllAdverts() {
   }
 }
 
-// Helper to fix image URLs - USING IMAGE URL
+// Helper to fix image URLs - USING IMAGE URL ONLY (not targetUrl)
 function fixImageUrl(advert) {
   if (!advert) return '../assets/adverts/default_marketing.jpg';
   
+  // USE ONLY imageUrl as requested
   let imageUrl = advert.imageUrl || '';
   
   if (!imageUrl) {
     return '../assets/adverts/default_marketing.jpg';
   }
   
+  // Fix path
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
@@ -148,7 +150,7 @@ function fixImageUrl(advert) {
   return '../assets/' + imageUrl;
 }
 
-// Render advert detail
+// Render advert detail - NO CATEGORY/TYPE FIELDS
 function renderAdvertDetail(advert) {
   const imageUrl = fixImageUrl(advert);
   const price = advert.price || 0;
@@ -170,6 +172,8 @@ function renderAdvertDetail(advert) {
         <h1 class="advert-detail-name">${advert.title}</h1>
         <div class="advert-detail-subtitle">${subtitle}</div>
         <div class="advert-detail-price">R${price.toFixed(2)}</div>
+        
+        <!-- NO CATEGORY/TYPE FIELDS - removed completely -->
         
         ${isAvailable ? `
           <div class="stock-status ${stockCount > 5 ? 'stock-in' : stockCount > 0 ? 'stock-low' : 'stock-out'}">

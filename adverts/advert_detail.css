@@ -1,4 +1,4 @@
-/* Advert Detail Specific Styles - All CSS moved here */
+/* Advert Detail Specific Styles */
 
 /* Advert Detail Section */
 .advert-detail-section {
@@ -87,6 +87,8 @@
   text-align: center;
   margin: 0 0 25px;
 }
+
+/* NO CATEGORY/TYPE FIELDS - removed completely */
 
 /* Stock Status */
 .stock-status {
