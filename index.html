@@ -642,7 +642,7 @@
       100% { transform: rotate(360deg); }
     }
     
-/* MARKETING BANNERS SECTION STYLES - FIXED FOR SAFARI */
+/* MARKETING BANNERS SECTION STYLES - OPTIMIZED FOR ALL BROWSERS */
 .marketing-banners-section {
   margin: 0 auto 40px;
   max-width: 1000px;
@@ -659,26 +659,34 @@
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.15);
   background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
-  /* Fixed height approach - works consistently across browsers */
-  height: 400px;
+  /* Use percentage-based height with min-height for better control */
+  height: auto;
+  min-height: 400px;
+  max-height: 500px;
+  aspect-ratio: 16/9; /* Consistent aspect ratio across browsers */
 }
 
-/* Safari-specific adjustments */
+/* Safari-specific fixes */
 @supports (-webkit-touch-callout: none) {
   .marketing-banners-container {
-    height: 400px;
-    background: #f5f5f5;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio (9/16 = 0.5625) */
+    background: #f5f5f5; /* Fallback color */
   }
-
+  
   .marketing-banners-track {
-    height: 400px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   }
 }
 
 .marketing-banners-track {
   display: flex;
   transition: transform 0.6s ease-in-out;
-  height: 400px;
+  height: 100%;
   width: 100%;
   will-change: transform;
 }
@@ -690,36 +698,35 @@
   cursor: pointer;
   border-radius: 16px;
   overflow: hidden;
-  height: 400px;
-  background: #f5f5f5;
+  height: 100%;
+  background: #f5f5f5; /* Fallback background */
 }
 
-/* -------------------------------------------- */
-/* SAFARI FIX ADDED HERE — THIS FIXES CROPPING */
-/* -------------------------------------------- */
 .marketing-banner-image {
   width: 100%;
-  height: 400px;
-  object-fit: cover;
-  object-position: center;
+  height: 100%;
+  object-fit: contain; /* Changed from cover to contain for Safari */
+  object-position: center; /* Center the image */
   display: block;
   transition: transform 0.8s ease;
-  background: #f5f5f5;
-
-  /* SAFARI FIX */
-  -webkit-transform: translate3d(0,0,0);
-  transform: translate3d(0,0,0);
-
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
+  background: #f5f5f5; /* Fallback background */
 }
 
-/* Hover Zoom (Cross-Browser Compatible) */
+/* Chrome, Edge, Firefox - use cover for better fill */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+  .marketing-banner-image {
+    object-fit: cover; /* Keep cover for Chrome */
+  }
+}
+
+/* Firefox specific */
+@-moz-document url-prefix() {
+  .marketing-banner-image {
+    object-fit: cover; /* Keep cover for Firefox */
+  }
+}
+
 .marketing-banner-slide:hover .marketing-banner-image {
-  -webkit-transform: scale(1.05);
   transform: scale(1.05);
 }
 
@@ -736,7 +743,6 @@
   padding: 30px;
   padding-top: 80px;
   box-sizing: border-box;
-  pointer-events: none;
 }
 
 .marketing-banner-title {
@@ -766,7 +772,7 @@
   width: 55px;
   height: 55px;
   border-radius: 50%;
-  display: flex !important;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -805,15 +811,13 @@
   bottom: 25px;
   left: 0;
   right: 0;
-  display: flex !important;
+  display: flex;
   justify-content: center;
   gap: 12px;
   z-index: 10;
   flex-wrap: wrap;
   padding: 0 10px;
   box-sizing: border-box;
-  visibility: visible !important;
-  opacity: 1 !important;
 }
 
 .marketing-dot {
@@ -839,250 +843,177 @@
   transform: scale(1.2);
 }
 
-/* Loading and Error States */
-.loading-state {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 400px;
-  background: #f5f5f5;
+/* RESPONSIVE BREAKPOINTS - Matches your original design */
+
+/* Large Desktop */
+@media (min-width: 1400px) {
+  .marketing-banners-container {
+    min-height: 500px;
+    max-height: 600px;
+  }
 }
 
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(107, 13, 43, 0.1);
-  border-top-color: #6b0d2b;
-  border-radius: 50%;
-  animation: spin 1.2s linear infinite;
-  margin-bottom: 20px;
-}
-
-.carousel-error-state,
-.carousel-empty-state {
-  width: 100%;
-  text-align: center;
-  padding: 40px;
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-}
-
-.carousel-error-state i,
-.carousel-empty-state i {
-  font-size: 56px;
-  margin-bottom: 20px;
-}
-
-.carousel-error-state i {
-  color: #ff6b6b;
-}
-
-.carousel-empty-state i {
-  color: #6b0d2b;
-  opacity: 0.5;
-}
-
-.carousel-error-state h3,
-.carousel-empty-state h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 26px;
-  color: #1b1b1b;
-  margin-bottom: 12px;
-}
-
-.carousel-error-state p,
-.carousel-empty-state p {
-  color: #666;
-  margin-bottom: 25px;
-  max-width: 400px;
-  line-height: 1.6;
-}
-
-.btn-fill {
-  background: #6b0d2b;
-  color: white;
-  border: none;
-  padding: 12px 28px;
-  border-radius: 10px;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-fill:hover {
-  background: #5a0b23;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(107, 13, 43, 0.3);
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* RESPONSIVE BREAKPOINTS */
+/* Desktop - Original Chrome size */
 @media (max-width: 1200px) {
-  .marketing-banners-container,
-  .marketing-banners-track,
-  .marketing-banner-slide,
-  .marketing-banner-image,
-  .loading-state,
-  .carousel-error-state,
-  .carousel-empty-state {
-    height: 380px;
+  .marketing-banners-container {
+    min-height: 380px;
+    max-height: 450px;
   }
 }
 
+/* Tablet Landscape - Original */
 @media (max-width: 992px) {
-  .marketing-banners-container,
-  .marketing-banners-track,
-  .marketing-banner-slide,
-  .marketing-banner-image,
-  .loading-state,
-  .carousel-error-state,
-  .carousel-empty-state {
-    height: 350px;
+  .marketing-banners-container {
+    min-height: 350px;
+    max-height: 400px;
   }
-
+  
   .marketing-banner-title {
     font-size: 28px;
   }
-
+  
   .marketing-banner-subtitle {
     font-size: 18px;
   }
 }
 
+/* Tablet Portrait - Original */
 @media (max-width: 768px) {
-  .marketing-banners-container,
-  .marketing-banners-track,
-  .marketing-banner-slide,
-  .marketing-banner-image,
-  .loading-state,
-  .carousel-error-state,
-  .carousel-empty-state {
-    height: 300px;
+  .marketing-banners-container {
+    min-height: 300px;
+    max-height: 350px;
   }
-
+  
   .marketing-banner-overlay {
     padding: 25px;
     padding-top: 60px;
   }
-
+  
   .marketing-banner-title {
     font-size: 24px;
   }
-
+  
   .marketing-banner-subtitle {
     font-size: 16px;
   }
-
+  
   .marketing-nav-btn {
     width: 45px;
     height: 45px;
     font-size: 20px;
   }
-
+  
   .marketing-prev-btn {
     left: 15px;
   }
-
+  
   .marketing-next-btn {
     right: 15px;
   }
 }
 
+/* Mobile Large - Original */
 @media (max-width: 576px) {
-  .marketing-banners-container,
-  .marketing-banners-track,
-  .marketing-banner-slide,
-  .marketing-banner-image,
-  .loading-state,
-  .carousel-error-state,
-  .carousel-empty-state {
-    height: 250px;
+  .marketing-banners-container {
+    min-height: 250px;
+    max-height: 300px;
+    border-radius: 12px;
   }
-
+  
   .marketing-banner-overlay {
     padding: 20px;
     padding-top: 50px;
   }
-
+  
   .marketing-banner-title {
     font-size: 20px;
   }
-
+  
   .marketing-banner-subtitle {
     font-size: 14px;
   }
-
+  
   .marketing-nav-btn {
     width: 40px;
     height: 40px;
     font-size: 18px;
   }
-
+  
   .marketing-prev-btn {
     left: 10px;
   }
-
+  
   .marketing-next-btn {
     right: 10px;
   }
-
+  
   .marketing-dots {
     bottom: 15px;
     gap: 8px;
   }
-
+  
   .marketing-dot {
     width: 12px;
     height: 12px;
   }
 }
 
+/* Mobile Small - Original */
 @media (max-width: 375px) {
-  .marketing-banners-container,
-  .marketing-banners-track,
-  .marketing-banner-slide,
-  .marketing-banner-image,
-  .loading-state,
-  .carousel-error-state,
-  .carousel-empty-state {
-    height: 200px;
+  .marketing-banners-container {
+    min-height: 200px;
+    max-height: 250px;
   }
-
+  
   .marketing-banner-overlay {
     padding: 15px;
     padding-top: 40px;
   }
-
+  
   .marketing-banner-title {
     font-size: 18px;
   }
-
+  
   .marketing-banner-subtitle {
     font-size: 12px;
   }
-
+  
   .marketing-nav-btn {
     width: 35px;
     height: 35px;
     font-size: 16px;
   }
-
+  
   .marketing-dot {
     width: 10px;
     height: 10px;
   }
+}
+
+/* Safari gap fix */
+@supports (-webkit-touch-callout: none) {
+  .marketing-dots {
+    gap: 8px;
+  }
+  
+  .marketing-dot {
+    margin: 0 2px;
+  }
+}
+
+/* Force arrows and dots to show */
+#marketingPrevBtn,
+#marketingNextBtn {
+  display: flex !important;
+  z-index: 1000 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.marketing-dots {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
   </style>
