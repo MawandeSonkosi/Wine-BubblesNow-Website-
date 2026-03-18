@@ -16,6 +16,7 @@ const filterDropdown = document.getElementById('filterDropdown');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🍷 Wine page loaded');
+  console.log('🔧 Using API URL:', API_BASE_URL);
   fetchWines();
   setupEventListeners();
 });
@@ -49,11 +50,10 @@ function setupEventListeners() {
   }
 }
 
-// Extract wine types - matching Flutter's filter list
+// Extract wine types - REMOVED "White Wine" from default types
 function extractWineTypes(wines) {
   const defaultTypes = [
     'All',
-    'White Wine',
     'Red Wine',
     'Champagne',
     'Whiskey',
@@ -70,6 +70,20 @@ function extractWineTypes(wines) {
   
   const allTypes = [...new Set([...defaultTypes.filter(t => t !== 'All'), ...uniqueTypes])].sort();
   return ['All', ...allTypes];
+}
+
+// Check if item is a wine (not a banner or advert)
+function isWine(item) {
+  // Check if it has wine-specific properties
+  return (
+    item && 
+    item.type && 
+    item.price && 
+    // Exclude items that are clearly adverts
+    !item.productType === 'advert' && 
+    !item.type.toLowerCase().includes('advert') &&
+    !item.category === 'marketing'
+  );
 }
 
 // Populate filter dropdown
@@ -113,7 +127,7 @@ async function fetchWines() {
   try {
     showLoading();
     
-    // Use relative URL through your proxy server - works on both localhost and live site
+    // Use relative URL through your proxy server - NO CORS PROXY
     const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
     console.log('🌐 Fetching wines from:', apiUrl);
     
@@ -131,18 +145,35 @@ async function fetchWines() {
     }
     
     const wines = await response.json();
-    console.log(`✅ Received ${wines.length} wines`);
+    console.log(`✅ Received ${wines.length} items from API`);
     
-    // Log wine details for debugging
-    console.log('📊 ALL WINES LOADED:', wines.length);
+    // Filter out non-wine items (banners, adverts, etc.)
+    const filteredItems = wines.filter(item => {
+      // Keep only items that are actual wines
+      // Check if it has a type that matches wine categories
+      const validWineTypes = ['Red Wine', 'White Wine', 'Champagne', 'Sparkling', 'Rose', 'Dessert Wine'];
+      const hasValidType = item.type && validWineTypes.some(type => 
+        item.type.toLowerCase().includes(type.toLowerCase())
+      );
+      
+      // Exclude items that are clearly adverts
+      const isNotAdvert = !item.productType === 'advert' && 
+                          !item.category === 'marketing' && 
+                          !item.title?.toLowerCase().includes('advert');
+      
+      // Include if it has a price and valid wine characteristics
+      return item.price && (hasValidType || isNotAdvert);
+    });
     
-    allWines = wines;
-    filteredWines = wines;
+    console.log(`🍷 Filtered to ${filteredItems.length} actual wines`);
     
-    if (wines.length === 0) {
+    allWines = filteredItems;
+    filteredWines = filteredItems;
+    
+    if (filteredItems.length === 0) {
       showEmptyState('No wines found');
     } else {
-      populateFilterDropdown(wines);
+      populateFilterDropdown(filteredItems);
       renderWines();
     }
     
