@@ -24,7 +24,7 @@
   <script src="../cart/cart-utils.js"></script>
   
   <style>
-    /* Only user dropdown styles remain in HTML - these can't be moved easily */
+    /* Only user dropdown styles remain in HTML */
     .user-dropdown {
       position: absolute;
       top: 100px;
@@ -198,12 +198,12 @@
   <!-- Advert Detail Content -->
   <section class="section advert-detail-section">
     <div class="container">
-      <!-- Back button and header - EXACTLY LIKE WINE DETAIL -->
+      <!-- Back button only - NO TYPE DISPLAYED -->
       <div class="advert-detail-header">
         <a href="javascript:history.back()" class="back-button">
           <i class="fas fa-arrow-left"></i>
         </a>
-        <h2 class="advert-type" id="advertType">Special Offer</h2>
+        <!-- No type displayed here - removed completely -->
       </div>
 
       <!-- NO SEARCH BAR - removed as requested -->
@@ -264,10 +264,10 @@
     </div>
   </footer>
 
-  <!-- Authentication Script - moved to external file -->
+  <!-- Authentication Script -->
   <script src="../js/auth.js"></script>
   
-  <!-- Advert Detail JavaScript - moved to external file -->
+  <!-- Advert Detail JavaScript -->
   <script src="advert_detail.js"></script>
 </body>
 </html>
