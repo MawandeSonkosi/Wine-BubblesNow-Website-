@@ -1836,10 +1836,10 @@
     }
   });
 </script>
-<!-- MARKETING BANNERS - COMPLETELY FIXED VERSION -->
+<!-- MARKETING BANNERS - USING IMAGE PATH -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎪 Starting marketing banners (FIXED VERSION)');
+    console.log('🎪 Starting marketing banners (USING IMAGE PATH)');
     
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
     if (!ageConfirmed) {
@@ -1857,8 +1857,7 @@
       return;
     }
     
-    // IMPORTANT: Use RELATIVE URL so it goes through your proxy server
-    const API_BASE_URL = '/api';  // This will use the current domain's proxy
+    const API_BASE_URL = '/api';
     
     let marketingAdverts = [];
     let currentMarketingSlide = 0;
@@ -1877,7 +1876,6 @@
     
     async function initMarketingBanners() {
       try {
-        // Use relative URL - this goes through your proxy server
         const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage`;
         console.log('🌐 FETCHING FROM PROXY:', apiUrl);
         
@@ -1898,7 +1896,6 @@
         const adverts = await response.json();
         console.log('✅ BACKEND RESPONSE:', adverts);
         
-        // Check if we got actual data or fallback
         if (Array.isArray(adverts) && adverts.length > 0) {
           console.log('✅ GOT REAL DATA FROM BACKEND:', adverts.length, 'items');
           marketingAdverts = adverts;
@@ -1945,6 +1942,7 @@
           id: 'fallback-1',
           title: 'African Diamond Blanc',
           subtitle: 'Premium selection for connoisseurs',
+          imagePath: 'assets/adverts/African_Diamond_Blanc.png',
           imageUrl: 'assets/adverts/African_Diamond_Blanc.png',
           targetUrl: '#',
           isActive: true,
@@ -1954,6 +1952,7 @@
           id: 'fallback-2',
           title: 'Ferrero Rocher Collection',
           subtitle: 'Perfect pairing for special moments',
+          imagePath: 'assets/adverts/ferrero.png',
           imageUrl: 'assets/adverts/ferrero.png',
           targetUrl: '#',
           isActive: true,
@@ -1963,6 +1962,7 @@
           id: 'fallback-3',
           title: 'Moët & Chandon Rosé',
           subtitle: 'Celebrate with premium champagne',
+          imagePath: 'assets/adverts/moet_rose.png',
           imageUrl: 'assets/adverts/moet_rose.png',
           targetUrl: '#',
           isActive: true,
@@ -2005,72 +2005,97 @@
     }
     
     function createMarketingSlide(advert, index) {
-  const slide = document.createElement('div');
-  slide.className = 'marketing-banner-slide';
-  slide.dataset.index = index;
-  slide.dataset.advertId = advert.id;
-  
-  // Get the image URL from the backend
-  let imagePath = advert.imageUrl || '';
-  
-  console.log(`🖼️ SLIDE ${index} ORIGINAL IMAGE PATH:`, imagePath);
-  
-  // Fix the path - remove "assets/" prefix if it exists since we're already in the root
-  if (imagePath.startsWith('assets/')) {
-    // Keep as is - it's already correct for the website
-    imagePath = imagePath;
-  } else if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
-    imagePath = 'assets/' + imagePath;
-  }
-  
-  // If still no image, use fallback
-  if (!imagePath) {
-    imagePath = 'assets/adverts/default_marketing.jpg';
-  }
-  
-  console.log(`🖼️ SLIDE ${index} FINAL IMAGE PATH:`, imagePath);
-  
-  slide.innerHTML = `
-    <img src="${imagePath}" 
-         alt="${advert.title}" 
-         class="marketing-banner-image"
-         loading="eager"
-         decoding="async"
-         onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; console.log('❌ Failed to load: ${imagePath}');">
-    
-    <div class="marketing-banner-overlay">
-      <div class="marketing-banner-title">${advert.title}</div>
-      <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
-    </div>
-  `;
-  
-  slide.addEventListener('click', (event) => {
-    if (!isMarketingTransitioning) {
-      event.preventDefault();
-      handleAdvertClick(advert);
-    }
-  });
-  
-  slide.style.cursor = 'pointer';
-  
-  marketingBannersTrack.appendChild(slide);
-  
-  if (marketingDots) {
-    const dot = document.createElement('span');
-    dot.className = 'marketing-dot';
-    if (index === 0) dot.classList.add('active');
-    dot.dataset.index = index;
-    dot.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (!isMarketingTransitioning) {
-        clearInterval(marketingAutoSlideInterval);
-        goToMarketingSlide(index);
-        startMarketingAutoSlide();
+      const slide = document.createElement('div');
+      slide.className = 'marketing-banner-slide';
+      slide.dataset.index = index;
+      slide.dataset.advertId = advert.id;
+      
+      // PRIORITIZE imagePath for marketing banners (as per your Advert.js model)
+      // The virtual combinedImageUrl uses imagePath for marketing banners
+      let imagePath = '';
+      
+      // Check if this is a marketing banner and has imagePath
+      if (advert.type === 'homepage' || advert.category === 'marketing') {
+        // First try imagePath (as per your schema's virtual field)
+        if (advert.imagePath) {
+          imagePath = advert.imagePath;
+          console.log(`🖼️ SLIDE ${index} USING imagePath:`, imagePath);
+        } 
+        // Then try the combined virtual field
+        else if (advert.combinedImageUrl) {
+          imagePath = advert.combinedImageUrl;
+          console.log(`🖼️ SLIDE ${index} USING combinedImageUrl:`, imagePath);
+        }
+        // Fallback to imageUrl
+        else if (advert.imageUrl) {
+          imagePath = advert.imageUrl;
+          console.log(`🖼️ SLIDE ${index} USING imageUrl:`, imagePath);
+        }
+      } else {
+        // For non-marketing banners, use imageUrl
+        imagePath = advert.imageUrl || '';
+        console.log(`🖼️ SLIDE ${index} USING imageUrl (non-marketing):`, imagePath);
       }
-    });
-    marketingDots.appendChild(dot);
-  }
-}
+      
+      console.log(`🖼️ SLIDE ${index} ORIGINAL IMAGE PATH:`, imagePath);
+      
+      // Make sure the path is correct for the website
+      if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+        // If it's a relative path, make sure it starts with assets/
+        if (!imagePath.startsWith('assets/')) {
+          imagePath = 'assets/' + imagePath;
+        }
+      }
+      
+      // If still no image, use fallback
+      if (!imagePath) {
+        imagePath = 'assets/adverts/default_marketing.jpg';
+      }
+      
+      console.log(`🖼️ SLIDE ${index} FINAL IMAGE PATH:`, imagePath);
+      
+      slide.innerHTML = `
+        <img src="${imagePath}" 
+             alt="${advert.title}" 
+             class="marketing-banner-image"
+             loading="eager"
+             decoding="async"
+             onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'; console.log('❌ Failed to load: ${imagePath}');">
+        
+        <div class="marketing-banner-overlay">
+          <div class="marketing-banner-title">${advert.title}</div>
+          <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
+        </div>
+      `;
+      
+      slide.addEventListener('click', (event) => {
+        if (!isMarketingTransitioning) {
+          event.preventDefault();
+          handleAdvertClick(advert);
+        }
+      });
+      
+      slide.style.cursor = 'pointer';
+      
+      marketingBannersTrack.appendChild(slide);
+      
+      if (marketingDots) {
+        const dot = document.createElement('span');
+        dot.className = 'marketing-dot';
+        if (index === 0) dot.classList.add('active');
+        dot.dataset.index = index;
+        dot.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!isMarketingTransitioning) {
+            clearInterval(marketingAutoSlideInterval);
+            goToMarketingSlide(index);
+            startMarketingAutoSlide();
+          }
+        });
+        marketingDots.appendChild(dot);
+      }
+    }
+    
     function setupMarketingEventListeners() {
       if (marketingPrevBtn) {
         marketingPrevBtn.addEventListener('click', (event) => {
@@ -2166,6 +2191,5 @@
     }
   });
 </script>
- 
 </body>
 </html>
