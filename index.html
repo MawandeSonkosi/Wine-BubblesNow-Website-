@@ -372,7 +372,7 @@
       -webkit-justify-content: center;
     }
     
-    /* ========== BANNER CAROUSEL STYLES - IDENTICAL ACROSS ALL BROWSERS ========== */
+    /* ========== BANNER CAROUSEL STYLES - CHROME ========== */
     .banner-carousel-container {
       position: relative;
       max-width: 1000px;
@@ -430,7 +430,7 @@
       padding: 0;
     }
     
-    /* ALL BROWSERS - use cover for consistent display */
+    /* Chrome - use cover */
     .banner-carousel-image {
       width: 100%;
       height: 100%;
@@ -450,55 +450,28 @@
       transition: transform 0.8s ease;
     }
     
-    /* Safari-specific fix - use background-image instead of object-fit */
+    /* Safari - use contain to prevent zooming */
     @media not all and (min-resolution: 0.001dpcm) {
       @supports (-webkit-appearance: none) {
-        .banner-carousel-slide {
-          position: relative;
-          overflow: hidden;
-          background-color: #f8f8f8;
-        }
-        
         .banner-carousel-image {
-          opacity: 0;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          -webkit-object-fit: cover;
-        }
-        
-        .banner-carousel-slide::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-size: cover;
-          background-position: center center;
-          background-repeat: no-repeat;
-          z-index: 1;
+          object-fit: contain !important;
+          -webkit-object-fit: contain !important;
+          object-position: center center !important;
+          -webkit-object-position: center center !important;
+          width: 100% !important;
+          height: 100% !important;
+          background-color: #f8f8f8;
         }
       }
     }
     
     /* Alternative Safari detection */
-    _::-webkit-full-page-media, _:future, :root .banner-carousel-slide::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      z-index: 1;
-    }
-    
     _::-webkit-full-page-media, _:future, :root .banner-carousel-image {
-      opacity: 0;
+      object-fit: contain !important;
+      object-position: center center !important;
+      width: 100% !important;
+      height: 100% !important;
+      background-color: #f8f8f8;
     }
     
     .banner-carousel-slide:hover .banner-carousel-image {
@@ -696,7 +669,7 @@
       transform: scale(1.2);
     }
     
-    /* ========== MARKETING BANNERS SECTION - IDENTICAL ACROSS ALL BROWSERS ========== */
+    /* ========== MARKETING BANNERS SECTION - CHROME ========== */
     .marketing-banners-section {
       margin: 0 auto 40px;
       max-width: 1000px;
@@ -762,7 +735,7 @@
       padding: 0;
     }
     
-    /* ALL BROWSERS - use cover for consistent display */
+    /* Chrome - use cover */
     .marketing-banner-image {
       width: 100%;
       height: 100%;
@@ -782,55 +755,28 @@
       transition: transform 0.8s ease;
     }
     
-    /* Safari-specific fix - use background-image instead of object-fit */
+    /* Safari - use contain to prevent zooming */
     @media not all and (min-resolution: 0.001dpcm) {
       @supports (-webkit-appearance: none) {
-        .marketing-banner-slide {
-          position: relative;
-          overflow: hidden;
-          background-color: #f5f5f5;
-        }
-        
         .marketing-banner-image {
-          opacity: 0;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          -webkit-object-fit: cover;
-        }
-        
-        .marketing-banner-slide::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-size: cover;
-          background-position: center center;
-          background-repeat: no-repeat;
-          z-index: 1;
+          object-fit: contain !important;
+          -webkit-object-fit: contain !important;
+          object-position: center center !important;
+          -webkit-object-position: center center !important;
+          width: 100% !important;
+          height: 100% !important;
+          background-color: #f5f5f5;
         }
       }
     }
     
     /* Alternative Safari detection */
-    _::-webkit-full-page-media, _:future, :root .marketing-banner-slide::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      z-index: 1;
-    }
-    
     _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
-      opacity: 0;
+      object-fit: contain !important;
+      object-position: center center !important;
+      width: 100% !important;
+      height: 100% !important;
+      background-color: #f5f5f5;
     }
     
     .marketing-banner-slide:hover .marketing-banner-image {
@@ -2121,34 +2067,6 @@
       
       console.log('🎠 Initializing wine banner carousel...');
       
-      // Safari-specific fix to set background images
-      function fixSafariZoom() {
-        if (navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome')) {
-          setTimeout(() => {
-            // Fix wine banner images
-            document.querySelectorAll('.banner-carousel-slide').forEach((slide, index) => {
-              const img = slide.querySelector('.banner-carousel-image');
-              if (img && img.src) {
-                // Set the background-image on the ::before pseudo-element
-                slide.style.setProperty('--bg-image', `url('${img.src}')`);
-                // Add a style element for this slide
-                const styleId = `safari-wine-style-${index}`;
-                if (!document.getElementById(styleId)) {
-                  const style = document.createElement('style');
-                  style.id = styleId;
-                  style.textContent = `
-                    .banner-carousel-slide[data-index="${index}"]::before {
-                      background-image: var(--bg-image) !important;
-                    }
-                  `;
-                  document.head.appendChild(style);
-                }
-              }
-            });
-          }, 100);
-        }
-      }
-      
       // Immediate execution - don't wait for events
       let initAttempts = 0;
       const maxAttempts = 10;
@@ -2253,7 +2171,6 @@
           renderCarousel();
           setupEventListeners();
           startAutoSlide();
-          fixSafariZoom();
           
         } catch (error) {
           console.error('❌ Error loading featured wines:', error);
@@ -2300,7 +2217,6 @@
           renderCarousel();
           setupEventListeners();
           startAutoSlide();
-          fixSafariZoom();
         }
         
         function renderCarousel() {
@@ -2479,34 +2395,6 @@
       
       console.log('🎪 Starting marketing banners');
       
-      // Safari-specific fix to set background images
-      function fixSafariZoomMarketing() {
-        if (navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome')) {
-          setTimeout(() => {
-            // Fix marketing banner images
-            document.querySelectorAll('.marketing-banner-slide').forEach((slide, index) => {
-              const img = slide.querySelector('.marketing-banner-image');
-              if (img && img.src) {
-                // Set the background-image on the ::before pseudo-element
-                slide.style.setProperty('--bg-image', `url('${img.src}')`);
-                // Add a style element for this slide
-                const styleId = `safari-marketing-style-${index}`;
-                if (!document.getElementById(styleId)) {
-                  const style = document.createElement('style');
-                  style.id = styleId;
-                  style.textContent = `
-                    .marketing-banner-slide[data-index="${index}"]::before {
-                      background-image: var(--bg-image) !important;
-                    }
-                  `;
-                  document.head.appendChild(style);
-                }
-              }
-            });
-          }, 100);
-        }
-      }
-      
       let initAttempts = 0;
       const maxAttempts = 10;
       
@@ -2626,7 +2514,6 @@
           renderMarketingBanners();
           setupMarketingEventListeners();
           startMarketingAutoSlide();
-          fixSafariZoomMarketing();
           
         } catch (error) {
           console.error('❌ ERROR LOADING ADVERTS:', error);
@@ -2666,7 +2553,6 @@
           renderMarketingBanners();
           setupMarketingEventListeners();
           startMarketingAutoSlide();
-          fixSafariZoomMarketing();
         }
         
         function showEmptyState() {
