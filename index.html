@@ -1559,7 +1559,7 @@
   </script>
 
   <script>
-  // FEATURED WINES BANNER - EXACTLY LIKE FLUTTER FETCHES THEM
+  // FEATURED WINES BANNER - FIXED VERSION
   document.addEventListener('DOMContentLoaded', function() {
     const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
     
@@ -1568,9 +1568,9 @@
         return;
     }
     
-    console.log('🎠 Initializing banner carousel (Flutter-compatible mode)...');
+    console.log('🎠 Initializing wine banner carousel...');
     
-    const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
+    const API_BASE_URL = '/api';  // Use relative URL through proxy
     
     const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
     const prevBtn = document.getElementById('prevBtn');
@@ -1586,11 +1586,9 @@
     
     async function initCarousel() {
       try {
-        console.log('🌐 Fetching featured wines from backend (Flutter style)...');
+        console.log('🌐 Fetching featured wines...');
         
-        // EXACT same endpoint as Flutter's featuredWinesProvider
         const apiUrl = `${API_BASE_URL}/wines/featured/featured`;
-        
         console.log('📡 Fetching from:', apiUrl);
         
         const response = await fetch(apiUrl, {
@@ -1602,17 +1600,16 @@
         });
         
         if (!response.ok) {
-          console.error(`❌ HTTP ${response.status}: ${response.statusText}`);
           throw new Error(`Failed to fetch featured wines: ${response.status}`);
         }
         
         const wines = await response.json();
-        console.log(`✅ Received ${wines.length} wines from backend`);
+        console.log('✅ Raw wines response:', wines);
         
-        // Filter featured wines exactly like Flutter
+        // Filter featured wines
         featuredWines = wines.filter(wine => wine.isFeatured === true);
         
-        console.log(`🖼️ Will show ${featuredWines.length} featured wines`);
+        console.log(`🖼️ Found ${featuredWines.length} featured wines`);
         
         if (featuredWines.length === 0) {
           console.log('⚠️ No featured wines found, using fallback');
@@ -1638,7 +1635,6 @@
           name: 'The African Diamond Grenache Noir',
           type: 'Red Wine',
           price: 299.99,
-          bannerImageUrl: 'assets/wines/breakfast/Noir.png',
           imageUrl: 'assets/wines/breakfast/Noir.png',
           isFeatured: true
         },
@@ -1647,7 +1643,6 @@
           name: 'The African Diamond Grenache Blanc',
           type: 'White Wine',
           price: 299.99,
-          bannerImageUrl: 'assets/wines/breakfast/Blanc.png',
           imageUrl: 'assets/wines/breakfast/Blanc.png',
           isFeatured: true
         },
@@ -1656,7 +1651,6 @@
           name: 'YBY Crystal Dry',
           type: 'Champagne',
           price: 499.99,
-          bannerImageUrl: 'assets/wines/breakfast/YBY.png',
           imageUrl: 'assets/wines/breakfast/YBY.png',
           isFeatured: true
         }
@@ -1668,8 +1662,10 @@
     }
     
     function renderCarousel() {
+      if (!bannerCarouselTrack) return;
+      
       bannerCarouselTrack.innerHTML = '';
-      carouselDots.innerHTML = '';
+      if (carouselDots) carouselDots.innerHTML = '';
       
       featuredWines.forEach((wine, index) => {
         createSlide(wine, index);
@@ -1678,8 +1674,6 @@
       setTimeout(() => {
         updateCarouselPosition();
       }, 50);
-      
-      updateButtonStates();
     }
     
     function createSlide(wine, index) {
@@ -1688,16 +1682,25 @@
       slide.dataset.index = index;
       slide.dataset.wineId = wine.id;
       
-      // Flutter uses bannerImageUrl or imageUrl
-      let imageUrl = wine.bannerImageUrl || wine.imageUrl;
+      // Get image URL - try bannerImageUrl first, then imageUrl
+      let imageUrl = wine.bannerImageUrl || wine.imageUrl || '';
       
-      if (imageUrl) {
-        if (imageUrl.startsWith('assets/')) {
-          imageUrl = imageUrl;
-        } else if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/') && !imageUrl.startsWith('../')) {
+      console.log(`🍷 Wine ${index} - ${wine.name}:`, {
+        bannerImageUrl: wine.bannerImageUrl,
+        imageUrl: wine.imageUrl,
+        finalImageUrl: imageUrl
+      });
+      
+      // Make sure the path is correct for the website
+      if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+        // If it's a relative path, make sure it starts with assets/
+        if (!imageUrl.startsWith('assets/')) {
           imageUrl = 'assets/' + imageUrl;
         }
-      } else {
+      }
+      
+      // Fallback if no image
+      if (!imageUrl) {
         imageUrl = 'assets/wines/breakfast/Noir.png';
       }
       
@@ -1707,7 +1710,7 @@
              class="banner-carousel-image"
              loading="lazy"
              decoding="async"
-             onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png';">
+             onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png'; console.log('❌ Failed to load: ${imageUrl}');">
         <div class="banner-slide-overlay">
           <div class="banner-slide-title">${wine.name}</div>
           <div class="banner-slide-subtitle">${wine.type || 'Premium Wine'}</div>
@@ -1723,19 +1726,21 @@
       
       bannerCarouselTrack.appendChild(slide);
       
-      const dot = document.createElement('span');
-      dot.className = 'carousel-dot';
-      if (index === 0) dot.classList.add('active');
-      dot.dataset.index = index;
-      dot.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (!isTransitioning) {
-          clearInterval(autoSlideInterval);
-          goToSlide(index);
-          startAutoSlide();
-        }
-      });
-      carouselDots.appendChild(dot);
+      if (carouselDots) {
+        const dot = document.createElement('span');
+        dot.className = 'carousel-dot';
+        if (index === 0) dot.classList.add('active');
+        dot.dataset.index = index;
+        dot.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (!isTransitioning) {
+            clearInterval(autoSlideInterval);
+            goToSlide(index);
+            startAutoSlide();
+          }
+        });
+        carouselDots.appendChild(dot);
+      }
     }
     
     function setupEventListeners() {
@@ -1761,13 +1766,15 @@
         });
       }
       
-      bannerCarouselTrack.addEventListener('mouseenter', () => {
-        clearInterval(autoSlideInterval);
-      });
-      
-      bannerCarouselTrack.addEventListener('mouseleave', () => {
-        startAutoSlide();
-      });
+      if (bannerCarouselTrack) {
+        bannerCarouselTrack.addEventListener('mouseenter', () => {
+          clearInterval(autoSlideInterval);
+        });
+        
+        bannerCarouselTrack.addEventListener('mouseleave', () => {
+          startAutoSlide();
+        });
+      }
     }
     
     function nextSlide() {
@@ -1784,29 +1791,32 @@
     
     function goToSlide(slideIndex) {
       if (isTransitioning || slideIndex === currentSlide || featuredWines.length === 0) return;
+      
+      isTransitioning = true;
       currentSlide = slideIndex;
       updateCarouselPosition();
+      
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 600);
     }
     
     function updateCarouselPosition() {
+      if (!bannerCarouselTrack) return;
+      
       const translateX = -currentSlide * 100;
       bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
       bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
       
-      document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlide);
-      });
+      if (carouselDots) {
+        document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
+          dot.classList.toggle('active', index === currentSlide);
+        });
+      }
       
-      updateButtonStates();
-    }
-    
-    function updateButtonStates() {
-      if (prevBtn) {
-        prevBtn.disabled = currentSlide === 0;
-      }
-      if (nextBtn) {
-        nextBtn.disabled = currentSlide >= featuredWines.length - 1;
-      }
+      // Update button states
+      if (prevBtn) prevBtn.disabled = currentSlide === 0;
+      if (nextBtn) nextBtn.disabled = currentSlide >= featuredWines.length - 1;
     }
     
     function startAutoSlide() {
