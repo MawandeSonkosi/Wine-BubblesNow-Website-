@@ -642,7 +642,7 @@
       100% { transform: rotate(360deg); }
     }
     
-   /* MARKETING BANNERS SECTION STYLES - INCREASED HEIGHT */
+/* MARKETING BANNERS SECTION STYLES - INCREASED HEIGHT */
 .marketing-banners-section {
   margin: 0 auto 40px;
   max-width: 1000px;
@@ -657,7 +657,7 @@
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.15);
   background: linear-gradient(135deg, #f9f9f9 0%, #f5f5f5 100%);
-  height: 500px; /* INCREASED from 420px to 500px */
+  height: 500px;
 }
 
 .marketing-banners-track {
@@ -679,7 +679,7 @@
 .marketing-banner-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* This ensures the image covers the entire area without distortion */
+  object-fit: cover;
   display: block;
   transition: transform 0.8s ease;
 }
@@ -698,29 +698,104 @@
     rgba(0,0,0,0.7) 50%, 
     rgba(0,0,0,0) 100%);
   color: white;
-  padding: 30px; /* INCREASED padding */
-  padding-top: 80px; /* INCREASED top padding */
+  padding: 30px;
+  padding-top: 80px;
 }
 
 .marketing-banner-title {
   font-family: 'Playfair Display', serif;
-  font-size: 32px; /* INCREASED font size */
+  font-size: 32px;
   font-weight: 700;
   margin-bottom: 10px;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
 .marketing-banner-subtitle {
-  font-size: 20px; /* INCREASED font size */
+  font-size: 20px;
   opacity: 0.95;
   margin-bottom: 15px;
   font-weight: 500;
 }
 
+/* Navigation Buttons for Marketing Banners */
+.marketing-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 22px;
+  color: #6b0d2b;
+  transition: all 0.3s ease;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.marketing-nav-btn:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.marketing-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: translateY(-50%) scale(1);
+}
+
+.marketing-prev-btn {
+  left: 25px;
+}
+
+.marketing-next-btn {
+  right: 25px;
+}
+
+/* Marketing Dots */
+.marketing-dots {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.marketing-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.marketing-dot.active {
+  background: #6b0d2b;
+  border-color: white;
+  transform: scale(1.3);
+  box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+}
+
+.marketing-dot:hover:not(.active) {
+  background: white;
+  transform: scale(1.2);
+}
+
 /* Responsive adjustments for marketing banners */
 @media (max-width: 768px) {
   .marketing-banners-container {
-    height: 400px; /* INCREASED from 340px to 400px */
+    height: 400px;
   }
   
   .marketing-banner-overlay {
@@ -749,11 +824,16 @@
   .marketing-next-btn {
     right: 15px;
   }
+  
+  .marketing-dot {
+    width: 12px;
+    height: 12px;
+  }
 }
 
 @media (max-width: 480px) {
   .marketing-banners-container {
-    height: 350px; /* INCREASED from 280px to 350px */
+    height: 350px;
   }
   
   .marketing-banner-overlay {
@@ -774,7 +854,23 @@
     height: 40px;
     font-size: 16px;
   }
-  #marketingPrevBtn,
+  
+  .marketing-prev-btn {
+    left: 10px;
+  }
+  
+  .marketing-next-btn {
+    right: 10px;
+  }
+  
+  .marketing-dot {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Force arrows to be visible */
+#marketingPrevBtn,
 #marketingNextBtn {
   display: flex !important;
   z-index: 1000 !important;
@@ -782,17 +878,11 @@
   pointer-events: auto !important;
 }
 
-/* Style them to stand out */
-.marketing-nav-btn {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 2px solid #6b0d2b !important;
+/* Style dots to match wine banner style */
+.marketing-dots {
+  display: flex !important;
 }
 
-.marketing-nav-btn i {
-  color: #6b0d2b !important;
-  font-size: 24px !important;
-}
-}
   </style>
 </head>
 <body>
