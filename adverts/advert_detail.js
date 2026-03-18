@@ -1,4 +1,4 @@
-// Advert Detail JavaScript - NO DEBUG BUTTON, USING IMAGE URL
+// Advert Detail JavaScript - NO DEBUG BUTTON, USING IMAGE URL ONLY
 const API_BASE_URL = '/api';
 
 // State
@@ -116,6 +116,7 @@ async function fetchAllAdverts() {
     if (!response.ok) return;
     
     const adverts = await response.json();
+    // Filter only active adverts
     allAdverts = adverts.filter(advert => 
       advert.isActive === true || advert.isActive === undefined
     );
@@ -127,18 +128,18 @@ async function fetchAllAdverts() {
   }
 }
 
-// Helper to fix image URLs - USING IMAGE URL ONLY (not targetUrl)
+// Helper to fix image URLs - USING ONLY IMAGE URL (NO TARGET URL)
 function fixImageUrl(advert) {
   if (!advert) return '../assets/adverts/default_marketing.jpg';
   
-  // USE ONLY imageUrl as requested
+  // USE ONLY imageUrl - NO targetUrl
   let imageUrl = advert.imageUrl || '';
   
   if (!imageUrl) {
     return '../assets/adverts/default_marketing.jpg';
   }
   
-  // Fix path
+  // Fix path for website
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
@@ -173,7 +174,7 @@ function renderAdvertDetail(advert) {
         <div class="advert-detail-subtitle">${subtitle}</div>
         <div class="advert-detail-price">R${price.toFixed(2)}</div>
         
-        <!-- NO CATEGORY/TYPE FIELDS - removed completely -->
+        <!-- NO CATEGORY/TYPE FIELDS - completely removed -->
         
         ${isAvailable ? `
           <div class="stock-status ${stockCount > 5 ? 'stock-in' : stockCount > 0 ? 'stock-low' : 'stock-out'}">
@@ -265,15 +266,15 @@ function addToCart() {
     return;
   }
   
+  // Create cart item - USING IMAGE URL
   const cartItem = {
     id: currentAdvert.id.toString(),
     name: currentAdvert.title,
     price: currentAdvert.price,
-    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg',
+    imageUrl: currentAdvert.imageUrl || '../assets/adverts/default_marketing.jpg', // Using imageUrl
     type: 'advert',
-    category: currentAdvert.category || '',
-    description: currentAdvert.subtitle || '',
     quantity: quantity
+    // Removed category and description as they're not needed
   };
   
   if (window.CartUtils && typeof window.CartUtils.addItem === 'function') {

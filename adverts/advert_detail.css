@@ -5,7 +5,7 @@
   padding: 20px 0 40px;
 }
 
-/* Header with back button only - NO TYPE */
+/* Header with back button only */
 .advert-detail-header {
   display: flex;
   align-items: center;
@@ -88,7 +88,7 @@
   margin: 0 0 25px;
 }
 
-/* NO CATEGORY/TYPE FIELDS - removed completely */
+/* NO CATEGORY/TYPE FIELDS - completely removed */
 
 /* Stock Status */
 .stock-status {
