@@ -50,11 +50,12 @@ function setupEventListeners() {
   }
 }
 
-// Extract wine types - REMOVED "White Wine" completely
+// Extract wine types - FIXED to show "White Wine" not "White Wines"
 function extractWineTypes(wines) {
   const defaultTypes = [
     'All',
     'Red Wine',
+    'White Wine',  // Changed from 'White Wines' to 'White Wine'
     'Champagne',
     'Whiskey',
     'Gin',
@@ -64,13 +65,11 @@ function extractWineTypes(wines) {
   const uniqueTypes = new Set();
   wines.forEach(wine => {
     if (wine.type && wine.type.trim() !== '') {
-      // Only add if it's not "White Wine"
-      if (wine.type !== 'White Wine') {
-        uniqueTypes.add(wine.type);
-      }
+      uniqueTypes.add(wine.type);
     }
   });
   
+  // Combine default types with unique types
   const allTypes = [...new Set([...defaultTypes.filter(t => t !== 'All'), ...uniqueTypes])].sort();
   return ['All', ...allTypes];
 }
@@ -78,7 +77,7 @@ function extractWineTypes(wines) {
 // Check if item is a wine (not a banner or advert)
 function isWine(item) {
   // Check if it has a valid wine type
-  const validWineTypes = ['Red Wine', 'White Wine', 'Champagne', 'Sparkling', 'Rosé', 'Rose', 'Dessert Wine'];
+  const validWineTypes = ['Red Wine', 'White Wine', 'Champagne', 'Sparkling', 'Rosé', 'Rose', 'Dessert Wine', 'Whiskey', 'Gin', 'Cognac'];
   
   // Check if it has a price (adverts might have price but different structure)
   const hasPrice = item.price && item.price > 0;
