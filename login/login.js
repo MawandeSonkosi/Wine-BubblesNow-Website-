@@ -1,4 +1,4 @@
-// login/login.js - MATCHING FLUTTER APP EXACTLY
+// login/login.js - WITH PROPER WELCOME BACK MESSAGE
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
@@ -141,6 +141,130 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
     
+    // Function to show welcome toast that matches website layout
+    function showWelcomeToast(userName) {
+        // Create toast container
+        const toast = document.createElement('div');
+        toast.className = 'welcome-toast';
+        toast.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(135deg, #6b0d2b 0%, #8a1e3d 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(107, 13, 43, 0.3);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInRight 0.5s ease forwards;
+            font-family: 'Montserrat', sans-serif;
+            max-width: 400px;
+            border-left: 5px solid #d4af37;
+        `;
+        
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Create icon
+        const iconDiv = document.createElement('div');
+        iconDiv.style.cssText = `
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        `;
+        iconDiv.innerHTML = '<i class="fas fa-wine-glass-alt"></i>';
+        
+        // Create content
+        const contentDiv = document.createElement('div');
+        contentDiv.style.flex = '1';
+        
+        const title = document.createElement('div');
+        title.style.cssText = `
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        `;
+        title.textContent = 'Welcome Back!';
+        
+        const message = document.createElement('div');
+        message.style.cssText = `
+            font-size: 16px;
+            opacity: 0.9;
+        `;
+        message.textContent = userName ? `Hello, ${userName}!` : 'Hello, Wine Lover!';
+        
+        contentDiv.appendChild(title);
+        contentDiv.appendChild(message);
+        
+        // Create close button
+        const closeBtn = document.createElement('button');
+        closeBtn.style.cssText = `
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            padding: 5px;
+        `;
+        closeBtn.innerHTML = '&times;';
+        closeBtn.onmouseover = () => closeBtn.style.opacity = '1';
+        closeBtn.onmouseout = () => closeBtn.style.opacity = '0.7';
+        closeBtn.onclick = () => {
+            toast.style.animation = 'slideOutRight 0.5s ease forwards';
+            setTimeout(() => toast.remove(), 500);
+        };
+        
+        // Assemble toast
+        toast.appendChild(iconDiv);
+        toast.appendChild(contentDiv);
+        toast.appendChild(closeBtn);
+        
+        // Add to body
+        document.body.appendChild(toast);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.style.animation = 'slideOutRight 0.5s ease forwards';
+                setTimeout(() => toast.remove(), 500);
+            }
+        }, 5000);
+    }
+    
     async function login() {
         if (submitBtn) {
             submitBtn.disabled = true;
@@ -182,9 +306,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Login successful - EXACTLY like Flutter app
                 console.log('✅ Login successful!');
                 
-                // Show success message (like Flutter's SnackBar)
-                showMessage('Login successful!', 'success');
-                
                 // Store user data - EXACTLY like Flutter's login method
                 storeUserData(data);
                 
@@ -193,10 +314,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     localStorage.setItem('wineBubbles_rememberedEmail', email);
                 }
                 
-                // Redirect to home page after delay
+                // Get user name for welcome message
+                const user = data.user;
+                const userName = user ? (user.fullName || user.email.split('@')[0]) : null;
+                
+                // Show welcome toast
+                showWelcomeToast(userName);
+                
+                // Show success message in snackbar
+                showSnackbar('Login successful!', 'success');
+                
+                // Redirect to home page after delay with welcome message
                 setTimeout(() => {
                     window.location.href = '../index.html?login=success';
-                }, 1500);
+                }, 2000);
                 
                 return; // Important: stop execution
             }
