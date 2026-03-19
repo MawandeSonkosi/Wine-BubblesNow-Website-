@@ -1,4 +1,4 @@
-// login/login.js - COMPLETELY FIXED
+// login/login.js - MATCHING FLUTTER APP EXACTLY
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
@@ -177,15 +177,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Invalid server response');
             }
             
-            // FIXED: Login is successful if response is OK (200)
+            // Check if response is OK (status 200)
             if (response.ok) {
-                // Login successful - DO NOT THROW ERROR
+                // Login successful - EXACTLY like Flutter app
                 console.log('✅ Login successful!');
                 
-                // Show success message
+                // Show success message (like Flutter's SnackBar)
                 showMessage('Login successful!', 'success');
                 
-                // Store user data
+                // Store user data - EXACTLY like Flutter's login method
                 storeUserData(data);
                 
                 // Save email if remember me is checked
@@ -198,13 +198,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = '../index.html?login=success';
                 }, 1500);
                 
-                return; // IMPORTANT: Return here to prevent going to error handling
+                return; // Important: stop execution
             }
             
-            // If we get here, response was not OK
+            // Handle verification requirement (like Flutter's needsVerification)
             if (data.needsVerification === true) {
                 showVerificationPrompt(email);
             } else {
+                // Show error message from backend (like Flutter)
                 throw new Error(data.message || 'Login failed');
             }
             
@@ -224,18 +225,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // FIXED: Updated storeUserData function to handle different response formats
+    // Store user data - EXACTLY like Flutter's storeUserData
     function storeUserData(data) {
         console.log('💾 Storing user data...');
         
-        // Store token if present
+        // Store token if present (like Flutter's _storeToken)
         if (data.token) {
             localStorage.setItem('wineBubbles_token', data.token);
             localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
         }
         
-        // Handle user data - could be in data.user or directly in data
-        const user = data.user || data;
+        // Handle user data - Flutter uses data['user']
+        const user = data.user;
         
         if (user) {
             // Store full user object
