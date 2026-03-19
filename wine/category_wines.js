@@ -1,6 +1,5 @@
-// Configuration
-const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
+// Configuration - USE PROXY SERVER (works on app.wineandbubblesnow.co.za)
+const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
 
 // State
 let allWines = [];
@@ -16,7 +15,7 @@ const filterDropdown = document.getElementById('filterDropdown');
 const pageTitle = document.getElementById('pageTitle');
 const pageSubtitle = document.getElementById('pageSubtitle');
 
-// Available category types (these should match your homepage icons)
+// Available category types (these should match your homepage icons) - ALL TYPES INCLUDED
 const categoryTypes = [
   'Red Wine',
   'White Wine',
@@ -29,6 +28,7 @@ const categoryTypes = [
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🍷 Category Wines page loaded');
+  console.log('🔧 Using API URL:', API_BASE_URL);
   
   // Get category type from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -60,6 +60,13 @@ function setupEventListeners() {
       filterWines();
     });
   }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (event) => {
+    if (filterDropdown && !event.target.closest('.filter-dropdown')) {
+      filterDropdown.style.display = 'none';
+    }
+  });
 }
 
 // Populate filter dropdown with category types
@@ -94,40 +101,46 @@ function populateFilterDropdown() {
   });
   
   // Show dropdown on hover
-  filterBtn.parentElement.addEventListener('mouseenter', () => {
-    filterDropdown.style.display = 'block';
-  });
-  
-  filterBtn.parentElement.addEventListener('mouseleave', () => {
-    setTimeout(() => {
-      filterDropdown.style.display = 'none';
-    }, 300);
-  });
+  if (filterBtn) {
+    const dropdownContainer = filterBtn.parentElement;
+    dropdownContainer.addEventListener('mouseenter', () => {
+      filterDropdown.style.display = 'block';
+    });
+    
+    dropdownContainer.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        filterDropdown.style.display = 'none';
+      }, 300);
+    });
+  }
 }
 
-// Fetch wines
+// Fetch wines - USING PROXY SERVER
 async function fetchWines() {
   try {
     showLoading();
     
     console.log('🌐 Fetching wines from API...');
     
-    // Use CORS proxy
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/wines?all=true`)}`;
+    // Use your proxy server - NO CORS PROXY NEEDED
+    const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
+    console.log('📡 Fetching from:', apiUrl);
     
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const wines = await response.json();
-    console.log(`✅ Success! Received ${wines.length} wines`);
+    console.log(`✅ Success! Received ${wines.length} wines total`);
     
     allWines = wines;
     
@@ -135,10 +148,7 @@ async function fetchWines() {
     if (currentCategoryType) {
       // Filter wines by type OR category matching the category type
       filteredWines = wines.filter(wine => {
-        // Exclude wine cases
-        if (wine.isCase) return false;
-        
-        // Check both type and category for matching
+        // Check both type and category for matching (case insensitive)
         const matchesType = wine.type && 
                            wine.type.toLowerCase() === currentCategoryType.toLowerCase();
         const matchesCategory = wine.category && 
@@ -149,19 +159,20 @@ async function fetchWines() {
       
       console.log(`📊 Filtered to ${filteredWines.length} wines for category type "${currentCategoryType}"`);
     } else {
-      // No category type specified, show all non-case wines
-      filteredWines = wines.filter(wine => !wine.isCase);
+      // No category type specified, show all wines (including all types)
+      filteredWines = wines;
+      console.log(`📊 Showing all ${filteredWines.length} wines`);
     }
     
     if (filteredWines.length === 0) {
-      showEmptyState(`No ${currentCategoryType} found`);
+      showEmptyState(`No ${currentCategoryType || 'wines'} found`);
     } else {
       populateFilterDropdown();
       renderWines();
     }
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('❌ Error:', error);
     showError(`Failed to load wines: ${error.message}`);
   }
 }
@@ -188,28 +199,28 @@ function renderWines() {
   console.log(`🎨 Rendering ${filteredWines.length} wines...`);
   
   if (filteredWines.length === 0) {
-    showEmptyState(`No ${currentCategoryType} found matching "${searchQuery}"`);
+    showEmptyState(`No ${currentCategoryType || 'wines'} found matching "${searchQuery}"`);
     return;
   }
   
   // Filter by search query if applicable
   let winesToShow = filteredWines;
   if (searchQuery) {
-    winesToShow = filteredWines.filter(wine => {
-      const searchLower = searchQuery.toLowerCase().trim();
-      if (searchLower === '') return true;
-      
-      const matchesName = (wine.name || '').toLowerCase().includes(searchLower);
-      const matchesType = (wine.type || '').toLowerCase().includes(searchLower);
-      const matchesCategory = (wine.category || '').toLowerCase().includes(searchLower);
-      const matchesDescription = (wine.description || '').toLowerCase().includes(searchLower);
-      
-      return matchesName || matchesType || matchesCategory || matchesDescription;
-    });
+    const searchLower = searchQuery.toLowerCase().trim();
+    if (searchLower !== '') {
+      winesToShow = filteredWines.filter(wine => {
+        const matchesName = (wine.name || '').toLowerCase().includes(searchLower);
+        const matchesType = (wine.type || '').toLowerCase().includes(searchLower);
+        const matchesCategory = (wine.category || '').toLowerCase().includes(searchLower);
+        const matchesDescription = (wine.description || '').toLowerCase().includes(searchLower);
+        
+        return matchesName || matchesType || matchesCategory || matchesDescription;
+      });
+    }
   }
   
   if (winesToShow.length === 0) {
-    showEmptyState(`No ${currentCategoryType} found matching "${searchQuery}"`);
+    showEmptyState(`No ${currentCategoryType || 'wines'} found matching "${searchQuery}"`);
     return;
   }
   
@@ -218,10 +229,11 @@ function renderWines() {
     const price = wine.price || 0;
     const type = wine.type || 'Wine';
     const category = wine.category || '';
+    const isInStock = (wine.stockCount || 0) > 0;
     
     // Same card layout as all_wines.html
     return `
-      <div class="wine-card" onclick="navigateToWineDetail(${wine.id})">
+      <div class="wine-card ${!isInStock ? 'out-of-stock' : ''}" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${wine.name}" 
@@ -233,7 +245,7 @@ function renderWines() {
           <div class="wine-title">${wine.name}</div>
           <div class="wine-sub">${type}</div>
           <div class="wine-sub">${category}</div>
-          <div class="wine-sub">R${price.toFixed(2)}</div>
+          <div class="wine-price">R${price.toFixed(2)}</div>
         </div>
       </div>
     `;
@@ -250,6 +262,7 @@ function filterWines() {
 
 // Navigate to wine detail page
 function navigateToWineDetail(wineId) {
+  console.log(`📱 Navigating to wine detail: ${wineId}`);
   window.location.href = `wine_detail.html?id=${wineId}`;
 }
 
@@ -300,10 +313,3 @@ function resetSearch() {
 window.fetchWines = fetchWines;
 window.resetSearch = resetSearch;
 window.navigateToWineDetail = navigateToWineDetail;
-
-// Close dropdown when clicking outside
-document.addEventListener('click', (event) => {
-  if (filterDropdown && !event.target.closest('.filter-dropdown')) {
-    filterDropdown.style.display = 'none';
-  }
-});

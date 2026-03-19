@@ -1,11 +1,14 @@
-// Configuration
-const API_BASE_URL = '/api';  // Changed to proxy server
+// Configuration - USE PROXY SERVER
+const API_BASE_URL = '/api';  // Works on both localhost and app.wineandbubblesnow.co.za
 
 // State
 let allWines = [];
 let filteredWines = [];
 let currentCategory = '';
 let searchQuery = '';
+
+// List of wine types to EXCLUDE from wine list
+const excludedTypes = ['Whiskey', 'Cognac', 'Gin'];
 
 // DOM Elements
 const wineGrid = document.getElementById('wineGrid');
@@ -27,6 +30,7 @@ const availableCategories = [
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🍷 Wine List page loaded');
+  console.log('🔧 Using API URL:', API_BASE_URL);
   
   // Get category from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -92,18 +96,21 @@ function populateFilterDropdown() {
   });
   
   // Show dropdown on hover
-  filterBtn.parentElement.addEventListener('mouseenter', () => {
-    filterDropdown.style.display = 'block';
-  });
-  
-  filterBtn.parentElement.addEventListener('mouseleave', () => {
-    setTimeout(() => {
-      filterDropdown.style.display = 'none';
-    }, 300);
-  });
+  if (filterBtn) {
+    const dropdownContainer = filterBtn.parentElement;
+    dropdownContainer.addEventListener('mouseenter', () => {
+      filterDropdown.style.display = 'block';
+    });
+    
+    dropdownContainer.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        filterDropdown.style.display = 'none';
+      }, 300);
+    });
+  }
 }
 
-// Fetch wines - UPDATED TO USE PROXY
+// Fetch wines - USING PROXY SERVER
 async function fetchWines() {
   try {
     showLoading();
@@ -111,14 +118,15 @@ async function fetchWines() {
     console.log('🌐 Fetching wines from API...');
     
     // Use your proxy server directly - NO CORS PROXY NEEDED
-    const apiUrl = `${API_BASE_URL}/wines?all=true`;
+    const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
     console.log('📡 Fetching from:', apiUrl);
     
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     
@@ -127,37 +135,36 @@ async function fetchWines() {
     }
     
     const wines = await response.json();
-    console.log(`✅ Success! Received ${wines.length} wines`);
+    console.log(`✅ Success! Received ${wines.length} wines total`);
     
-    allWines = wines;
+    // Filter out excluded types (Whiskey, Cognac, Gin)
+    const filteredWinesByType = wines.filter(wine => !excludedTypes.includes(wine.type));
+    console.log(`🍷 After excluding ${excludedTypes.join(', ')}: ${filteredWinesByType.length} wines remain`);
+    
+    allWines = filteredWinesByType;
     
     // Filter by category if specified
     if (currentCategory) {
       // Handle special cases (like in Flutter)
       switch(currentCategory.toLowerCase()) {
         case 'gifting wines':
-          filteredWines = wines.filter(wine => wine.isGifting === true);
+          filteredWines = filteredWinesByType.filter(wine => wine.isGifting === true);
           console.log(`🎁 Filtered to ${filteredWines.length} gifting wines`);
           break;
         case 'event wines':
-          filteredWines = wines.filter(wine => wine.isEvent === true);
+          filteredWines = filteredWinesByType.filter(wine => wine.isEvent === true);
           console.log(`🎪 Filtered to ${filteredWines.length} event wines`);
-          break;
-        case 'wine cases':
-          // Show all wines for wine cases (like in Flutter)
-          filteredWines = wines;
-          console.log('📦 Showing all wines for wine cases');
           break;
         default:
           // Filter by category
-          filteredWines = wines.filter(wine => 
+          filteredWines = filteredWinesByType.filter(wine => 
             wine.category && wine.category.toLowerCase() === currentCategory.toLowerCase()
           );
           console.log(`📊 Filtered to ${filteredWines.length} wines in category "${currentCategory}"`);
       }
     } else {
-      // No category specified, show all
-      filteredWines = wines;
+      // No category specified, show all (excluding Whiskey, Cognac, Gin)
+      filteredWines = filteredWinesByType;
     }
     
     if (filteredWines.length === 0) {
@@ -168,7 +175,7 @@ async function fetchWines() {
     }
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('❌ Error:', error);
     showError(`Failed to load wines: ${error.message}`);
   }
 }
@@ -202,21 +209,21 @@ function renderWines() {
   // Filter by search query if applicable
   let winesToShow = filteredWines;
   if (searchQuery) {
-    winesToShow = filteredWines.filter(wine => {
-      const searchLower = searchQuery.toLowerCase().trim();
-      if (searchLower === '') return true;
-      
-      const matchesName = (wine.name || '').toLowerCase().includes(searchLower);
-      const matchesType = (wine.type || '').toLowerCase().includes(searchLower);
-      const matchesCategory = (wine.category || '').toLowerCase().includes(searchLower);
-      const matchesDescription = (wine.description || '').toLowerCase().includes(searchLower);
-      
-      return matchesName || matchesType || matchesCategory || matchesDescription;
-    });
+    const searchLower = searchQuery.toLowerCase().trim();
+    if (searchLower !== '') {
+      winesToShow = filteredWines.filter(wine => {
+        const matchesName = (wine.name || '').toLowerCase().includes(searchLower);
+        const matchesType = (wine.type || '').toLowerCase().includes(searchLower);
+        const matchesCategory = (wine.category || '').toLowerCase().includes(searchLower);
+        const matchesDescription = (wine.description || '').toLowerCase().includes(searchLower);
+        
+        return matchesName || matchesType || matchesCategory || matchesDescription;
+      });
+    }
   }
   
   if (winesToShow.length === 0) {
-    showEmptyState(`No wines found matching "${searchQuery}" in ${currentCategory}`);
+    showEmptyState(`No wines found matching "${searchQuery}" in ${currentCategory || 'this category'}`);
     return;
   }
   
@@ -225,9 +232,10 @@ function renderWines() {
     const price = wine.price || 0;
     const type = wine.type || 'Wine';
     const category = wine.category || '';
+    const isInStock = (wine.stockCount || 0) > 0;
     
     return `
-      <div class="wine-card" onclick="navigateToWineDetail(${wine.id})">
+      <div class="wine-card ${!isInStock ? 'out-of-stock' : ''}" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${wine.name}" 
@@ -239,7 +247,7 @@ function renderWines() {
           <div class="wine-title">${wine.name}</div>
           <div class="wine-sub">${type}</div>
           <div class="wine-sub">${category}</div>
-          <div class="wine-sub">R${price.toFixed(2)}</div>
+          <div class="wine-price">R${price.toFixed(2)}</div>
         </div>
       </div>
     `;
@@ -256,6 +264,7 @@ function filterWines() {
 
 // Navigate to wine detail page
 function navigateToWineDetail(wineId) {
+  console.log(`📱 Navigating to wine detail: ${wineId}`);
   window.location.href = `wine_detail.html?id=${wineId}`;
 }
 
