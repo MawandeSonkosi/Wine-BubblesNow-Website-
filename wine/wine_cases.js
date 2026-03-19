@@ -1,6 +1,5 @@
-// Configuration
-const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
+// Configuration - USE RELATIVE URL FOR CLOUDFLARE
+const API_BASE_URL = '/api'; // This works on both localhost and app.wineandbubblesnow.co.za
 
 // State
 let allWines = [];
@@ -8,8 +7,8 @@ let filteredWines = [];
 let currentFilter = '';
 let searchQuery = '';
 
-// List of wine types to exclude (like your Flutter code)
-const excludedTypes = ['Whiskey', 'Cognac', 'Gin'];
+// List of wine types to include for wine cases
+const allowedTypes = ['Red Wine', 'White Wine', 'Champagne'];
 
 // DOM Elements
 const wineCasesGrid = document.getElementById('wineCasesGrid');
@@ -20,12 +19,12 @@ const filterDropdown = document.getElementById('filterDropdown');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('📦 Wine Cases page loaded');
+  console.log('🔧 Using API URL:', API_BASE_URL);
   
   // Get URL parameters for filtering
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get('search');
   const typeParam = urlParams.get('type');
-  const categoryParam = urlParams.get('category');
   
   if (searchParam) {
     searchQuery = searchParam.toLowerCase();
@@ -35,11 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeParam) {
     currentFilter = typeParam;
     updateFilterButton();
-  }
-  
-  if (categoryParam) {
-    searchQuery = categoryParam.toLowerCase();
-    if (searchInput) searchInput.value = categoryParam;
   }
   
   fetchWineCases();
@@ -56,28 +50,28 @@ function setupEventListeners() {
     });
   }
   
-  // Filter button click
+  // Toggle filter dropdown on button click
   if (filterBtn) {
     filterBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+      filterDropdown.classList.toggle('show');
     });
   }
   
   // Close dropdown when clicking outside
   document.addEventListener('click', (event) => {
     if (filterDropdown && !event.target.closest('.filter-dropdown')) {
-      filterDropdown.style.display = 'none';
+      filterDropdown.classList.remove('show');
     }
   });
 }
 
-// Extract wine types for filter (excluding excluded types)
+// Extract wine types for filter
 function extractWineTypes(wines) {
   const types = new Set(['All']);
   
   wines.forEach(wine => {
-    if (wine.type && wine.type.trim() !== '' && !excludedTypes.includes(wine.type)) {
+    if (wine.type && wine.type.trim() !== '' && allowedTypes.includes(wine.type)) {
       types.add(wine.type);
     }
   });
@@ -110,7 +104,7 @@ function populateFilterDropdown(wines) {
       currentFilter = wineType === 'All' ? '' : wineType;
       updateFilterButton();
       filterWineCases();
-      filterDropdown.style.display = 'none';
+      filterDropdown.classList.remove('show');
     });
     filterDropdown.appendChild(link);
   });
@@ -135,12 +129,16 @@ async function fetchWineCases() {
     
     console.log('🌐 Fetching wine cases from API...');
     
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/wines?all=true`)}`;
+    // Use relative URL through your proxy server
+    const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
+    console.log('📡 Fetching from:', apiUrl);
     
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     
@@ -151,9 +149,9 @@ async function fetchWineCases() {
     const wines = await response.json();
     console.log(`📦 Received ${wines.length} wines total`);
     
-    // Filter out excluded types for wine cases
-    allWines = wines.filter(wine => !excludedTypes.includes(wine.type));
-    console.log(`📦 Filtered to ${allWines.length} wine cases (excluding ${excludedTypes.join(', ')})`);
+    // Filter to only include allowed types for wine cases
+    allWines = wines.filter(wine => allowedTypes.includes(wine.type));
+    console.log(`📦 Filtered to ${allWines.length} wine cases (${allowedTypes.join(', ')})`);
     
     if (allWines.length === 0) {
       showEmptyState('No wine cases found');
@@ -204,7 +202,7 @@ function renderWineCases() {
     const imageUrl = fixImageUrl(wine.imageUrl);
     const price = wine.price || 0;
     const type = wine.type || 'Wine';
-    const isOutOfStock = wine.stockCount <= 0;
+    const isOutOfStock = (wine.stockCount || 0) <= 0;
     const casePrice = (price * 6).toFixed(2); // 6 bottles per case
     
     return `
@@ -232,7 +230,7 @@ function renderWineCases() {
 function filterWineCases() {
   console.log(`🔍 Filtering wine cases: filter="${currentFilter}", search="${searchQuery}"`);
   
-  // Start with all wines (already filtered to exclude excluded types)
+  // Start with all wines (already filtered to allowed types)
   filteredWines = [...allWines];
   
   // Filter by type
