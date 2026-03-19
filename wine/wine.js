@@ -50,22 +50,23 @@ function setupEventListeners() {
   }
 }
 
-// Extract wine types - FIXED to show "White Wine" not "White Wines"
+// Extract wine types - REMOVED Cognac, Whiskey, and Gin
 function extractWineTypes(wines) {
   const defaultTypes = [
     'All',
     'Red Wine',
-    'White Wine',  // Changed from 'White Wines' to 'White Wine'
-    'Champagne',
-    'Whiskey',
-    'Gin',
-    'Cognac'
+    'White Wine',
+    'Champagne'
   ];
   
   const uniqueTypes = new Set();
   wines.forEach(wine => {
     if (wine.type && wine.type.trim() !== '') {
-      uniqueTypes.add(wine.type);
+      // Only add wine types that are in our allowed list
+      const allowedTypes = ['Red Wine', 'White Wine', 'Champagne'];
+      if (allowedTypes.includes(wine.type)) {
+        uniqueTypes.add(wine.type);
+      }
     }
   });
   
@@ -76,16 +77,14 @@ function extractWineTypes(wines) {
 
 // Check if item is a wine (not a banner or advert)
 function isWine(item) {
-  // Check if it has a valid wine type
-  const validWineTypes = ['Red Wine', 'White Wine', 'Champagne', 'Sparkling', 'Rosé', 'Rose', 'Dessert Wine', 'Whiskey', 'Gin', 'Cognac'];
+  // Check if it has a valid wine type - only Red Wine, White Wine, Champagne
+  const validWineTypes = ['Red Wine', 'White Wine', 'Champagne'];
   
   // Check if it has a price (adverts might have price but different structure)
   const hasPrice = item.price && item.price > 0;
   
   // Check if it has a valid wine type
-  const hasValidType = item.type && validWineTypes.some(type => 
-    item.type.toLowerCase().includes(type.toLowerCase())
-  );
+  const hasValidType = item.type && validWineTypes.includes(item.type);
   
   // Check if it has a wine-like name (not "Special Offer", "Advertisement", etc.)
   const hasWineName = item.name && 
@@ -99,8 +98,8 @@ function isWine(item) {
                              item.description.toLowerCase().includes('vintage') ||
                              item.description.toLowerCase().includes('bottle'));
   
-  // Return true if it meets wine criteria
-  return hasPrice && (hasValidType || hasWineName || hasWineDescription);
+  // Return true if it meets wine criteria AND has valid type
+  return hasPrice && hasValidType && (hasWineName || hasWineDescription);
 }
 
 // Populate filter dropdown
@@ -108,7 +107,7 @@ function populateFilterDropdown(wines) {
   if (!filterDropdown) return;
   
   const wineTypes = extractWineTypes(wines);
-  console.log('🍷 Wine types found:', wineTypes);
+  console.log('🍷 Wine types found (only Red Wine, White Wine, Champagne):', wineTypes);
   
   filterDropdown.innerHTML = '';
   
@@ -164,15 +163,15 @@ async function fetchWines() {
     const items = await response.json();
     console.log(`✅ Received ${items.length} items from API`);
     
-    // Filter out non-wine items (banners, adverts, etc.)
+    // Filter to only Red Wine, White Wine, and Champagne
     const wines = items.filter(item => isWine(item));
     
-    console.log(`🍷 Filtered to ${wines.length} actual wines`);
+    console.log(`🍷 Filtered to ${wines.length} wines (Red Wine, White Wine, Champagne only)`);
     
     // Log what was filtered out for debugging
     const filteredOut = items.length - wines.length;
     if (filteredOut > 0) {
-      console.log(`🚫 Filtered out ${filteredOut} non-wine items`);
+      console.log(`🚫 Filtered out ${filteredOut} non-wine items and other categories`);
     }
     
     allWines = wines;
