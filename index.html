@@ -1641,25 +1641,17 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
           });
       }
       
-      const urlParams = new URLSearchParams(window.location.search);
-      const justLoggedInParam = urlParams.get('login') === 'success';
-      
-      if (justLoggedInParam) {
-          const userData = localStorage.getItem('wineBubbles_user');
-          if (userData) {
-              try {
-                  const user = JSON.parse(userData);
-                  setTimeout(() => {
-                      alert(`Welcome back, ${user.fullName || user.email.split('@')[0]}!`);
-                      const url = new URL(window.location);
-                      url.searchParams.delete('login');
-                      window.history.replaceState({}, '', url);
-                  }, 500);
-              } catch (error) {
-                  console.error('Error parsing user data for welcome:', error);
-              }
-          }
-      }
+     const urlParams = new URLSearchParams(window.location.search);
+const justLoggedInParam = urlParams.get('login') === 'success';
+
+if (justLoggedInParam) {
+    // Just clean up the URL without showing alert
+    const url = new URL(window.location);
+    url.searchParams.delete('login');
+    window.history.replaceState({}, '', url);
+    
+    console.log('✅ Login success parameter cleaned up');
+}
       
       window.addEventListener('storage', function(event) {
           if (event.key === 'wineBubbles_cart' || event.key === 'wine_cart') {
