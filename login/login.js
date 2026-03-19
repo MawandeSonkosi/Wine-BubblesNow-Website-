@@ -1,54 +1,150 @@
-// login/login.js - UPDATED TO MATCH FLUTTER APP
+// login/login.js - UPDATED FOR PRODUCTION API
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
-    const form = document.getElementById('loginForm');
+    // DOM Elements
+    const backButton = document.getElementById('backButton');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const rememberMe = document.getElementById('rememberMe');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('errorMessage');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const snackbar = document.getElementById('snackbar');
     
-    // API base URL - USE PRODUCTION API LIKE FLUTTER
-    const API_BASE_URL = 'https://www.wineandbubblesnow.co.za';
+    // API Configuration - USE PRODUCTION API LIKE FLUTTER
+    const API_BASE_URL = window.location.origin; // Uses current domain (app.wineandbubblesnow.co.za)
+    console.log('🌐 Using production API:', API_BASE_URL);
     
-    function showError(message, isSuccess = false) {
-        if (errorMessage) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            errorMessage.style.color = isSuccess ? '#28a745' : '#721c24';
-            errorMessage.style.background = isSuccess ? '#d4edda' : '#f8d7da';
-            errorMessage.style.border = isSuccess ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
-            console.error('Error:', message);
-        }
+    // Check if user is already logged in
+    checkAuth();
+    
+    // Back button functionality
+    if (backButton) {
+        backButton.addEventListener('click', function() {
+            window.history.back();
+        });
     }
     
-    function hideError() {
-        if (errorMessage) {
-            errorMessage.style.display = 'none';
-        }
+    // Toggle password visibility
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
     }
     
-    function setLoading(isLoading) {
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
+    // Forgot password link
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'forgot_password.html';
+        });
+    }
+    
+    // Form submission
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (validateForm()) {
+                await login();
+            }
+        });
+    }
+    
+    // Functions
+    function checkAuth() {
+        const token = localStorage.getItem('wineBubbles_token');
+        const userData = localStorage.getItem('wineBubbles_user');
         
-        if (submitBtn && btnText && loadingSpinner) {
-            if (isLoading) {
-                submitBtn.disabled = true;
-                btnText.style.display = 'none';
-                loadingSpinner.style.display = 'block';
-            } else {
-                submitBtn.disabled = false;
-                btnText.style.display = 'block';
-                loadingSpinner.style.display = 'none';
+        if (token && userData) {
+            // Verify token isn't expired
+            const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
+            if (timestamp) {
+                const tokenAge = Date.now() - parseInt(timestamp);
+                const sevenDays = 7 * 24 * 60 * 60 * 1000;
+                
+                if (tokenAge < sevenDays) {
+                    console.log('✅ Already logged in, redirecting to home');
+                    window.location.href = '../index.html';
+                    return;
+                } else {
+                    // Token expired, clear it
+                    localStorage.removeItem('wineBubbles_token');
+                    localStorage.removeItem('wineBubbles_token_timestamp');
+                    localStorage.removeItem('wineBubbles_user');
+                }
             }
         }
     }
     
-    async function loginUser(email, password) {
-        console.log(`🔐 Attempting login for: ${email}`);
+    function validateForm() {
+        let isValid = true;
+        
+        // Clear previous errors
+        if (emailError) emailError.style.display = 'none';
+        if (passwordError) passwordError.style.display = 'none';
+        if (errorMessage) errorMessage.style.display = 'none';
+        
+        // Email validation
+        const email = emailInput.value.trim();
+        if (!email) {
+            if (emailError) {
+                emailError.textContent = 'Email is required';
+                emailError.style.display = 'block';
+            }
+            isValid = false;
+        } else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                if (emailError) {
+                    emailError.textContent = 'Enter a valid email address';
+                    emailError.style.display = 'block';
+                }
+                isValid = false;
+            }
+        }
+        
+        // Password validation
+        const password = passwordInput.value.trim();
+        if (!password) {
+            if (passwordError) {
+                passwordError.textContent = 'Password is required';
+                passwordError.style.display = 'block';
+            }
+            isValid = false;
+        } else if (password.length < 6) {
+            if (passwordError) {
+                passwordError.textContent = 'Password must be at least 6 characters';
+                passwordError.style.display = 'block';
+            }
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    async function login() {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            btnText.textContent = 'Logging in...';
+            loadingSpinner.style.display = 'inline-block';
+        }
+        
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value.trim();
         
         try {
+            console.log('🔐 Attempting login for:', email);
+            
             const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -56,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email.toLowerCase().trim(),
+                    email: email,
                     password: password
                 })
             });
@@ -69,375 +165,252 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('📦 Response data:', data);
             } catch (parseError) {
                 console.error('Failed to parse JSON:', parseError);
-                const text = await response.text();
-                console.error('Raw response:', text);
-                return { 
-                    success: false, 
-                    error: 'Invalid server response format',
-                    needsVerification: false
-                };
+                throw new Error('Invalid server response');
             }
             
-            if (!response.ok) {
-                // Check for verification requirement (like Flutter app)
-                if (data.needsVerification === true || 
-                    data.message?.toLowerCase().includes('verify') ||
-                    data.message?.toLowerCase().includes('verification')) {
-                    return { 
-                        success: false, 
-                        error: data.message || 'Please verify your email first.',
-                        needsVerification: true,
-                        email: data.email || email
-                    };
+            if (response.ok && data.success) {
+                // Login successful
+                showMessage('Login successful!', 'success');
+                
+                // Store user data
+                storeUserData(data);
+                
+                // Save email if remember me is checked
+                if (rememberMe && rememberMe.checked && email) {
+                    localStorage.setItem('wineBubbles_rememberedEmail', email);
                 }
                 
-                return { 
-                    success: false, 
-                    error: data.message || `Login failed (${response.status})`,
-                    needsVerification: false
-                };
-            }
-            
-            console.log('✅ Login successful!', data);
-            return { 
-                success: true, 
-                data: data,
-                needsVerification: false
-            };
-            
-        } catch (error) {
-            console.error('🚨 Network error:', error);
-            
-            if (error.message.includes('Failed to fetch')) {
-                return { 
-                    success: false, 
-                    error: 'Cannot connect to server. Please check if the server is running.',
-                    needsVerification: false
-                };
-            }
-            
-            return { 
-                success: false, 
-                error: `Connection error: ${error.message}`,
-                needsVerification: false
-            };
-        }
-    }
-    
-    // After successful login, set the flag and clear cart
-// In login/login.js - storeUserData function
-function storeUserData(userData) {
-    console.log('💾 Storing user data...');
-    
-    // DO NOT clear cart here - let homepage handle it
-    
-    // Store user data
-    if (userData.token) {
-        localStorage.setItem('wineBubbles_token', userData.token);
-        localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
-    }
-    
-    if (userData.user) {
-        localStorage.setItem('wineBubbles_user', JSON.stringify(userData.user));
-        // ... store other user fields
-    }
-    
-    // IMPORTANT: Set this flag to tell homepage to reset cart
-    localStorage.setItem('wineBubbles_justLoggedIn', 'true');
-    
-    console.log('✅ User data stored, cart will be reset on homepage');
-}
-    async function verifyEmail(email, verificationCode) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/verify-email`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email.toLowerCase().trim(),
-                    verificationCode: verificationCode
-                })
-            });
-            
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Verification failed');
-            }
-            
-            const data = await response.json();
-            return { success: true, data: data };
-            
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    }
-    
-    // Test server connection
-    async function testConnection() {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/health`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
+                // Redirect to home page after delay
+                setTimeout(() => {
+                    window.location.href = '../index.html?login=success';
+                }, 1500);
+                
+            } else {
+                // Check for verification requirement
+                if (data.needsVerification === true) {
+                    showVerificationPrompt(email);
+                } else {
+                    throw new Error(data.message || 'Login failed');
                 }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                console.log('✅ Server is running:', data.message);
-                return true;
             }
-            return false;
+            
         } catch (error) {
-            console.error('❌ Server is not reachable:', error);
-            return false;
+            console.error('Login error:', error);
+            if (errorMessage) {
+                errorMessage.textContent = error.message || 'Login failed. Please try again.';
+                errorMessage.style.display = 'block';
+            }
+            showSnackbar(error.message || 'Login failed', 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                btnText.textContent = 'LOG IN';
+                loadingSpinner.style.display = 'none';
+            }
         }
     }
     
-    // Main form submission
-    if (form) {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
+    function storeUserData(data) {
+        console.log('💾 Storing user data...');
+        
+        if (data.token) {
+            localStorage.setItem('wineBubbles_token', data.token);
+            localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
+        }
+        
+        if (data.user) {
+            localStorage.setItem('wineBubbles_user', JSON.stringify(data.user));
             
-            hideError();
-            
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            
-            // Basic validation
-            if (!email || !email.includes('@')) {
-                showError('Please enter a valid email address');
-                emailInput.focus();
+            if (data.user.fullName) {
+                localStorage.setItem('wineBubbles_userFullName', data.user.fullName);
+            }
+            if (data.user.email) {
+                localStorage.setItem('wineBubbles_userEmail', data.user.email);
+            }
+            if (data.user.phoneNumber) {
+                localStorage.setItem('wineBubbles_userPhone', data.user.phoneNumber);
+            }
+            if (data.user.isAdmin) {
+                localStorage.setItem('wineBubbles_isAdmin', 'true');
+            }
+            if (data.user.isDriver) {
+                localStorage.setItem('wineBubbles_isDriver', 'true');
+            }
+        }
+        
+        // Set flag for homepage to reset cart
+        localStorage.setItem('wineBubbles_justLoggedIn', 'true');
+        
+        console.log('✅ User data stored');
+    }
+    
+    function showVerificationPrompt(email) {
+        // Create verification modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        `;
+        
+        modal.innerHTML = `
+            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 450px; width: 100%;">
+                <h3 style="color: #6b0d2b; margin-bottom: 15px; font-family: 'Playfair Display', serif; font-size: 24px;">
+                    Verify Your Email
+                </h3>
+                <p style="color: #555; margin-bottom: 20px;">
+                    We've sent a verification code to <strong>${email}</strong>.
+                    Please enter the 6-digit code below:
+                </p>
+                <input type="text" id="verifyCode" 
+                       placeholder="Enter 6-digit code" 
+                       style="width: 100%; padding: 16px; border: 2px solid #eee; border-radius: 8px; 
+                              font-size: 20px; text-align: center; letter-spacing: 8px; margin-bottom: 20px;
+                              font-family: monospace;"
+                       maxlength="6">
+                <div style="display: flex; gap: 10px;">
+                    <button id="cancelVerify" 
+                            style="flex: 1; padding: 14px; background: #f0f0f0; border: none; 
+                                   border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        Cancel
+                    </button>
+                    <button id="submitVerify" 
+                            style="flex: 1; padding: 14px; background: #6b0d2b; color: white; 
+                                   border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                        Verify
+                    </button>
+                </div>
+                <p style="font-size: 12px; color: #999; margin-top: 15px; text-align: center;">
+                    Didn't receive the code? 
+                    <a href="#" id="resendVerify" style="color: #6b0d2b;">Resend code</a>
+                </p>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Focus input
+        setTimeout(() => {
+            const codeInput = document.getElementById('verifyCode');
+            if (codeInput) codeInput.focus();
+        }, 100);
+        
+        // Handle verify
+        document.getElementById('submitVerify').addEventListener('click', async () => {
+            const code = document.getElementById('verifyCode').value;
+            if (!code || code.length !== 6) {
+                alert('Please enter a valid 6-digit code');
                 return;
             }
-            
-            if (!password || password.length < 6) {
-                showError('Password must be at least 6 characters');
-                passwordInput.focus();
-                return;
-            }
-            
-            console.log('🚀 Starting login process...');
-            setLoading(true);
             
             try {
-                const result = await loginUser(email, password);
+                const response = await fetch(`${API_BASE_URL}/api/auth/verify-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        verificationCode: code
+                    })
+                });
                 
-                if (result.success) {
-                    storeUserData(result.data);
-                    
-                    showError('✓ Login successful! Redirecting...', true);
-                    
-                    setTimeout(() => {
-                        // Redirect to homepage with success parameter
-                        window.location.href = '../index.html?login=success';
-                    }, 1500);
-                    
+                const data = await response.json();
+                
+                if (response.ok) {
+                    modal.remove();
+                    showMessage('✓ Email verified! You can now log in.', 'success');
+                    showSnackbar('Email verified successfully!', 'success');
                 } else {
-                    if (result.needsVerification) {
-                        console.log('📧 User needs verification - showing prompt');
-                        
-                        // Show verification modal/prompt
-                        const verificationModal = document.createElement('div');
-                        verificationModal.style.cssText = `
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(0,0,0,0.8);
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            z-index: 9999;
-                        `;
-                        
-                        verificationModal.innerHTML = `
-                            <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; width: 90%;">
-                                <h3 style="color: #6b0d2b; margin-bottom: 15px; font-family: 'Playfair Display', serif;">
-                                    Verify Your Email
-                                </h3>
-                                <p style="color: #666; margin-bottom: 20px;">
-                                    We've sent a 6-digit verification code to <strong>${email}</strong>.
-                                    Please enter it below:
-                                </p>
-                                <input type="text" id="verificationCode" 
-                                       placeholder="Enter 6-digit code" 
-                                       style="width: 100%; padding: 12px; border: 2px solid #ddd; 
-                                              border-radius: 8px; font-size: 16px; margin-bottom: 15px;"
-                                       maxlength="6">
-                                <div style="display: flex; gap: 10px;">
-                                    <button id="cancelVerify" 
-                                            style="flex: 1; padding: 12px; background: #f5f5f5; 
-                                                   border: none; border-radius: 8px; cursor: pointer;">
-                                        Cancel
-                                    </button>
-                                    <button id="submitVerify" 
-                                            style="flex: 1; padding: 12px; background: #6b0d2b; 
-                                                   color: white; border: none; border-radius: 8px; cursor: pointer;">
-                                        Verify
-                                    </button>
-                                </div>
-                                <p style="font-size: 12px; color: #999; margin-top: 15px; text-align: center;">
-                                    Didn't receive the code? Check your spam folder or 
-                                    <a href="#" id="resendCode" style="color: #6b0d2b;">resend code</a>
-                                </p>
-                            </div>
-                        `;
-                        
-                        document.body.appendChild(verificationModal);
-                        
-                        // Focus on verification code input
-                        setTimeout(() => {
-                            const codeInput = document.getElementById('verificationCode');
-                            if (codeInput) codeInput.focus();
-                        }, 100);
-                        
-                        // Handle verification submission
-                        document.getElementById('submitVerify').addEventListener('click', async () => {
-                            const code = document.getElementById('verificationCode').value;
-                            if (!code || code.length !== 6) {
-                                alert('Please enter a valid 6-digit code');
-                                return;
-                            }
-                            
-                            setLoading(true);
-                            const verifyResult = await verifyEmail(email, code);
-                            
-                            if (verifyResult.success) {
-                                storeUserData(verifyResult.data);
-                                verificationModal.remove();
-                                showError('✓ Email verified! Redirecting...', true);
-                                
-                                setTimeout(() => {
-                                    window.location.href = '../index.html?login=success';
-                                }, 1500);
-                            } else {
-                                alert(`Verification failed: ${verifyResult.error}`);
-                                setLoading(false);
-                            }
-                        });
-                        
-                        // Handle cancel
-                        document.getElementById('cancelVerify').addEventListener('click', () => {
-                            verificationModal.remove();
-                            setLoading(false);
-                            passwordInput.value = '';
-                            passwordInput.focus();
-                        });
-                        
-                        // Handle resend code
-                        document.getElementById('resendCode').addEventListener('click', async (e) => {
-                            e.preventDefault();
-                            alert('Code resent! Please check your email.');
-                            // You can implement actual resend logic here
-                        });
-                        
-                    } else {
-                        showError(result.error);
-                        passwordInput.value = '';
-                        passwordInput.focus();
-                    }
+                    alert(data.message || 'Verification failed');
                 }
-                
             } catch (error) {
-                console.error('🚨 Unexpected error:', error);
-                showError('An unexpected error occurred. Please try again.');
-            } finally {
-                setLoading(false);
+                console.error('Verification error:', error);
+                alert('Verification failed. Please try again.');
             }
         });
-    }
-    
-    // Password toggle
-    const togglePassword = document.getElementById('togglePassword');
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener('click', function() {
-            const icon = this.querySelector('i');
+        
+        // Handle cancel
+        document.getElementById('cancelVerify').addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        // Handle resend
+        document.getElementById('resendVerify').addEventListener('click', async (e) => {
+            e.preventDefault();
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-                icon.title = 'Hide password';
-            } else {
-                passwordInput.type = 'password';
-                icon.className = 'fas fa-eye';
-                icon.title = 'Show password';
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/resend-verification`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                if (response.ok) {
+                    alert('Verification code resent! Please check your email.');
+                } else {
+                    alert('Failed to resend code. Please try again.');
+                }
+            } catch (error) {
+                console.error('Resend error:', error);
+                alert('Failed to resend code. Please try again.');
             }
         });
     }
     
-    // Remember me functionality
-    const rememberMeCheckbox = document.getElementById('rememberMe');
-    const rememberedEmail = localStorage.getItem('wineBubbles_rememberedEmail');
+    function showMessage(message, type = 'success') {
+        if (errorMessage) {
+            errorMessage.textContent = message;
+            errorMessage.className = type === 'error' ? 'error-message' : 'success-message';
+            errorMessage.style.display = 'block';
+        }
+        showSnackbar(message, type);
+    }
     
+    function showSnackbar(message, type = 'success') {
+        if (!snackbar) return;
+        
+        snackbar.textContent = message;
+        snackbar.className = 'snackbar';
+        
+        if (type === 'error') {
+            snackbar.classList.add('error');
+        } else if (type === 'success') {
+            snackbar.classList.add('success');
+        }
+        
+        snackbar.classList.add('show');
+        
+        setTimeout(() => {
+            snackbar.classList.remove('show');
+        }, 3000);
+    }
+    
+    // Load remembered email
+    const rememberedEmail = localStorage.getItem('wineBubbles_rememberedEmail');
     if (rememberedEmail && emailInput) {
         emailInput.value = rememberedEmail;
-        if (rememberMeCheckbox) {
-            rememberMeCheckbox.checked = true;
+        if (rememberMe) {
+            rememberMe.checked = true;
         }
-    }
-    
-    // Save email if remember me is checked
-    if (rememberMeCheckbox) {
-        rememberMeCheckbox.addEventListener('change', function() {
-            if (!this.checked) {
-                localStorage.removeItem('wineBubbles_rememberedEmail');
-                console.log('🗑️ Cleared remembered email');
-            }
-        });
-    }
-    
-    if (emailInput) {
-        emailInput.addEventListener('blur', function() {
-            const email = this.value.trim();
-            if (rememberMeCheckbox && rememberMeCheckbox.checked && email) {
-                localStorage.setItem('wineBubbles_rememberedEmail', email);
-                console.log('💾 Saved email for remember me');
-            }
-        });
-    }
-    
-    // Sign up link
-    const signupLink = document.getElementById('signupLink');
-    if (signupLink) {
-        signupLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = 'register.html';
-        });
-    }
-    
-    // Forgot password link
-    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-    if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = 'forgot_password.html';
-        });
-    }
-    
-    // Back button
-    const backButton = document.getElementById('backButton');
-    if (backButton) {
-        backButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.history.back();
-        });
     }
     
     // Auto-focus email field
     if (emailInput && !emailInput.value) {
         setTimeout(() => emailInput.focus(), 300);
     }
-    
-    // Test connection on load
-    setTimeout(async () => {
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            console.warn('⚠️ Server is not reachable');
-        }
-    }, 1000);
     
     console.log('✅ Login script initialized');
 });

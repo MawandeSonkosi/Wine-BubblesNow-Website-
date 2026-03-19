@@ -1,8 +1,9 @@
-// login/forgot-password.js - UPDATED FOR YOUR BACKEND
+// login/forgot-password.js - UPDATED FOR PRODUCTION API
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Forgot password page loaded');
     
     // DOM Elements
+    const backButton = document.getElementById('backButton');
     const emailForm = document.getElementById('emailForm');
     const codeForm = document.getElementById('codeForm');
     const passwordForm = document.getElementById('passwordForm');
@@ -17,25 +18,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const resendLink = document.getElementById('resendLink');
     const resendTimer = document.getElementById('resendTimer');
     const timerCountSpan = document.getElementById('timerCount');
+    const goToLoginBtn = document.getElementById('goToLoginBtn');
+    
+    // Toggle password buttons
+    const toggleNewPassword = document.getElementById('toggleNewPassword');
+    const toggleConfirmNewPassword = document.getElementById('toggleConfirmNewPassword');
     
     // Steps
     const steps = document.querySelectorAll('.step');
     
-    // API base URL
-    const API_BASE_URL = window.location.origin;
-    console.log('🌐 API Base URL:', API_BASE_URL);
+    // API Configuration - USE PRODUCTION API
+    const API_BASE_URL = window.location.origin; // Uses current domain (app.wineandbubblesnow.co.za)
+    console.log('🌐 Using production API:', API_BASE_URL);
     
     let currentEmail = '';
     let resetToken = '';
     let resendTimerInterval;
     let countdown = 60;
+    let canResend = false;
     
     // Initialize
     init();
     
     function init() {
         setupEventListeners();
-        startResendTimer();
         
         // Auto-focus email input
         if (emailInput) {
@@ -44,6 +50,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function setupEventListeners() {
+        // Back button
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                window.history.back();
+            });
+        }
+        
         // Email form submission
         if (emailForm) {
             emailForm.addEventListener('submit', handleEmailSubmit);
@@ -59,29 +72,140 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordForm.addEventListener('submit', handlePasswordSubmit);
         }
         
-        // Verification code inputs
-        setupVerificationInputs();
-        
-        // Resend link
-        if (resendLink) {
-            resendLink.addEventListener('click', handleResendCode);
-        }
-        
         // Go to login button
-        const goToLoginBtn = document.getElementById('goToLoginBtn');
         if (goToLoginBtn) {
             goToLoginBtn.addEventListener('click', function() {
                 window.location.href = 'login.html';
             });
         }
         
+        // Resend link
+        if (resendLink) {
+            resendLink.addEventListener('click', handleResendCode);
+        }
+        
         // Password toggle buttons
-        setupPasswordToggle('toggleNewPassword', newPasswordInput);
-        setupPasswordToggle('toggleConfirmNewPassword', confirmNewPasswordInput);
+        setupPasswordToggle(toggleNewPassword, newPasswordInput);
+        setupPasswordToggle(toggleConfirmNewPassword, confirmNewPasswordInput);
         
         // Password strength indicator
         if (newPasswordInput) {
             newPasswordInput.addEventListener('input', updatePasswordStrength);
+        }
+        
+        // Setup verification inputs
+        setupVerificationInputs();
+    }
+    
+    function setupPasswordToggle(toggleBtn, passwordField) {
+        if (toggleBtn && passwordField) {
+            toggleBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    icon.className = 'fas fa-eye-slash';
+                } else {
+                    passwordField.type = 'password';
+                    icon.className = 'fas fa-eye';
+                }
+            });
+        }
+    }
+    
+    function setupVerificationInputs() {
+        verificationInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                const value = this.value;
+                
+                // Only allow numbers
+                if (value && !/^\d$/.test(value)) {
+                    this.value = '';
+                    return;
+                }
+                
+                // Move to next input if value entered
+                if (value && index < verificationInputs.length - 1) {
+                    verificationInputs[index + 1].focus();
+                }
+                
+                // Update hidden input
+                updateVerificationCode();
+                
+                // Clear any error
+                const codeError = document.getElementById('codeError');
+                if (codeError) {
+                    codeError.style.display = 'none';
+                    codeError.textContent = '';
+                }
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                // Handle backspace
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    verificationInputs[index - 1].focus();
+                }
+                
+                // Handle paste
+                if ((e.key === 'v' && (e.ctrlKey || e.metaKey)) || e.type === 'paste') {
+                    e.preventDefault();
+                    setTimeout(() => {
+                        handlePaste(this, e);
+                    }, 10);
+                }
+            });
+            
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                handlePaste(this, e);
+            });
+        });
+    }
+    
+    function handlePaste(input, e) {
+        const pastedData = e.clipboardData ? e.clipboardData.getData('text') : '';
+        
+        if (!/^\d+$/.test(pastedData)) {
+            return;
+        }
+        
+        const digits = pastedData.split('').slice(0, 6);
+        
+        digits.forEach((digit, index) => {
+            if (verificationInputs[index]) {
+                verificationInputs[index].value = digit;
+            }
+        });
+        
+        // Focus last input
+        const lastIndex = Math.min(digits.length - 1, verificationInputs.length - 1);
+        if (verificationInputs[lastIndex]) {
+            verificationInputs[lastIndex].focus();
+        }
+        
+        updateVerificationCode();
+    }
+    
+    function updateVerificationCode() {
+        let code = '';
+        verificationInputs.forEach(input => {
+            code += input.value;
+        });
+        
+        if (verificationCodeInput) {
+            verificationCodeInput.value = code;
+        }
+    }
+    
+    function resetVerificationInputs() {
+        verificationInputs.forEach(input => {
+            input.value = '';
+        });
+        updateVerificationCode();
+        
+        // Focus first input
+        if (verificationInputs[0]) {
+            verificationInputs[0].focus();
         }
     }
     
@@ -137,6 +261,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 btnText = document.getElementById('resetBtnText');
                 loadingSpinner = document.getElementById('resetLoadingSpinner');
                 break;
+            default:
+                return;
         }
         
         if (submitBtn && btnText && loadingSpinner) {
@@ -179,11 +305,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (result.success) {
                 currentEmail = email;
-                userEmailSpan.textContent = email;
-                showError(result.message || 'OTP sent successfully', true);
+                if (userEmailSpan) {
+                    userEmailSpan.textContent = email;
+                }
+                showError('OTP sent successfully! Check your email.', true);
                 goToStep(2);
                 resetVerificationInputs();
                 startResendTimer();
+                
+                // Auto-focus first verification input
+                setTimeout(() => {
+                    if (verificationInputs[0]) {
+                        verificationInputs[0].focus();
+                    }
+                }, 100);
             } else {
                 showError(result.error || 'Failed to send OTP');
             }
@@ -221,136 +356,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('📦 Response data:', data);
             } catch (parseError) {
                 console.error('Failed to parse JSON:', parseError);
-                const text = await response.text();
-                console.error('Raw response:', text);
                 return { success: false, error: 'Invalid server response format' };
             }
             
-            if (!response.ok) {
-                let errorMsg = data.message || `Failed to send OTP (${response.status})`;
+            if (response.ok) {
+                return { 
+                    success: true, 
+                    data: data,
+                    message: data.message || 'OTP sent successfully'
+                };
+            } else {
                 // For security, show generic message for 404
+                let errorMsg = data.message || `Failed to send OTP (${response.status})`;
                 if (response.status === 404) {
                     errorMsg = 'If this email exists in our system, you will receive an OTP';
                 }
+                
                 return { 
                     success: false, 
                     error: errorMsg 
                 };
             }
             
-            return { 
-                success: true, 
-                data: data,
-                message: data.message || 'OTP sent successfully'
-            };
-            
         } catch (error) {
             console.error('🚨 Network error:', error);
+            
+            if (error.message.includes('Failed to fetch')) {
+                return { 
+                    success: false, 
+                    error: 'Cannot connect to server. Please check your connection.' 
+                };
+            }
+            
             return { 
                 success: false, 
-                error: 'Cannot connect to server. Please check your connection.' 
+                error: `Connection error: ${error.message}` 
             };
         }
     }
     
     // Step 2: Verify OTP
-    function setupVerificationInputs() {
-        verificationInputs.forEach((input, index) => {
-            input.addEventListener('input', function(e) {
-                const value = this.value;
-                
-                // Only allow numbers
-                if (value && !/^\d$/.test(value)) {
-                    this.value = '';
-                    return;
-                }
-                
-                // Move to next input if value entered
-                if (value && index < verificationInputs.length - 1) {
-                    verificationInputs[index + 1].focus();
-                }
-                
-                // Update hidden input
-                updateVerificationCode();
-                
-                // Clear any error
-                const codeError = document.getElementById('codeError');
-                if (codeError) {
-                    codeError.style.display = 'none';
-                    codeError.textContent = '';
-                }
-            });
-            
-            input.addEventListener('keydown', function(e) {
-                // Handle backspace
-                if (e.key === 'Backspace' && !this.value && index > 0) {
-                    verificationInputs[index - 1].focus();
-                }
-                
-                // Handle paste
-                if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
-                    setTimeout(() => {
-                        handlePaste(this, e);
-                    }, 10);
-                }
-            });
-            
-            input.addEventListener('paste', handlePaste);
-        });
-    }
-    
-    function handlePaste(input, e) {
-        e.preventDefault();
-        const pastedData = e.clipboardData.getData('text');
-        
-        if (!/^\d+$/.test(pastedData)) {
-            return;
-        }
-        
-        const digits = pastedData.split('').slice(0, 6);
-        
-        digits.forEach((digit, index) => {
-            if (verificationInputs[index]) {
-                verificationInputs[index].value = digit;
-            }
-        });
-        
-        // Focus last input
-        const lastIndex = Math.min(digits.length - 1, verificationInputs.length - 1);
-        if (verificationInputs[lastIndex]) {
-            verificationInputs[lastIndex].focus();
-        }
-        
-        updateVerificationCode();
-    }
-    
-    function updateVerificationCode() {
-        let code = '';
-        verificationInputs.forEach(input => {
-            code += input.value;
-        });
-        
-        if (verificationCodeInput) {
-            verificationCodeInput.value = code;
-        }
-    }
-    
-    function resetVerificationInputs() {
-        verificationInputs.forEach(input => {
-            input.value = '';
-        });
-        updateVerificationCode();
-        
-        // Focus first input
-        if (verificationInputs[0]) {
-            verificationInputs[0].focus();
-        }
-    }
-    
     async function handleCodeSubmit(e) {
         e.preventDefault();
         
-        const otp = verificationCodeInput.value;
+        const otp = verificationCodeInput ? verificationCodeInput.value : '';
         
         if (!otp || otp.length !== 6) {
             const codeError = document.getElementById('codeError');
@@ -367,9 +416,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await verifyOTP(currentEmail, otp);
             
             if (result.success) {
-                resetToken = result.data.resetToken;
+                resetToken = result.data.resetToken || result.data.token;
+                
+                // Move to step 3
                 goToStep(3);
                 resetPasswordForm();
+                
+                // Focus password input
+                setTimeout(() => {
+                    if (newPasswordInput) {
+                        newPasswordInput.focus();
+                    }
+                }, 100);
+                
             } else {
                 const codeError = document.getElementById('codeError');
                 if (codeError) {
@@ -416,18 +475,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 return { success: false, error: 'Invalid server response format' };
             }
             
-            if (!response.ok) {
+            if (response.ok) {
+                return { 
+                    success: true, 
+                    data: data,
+                    message: data.message || 'OTP verified successfully'
+                };
+            } else {
                 return { 
                     success: false, 
                     error: data.message || 'Invalid or expired OTP' 
                 };
             }
-            
-            return { 
-                success: true, 
-                data: data,
-                message: data.message || 'OTP verified successfully'
-            };
             
         } catch (error) {
             console.error('🚨 Network error:', error);
@@ -445,25 +504,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePasswordStrength();
     }
     
-    function setupPasswordToggle(toggleId, passwordField) {
-        const toggleBtn = document.getElementById(toggleId);
-        if (toggleBtn && passwordField) {
-            toggleBtn.addEventListener('click', function() {
-                const icon = this.querySelector('i');
-                
-                if (passwordField.type === 'password') {
-                    passwordField.type = 'text';
-                    icon.className = 'fas fa-eye-slash';
-                    icon.title = 'Hide password';
-                } else {
-                    passwordField.type = 'password';
-                    icon.className = 'fas fa-eye';
-                    icon.title = 'Show password';
-                }
-            });
-        }
-    }
-    
     function updatePasswordStrength() {
         const password = newPasswordInput ? newPasswordInput.value : '';
         const strengthFill = document.getElementById('strengthFill');
@@ -476,9 +516,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let color = '#e0e0e0';
         
         if (password.length >= 6) strength += 25;
+        if (password.length >= 8) strength += 25;
         if (/[A-Z]/.test(password)) strength += 25;
         if (/[0-9]/.test(password)) strength += 25;
-        if (/[^A-Za-z0-9]/.test(password)) strength += 25;
         
         strengthFill.style.width = `${strength}%`;
         
@@ -525,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await resetPassword(resetToken, password);
             
             if (result.success) {
-                showError(result.message || 'Password reset successfully! You can now log in with your new password.', true);
+                showError('Password reset successfully! You can now log in with your new password.', true);
                 goToStep(4);
             } else {
                 showError(result.error || 'Failed to reset password');
@@ -540,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function resetPassword(token, newPassword) {
         try {
-            console.log('🔐 Resetting password with token');
+            console.log('🔐 Resetting password');
             
             const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
                 method: 'POST',
@@ -565,18 +605,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 return { success: false, error: 'Invalid server response format' };
             }
             
-            if (!response.ok) {
+            if (response.ok) {
+                return { 
+                    success: true, 
+                    data: data,
+                    message: data.message || 'Password reset successfully'
+                };
+            } else {
                 return { 
                     success: false, 
                     error: data.message || 'Failed to reset password' 
                 };
             }
-            
-            return { 
-                success: true, 
-                data: data,
-                message: data.message || 'Password reset successfully'
-            };
             
         } catch (error) {
             console.error('🚨 Network error:', error);
@@ -637,9 +677,12 @@ document.addEventListener('DOMContentLoaded', function() {
     async function handleResendCode(e) {
         e.preventDefault();
         
-        if (!currentEmail) return;
+        if (!currentEmail) {
+            showError('Please enter your email first');
+            return;
+        }
         
-        if (resendLink.classList.contains('disabled')) {
+        if (!canResend) {
             return;
         }
         
@@ -649,15 +692,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await sendPasswordResetOTP(currentEmail);
             
             if (result.success) {
-                alert('New OTP sent successfully!');
+                showError('New OTP sent successfully!', true);
                 startResendTimer();
                 resetVerificationInputs();
+                
+                // Focus first verification input
+                setTimeout(() => {
+                    if (verificationInputs[0]) {
+                        verificationInputs[0].focus();
+                    }
+                }, 100);
             } else {
-                alert(result.error || 'Failed to resend OTP');
+                showError(result.error || 'Failed to resend OTP');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to resend OTP');
+            showError('Failed to resend OTP');
         } finally {
             setLoading(1, false);
         }
@@ -666,24 +716,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Test connection on load
     async function testConnection() {
         try {
+            console.log('🔗 Testing connection to API...');
             const response = await fetch(`${API_BASE_URL}/api/health`);
+            
             if (response.ok) {
                 const data = await response.json();
-                console.log('✅ Server is running:', data.message);
+                console.log('✅ API is running:', data.message);
                 return true;
+            } else {
+                console.log('⚠️ API returned non-OK status:', response.status);
+                return false;
             }
-            return false;
         } catch (error) {
-            console.error('❌ Server is not reachable:', error);
+            console.error('❌ Cannot connect to API:', error);
             return false;
         }
     }
     
+    // Test connection on load
     setTimeout(async () => {
         const isConnected = await testConnection();
         if (!isConnected) {
-            console.warn('⚠️ Server is not running');
-            showError('⚠️ Note: Server is not running. Run: npm start');
+            console.warn('⚠️ API is not reachable');
+            // Don't show error to user, just log it
         }
     }, 1000);
     
