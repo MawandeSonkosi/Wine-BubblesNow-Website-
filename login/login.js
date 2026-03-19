@@ -1,4 +1,4 @@
-// login/login.js - UPDATED FOR PRODUCTION API
+// login/login.js - COMPLETELY FIXED
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
@@ -179,7 +179,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // FIXED: Login is successful if response is OK (200)
             if (response.ok) {
-                // Login successful
+                // Login successful - DO NOT THROW ERROR
+                console.log('✅ Login successful!');
+                
+                // Show success message
                 showMessage('Login successful!', 'success');
                 
                 // Store user data
@@ -195,13 +198,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = '../index.html?login=success';
                 }, 1500);
                 
+                return; // IMPORTANT: Return here to prevent going to error handling
+            }
+            
+            // If we get here, response was not OK
+            if (data.needsVerification === true) {
+                showVerificationPrompt(email);
             } else {
-                // Handle error cases
-                if (data.needsVerification === true) {
-                    showVerificationPrompt(email);
-                } else {
-                    throw new Error(data.message || 'Login failed');
-                }
+                throw new Error(data.message || 'Login failed');
             }
             
         } catch (error) {
