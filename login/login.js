@@ -177,7 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error('Invalid server response');
             }
             
-            if (response.ok && data.success) {
+            // FIXED: Login is successful if response is OK (200)
+            if (response.ok) {
                 // Login successful
                 showMessage('Login successful!', 'success');
                 
@@ -195,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1500);
                 
             } else {
-                // Check for verification requirement
+                // Handle error cases
                 if (data.needsVerification === true) {
                     showVerificationPrompt(email);
                 } else {
@@ -219,30 +220,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // FIXED: Updated storeUserData function to handle different response formats
     function storeUserData(data) {
         console.log('💾 Storing user data...');
         
+        // Store token if present
         if (data.token) {
             localStorage.setItem('wineBubbles_token', data.token);
             localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
         }
         
-        if (data.user) {
-            localStorage.setItem('wineBubbles_user', JSON.stringify(data.user));
+        // Handle user data - could be in data.user or directly in data
+        const user = data.user || data;
+        
+        if (user) {
+            // Store full user object
+            localStorage.setItem('wineBubbles_user', JSON.stringify(user));
             
-            if (data.user.fullName) {
-                localStorage.setItem('wineBubbles_userFullName', data.user.fullName);
+            // Store individual fields for easy access
+            if (user.fullName) {
+                localStorage.setItem('wineBubbles_userFullName', user.fullName);
             }
-            if (data.user.email) {
-                localStorage.setItem('wineBubbles_userEmail', data.user.email);
+            if (user.email) {
+                localStorage.setItem('wineBubbles_userEmail', user.email);
             }
-            if (data.user.phoneNumber) {
-                localStorage.setItem('wineBubbles_userPhone', data.user.phoneNumber);
+            if (user.phoneNumber) {
+                localStorage.setItem('wineBubbles_userPhone', user.phoneNumber);
             }
-            if (data.user.isAdmin) {
+            if (user.isAdmin) {
                 localStorage.setItem('wineBubbles_isAdmin', 'true');
             }
-            if (data.user.isDriver) {
+            if (user.isDriver) {
                 localStorage.setItem('wineBubbles_isDriver', 'true');
             }
         }
