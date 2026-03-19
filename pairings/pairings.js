@@ -1,6 +1,5 @@
-// Configuration
-const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
+// Configuration - USE PROXY SERVER
+const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
 
 // State
 let allPairings = [];
@@ -17,6 +16,7 @@ const filterDropdown = document.getElementById('filterDropdown');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🥂 Pairings page loaded');
+  console.log('🔧 Using API URL:', API_BASE_URL);
   fetchPairings();
   setupEventListeners();
 });
@@ -29,6 +29,21 @@ function setupEventListeners() {
       filterPairings();
     });
   }
+  
+  // Toggle filter dropdown on button click
+  if (filterBtn) {
+    filterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      filterDropdown.classList.toggle('show');
+    });
+  }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (event) => {
+    if (filterDropdown && !event.target.closest('.filter-dropdown')) {
+      filterDropdown.classList.remove('show');
+    }
+  });
 }
 
 // Extract pairing categories
@@ -63,30 +78,34 @@ function populateFilterDropdown(pairings) {
         filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${category === 'All' ? 'Filter' : category}`;
       }
       filterPairings();
+      filterDropdown.classList.remove('show');
     });
     filterDropdown.appendChild(link);
   });
 }
 
-// Fetch pairings from backend
+// Fetch pairings from backend - USING PROXY SERVER
 async function fetchPairings() {
   try {
     showLoading();
     
     console.log('🌐 Fetching pairings from API...');
     
-    // Use CORS proxy
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/addons`)}`;
+    // Use your proxy server - NO CORS PROXY NEEDED
+    const apiUrl = `${API_BASE_URL}/addons?all=true&_=${Date.now()}`;
+    console.log('📡 Fetching from:', apiUrl);
     
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const pairings = await response.json();
@@ -103,12 +122,12 @@ async function fetchPairings() {
     }
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('❌ Error:', error);
     showError(`Failed to load pairings: ${error.message}`);
   }
 }
 
-// Fix image URLs - FIXED PATH: Go up one level
+// Fix image URLs
 function fixImageUrl(imageUrl) {
   if (!imageUrl) {
     return '../assets/images/default_addon.png';
@@ -129,8 +148,7 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render pairings - EXACT SAME FORMAT AS WINE PAGE
-// NO STOCK CHECKING FOR PAIRINGS - THEY'RE ALWAYS AVAILABLE
+// Render pairings
 function renderPairings() {
   console.log(`🎨 Rendering ${filteredPairings.length} pairings...`);
   
@@ -144,9 +162,6 @@ function renderPairings() {
     const price = pairing.price || 0;
     const category = pairing.category || 'Add-On';
     
-    // EXACT SAME FORMAT AS WINE PAGE: Name, Type (Category), Price
-    // NO STOCK STATUS - PAIRINGS ARE ALWAYS AVAILABLE
-    // UPDATED: Add onclick to navigate to detail page
     return `
       <div class="wine-card" onclick="navigateToPairingDetail(${pairing.id})">
         <div class="wine-image-container">
@@ -160,7 +175,6 @@ function renderPairings() {
           <div class="wine-title">${pairing.name}</div>
           <div class="wine-sub">${category}</div>
           <div class="wine-price">R${price.toFixed(2)}</div>
-          <!-- NO STOCK STATUS FOR PAIRINGS - THEY DON'T HAVE STOCK COUNT -->
         </div>
       </div>
     `;
@@ -169,7 +183,7 @@ function renderPairings() {
   console.log('✅ Render complete!');
 }
 
-// Navigate to pairing detail page - NEW FUNCTION
+// Navigate to pairing detail page
 function navigateToPairingDetail(pairingId) {
   console.log(`📱 Navigating to pairing detail: ${pairingId}`);
   window.location.href = `pairings_detail.html?id=${pairingId}`;

@@ -1,7 +1,5 @@
-// /pairings/pairings_detail.js - UPDATED FOR UNIFIED CART
-// Configuration
-const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
+// Configuration - USE PROXY SERVER
+const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
 
 // State
 let currentPairing = null;
@@ -20,6 +18,7 @@ const filterDropdown = document.getElementById('filterDropdown');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🥂 Pairing detail page loaded');
+  console.log('🔧 Using API URL:', API_BASE_URL);
   
   // Get pairing ID from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -30,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
   
-  fetchPairingDetail(parseInt(pairingId));
+  fetchPairingDetail(pairingId);
   setupEventListeners();
   
   // Initialize cart badge
@@ -48,33 +47,44 @@ function setupEventListeners() {
     });
   }
   
+  // Toggle filter dropdown on button click
+  if (filterBtn) {
+    filterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      filterDropdown.classList.toggle('show');
+    });
+  }
+  
   // Close dropdown when clicking outside
   document.addEventListener('click', (event) => {
     if (filterDropdown && !event.target.closest('.filter-dropdown')) {
-      filterDropdown.style.display = 'none';
+      filterDropdown.classList.remove('show');
     }
   });
 }
 
-// Fetch pairing detail
+// Fetch pairing detail - USING PROXY SERVER
 async function fetchPairingDetail(pairingId) {
   try {
     showLoading();
     
     console.log(`🌐 Fetching pairing detail for ID: ${pairingId}...`);
     
-    // Use CORS proxy
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/addons/${pairingId}`)}`;
+    // Use your proxy server - NO CORS PROXY NEEDED
+    const apiUrl = `${API_BASE_URL}/addons/${pairingId}?_=${Date.now()}`;
+    console.log('📡 Fetching from:', apiUrl);
     
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const pairing = await response.json();
@@ -94,7 +104,7 @@ async function fetchPairingDetail(pairingId) {
     fetchRelatedPairings(pairing.category);
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('❌ Error:', error);
     showError(`Failed to load pairing details: ${error.message}`);
   }
 }
@@ -120,13 +130,12 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render pairing detail - REMOVED STOCK CHECKING
+// Render pairing detail
 function renderPairingDetail(pairing) {
   const imageUrl = fixImageUrl(pairing.imageUrl);
   const price = pairing.price || 0;
   const category = pairing.category || 'Add-On';
   
-  // PAIRINGS ARE ALWAYS IN STOCK - NO STOCK CHECKING NEEDED
   const template = `
     <div class="pairing-detail-card">
       <div class="pairing-detail-image-container">
@@ -141,11 +150,9 @@ function renderPairingDetail(pairing) {
         <div class="pairing-detail-category">${category}</div>
         <div class="pairing-detail-price">R${price.toFixed(2)}</div>
         
-        <!-- REMOVED STOCK STATUS SECTION -->
-        
         <p class="pairing-detail-description">${pairing.description || 'No description available.'}</p>
         
-        <!-- Quantity Selector - ALWAYS SHOW (no stock check) -->
+        <!-- Quantity Selector -->
         <div class="quantity-selector">
           <button class="quantity-btn" id="decrementBtn" ${quantity <= 1 ? 'disabled' : ''}>
             <i class="fas fa-minus"></i>
@@ -156,7 +163,7 @@ function renderPairingDetail(pairing) {
           </button>
         </div>
         
-        <!-- Add to Cart Button - ALWAYS ENABLED (no stock check) -->
+        <!-- Add to Cart Button -->
         <button class="add-to-cart-btn" id="addToCartBtn">
           Add to Cart
         </button>
@@ -198,17 +205,17 @@ function updateQuantityDisplay() {
   }
 }
 
-// Add to cart - REMOVED STOCK CHECKING
+// Add to cart
 function addToCart() {
   if (!currentPairing) return;
   
   // Create cart item for pairing/addon
   const cartItem = {
-    id: currentPairing.id.toString(), // Ensure it's a string
+    id: currentPairing.id.toString(),
     name: currentPairing.name,
     price: currentPairing.price,
     imageUrl: currentPairing.imageUrl,
-    type: 'addon', // Important: Must match CartUtils type
+    type: 'addon',
     category: currentPairing.category || '',
     description: currentPairing.description,
     quantity: quantity
@@ -218,7 +225,6 @@ function addToCart() {
   
   // Add to cart using unified cart system
   if (window.CartUtils) {
-    // Use addItem() not addPairing() - method doesn't exist
     const result = window.CartUtils.addItem(cartItem);
     
     if (result) {
@@ -228,6 +234,9 @@ function addToCart() {
       // Reset quantity
       quantity = 1;
       updateQuantityDisplay();
+      
+      // Update cart badge
+      window.CartUtils.updateCartBadge();
     } else {
       showToast('Failed to add to cart', 'error');
     }
@@ -237,18 +246,20 @@ function addToCart() {
   }
 }
 
-// Fetch related pairings
+// Fetch related pairings - USING PROXY SERVER
 async function fetchRelatedPairings(category) {
   try {
     console.log(`🌐 Fetching related pairings for category: ${category}...`);
     
-    // Use CORS proxy
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/addons`)}`;
+    // Use your proxy server
+    const apiUrl = `${API_BASE_URL}/addons?all=true&_=${Date.now()}`;
     
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     
@@ -304,7 +315,7 @@ function populateFilterDropdown(pairings) {
       e.preventDefault();
       const filterValue = category === 'All' ? '' : category;
       filterRelatedPairingsByCategory(filterValue);
-      filterDropdown.style.display = 'none';
+      filterDropdown.classList.remove('show');
     });
     filterDropdown.appendChild(link);
   });
