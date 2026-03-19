@@ -1,4 +1,4 @@
-// login/login.js - WITH PROPER WELCOME BACK MESSAGE
+// login/login.js - WITH FIXED WELCOME MESSAGE
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
@@ -303,10 +303,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Check if response is OK (status 200)
             if (response.ok) {
-                // Login successful - EXACTLY like Flutter app
+                // Login successful
                 console.log('✅ Login successful!');
                 
-                // Store user data - EXACTLY like Flutter's login method
+                // Store user data
                 storeUserData(data);
                 
                 // Save email if remember me is checked
@@ -324,19 +324,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show success message in snackbar
                 showSnackbar('Login successful!', 'success');
                 
-                // Redirect to home page after delay with welcome message
+                // Redirect to home page after delay with login success parameter
                 setTimeout(() => {
                     window.location.href = '../index.html?login=success';
                 }, 2000);
                 
-                return; // Important: stop execution
+                return;
             }
             
-            // Handle verification requirement (like Flutter's needsVerification)
+            // Handle verification requirement
             if (data.needsVerification === true) {
                 showVerificationPrompt(email);
             } else {
-                // Show error message from backend (like Flutter)
                 throw new Error(data.message || 'Login failed');
             }
             
@@ -356,17 +355,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Store user data - EXACTLY like Flutter's storeUserData
+    // Store user data
     function storeUserData(data) {
         console.log('💾 Storing user data...');
         
-        // Store token if present (like Flutter's _storeToken)
+        // Store token if present
         if (data.token) {
             localStorage.setItem('wineBubbles_token', data.token);
             localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
         }
         
-        // Handle user data - Flutter uses data['user']
+        // Handle user data
         const user = data.user;
         
         if (user) {
