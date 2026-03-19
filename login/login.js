@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const togglePassword = document.getElementById('togglePassword');
     const rememberMe = document.getElementById('rememberMe');
     const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const signupLink = document.getElementById('signupLink');
     const submitBtn = document.getElementById('submitBtn');
     const btnText = document.getElementById('btnText');
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -18,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordError = document.getElementById('passwordError');
     const snackbar = document.getElementById('snackbar');
     
-    // API Configuration - USE PRODUCTION API LIKE FLUTTER
-    const API_BASE_URL = window.location.origin; // Uses current domain (app.wineandbubblesnow.co.za)
+    // API Configuration - USE PRODUCTION API (app.wineandbubblesnow.co.za)
+    const API_BASE_URL = window.location.origin; // Uses https://app.wineandbubblesnow.co.za
     console.log('🌐 Using production API:', API_BASE_URL);
     
     // Check if user is already logged in
@@ -46,6 +47,14 @@ document.addEventListener('DOMContentLoaded', function() {
         forgotPasswordLink.addEventListener('click', function(e) {
             e.preventDefault();
             window.location.href = 'forgot_password.html';
+        });
+    }
+    
+    // Sign up link
+    if (signupLink) {
+        signupLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'register.html';
         });
     }
     
