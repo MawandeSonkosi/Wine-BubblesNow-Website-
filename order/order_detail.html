@@ -589,6 +589,7 @@
                 this.showError('No order ID provided in URL');
             }
         }
+        
         checkAuthentication() {
             const userData = localStorage.getItem('wineBubbles_user');
             this.token = localStorage.getItem('wineBubbles_token');
@@ -642,112 +643,104 @@
                 this.updateCartBadge();
             });
         }
+        
         async loadOrderDetails(orderId) {
-            console.log('📦 Loading order details from localStorage only');
+            if (!this.token) {
+                this.showAuthRequired();
+                return;
+            }
             
-            // Immediately show loading
-            this.contentElement.innerHTML = `
-                <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p style="color: #666;">Loading order details...</p>
-                </div>
-            `;
+            this.showLoading();
             
-            // Small delay for better UX
-            setTimeout(() => {
-                try {
-                    // Get from localStorage only
-                    const savedOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
-                    console.log('🔍 Checking localStorage for order:', orderId);
-                    
-                    // Try different ID formats
-                    let order = null;
-                    const possibleIds = [
-                        orderId,
-                        `local-${orderId}`,
-                        orderId.replace(/^local-/, '')
-                    ];
-                    
-                    for (const searchId of possibleIds) {
-                        order = savedOrders.find(o => 
-                            o.id === searchId || 
-                            o._id === searchId
-                        );
-                        if (order) break;
+            try {
+                console.log('📡 Fetching order details from API...');
+                console.log('🔧 API URL:', `${this.API_BASE_URL}/deliveries/${orderId}`);
+                
+                const response = await fetch(`${this.API_BASE_URL}/deliveries/${orderId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     }
-                    
-                    if (order) {
-                        console.log('✅ Found order in localStorage:', order);
-                        this.renderOrderDetails(order);
-                    } else {
-                        console.log('❌ Order not found in localStorage');
-                        this.showError(`
-                            <h2>Order Not Found</h2>
-                            <p>Order #${orderId} was not found in your recent orders.</p>
-                            <p>This could be because:</p>
-                            <ul style="text-align: left; margin: 20px auto; max-width: 400px;">
-                                <li>The order was placed on a different device</li>
-                                <li>Your browser history was cleared</li>
-                                <li>The order ID is incorrect</li>
-                            </ul>
-                            <a href="track_order.html" class="btn btn-primary" style="margin-top: 20px;">
+                });
+                
+                if (response.status === 401) {
+                    console.error('❌ Authentication failed - token invalid');
+                    this.showAuthRequired('Your session has expired. Please log in again.');
+                    return;
+                }
+                
+                if (response.status === 404) {
+                    console.error('❌ Order not found');
+                    this.showError(`
+                        <h2>Order Not Found</h2>
+                        <p>Order #${orderId} could not be found.</p>
+                        <p>Please check the order ID and try again.</p>
+                        <a href="track_order.html" class="btn btn-primary" style="margin-top: 20px;">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Orders
+                        </a>
+                    `);
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log('✅ API Response:', result);
+                
+                // Parse the response - handle different response formats
+                let order = null;
+                if (result.success && result.data) {
+                    order = result.data;
+                } else if (result._id || result.id) {
+                    order = result;
+                } else if (result.order) {
+                    order = result.order;
+                } else if (Array.isArray(result) && result.length > 0) {
+                    order = result[0];
+                }
+                
+                if (order) {
+                    console.log('✅ Order loaded successfully:', order);
+                    this.renderOrderDetails(order);
+                } else {
+                    console.error('❌ No order data in response:', result);
+                    this.showError('Failed to load order details: Invalid response format');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading order details:', error);
+                
+                // Fallback to localStorage if API fails
+                console.log('🔄 Trying localStorage fallback...');
+                const localOrder = this.getOrderFromLocalStorage(orderId);
+                
+                if (localOrder) {
+                    console.log('✅ Found order in localStorage:', localOrder);
+                    this.renderOrderDetails(localOrder);
+                } else {
+                    this.showError(`
+                        <h2>Error Loading Order</h2>
+                        <p>${error.message}</p>
+                        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="location.reload()">
+                                <i class="fas fa-redo"></i>
+                                Try Again
+                            </button>
+                            <a href="track_order.html" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i>
                                 Back to Orders
                             </a>
-                        `);
-                    }
-                } catch (error) {
-                    console.error('❌ Error:', error);
-                    this.showError(`Error loading order: ${error.message}`);
+                        </div>
+                    `);
                 }
-            }, 500);
-        }
-        getOrderFromLocalStorage(orderId) {
-            try {
-                // Try multiple localStorage keys
-                const storageKeys = ['wineBubbles_orders', 'wine_cart', 'wineBubbles_deliveries'];
-                
-                for (const key of storageKeys) {
-                    const storedData = localStorage.getItem(key);
-                    if (storedData) {
-                        try {
-                            const data = JSON.parse(storedData);
-                            
-                            // Check if it's an array
-                            if (Array.isArray(data)) {
-                                // Search in array
-                                const found = data.find(order => {
-                                    return order.id === orderId || 
-                                           order._id === orderId ||
-                                           order.id === `local-${orderId}` ||
-                                           order._id === `local-${orderId}`;
-                                });
-                                
-                                if (found) {
-                                    console.log(`✅ Found order in localStorage key "${key}"`);
-                                    return found;
-                                }
-                            } 
-                            // Check if it's a single order object
-                            else if (data && (data.id === orderId || data._id === orderId)) {
-                                console.log(`✅ Found single order in localStorage key "${key}"`);
-                                return data;
-                            }
-                        } catch (parseError) {
-                            console.warn(`⚠️ Failed to parse localStorage key "${key}":`, parseError);
-                        }
-                    }
-                }
-                
-                console.log('❌ Order not found in localStorage');
-                return null;
-                
-            } catch (error) {
-                console.error('Error reading localStorage:', error);
-                return null;
             }
         }
-
+        
         getOrderFromLocalStorage(orderId) {
             try {
                 const savedOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
@@ -991,16 +984,13 @@
             this.contentElement.innerHTML = html;
         }
 
-        showAuthRequired() {
+        showLoading() {
             if (!this.contentElement) return;
-
+            
             this.contentElement.innerHTML = `
-                <div class="error-state">
-                    <h2>Authentication Required</h2>
-                    <p>Please log in to view order details.</p>
-                    <a href="../login/login.html" class="btn btn-primary">
-                        Go to Login
-                    </a>
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p style="color: #666;">Loading order details...</p>
                 </div>
             `;
         }
@@ -1010,23 +1000,12 @@
 
             this.contentElement.innerHTML = `
                 <div class="error-state">
-                    <h2>Error</h2>
-                    <p>${message}</p>
-                    <div style="display: flex; gap: 12px; justify-content: center;">
-                        <a href="track_order.html" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i>
-                            Back to Orders
-                        </a>
-                        <button class="btn btn-primary" onclick="location.reload()">
-                            <i class="fas fa-redo"></i>
-                            Try Again
-                        </button>
-                    </div>
+                    ${message}
                 </div>
             `;
         }
 
-               updateCartBadge() {
+        updateCartBadge() {
             // Use your existing CartUtils if available
             if (window.CartUtils && typeof window.CartUtils.updateCartBadge === 'function') {
                 window.CartUtils.updateCartBadge();
