@@ -622,9 +622,10 @@
             this.payBtn = document.getElementById('payBtn');
             this.paySpinner = document.getElementById('paySpinner');
             this.isProcessing = false;
-            this.API_BASE_URL = '/api'; // USE PROXY SERVER - works on both localhost and production
+            this.API_BASE_URL = '/api';
             this.cartUtils = null;
-            this.userProfile = null; // Store user profile with fullName and phoneNumber
+            this.userProfile = null;
+            this.advertItems = []; // Store advert items separately
             
             this.init();
         }
@@ -637,10 +638,28 @@
                 this.updateCartBadge();
                 this.loadCheckoutData();
                 this.validateCheckout();
-                this.loadUserProfile(); // Load user profile for fullName and phoneNumber
+                this.loadUserProfile();
+                this.loadAdvertItems(); // Load advert items from localStorage
                 console.log('✅ Checkout system initialized with CartUtils');
                 console.log('🔧 Using API URL:', this.API_BASE_URL);
             });
+        }
+
+        loadAdvertItems() {
+            try {
+                // Try to get adverts from localStorage (if stored separately)
+                const advertsData = localStorage.getItem('wineBubbles_adverts');
+                if (advertsData) {
+                    this.advertItems = JSON.parse(advertsData);
+                    console.log(`📢 Loaded ${this.advertItems.length} advert items from localStorage`);
+                } else {
+                    console.log('📢 No advert items found in localStorage');
+                    this.advertItems = [];
+                }
+            } catch (error) {
+                console.error('Error loading advert items:', error);
+                this.advertItems = [];
+            }
         }
 
         async loadUserProfile() {
@@ -652,7 +671,6 @@
                     const user = JSON.parse(userData);
                     console.log('👤 User data from localStorage:', user);
                     
-                    // Check if we have fullName and phoneNumber in localStorage first
                     const fullName = localStorage.getItem('wineBubbles_userFullName') || 
                                     user.fullName || 
                                     user.email.split('@')[0];
@@ -700,8 +718,6 @@
                 } else if (attempts >= maxAttempts) {
                     console.error('❌ CartUtils failed to load after', maxAttempts, 'attempts');
                     this.showError('Cart system failed to load. Please refresh the page.');
-                    
-                    // Try to load cart-utils.js dynamically as fallback
                     this.loadCartUtilsDynamically(callback);
                 } else {
                     console.log(`⏳ Waiting for CartUtils... (attempt ${attempts}/${maxAttempts})`);
@@ -714,7 +730,6 @@
 
         loadCartUtilsDynamically(callback) {
             console.log('🔄 Trying to load cart-utils.js dynamically');
-            
             const script = document.createElement('script');
             script.src = '../cart/cart-utils.js';
             script.onload = () => {
@@ -729,26 +744,22 @@
                 console.error('❌ Failed to load cart-utils.js dynamically');
                 this.showError('Failed to load cart system. Please check if cart-utils.js exists at: ../cart/cart-utils.js');
             };
-            
             document.head.appendChild(script);
         }
 
         setupEventListeners() {
-            // Pay Now button
             if (this.payBtn) {
                 this.payBtn.addEventListener('click', () => {
                     this.processPayment();
                 });
             }
 
-            // Listen for cart updates
             window.addEventListener('cartUpdated', () => {
                 this.updateCartBadge();
                 this.loadOrderItems();
                 this.updateOrderSummary();
             });
 
-            // Listen for storage events
             window.addEventListener('storage', (event) => {
                 if (event.key === 'wine_cart') {
                     setTimeout(() => {
@@ -760,21 +771,18 @@
         }
 
         loadCheckoutData() {
-            // Load payment method
             const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
             const paymentElement = document.getElementById('paymentMethodValue');
             if (paymentElement) {
                 paymentElement.textContent = paymentMethod || 'No payment method selected';
             }
 
-            // Load delivery address
             const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
             const addressElement = document.getElementById('deliveryAddressValue');
             if (addressElement) {
                 addressElement.textContent = deliveryAddress || 'No delivery address provided';
             }
 
-            // Load order items and summary
             this.loadOrderItems();
             this.updateOrderSummary();
         }
@@ -789,7 +797,7 @@
                 const cart = this.cartUtils.getCart();
                 const orderItemsContainer = document.getElementById('orderItems');
 
-                if (!cart || !cart.items || cart.items.length === 0) {
+                if ((!cart || !cart.items || cart.items.length === 0) && this.advertItems.length === 0) {
                     orderItemsContainer.innerHTML = `
                         <div class="empty-state" style="text-align: center; padding: 40px;">
                             <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i>
@@ -801,32 +809,64 @@
                 }
 
                 let itemsHTML = '';
-                cart.items.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    const imageUrl = this.cartUtils.fixImageUrl(item.imageUrl);
-                    
-                    itemsHTML += `
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="${imageUrl}" 
-                                     alt="${item.name}"
-                                     onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">${item.name.charAt(0).toUpperCase()}</text></svg>';">
-                            </div>
-                            <div class="item-details">
-                                <div class="item-name">${item.name}</div>
-                                <div class="item-meta">
-                                    ${item.category ? `<span style="background: rgba(107, 13, 43, 0.1); color: #6b0d2b; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 8px;">${item.category}</span>` : ''}
-                                    ${item.type ? `<span>${item.type}</span>` : ''}
+                
+                // Display wine items
+                if (cart && cart.items) {
+                    cart.items.forEach(item => {
+                        const itemTotal = item.price * item.quantity;
+                        const imageUrl = this.cartUtils.fixImageUrl(item.imageUrl);
+                        itemsHTML += `
+                            <div class="order-item">
+                                <div class="item-image">
+                                    <img src="${imageUrl}" 
+                                         alt="${item.name}"
+                                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">${item.name.charAt(0).toUpperCase()}</text></svg>';">
                                 </div>
-                                <div class="item-quantity-price">
-                                    <div class="item-quantity">Qty: ${item.quantity}</div>
-                                    <div class="item-price">R${itemTotal.toFixed(2)}</div>
+                                <div class="item-details">
+                                    <div class="item-name">${item.name}</div>
+                                    <div class="item-meta">
+                                        ${item.category ? `<span style="background: rgba(107, 13, 43, 0.1); color: #6b0d2b; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 8px;">${item.category}</span>` : ''}
+                                        ${item.type ? `<span>${item.type}</span>` : ''}
+                                    </div>
+                                    <div class="item-quantity-price">
+                                        <div class="item-quantity">Qty: ${item.quantity}</div>
+                                        <div class="item-price">R${itemTotal.toFixed(2)}</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                });
-
+                        `;
+                    });
+                }
+                
+                // Display advert items
+                if (this.advertItems.length > 0) {
+                    this.advertItems.forEach(advert => {
+                        const itemTotal = advert.price * (advert.quantity || 1);
+                        const imageUrl = advert.imageUrl || '../assets/images/default_advert.jpg';
+                        itemsHTML += `
+                            <div class="order-item" style="border-left: 3px solid #03a9f4; padding-left: 10px;">
+                                <div class="item-image">
+                                    <img src="${imageUrl}" 
+                                         alt="${advert.title}"
+                                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">📢</text></svg>';">
+                                </div>
+                                <div class="item-details">
+                                    <div class="item-name">📢 ${advert.title}</div>
+                                    <div class="item-meta">
+                                        <span style="background: rgba(3, 169, 244, 0.1); color: #03a9f4; padding: 2px 6px; border-radius: 4px; font-size: 12px;">Advert Placement</span>
+                                        ${advert.category ? `<span style="margin-left: 8px;">${advert.category}</span>` : ''}
+                                    </div>
+                                    ${advert.subtitle ? `<div style="color: #666; font-size: 12px; margin-bottom: 4px;">${advert.subtitle}</div>` : ''}
+                                    <div class="item-quantity-price">
+                                        <div class="item-quantity">Qty: ${advert.quantity || 1}</div>
+                                        <div class="item-price">R${itemTotal.toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
                 orderItemsContainer.innerHTML = itemsHTML;
             } catch (error) {
                 console.error('Error loading order items:', error);
@@ -842,18 +882,26 @@
 
             try {
                 const cart = this.cartUtils.getCart();
+                let subtotal = cart.subtotal || 0;
                 
-                document.getElementById('subtotal').textContent = `R${cart.subtotal.toFixed(2)}`;
-                document.getElementById('deliveryFee').textContent = 
-                    cart.deliveryFee === 0 ? 'FREE' : `R${cart.deliveryFee.toFixed(2)}`;
-                document.getElementById('total').textContent = `R${cart.total.toFixed(2)}`;
+                // Add advert subtotal
+                if (this.advertItems.length > 0) {
+                    const advertTotal = this.advertItems.reduce((sum, advert) => sum + (advert.price * (advert.quantity || 1)), 0);
+                    subtotal += advertTotal;
+                }
+                
+                const deliveryFee = subtotal >= 500 ? 0 : 50;
+                const total = subtotal + deliveryFee;
+                
+                document.getElementById('subtotal').textContent = `R${subtotal.toFixed(2)}`;
+                document.getElementById('deliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `R${deliveryFee.toFixed(2)}`;
+                document.getElementById('total').textContent = `R${total.toFixed(2)}`;
             } catch (error) {
                 console.error('Error updating order summary:', error);
             }
         }
 
         validateCheckout() {
-            // Check if user is authenticated
             if (!this.isAuthenticated()) {
                 this.showToast('Please login to continue', 'error');
                 setTimeout(() => {
@@ -862,22 +910,16 @@
                 return;
             }
 
-            // Check if cart has items
-            if (this.cartUtils) {
-                try {
-                    const cart = this.cartUtils.getCart();
-                    if (!cart || !cart.items || cart.items.length === 0) {
-                        this.showToast('Your cart is empty. Please add items before checkout.', 'error');
-                        setTimeout(() => {
-                            window.location.href = '../cart/cart.html';
-                        }, 2000);
-                    }
-                } catch (error) {
-                    console.error('Error checking cart:', error);
-                }
+            const cart = this.cartUtils ? this.cartUtils.getCart() : null;
+            const hasItems = (cart && cart.items && cart.items.length > 0) || this.advertItems.length > 0;
+            
+            if (!hasItems) {
+                this.showToast('Your cart is empty. Please add items before checkout.', 'error');
+                setTimeout(() => {
+                    window.location.href = '../cart/cart.html';
+                }, 2000);
             }
 
-            // Check if payment method is selected
             const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
             if (!paymentMethod) {
                 this.showToast('Please select a payment method', 'error');
@@ -886,9 +928,8 @@
                 }, 2000);
             }
 
-            // Check if delivery address exists
             const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
-            const hasPhysicalItems = this.hasPhysicalItems();
+            const hasPhysicalItems = this.hasPhysicalItems() || this.advertItems.length > 0;
             
             if (hasPhysicalItems && !deliveryAddress) {
                 this.showToast('Please add a delivery address', 'error');
@@ -900,12 +941,10 @@
 
         hasPhysicalItems() {
             if (!this.cartUtils) return false;
-            
             try {
                 const cart = this.cartUtils.getCart();
                 return cart && cart.items && cart.items.some(item => item.type === 'wine' || item.type === 'addon');
             } catch (error) {
-                console.error('Error checking physical items:', error);
                 return false;
             }
         }
@@ -918,10 +957,8 @@
                 return;
             }
 
-            // Validate everything again
             this.validateCheckout();
             
-            // Get user data
             const userData = localStorage.getItem('wineBubbles_user');
             if (!userData) {
                 this.showToast('Please login to continue', 'error');
@@ -935,71 +972,79 @@
             this.payBtn.querySelector('span').textContent = 'PROCESSING...';
 
             try {
-                // Get all necessary data
                 const user = JSON.parse(userData);
                 const cart = this.cartUtils.getCart();
                 const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
                 const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
                 
-                // Use the user profile we loaded (with fullName and phoneNumber)
                 const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
                 const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
                 
-                console.log('📧 EMAIL DATA - User Details:');
-                console.log('   Full Name:', userFullName);
+                console.log('📧 ORDER DETAILS:');
+                console.log('   Customer:', userFullName);
                 console.log('   Email:', user.email);
                 console.log('   Phone:', userPhoneNumber);
+                console.log('   Adverts:', this.advertItems.length);
+                console.log('   Wine items:', cart.items?.length || 0);
 
-                // Prepare items for delivery
-                const wineItems = [];
-                const addOns = [];
-                
-                cart.items.forEach(item => {
-                    if (item.type === 'wine') {
-                        wineItems.push({
-                            id: parseInt(item.id) || 0,
-                            name: item.name || '',
-                            price: item.price || 0,
-                            quantity: item.quantity || 1,
-                            type: item.type || 'wine',
-                            category: item.category || '',
-                            description: item.description || '',
-                            imageUrl: item.imageUrl || '',
-                            isCase: item.isCase || false,
-                            itemType: 'wine'
-                        });
-                    } else if (item.type === 'addon') {
-                        addOns.push({
-                            id: parseInt(item.id) || 0,
-                            name: item.name || '',
-                            price: item.price || 0,
-                            category: item.category || '',
-                            description: item.description || '',
-                            imageUrl: item.imageUrl || ''
-                        });
-                    }
-                });
+                // Prepare wine items
+                const wineItems = (cart.items || []).filter(item => item.type === 'wine').map(item => ({
+                    id: parseInt(item.id) || 0,
+                    name: item.name || '',
+                    price: item.price || 0,
+                    quantity: item.quantity || 1,
+                    type: item.type || 'wine',
+                    category: item.category || '',
+                    description: item.description || '',
+                    imageUrl: item.imageUrl || '',
+                    isCase: item.isCase || false,
+                    itemType: 'wine'
+                }));
 
-                // Create delivery object for backend
+                // Prepare add-on items
+                const addOns = (cart.items || []).filter(item => item.type === 'addon').map(item => ({
+                    id: parseInt(item.id) || 0,
+                    name: item.name || '',
+                    price: item.price || 0,
+                    category: item.category || '',
+                    description: item.description || '',
+                    imageUrl: item.imageUrl || ''
+                }));
+
+                // Prepare advert items (matching app format)
+                const adverts = this.advertItems.map(advert => ({
+                    id: advert.id || String(advert._id || Math.random()),
+                    title: advert.title || advert.name || 'Advert Placement',
+                    subtitle: advert.subtitle || '',
+                    price: advert.price || 0,
+                    type: advert.type || 'advert',
+                    category: advert.category || 'marketing',
+                    imageUrl: advert.imageUrl || '',
+                    targetUrl: advert.targetUrl || '',
+                    quantity: advert.quantity || 1,
+                    itemType: 'advert'
+                }));
+
+                // Calculate total amount including adverts
+                const subtotal = (cart.subtotal || 0) + adverts.reduce((sum, a) => sum + (a.price * a.quantity), 0);
+                const deliveryFee = subtotal >= 500 ? 0 : 50;
+                const totalAmount = subtotal + deliveryFee;
+
                 const deliveryData = {
                     userId: user.id || user.email,
                     userEmail: user.email,
                     address: deliveryAddress,
-                    totalAmount: cart.total || 0,
+                    totalAmount: totalAmount,
                     paymentMethod: paymentMethod,
                     items: wineItems,
                     addOns: addOns,
-                    adverts: []
+                    adverts: adverts
                 };
 
-                console.log('📦 Sending delivery to backend:', deliveryData);
-                console.log('🔧 API URL:', this.API_BASE_URL);
-
-                // 1. Send delivery to backend API
+                console.log('📦 Sending delivery to backend with adverts:', adverts.length);
                 const response = await this.createDelivery(deliveryData);
 
                 if (response.success) {
-                    // Prepare email data EXACTLY like the app does
                     const emailData = {
                         delivery: {
                             _id: response.data._id,
@@ -1011,26 +1056,17 @@
                             status: response.data.status,
                             items: response.data.items,
                             addOns: response.data.addOns,
-                            adverts: response.data.adverts || [],
+                            adverts: response.data.adverts || adverts,
                             createdAt: response.data.createdAt
                         },
                         userEmail: user.email,
-                        userFullName: userFullName,  // This matches app's userFullName
-                        userPhoneNumber: userPhoneNumber, // This matches app's userPhoneNumber
+                        userFullName: userFullName,
+                        userPhoneNumber: userPhoneNumber,
                         adminEmail: 'winebubblesnow@gmail.com'
                     };
 
-                    console.log('📧 Sending delivery confirmation email with user details:');
-                    console.log('   Customer Name:', emailData.userFullName);
-                    console.log('   Customer Email:', emailData.userEmail);
-                    console.log('   Customer Phone:', emailData.userPhoneNumber);
-                    console.log('   Order ID:', response.data._id);
-                    console.log('   Total:', `R${response.data.totalAmount}`);
-                    console.log('   Items:', wineItems.length, 'wines,', addOns.length, 'add-ons');
-
-                    // Try multiple email endpoints for compatibility
+                    console.log('📧 Sending confirmation email with adverts...');
                     let emailSent = false;
-                    let emailError = null;
                     
                     const emailEndpoints = [
                         `${this.API_BASE_URL}/email/send-delivery-confirmation`,
@@ -1040,7 +1076,6 @@
                     
                     for (const endpoint of emailEndpoints) {
                         try {
-                            console.log(`📤 Trying email endpoint: ${endpoint}`);
                             const emailResponse = await fetch(endpoint, {
                                 method: 'POST',
                                 headers: {
@@ -1052,32 +1087,23 @@
                             });
                             
                             const emailResult = await emailResponse.json();
-                            
                             if (emailResponse.ok && emailResult.success) {
-                                console.log(`✅ Email sent successfully via ${endpoint}`);
-                                console.log(`   ✓ Customer: ${emailData.userFullName} (${emailData.userEmail})`);
-                                console.log(`   ✓ Phone: ${emailData.userPhoneNumber}`);
+                                console.log(`✅ Email sent via ${endpoint}`);
                                 emailSent = true;
                                 break;
-                            } else {
-                                console.warn(`⚠️ Email endpoint ${endpoint} failed:`, emailResult.message);
-                                emailError = emailResult.message;
                             }
                         } catch (endpointError) {
-                            console.warn(`⚠️ Email endpoint ${endpoint} error:`, endpointError.message);
-                            emailError = endpointError.message;
+                            console.warn(`⚠️ Email endpoint ${endpoint} failed:`, endpointError.message);
                         }
                     }
                     
                     if (emailSent) {
                         this.showToast(`Order placed! Confirmation email sent to ${user.email}`, 'success');
                     } else {
-                        console.warn('⚠️ All email endpoints failed. Order created but no email sent.');
-                        console.warn('Last error:', emailError);
                         this.showToast('Order placed successfully! (Email notification pending)', 'success');
                     }
                     
-                    // Save order locally for reference
+                    // Save order locally
                     this.saveOrderLocal({
                         ...deliveryData,
                         id: response.data._id || 'ORD-' + Date.now(),
@@ -1087,17 +1113,15 @@
                         userPhoneNumber: userPhoneNumber
                     });
 
-                    // Clear cart
+                    // Clear cart and adverts
                     this.cartUtils.clearCart();
-
-                    // Clear checkout data
+                    localStorage.removeItem('wineBubbles_adverts');
                     localStorage.removeItem('wineBubbles_deliveryAddress');
                     localStorage.removeItem('wineBubbles_deliveryAddressDetails');
                     localStorage.removeItem('wineBubbles_paymentMethod');
 
-                    // Redirect to order confirmation page
                     setTimeout(() => {
-                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}&total=${deliveryData.totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
+                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
                     }, 2000);
                     
                 } else {
@@ -1114,7 +1138,6 @@
         async createDelivery(deliveryData) {
             try {
                 const token = localStorage.getItem('wineBubbles_token');
-                
                 const response = await fetch(`${this.API_BASE_URL}/deliveries`, {
                     method: 'POST',
                     headers: {
@@ -1126,17 +1149,12 @@
                 });
 
                 const data = await response.json();
-                
                 if (!response.ok) {
                     throw new Error(data.message || `HTTP ${response.status}`);
                 }
-
                 return data;
             } catch (error) {
                 console.error('Error creating delivery:', error);
-                
-                // If backend fails, save locally as fallback
-                console.log('⚠️ Backend failed, saving order locally');
                 return {
                     success: true,
                     data: {
@@ -1144,17 +1162,13 @@
                         ...deliveryData,
                         status: 'Order received',
                         createdAt: new Date().toISOString()
-                    },
-                    message: 'Order saved locally (backend unavailable)'
+                    }
                 };
             }
         }
 
         saveOrderLocal(order) {
-            // Get existing orders or create new array
             const existingOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
-            
-            // Ensure consistent property names
             const orderToSave = {
                 id: order.id || order._id || 'ORD-' + Date.now(),
                 _id: order._id || order.id,
@@ -1162,28 +1176,19 @@
                 totalAmount: order.totalAmount || order.total || 0,
                 paymentMethod: order.paymentMethod || 'Not specified',
                 createdAt: order.createdAt || new Date().toISOString(),
-                emailSent: order.emailSent || false,
                 items: order.items || [],
                 addOns: order.addOns || [],
+                adverts: order.adverts || [],
                 address: order.address,
                 userId: order.userId,
                 userEmail: order.userEmail,
-                userFullName: order.userFullName || '',
-                userPhoneNumber: order.userPhoneNumber || '',
+                userFullName: order.userFullName,
+                userPhoneNumber: order.userPhoneNumber,
                 status: order.status || 'Order received'
             };
-            
-            // Add new order
             existingOrders.push(orderToSave);
-            
-            // Save back to localStorage
             localStorage.setItem('wineBubbles_orders', JSON.stringify(existingOrders));
-            
             console.log('Order saved locally:', orderToSave.id);
-            if (orderToSave.userFullName) {
-                console.log('   Customer Name:', orderToSave.userFullName);
-                console.log('   Customer Phone:', orderToSave.userPhoneNumber);
-            }
         }
         
         resetProcessingState() {
@@ -1202,25 +1207,19 @@
 
         setupAuthentication() {
             const token = localStorage.getItem('wineBubbles_token');
-            const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
             const userData = localStorage.getItem('wineBubbles_user');
             const isValidToken = this.isAuthenticated();
             
             const userIcon = document.getElementById('userIcon');
             const userIconElement = document.getElementById('userIconElement');
-            const cartIcon = document.getElementById('cartIcon');
             
             if (isValidToken && userData) {
                 try {
                     const user = JSON.parse(userData);
-                    
-                    // Update user icon
                     if (userIconElement) {
                         userIconElement.className = 'fas fa-user-check';
                         userIconElement.style.color = '#6b0d2b';
                     }
-                    
-                    // Setup user dropdown
                     if (userIcon) {
                         userIcon.href = '#';
                         userIcon.addEventListener('click', (e) => {
@@ -1228,20 +1227,6 @@
                             this.toggleUserDropdown(user);
                         });
                     }
-                    
-                    // Cart functionality
-                    if (cartIcon) {
-                        cartIcon.addEventListener('click', (e) => {
-                            if (!isValidToken) {
-                                e.preventDefault();
-                                this.showToast('Please login to view your cart', 'error');
-                                setTimeout(() => {
-                                    window.location.href = '../login/login.html';
-                                }, 2000);
-                            }
-                        });
-                    }
-                    
                 } catch (error) {
                     console.error('Error parsing user data:', error);
                     this.resetUserIcon();
@@ -1254,19 +1239,14 @@
         isAuthenticated() {
             const token = localStorage.getItem('wineBubbles_token');
             const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
-            
             if (!token || !timestamp) return false;
-            
             const tokenAge = Date.now() - parseInt(timestamp);
-            const sevenDays = 7 * 24 * 60 * 60 * 1000;
-            
-            return tokenAge < sevenDays;
+            return tokenAge < (7 * 24 * 60 * 60 * 1000);
         }
 
         resetUserIcon() {
             const userIcon = document.getElementById('userIcon');
             const userIconElement = document.getElementById('userIconElement');
-            
             if (userIcon) {
                 userIcon.href = '../login/login.html';
                 if (userIconElement) {
@@ -1288,9 +1268,7 @@
 
         createUserDropdown(user) {
             const existingDropdown = document.querySelector('.user-dropdown');
-            if (existingDropdown) {
-                existingDropdown.remove();
-            }
+            if (existingDropdown) existingDropdown.remove();
             
             const dropdown = document.createElement('div');
             dropdown.className = 'user-dropdown';
@@ -1320,10 +1298,7 @@
                 const link = document.createElement('a');
                 link.href = item.href;
                 link.className = 'user-dropdown-link';
-                link.innerHTML = `
-                    <i class="${item.icon}"></i>
-                    <span>${item.text}</span>
-                `;
+                link.innerHTML = `<i class="${item.icon}"></i><span>${item.text}</span>`;
                 dropdown.appendChild(link);
             });
             
@@ -1331,23 +1306,17 @@
             logoutButton.className = 'user-dropdown-logout';
             logoutButton.textContent = 'Logout';
             logoutButton.addEventListener('click', () => {
-                localStorage.removeItem('wineBubbles_token');
-                localStorage.removeItem('wineBubbles_token_timestamp');
-                localStorage.removeItem('wineBubbles_user');
+                localStorage.clear();
                 this.showToast('Logged out successfully', 'success');
-                setTimeout(() => {
-                    window.location.href = '../index.html';
-                }, 1500);
+                setTimeout(() => window.location.href = '../index.html', 1500);
             });
-            
             dropdown.appendChild(logoutButton);
             document.body.appendChild(dropdown);
             
             document.addEventListener('click', (event) => {
                 const dropdown = document.querySelector('.user-dropdown');
                 const userIcon = document.getElementById('userIcon');
-                if (dropdown && !dropdown.contains(event.target) && 
-                    userIcon && !userIcon.contains(event.target)) {
+                if (dropdown && !dropdown.contains(event.target) && userIcon && !userIcon.contains(event.target)) {
                     dropdown.classList.remove('show');
                 }
             });
@@ -1356,45 +1325,36 @@
         showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             if (!toast) return;
-            
             toast.textContent = message;
             toast.className = `toast ${type}`;
             toast.style.display = 'block';
-            
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 5000);
+            setTimeout(() => toast.style.display = 'none', 5000);
         }
 
         showError(message) {
             const content = document.getElementById('orderItems');
             if (content) {
-                content.innerHTML = `
-                    <div class="empty-state" style="text-align: center; padding: 40px;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 16px;"></i>
-                        <h3 style="color: #666; margin-bottom: 8px;">Error Loading Cart</h3>
-                        <p style="color: #999;">${message}</p>
-                        <button onclick="window.location.reload()" style="background: #6b0d2b; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-top: 16px;">
-                            <i class="fas fa-redo"></i> Refresh Page
-                        </button>
-                    </div>
-                `;
+                content.innerHTML = `<div class="empty-state" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 16px;"></i>
+                    <h3 style="color: #666; margin-bottom: 8px;">Error Loading Cart</h3>
+                    <p style="color: #999;">${message}</p>
+                    <button onclick="window.location.reload()" style="background: #6b0d2b; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-top: 16px;">
+                        <i class="fas fa-redo"></i> Refresh Page
+                    </button>
+                </div>`;
             }
         }
 
         showLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.style.display = show ? 'flex' : 'none';
-            }
+            if (overlay) overlay.style.display = show ? 'flex' : 'none';
         }
     }
 
-    // Initialize checkout system when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
         console.log('💰 Checkout page loaded');
         window.checkoutSystem = new CheckoutSystem();
     });
-</script>
+    </script>
 </body>
 </html>
