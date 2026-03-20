@@ -936,7 +936,7 @@
                     paymentMethod: paymentMethod,
                     items: wineItems,
                     addOns: addOns,
-                    adverts: [] // Adverts array for future expansion
+                    adverts: []
                 };
 
                 console.log('📦 Sending delivery to backend:', deliveryData);
@@ -946,47 +946,81 @@
                 const response = await this.createDelivery(deliveryData);
 
                 if (response.success) {
-                    // 2. Send comprehensive delivery confirmation email (matches app functionality)
+                    // Prepare email data exactly like the app does
                     const emailData = {
-                        delivery: response.data,
+                        delivery: {
+                            _id: response.data._id,
+                            userId: response.data.userId,
+                            userEmail: response.data.userEmail,
+                            address: response.data.address,
+                            totalAmount: response.data.totalAmount,
+                            paymentMethod: response.data.paymentMethod,
+                            status: response.data.status,
+                            items: response.data.items,
+                            addOns: response.data.addOns,
+                            adverts: response.data.adverts || [],
+                            createdAt: response.data.createdAt
+                        },
                         userEmail: user.email,
                         userFullName: userProfile.fullName || user.email.split('@')[0],
-                        userPhoneNumber: userProfile.phoneNumber || 'Not provided'
+                        userPhoneNumber: userProfile.phoneNumber || 'Not provided',
+                        adminEmail: 'winebubblesnow@gmail.com'
                     };
 
-                    try {
-                        console.log('📧 Sending delivery confirmation email with user details...');
-                        console.log('   Customer:', emailData.userFullName);
-                        console.log('   Email:', emailData.userEmail);
-                        console.log('   Phone:', emailData.userPhoneNumber);
-                        console.log('   Order ID:', response.data._id);
-                        console.log('   Total Amount:', `R${response.data.totalAmount}`);
-                        console.log('   Items:', wineItems.length, 'wines,', addOns.length, 'add-ons');
-                        
-                        // Send to the dedicated delivery confirmation email endpoint
-                        const emailResponse = await fetch(`${this.API_BASE_URL}/email/send-delivery-confirmation`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem('wineBubbles_token')}`
-                            },
-                            body: JSON.stringify(emailData)
-                        });
+                    console.log('📧 Sending delivery confirmation email...');
+                    console.log('   Customer:', emailData.userFullName);
+                    console.log('   Email:', emailData.userEmail);
+                    console.log('   Phone:', emailData.userPhoneNumber);
+                    console.log('   Order ID:', response.data._id);
+                    console.log('   Total:', `R${response.data.totalAmount}`);
 
-                        const emailResult = await emailResponse.json();
-                        if (emailResult.success) {
-                            console.log('✅ Delivery confirmation email sent successfully to:', user.email);
-                            console.log('✅ Admin notification also sent to: winebubblesnow@gmail.com');
-                        } else {
-                            console.warn('⚠️ Delivery email failed but order was created:', emailResult.message);
+                    // Try multiple email endpoints for compatibility
+                    let emailSent = false;
+                    let emailError = null;
+                    
+                    const emailEndpoints = [
+                        `${this.API_BASE_URL}/email/send-delivery-confirmation`,
+                        `${this.API_BASE_URL}/email/send-delivery-confirmation-email`,
+                        `${this.API_BASE_URL}/email/delivery-confirmation`
+                    ];
+                    
+                    for (const endpoint of emailEndpoints) {
+                        try {
+                            console.log(`📤 Trying email endpoint: ${endpoint}`);
+                            const emailResponse = await fetch(endpoint, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('wineBubbles_token')}`
+                                },
+                                body: JSON.stringify(emailData)
+                            });
+                            
+                            const emailResult = await emailResponse.json();
+                            
+                            if (emailResponse.ok && emailResult.success) {
+                                console.log(`✅ Email sent successfully via ${endpoint}`);
+                                emailSent = true;
+                                break;
+                            } else {
+                                console.warn(`⚠️ Email endpoint ${endpoint} failed:`, emailResult.message);
+                                emailError = emailResult.message;
+                            }
+                        } catch (endpointError) {
+                            console.warn(`⚠️ Email endpoint ${endpoint} error:`, endpointError.message);
+                            emailError = endpointError.message;
                         }
-                    } catch (emailError) {
-                        console.warn('⚠️ Failed to send delivery email:', emailError.message);
-                        // Don't fail the order if email fails
                     }
-
-                    // Show success message
-                    this.showToast('Order placed successfully! Confirmation email sent.', 'success');
+                    
+                    if (emailSent) {
+                        console.log('✅ Delivery confirmation email sent successfully to:', user.email);
+                        this.showToast('Order placed! Confirmation email sent.', 'success');
+                    } else {
+                        console.warn('⚠️ All email endpoints failed. Order created but no email sent.');
+                        console.warn('Last error:', emailError);
+                        this.showToast('Order placed successfully! (Email notification pending)', 'success');
+                    }
                     
                     // Save order locally for reference
                     this.saveOrderLocal({
@@ -1007,7 +1041,8 @@
                     // Redirect to order confirmation page
                     setTimeout(() => {
                         window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}&total=${deliveryData.totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
-                    }, 1500);
+                    }, 2000);
+                    
                 } else {
                     throw new Error(response.message || 'Failed to create delivery');
                 }
@@ -1103,9 +1138,6 @@
         }
 
         setupAuthentication() {
-            // Configuration - USE PROXY SERVER (works on both localhost and production)
-            const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
-            
             const token = localStorage.getItem('wineBubbles_token');
             const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
             const userData = localStorage.getItem('wineBubbles_user');
@@ -1192,17 +1224,14 @@
         }
 
         createUserDropdown(user) {
-            // Remove existing dropdown if any
             const existingDropdown = document.querySelector('.user-dropdown');
             if (existingDropdown) {
                 existingDropdown.remove();
             }
             
-            // Create dropdown container
             const dropdown = document.createElement('div');
             dropdown.className = 'user-dropdown';
             
-            // User info
             const userInfo = document.createElement('div');
             userInfo.className = 'user-dropdown-info';
             
@@ -1218,14 +1247,12 @@
             userInfo.appendChild(userEmail);
             dropdown.appendChild(userInfo);
             
-            // Dropdown items
             const items = [
                 { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' },
                 { text: 'My Orders', icon: 'fas fa-shopping-bag', href: '../user/orders.html' },
                 { text: 'My Bookings', icon: 'fas fa-calendar', href: '../user/bookings.html' }
             ];
             
-            // Add items to dropdown
             items.forEach(item => {
                 const link = document.createElement('a');
                 link.href = item.href;
@@ -1237,7 +1264,6 @@
                 dropdown.appendChild(link);
             });
             
-            // Logout button
             const logoutButton = document.createElement('button');
             logoutButton.className = 'user-dropdown-logout';
             logoutButton.textContent = 'Logout';
@@ -1254,7 +1280,6 @@
             dropdown.appendChild(logoutButton);
             document.body.appendChild(dropdown);
             
-            // Close dropdown when clicking outside
             document.addEventListener('click', (event) => {
                 const dropdown = document.querySelector('.user-dropdown');
                 const userIcon = document.getElementById('userIcon');
