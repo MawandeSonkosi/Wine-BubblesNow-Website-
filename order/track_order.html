@@ -296,6 +296,7 @@
             display: flex;
             gap: 20px;
             margin-top: 12px;
+            flex-wrap: wrap;
         }
 
         .meta-item {
@@ -1086,7 +1087,8 @@
                     totalWineQuantity: (order.items?.length || 0) + (order.addOns?.length || 0),
                     createdAt: order.createdAt || new Date().toISOString(),
                     items: order.items || [],
-                    addOns: order.addOns || []
+                    addOns: order.addOns || [],
+                    adverts: order.adverts || []
                 }));
                 
                 console.log(`✅ Using ${this.deliveries.length} orders from localStorage`);
@@ -1156,7 +1158,7 @@
         });
     }
 
-           renderDeliveries(deliveries) {
+    renderDeliveries(deliveries) {
         if (!this.contentElement) return;
 
         const deliveriesHTML = deliveries.map(delivery => {
@@ -1164,8 +1166,33 @@
             const statusIcon = this.getStatusIcon(delivery.status);
             const statusTextClass = this.getStatusText(delivery.status);
             const statusDisplayText = this.getStatusDisplayText(delivery.status);
-            const totalItems = delivery.totalWineQuantity || 
-                             (delivery.items?.length || 0) + (delivery.addOns?.length || 0);
+            
+            // Calculate total items including add-ons and adverts
+            const wineCount = (delivery.items?.length || 0);
+            const addOnCount = (delivery.addOns?.length || 0);
+            const advertCount = (delivery.adverts?.length || 0);
+            const totalItems = wineCount + addOnCount + advertCount;
+            
+            // Calculate wine bottle count (for cases, each case counts as 6 bottles)
+            let wineBottleCount = 0;
+            if (delivery.items && delivery.items.length > 0) {
+                wineBottleCount = delivery.items.reduce((sum, item) => {
+                    const quantity = item.quantity || 1;
+                    const isCase = item.isCase === true;
+                    if (isCase) {
+                        return sum + (quantity * 6);
+                    }
+                    return sum + quantity;
+                }, 0);
+            }
+            
+            // Calculate advert count
+            let advertTotalCount = 0;
+            if (delivery.adverts && delivery.adverts.length > 0) {
+                advertTotalCount = delivery.adverts.reduce((sum, advert) => {
+                    return sum + (advert.quantity || 1);
+                }, 0);
+            }
             
             // Extract the delivery ID
             const deliveryId = delivery._id || delivery.id;
@@ -1200,10 +1227,22 @@
                                     <div class="meta-label">Total Items</div>
                                     <div class="meta-value">${totalItems} item${totalItems !== 1 ? 's' : ''}</div>
                                 </div>
-                                ${delivery.items?.length ? `
+                                ${wineCount > 0 ? `
                                 <div class="meta-item">
-                                    <div class="meta-label">Wine Bottles</div>
-                                    <div class="meta-value">${delivery.items.reduce((sum, item) => sum + (item.quantity || 1), 0)}</div>
+                                    <div class="meta-label">Wine</div>
+                                    <div class="meta-value">${wineBottleCount} bottle${wineBottleCount !== 1 ? 's' : ''}</div>
+                                </div>
+                                ` : ''}
+                                ${addOnCount > 0 ? `
+                                <div class="meta-item">
+                                    <div class="meta-label">Add-ons</div>
+                                    <div class="meta-value">${addOnCount}</div>
+                                </div>
+                                ` : ''}
+                                ${advertCount > 0 ? `
+                                <div class="meta-item">
+                                    <div class="meta-label">Adverts</div>
+                                    <div class="meta-value">${advertTotalCount} placement${advertTotalCount !== 1 ? 's' : ''}</div>
                                 </div>
                                 ` : ''}
                             </div>
@@ -1259,16 +1298,12 @@
             });
         });
     }
-           viewDeliveryDetails(deliveryId) {
+    
+    viewDeliveryDetails(deliveryId) {
         console.log('🔍 Viewing delivery details:', deliveryId);
-        
-        // Use the correct path to order_detail.html
-        // Since track_order.html is in /orders folder, and order_detail.html should be in same folder
         window.location.href = `order_detail.html?id=${deliveryId}`;
-        
-        // Alternative if order_detail.html is in a different location:
-        // window.location.href = `../orders/order_detail.html?id=${deliveryId}`;
     }
+    
     showAuthRequired() {
         if (!this.contentElement) return;
 
