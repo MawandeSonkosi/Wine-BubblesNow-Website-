@@ -622,7 +622,7 @@
             this.payBtn = document.getElementById('payBtn');
             this.paySpinner = document.getElementById('paySpinner');
             this.isProcessing = false;
-            this.API_BASE_URL = 'http://localhost:3000/api'; // Your backend API
+            this.API_BASE_URL = '/api'; // USE PROXY SERVER - works on both localhost and production
             this.cartUtils = null;
             
             this.init();
@@ -637,6 +637,7 @@
                 this.loadCheckoutData();
                 this.validateCheckout();
                 console.log('✅ Checkout system initialized with CartUtils');
+                console.log('🔧 Using API URL:', this.API_BASE_URL);
             });
         }
 
@@ -861,150 +862,153 @@
                 return false;
             }
         }
-async processPayment() {
-    if (this.isProcessing) return;
-    
-    if (!this.cartUtils) {
-        this.showToast('Cart system not available', 'error');
-        return;
-    }
-
-    // Validate everything again
-    this.validateCheckout();
-    
-    // Get user data
-    const userData = localStorage.getItem('wineBubbles_user');
-    if (!userData) {
-        this.showToast('Please login to continue', 'error');
-        return;
-    }
-
-    this.isProcessing = true;
-    this.showLoading(true);
-    this.payBtn.disabled = true;
-    this.paySpinner.style.display = 'block';
-    this.payBtn.querySelector('span').textContent = 'PROCESSING...';
-
-    try {
-        // Get all necessary data
-        const user = JSON.parse(userData);
-        const cart = this.cartUtils.getCart();
-        const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
-        const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
         
-        // Get user profile details for email
-        const userProfile = JSON.parse(localStorage.getItem('wineBubbles_userProfile') || '{}');
-
-        // Prepare items for delivery
-        const wineItems = [];
-        const addOns = [];
-        
-        cart.items.forEach(item => {
-            if (item.type === 'wine') {
-                wineItems.push({
-                    id: parseInt(item.id) || 0,
-                    name: item.name || '',
-                    price: item.price || 0,
-                    quantity: item.quantity || 1,
-                    type: item.type || 'wine',
-                    category: item.category || '',
-                    description: item.description || '',
-                    imageUrl: item.imageUrl || '',
-                    isCase: item.isCase || false,
-                    itemType: 'wine'
-                });
-            } else if (item.type === 'addon') {
-                addOns.push({
-                    id: parseInt(item.id) || 0,
-                    name: item.name || '',
-                    price: item.price || 0,
-                    category: item.category || '',
-                    description: item.description || '',
-                    imageUrl: item.imageUrl || ''
-                });
+        async processPayment() {
+            if (this.isProcessing) return;
+            
+            if (!this.cartUtils) {
+                this.showToast('Cart system not available', 'error');
+                return;
             }
-        });
 
-        // Create delivery object for backend
-        const deliveryData = {
-            userId: user.id || user.email,
-            userEmail: user.email,
-            address: deliveryAddress,
-            totalAmount: cart.total || 0,
-            paymentMethod: paymentMethod,
-            items: wineItems,
-            addOns: addOns
-        };
+            // Validate everything again
+            this.validateCheckout();
+            
+            // Get user data
+            const userData = localStorage.getItem('wineBubbles_user');
+            if (!userData) {
+                this.showToast('Please login to continue', 'error');
+                return;
+            }
 
-        console.log('📦 Sending delivery to backend:', deliveryData);
-
-        // 1. Send delivery to backend API
-        const response = await this.createDelivery(deliveryData);
-
-        if (response.success) {
-            // 2. Send confirmation email
-            const emailData = {
-                delivery: response.data, // Use the delivery data returned from backend
-                userEmail: user.email,
-                userFullName: userProfile.fullName || user.email.split('@')[0],
-                userPhoneNumber: userProfile.phoneNumber || 'Not provided'
-            };
+            this.isProcessing = true;
+            this.showLoading(true);
+            this.payBtn.disabled = true;
+            this.paySpinner.style.display = 'block';
+            this.payBtn.querySelector('span').textContent = 'PROCESSING...';
 
             try {
-                console.log('📧 Sending delivery confirmation email...');
-                const emailResponse = await fetch(`${this.API_BASE_URL}/email/send-delivery-confirmation`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('wineBubbles_token')}`
-                    },
-                    body: JSON.stringify(emailData)
+                // Get all necessary data
+                const user = JSON.parse(userData);
+                const cart = this.cartUtils.getCart();
+                const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
+                const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
+                
+                // Get user profile details for email
+                const userProfile = JSON.parse(localStorage.getItem('wineBubbles_userProfile') || '{}');
+
+                // Prepare items for delivery
+                const wineItems = [];
+                const addOns = [];
+                
+                cart.items.forEach(item => {
+                    if (item.type === 'wine') {
+                        wineItems.push({
+                            id: parseInt(item.id) || 0,
+                            name: item.name || '',
+                            price: item.price || 0,
+                            quantity: item.quantity || 1,
+                            type: item.type || 'wine',
+                            category: item.category || '',
+                            description: item.description || '',
+                            imageUrl: item.imageUrl || '',
+                            isCase: item.isCase || false,
+                            itemType: 'wine'
+                        });
+                    } else if (item.type === 'addon') {
+                        addOns.push({
+                            id: parseInt(item.id) || 0,
+                            name: item.name || '',
+                            price: item.price || 0,
+                            category: item.category || '',
+                            description: item.description || '',
+                            imageUrl: item.imageUrl || ''
+                        });
+                    }
                 });
 
-                const emailResult = await emailResponse.json();
-                if (emailResult.success) {
-                    console.log('✅ Delivery confirmation email sent successfully');
+                // Create delivery object for backend
+                const deliveryData = {
+                    userId: user.id || user.email,
+                    userEmail: user.email,
+                    address: deliveryAddress,
+                    totalAmount: cart.total || 0,
+                    paymentMethod: paymentMethod,
+                    items: wineItems,
+                    addOns: addOns
+                };
+
+                console.log('📦 Sending delivery to backend:', deliveryData);
+                console.log('🔧 API URL:', this.API_BASE_URL);
+
+                // 1. Send delivery to backend API
+                const response = await this.createDelivery(deliveryData);
+
+                if (response.success) {
+                    // 2. Send confirmation email
+                    const emailData = {
+                        delivery: response.data,
+                        userEmail: user.email,
+                        userFullName: userProfile.fullName || user.email.split('@')[0],
+                        userPhoneNumber: userProfile.phoneNumber || 'Not provided'
+                    };
+
+                    try {
+                        console.log('📧 Sending delivery confirmation email...');
+                        const emailResponse = await fetch(`${this.API_BASE_URL}/email/send-delivery-confirmation`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('wineBubbles_token')}`
+                            },
+                            body: JSON.stringify(emailData)
+                        });
+
+                        const emailResult = await emailResponse.json();
+                        if (emailResult.success) {
+                            console.log('✅ Delivery confirmation email sent successfully');
+                        } else {
+                            console.warn('⚠️ Delivery email failed but order was created:', emailResult.message);
+                        }
+                    } catch (emailError) {
+                        console.warn('⚠️ Failed to send delivery email:', emailError.message);
+                        // Don't fail the order if email fails
+                    }
+
+                    // Show success message
+                    this.showToast('Order placed successfully! Confirmation email sent.', 'success');
+                    
+                    // Save order locally for reference
+                    this.saveOrderLocal({
+                        ...deliveryData,
+                        id: response.data._id || 'ORD-' + Date.now(),
+                        status: 'Order received',
+                        createdAt: new Date().toISOString()
+                    });
+
+                    // Clear cart
+                    this.cartUtils.clearCart();
+
+                    // Clear checkout data
+                    localStorage.removeItem('wineBubbles_deliveryAddress');
+                    localStorage.removeItem('wineBubbles_deliveryAddressDetails');
+                    localStorage.removeItem('wineBubbles_paymentMethod');
+
+                    // Redirect to order confirmation page
+                    setTimeout(() => {
+                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}`;
+                    }, 1500);
                 } else {
-                    console.warn('⚠️ Delivery email failed but order was created:', emailResult.message);
+                    throw new Error(response.message || 'Failed to create delivery');
                 }
-            } catch (emailError) {
-                console.warn('⚠️ Failed to send delivery email:', emailError.message);
-                // Don't fail the order if email fails
+
+            } catch (error) {
+                console.error('Error processing payment:', error);
+                this.showToast(`Failed to process order: ${error.message}`, 'error');
+                this.resetProcessingState();
             }
-
-            // Show success message
-            this.showToast('Order placed successfully! Confirmation email sent.', 'success');
-            
-            // Save order locally for reference
-            this.saveOrderLocal({
-                ...deliveryData,
-                id: response.data._id || 'ORD-' + Date.now(),
-                status: 'Order received',
-                createdAt: new Date().toISOString()
-            });
-
-            // Clear cart
-            this.cartUtils.clearCart();
-
-            // Clear checkout data
-            localStorage.removeItem('wineBubbles_deliveryAddress');
-            localStorage.removeItem('wineBubbles_deliveryAddressDetails');
-            localStorage.removeItem('wineBubbles_paymentMethod');
-
-            // Redirect to order confirmation page
-            setTimeout(() => {
-                window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}`;
-            }, 1500);
-        } else {
-            throw new Error(response.message || 'Failed to create delivery');
         }
-
-    } catch (error) {
-        console.error('Error processing payment:', error);
-        this.showToast(`Failed to process order: ${error.message}`, 'error');
-        this.resetProcessingState();
-    }
-}
+        
         async createDelivery(deliveryData) {
             try {
                 const token = localStorage.getItem('wineBubbles_token');
@@ -1044,35 +1048,36 @@ async processPayment() {
             }
         }
 
-      saveOrderLocal(order) {
-    // Get existing orders or create new array
-    const existingOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
-    
-    // Ensure consistent property names
-    const orderToSave = {
-        id: order.id || order._id || 'ORD-' + Date.now(),
-        _id: order._id || order.id,
-        total: order.total || order.totalAmount || 0,
-        totalAmount: order.totalAmount || order.total || 0,
-        paymentMethod: order.paymentMethod || 'Not specified',
-        createdAt: order.createdAt || new Date().toISOString(),
-        emailSent: order.emailSent || false,
-        items: order.items || [],
-        addOns: order.addOns || [],
-        address: order.address,
-        userId: order.userId,
-        userEmail: order.userEmail,
-        status: order.status || 'Order received'
-    };
-    
-    // Add new order
-    existingOrders.push(orderToSave);
-    
-    // Save back to localStorage
-    localStorage.setItem('wineBubbles_orders', JSON.stringify(existingOrders));
-    
-    console.log('Order saved locally:', orderToSave.id);
-}
+        saveOrderLocal(order) {
+            // Get existing orders or create new array
+            const existingOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
+            
+            // Ensure consistent property names
+            const orderToSave = {
+                id: order.id || order._id || 'ORD-' + Date.now(),
+                _id: order._id || order.id,
+                total: order.total || order.totalAmount || 0,
+                totalAmount: order.totalAmount || order.total || 0,
+                paymentMethod: order.paymentMethod || 'Not specified',
+                createdAt: order.createdAt || new Date().toISOString(),
+                emailSent: order.emailSent || false,
+                items: order.items || [],
+                addOns: order.addOns || [],
+                address: order.address,
+                userId: order.userId,
+                userEmail: order.userEmail,
+                status: order.status || 'Order received'
+            };
+            
+            // Add new order
+            existingOrders.push(orderToSave);
+            
+            // Save back to localStorage
+            localStorage.setItem('wineBubbles_orders', JSON.stringify(existingOrders));
+            
+            console.log('Order saved locally:', orderToSave.id);
+        }
+        
         resetProcessingState() {
             this.isProcessing = false;
             this.showLoading(false);
@@ -1088,6 +1093,9 @@ async processPayment() {
         }
 
         setupAuthentication() {
+            // Configuration - USE PROXY SERVER (works on both localhost and production)
+            const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
+            
             const token = localStorage.getItem('wineBubbles_token');
             const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
             const userData = localStorage.getItem('wineBubbles_user');

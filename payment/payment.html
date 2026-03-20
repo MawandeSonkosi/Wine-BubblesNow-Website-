@@ -698,6 +698,9 @@
             }
 
             setupAuthentication() {
+                // Configuration - USE PROXY SERVER (works on both localhost and production)
+                const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
+                
                 const token = localStorage.getItem('wineBubbles_token');
                 const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
                 const userData = localStorage.getItem('wineBubbles_user');
