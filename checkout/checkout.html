@@ -625,7 +625,7 @@
             this.API_BASE_URL = '/api';
             this.cartUtils = null;
             this.userProfile = null;
-            this.advertItems = []; // Store advert items separately
+            this.advertItems = []; // Store advert items
             
             this.init();
         }
@@ -639,7 +639,7 @@
                 this.loadCheckoutData();
                 this.validateCheckout();
                 this.loadUserProfile();
-                this.loadAdvertItems(); // Load advert items from localStorage
+                this.loadAdvertItems(); // Load adverts from localStorage
                 console.log('✅ Checkout system initialized with CartUtils');
                 console.log('🔧 Using API URL:', this.API_BASE_URL);
             });
@@ -647,11 +647,14 @@
 
         loadAdvertItems() {
             try {
-                // Try to get adverts from localStorage (if stored separately)
+                // Get adverts from localStorage (saved when adding to cart)
                 const advertsData = localStorage.getItem('wineBubbles_adverts');
                 if (advertsData) {
                     this.advertItems = JSON.parse(advertsData);
                     console.log(`📢 Loaded ${this.advertItems.length} advert items from localStorage`);
+                    this.advertItems.forEach((advert, index) => {
+                        console.log(`   Advert ${index + 1}: ${advert.title} - Qty: ${advert.quantity || 1} - Price: R${advert.price}`);
+                    });
                 } else {
                     console.log('📢 No advert items found in localStorage');
                     this.advertItems = [];
@@ -665,12 +668,8 @@
         async loadUserProfile() {
             try {
                 const userData = localStorage.getItem('wineBubbles_user');
-                const token = localStorage.getItem('wineBubbles_token');
-                
                 if (userData) {
                     const user = JSON.parse(userData);
-                    console.log('👤 User data from localStorage:', user);
-                    
                     const fullName = localStorage.getItem('wineBubbles_userFullName') || 
                                     user.fullName || 
                                     user.email.split('@')[0];
@@ -684,10 +683,8 @@
                         email: user.email,
                         id: user.id
                     };
-                    
                     console.log('✅ User profile loaded:', this.userProfile);
                 } else {
-                    console.warn('⚠️ No user data found in localStorage');
                     this.userProfile = {
                         fullName: 'Valued Customer',
                         phoneNumber: 'Not provided',
@@ -696,7 +693,7 @@
                     };
                 }
             } catch (error) {
-                console.error('❌ Error loading user profile:', error);
+                console.error('Error loading user profile:', error);
                 this.userProfile = {
                     fullName: 'Valued Customer',
                     phoneNumber: 'Not provided',
@@ -724,7 +721,6 @@
                     setTimeout(check, 300);
                 }
             };
-            
             check();
         }
 
@@ -761,8 +757,9 @@
             });
 
             window.addEventListener('storage', (event) => {
-                if (event.key === 'wine_cart') {
+                if (event.key === 'wine_cart' || event.key === 'wineBubbles_adverts') {
                     setTimeout(() => {
+                        this.loadAdvertItems();
                         this.loadOrderItems();
                         this.updateOrderSummary();
                     }, 100);
@@ -841,25 +838,26 @@
                 // Display advert items
                 if (this.advertItems.length > 0) {
                     this.advertItems.forEach(advert => {
-                        const itemTotal = advert.price * (advert.quantity || 1);
+                        const quantity = advert.quantity || 1;
+                        const itemTotal = advert.price * quantity;
                         const imageUrl = advert.imageUrl || '../assets/images/default_advert.jpg';
                         itemsHTML += `
-                            <div class="order-item" style="border-left: 3px solid #03a9f4; padding-left: 10px;">
+                            <div class="order-item" style="border-left: 3px solid #03a9f4; padding-left: 10px; margin-left: 5px;">
                                 <div class="item-image">
                                     <img src="${imageUrl}" 
                                          alt="${advert.title}"
                                          onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">📢</text></svg>';">
                                 </div>
                                 <div class="item-details">
-                                    <div class="item-name">📢 ${advert.title}</div>
+                                    <div class="item-name" style="color: #03a9f4;">📢 ${advert.title}</div>
                                     <div class="item-meta">
                                         <span style="background: rgba(3, 169, 244, 0.1); color: #03a9f4; padding: 2px 6px; border-radius: 4px; font-size: 12px;">Advert Placement</span>
                                         ${advert.category ? `<span style="margin-left: 8px;">${advert.category}</span>` : ''}
                                     </div>
                                     ${advert.subtitle ? `<div style="color: #666; font-size: 12px; margin-bottom: 4px;">${advert.subtitle}</div>` : ''}
                                     <div class="item-quantity-price">
-                                        <div class="item-quantity">Qty: ${advert.quantity || 1}</div>
-                                        <div class="item-price">R${itemTotal.toFixed(2)}</div>
+                                        <div class="item-quantity">Qty: ${quantity}</div>
+                                        <div class="item-price" style="color: #03a9f4;">R${itemTotal.toFixed(2)}</div>
                                     </div>
                                 </div>
                             </div>
@@ -888,6 +886,7 @@
                 if (this.advertItems.length > 0) {
                     const advertTotal = this.advertItems.reduce((sum, advert) => sum + (advert.price * (advert.quantity || 1)), 0);
                     subtotal += advertTotal;
+                    console.log(`💰 Advert total: R${advertTotal.toFixed(2)}`);
                 }
                 
                 const deliveryFee = subtotal >= 500 ? 0 : 50;
@@ -918,6 +917,7 @@
                 setTimeout(() => {
                     window.location.href = '../cart/cart.html';
                 }, 2000);
+                return;
             }
 
             const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
@@ -926,6 +926,7 @@
                 setTimeout(() => {
                     window.location.href = '../payment/payment.html';
                 }, 2000);
+                return;
             }
 
             const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
@@ -936,6 +937,7 @@
                 setTimeout(() => {
                     window.location.href = '../delivery/delivery.html';
                 }, 2000);
+                return;
             }
         }
 
@@ -984,7 +986,7 @@
                 console.log('   Customer:', userFullName);
                 console.log('   Email:', user.email);
                 console.log('   Phone:', userPhoneNumber);
-                console.log('   Adverts:', this.advertItems.length);
+                console.log('   Adverts in cart:', this.advertItems.length);
                 console.log('   Wine items:', cart.items?.length || 0);
 
                 // Prepare wine items
@@ -1011,7 +1013,7 @@
                     imageUrl: item.imageUrl || ''
                 }));
 
-                // Prepare advert items (matching app format)
+                // Prepare advert items (from localStorage)
                 const adverts = this.advertItems.map(advert => ({
                     id: advert.id || String(advert._id || Math.random()),
                     title: advert.title || advert.name || 'Advert Placement',
@@ -1024,6 +1026,11 @@
                     quantity: advert.quantity || 1,
                     itemType: 'advert'
                 }));
+
+                console.log('📦 Adverts prepared for delivery:', adverts.length);
+                adverts.forEach((advert, idx) => {
+                    console.log(`   Advert ${idx + 1}: ${advert.title} - Qty: ${advert.quantity} - Price: R${advert.price}`);
+                });
 
                 // Calculate total amount including adverts
                 const subtotal = (cart.subtotal || 0) + adverts.reduce((sum, a) => sum + (a.price * a.quantity), 0);
@@ -1038,13 +1045,17 @@
                     paymentMethod: paymentMethod,
                     items: wineItems,
                     addOns: addOns,
-                    adverts: adverts
+                    adverts: adverts  // Include adverts in delivery data
                 };
 
                 console.log('📦 Sending delivery to backend with adverts:', adverts.length);
+                console.log('📦 Delivery data:', JSON.stringify(deliveryData, null, 2));
+
                 const response = await this.createDelivery(deliveryData);
 
                 if (response.success) {
+                    console.log('✅ Delivery created successfully with adverts!');
+                    
                     const emailData = {
                         delivery: {
                             _id: response.data._id,
@@ -1138,6 +1149,9 @@
         async createDelivery(deliveryData) {
             try {
                 const token = localStorage.getItem('wineBubbles_token');
+                console.log('📡 Sending POST to:', `${this.API_BASE_URL}/deliveries`);
+                console.log('📡 With adverts count:', deliveryData.adverts?.length || 0);
+                
                 const response = await fetch(`${this.API_BASE_URL}/deliveries`, {
                     method: 'POST',
                     headers: {
@@ -1149,6 +1163,9 @@
                 });
 
                 const data = await response.json();
+                console.log('📡 Response status:', response.status);
+                console.log('📡 Response data:', data);
+                
                 if (!response.ok) {
                     throw new Error(data.message || `HTTP ${response.status}`);
                 }
@@ -1188,7 +1205,7 @@
             };
             existingOrders.push(orderToSave);
             localStorage.setItem('wineBubbles_orders', JSON.stringify(existingOrders));
-            console.log('Order saved locally:', orderToSave.id);
+            console.log('Order saved locally with', orderToSave.adverts?.length || 0, 'adverts');
         }
         
         resetProcessingState() {

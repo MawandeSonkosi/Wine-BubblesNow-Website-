@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wine & Bubbles — Checkout</title>
+    <title>Wine & Bubbles — Track Your Orders</title>
     <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
     <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
     <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
@@ -17,295 +17,494 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="../style.css">
     
-    <!-- Cart Utils -->
-    <script src="../cart/cart-utils.js"></script>
-    
+    <!-- Profile Dropdown Styles - ADDED -->
     <style>
-        /* Checkout Specific Styles */
-        .checkout-section {
+        /* Profile Dropdown Styles - MATCHES HOMEPAGE */
+        .user-dropdown {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 16px;
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            border: 1px solid #eee;
+        }
+        
+        .user-dropdown.show {
+            display: block !important;
+        }
+        
+        .user-dropdown a:hover {
+            color: #6b0d2b !important;
+        }
+        
+        .top-icons a {
+            position: relative;
+        }
+        
+        /* Login icon style */
+        .fas.fa-sign-in-alt {
+            color: #6b0d2b !important;
+        }
+        
+        .fas.fa-user-check {
+            color: #6b0d2b !important;
+        }
+        
+        .user-dropdown-info {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-dropdown-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .user-dropdown-email {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .user-dropdown-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .user-dropdown-link i {
+            margin-right: 8px;
+            width: 20px;
+        }
+        
+        .user-dropdown-logout {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: #6b0d2b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .user-dropdown-logout:hover {
+            background: #8a1e3d;
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .user-dropdown {
+                position: fixed;
+                top: 70px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+        }
+        
+        /* Admin badge */
+        .admin-badge {
+            display: inline-block;
+            background: #6b0d2b;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        /* Driver badge */
+        .driver-badge {
+            display: inline-block;
+            background: #1e6b0d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        /* Track Order Specific Styles - KEEP YOUR EXISTING STYLES */
+        .track-orders-section {
             padding: 40px 0;
             background: #f8f8f8;
             min-height: 70vh;
         }
 
-        .checkout-container {
+        .track-orders-container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        .checkout-header {
+        .track-orders-header {
             margin-bottom: 30px;
             text-align: center;
         }
 
-        .checkout-title {
+        .track-orders-title {
             font-family: 'Playfair Display', serif;
             font-size: 36px;
-            color: #1b1b1b;
+            color: #6b0d2b;
             margin-bottom: 8px;
         }
 
-        .checkout-subtitle {
+        .track-orders-subtitle {
             color: #666;
             font-size: 16px;
         }
 
-        /* Checkout Layout */
-        .checkout-layout {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        @media (max-width: 992px) {
-            .checkout-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Order Summary Card */
-        .order-summary-card {
+        /* Delivery Cards - MATCHING WEBSITE LAYOUT */
+        .delivery-card {
             background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(107, 13, 43, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        /* Section Headers */
-        .section-header {
+        .delivery-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(107, 13, 43, 0.15);
+            border-color: rgba(107, 13, 43, 0.3);
+        }
+
+        .delivery-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            padding-bottom: 12px;
+            padding-bottom: 16px;
             border-bottom: 2px solid rgba(107, 13, 43, 0.1);
         }
 
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px;
-            color: #6b0d2b;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .section-icon {
-            color: #6b0d2b;
-            opacity: 0.7;
-            font-size: 18px;
-        }
-
-        /* Info Cards */
-        .info-card {
-            background: #2a2a2a;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            color: #e6c79c;
-        }
-
-        .info-content {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .info-icon {
-            color: #e6c79c;
-            font-size: 18px;
-            margin-top: 2px;
-        }
-
-        .info-text {
-            flex: 1;
-        }
-
-        .info-label {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #e6c79c;
-        }
-
-        .info-value {
-            font-size: 16px;
-            line-height: 1.5;
-            color: rgba(230, 199, 156, 0.9);
-        }
-
-        /* Order Items */
-        .order-items {
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 30px;
-        }
-
-        .order-item {
-            display: flex;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid rgba(107, 13, 43, 0.1);
-        }
-
-        .order-item:last-child {
-            border-bottom: none;
-        }
-
-        .item-image {
-            width: 80px;
-            height: 100px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #f5f5f5;
-            flex-shrink: 0;
-        }
-
-        .item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .item-details {
-            flex: 1;
-        }
-
-        .item-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .item-meta {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .item-quantity-price {
-            display: flex;
-            justify-content: space-between;
+        /* UPDATED Status Badges with better colors */
+        .status-badge {
+            display: inline-flex;
             align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 2px solid;
         }
 
-        .item-quantity {
+        .status-received {
+            color: #ff9800;
+            border-color: #ff9800;
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+        }
+
+        .status-processing {
+            color: #2196f3;
+            border-color: #2196f3;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.05) 100%);
+        }
+
+        .status-delivery {
+            color: #9c27b0;
+            border-color: #9c27b0;
+            background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(156, 39, 176, 0.05) 100%);
+        }
+
+        .status-delivered {
+            color: #4caf50;
+            border-color: #4caf50;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+        }
+
+        .status-cancelled {
+            color: #f44336;
+            border-color: #f44336;
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+        }
+
+        .delivery-date {
             color: #666;
             font-size: 14px;
-        }
-
-        .item-price {
-            font-weight: 600;
-            color: #6b0d2b;
-            font-size: 16px;
-        }
-
-        /* Payment Summary */
-        .payment-summary-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 20px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 16px;
-            color: #666;
-        }
-
-        .summary-row.total {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1b1b1b;
-            border-top: 2px solid rgba(107, 13, 43, 0.2);
-            padding-top: 16px;
-            margin-top: 16px;
-        }
-
-        .summary-row .value {
-            color: #1b1b1b;
             font-weight: 500;
         }
 
-        .summary-row.total .value {
-            color: #6b0d2b;
+        .delivery-content {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        .delivery-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6b0d2b 0%, #8a1c3a 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(107, 13, 43, 0.2);
+        }
+
+        .delivery-icon i {
+            color: white;
             font-size: 24px;
         }
 
-        /* Pay Now Button */
-        .pay-btn {
+        .delivery-details {
+            flex: 1;
+        }
+
+        .delivery-address-title {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .delivery-address {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .delivery-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-label {
+            color: #999;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .meta-value {
+            color: #6b0d2b;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .delivery-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(107, 13, 43, 0.1);
+        }
+
+        .delivery-amount {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #6b0d2b;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .delivery-amount-currency {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .delivery-status-text {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+        }
+
+        .status-text-progress {
+            color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .status-text-completed {
+            color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .status-text-cancelled {
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+
+        /* View Details Button */
+        .view-details-btn {
             width: 100%;
-            background: #6b0d2b;
+            background: linear-gradient(135deg, #6b0d2b 0%, #8a1c3a 100%);
             color: white;
             border: none;
-            padding: 18px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: 8px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 16px;
         }
 
-        .pay-btn:hover:not(:disabled) {
-            background: #5a0b23;
+        .view-details-btn:hover {
+            background: linear-gradient(135deg, #5a0b23 0%, #791532 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(107, 13, 43, 0.3);
+        }
+
+        /* Empty State - Updated to match website */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(107, 13, 43, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            color: rgba(107, 13, 43, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .empty-state-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: #6b0d2b;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-text {
+            color: #666;
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+
+        .empty-state-subtext {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .start-shopping-btn {
+            background: linear-gradient(135deg, #6b0d2b 0%, #8a1c3a 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-shopping-btn:hover {
+            background: linear-gradient(135deg, #5a0b23 0%, #791532 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(107, 13, 43, 0.3);
+        }
+
+        /* Auth Required State */
+        .auth-required-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(107, 13, 43, 0.1);
+        }
+
+        .auth-required-icon {
+            font-size: 64px;
+            color: #6b0d2b;
+            opacity: 0.7;
+            margin-bottom: 24px;
+        }
+
+        .auth-required-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: #6b0d2b;
+            margin-bottom: 12px;
+        }
+
+        .auth-required-text {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 32px;
+            max-width: 400px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
+        }
+
+        .go-back-btn {
+            background: linear-gradient(135deg, #6b0d2b 0%, #8a1c3a 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .go-back-btn:hover {
+            background: linear-gradient(135deg, #5a0b23 0%, #791532 100%);
             transform: translateY(-2px);
         }
 
-        .pay-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            display: none;
-        }
-
-        .loading-dialog {
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 40px;
             background: white;
             border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .loading-spinner {
@@ -318,121 +517,117 @@
             margin: 0 auto 20px;
         }
 
-        .loading-text {
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-state {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+            border: 2px solid #f44336;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .error-icon {
+            color: #f44336;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .error-message {
             color: #333;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .loading-subtext {
-            color: #666;
+            flex: 1;
             font-size: 14px;
+            font-weight: 500;
         }
 
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #323232;
+        .retry-btn {
+            background: linear-gradient(135deg, #6b0d2b 0%, #8a1c3a 100%);
             color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 1001;
-            display: none;
-            max-width: 400px;
-            animation: slideIn 0.3s ease;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .toast.success {
-            background: #27ae60;
-        }
-
-        .toast.error {
-            background: #e74c3c;
-        }
-
-        .toast.warning {
-            background: #f39c12;
+        .retry-btn:hover {
+            background: linear-gradient(135deg, #5a0b23 0%, #791532 100%);
+            transform: translateY(-1px);
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .checkout-title {
+            .track-orders-title {
                 font-size: 28px;
             }
 
-            .order-summary-card,
-            .payment-summary-card {
-                padding: 20px;
+            .delivery-content {
+                flex-direction: column;
+                gap: 16px;
             }
 
-            .section-title {
-                font-size: 18px;
+            .delivery-icon {
+                width: 50px;
+                height: 50px;
             }
 
-            .pay-btn {
-                padding: 16px;
-                font-size: 16px;
+            .delivery-icon i {
+                font-size: 20px;
             }
 
-            .item-image {
-                width: 60px;
-                height: 80px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .checkout-title {
-                font-size: 24px;
-            }
-
-            .checkout-container {
-                padding: 0 16px;
-            }
-
-            .order-item {
+            .delivery-meta {
                 flex-direction: column;
                 gap: 12px;
             }
 
-            .item-image {
-                width: 100%;
-                height: 150px;
+            .delivery-footer {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
             }
 
-            .summary-row.total .value {
-                font-size: 20px;
+            .empty-state-title {
+                font-size: 24px;
+            }
+
+            .delivery-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .status-badge {
+                align-self: flex-start;
             }
         }
 
-        /* Cart badge */
-        .cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #6b0d2b;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @media (max-width: 480px) {
+            .track-orders-title {
+                font-size: 24px;
+            }
+
+            .track-orders-container {
+                padding: 0 16px;
+            }
+
+            .delivery-card {
+                padding: 20px;
+            }
+
+            .delivery-amount {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -442,860 +637,230 @@
         <div class="topbar-top-inner">
             <!-- Empty - no content as requested -->
         </div>
+  </div>
+
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo">
+        <a href="../index.html">
+          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+        </a>
+      </div>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="../wine/all_wines.html">All Wines</a></li>
+          <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
+          <li><a href="../wine_farm/wine_farm.html">Wine Bars Near Me</a></li>
+          <li><a href="../pairings/pairings.html">Pairings</a></li>
+          <li><a href="track_order.html" class="active">Track Order</a></li>
+        </ul>
+      </nav>
+
+      <div class="top-icons">
+        <a href="../cart/cart.html" class="icon cart-icon" id="cartIcon">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+        </a>
+        <a href="../user/profile.html" class="icon" id="userIcon">
+          <i class="fas fa-user" id="userIconElement"></i>
+        </a>
+      </div>
     </div>
+  </div>
 
-    <div class="topbar-main">
-        <div class="topbar-main-inner">
-            <div class="logo">
-                <a href="../index.html">
-                    <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
-                </a>
-            </div>
+  <!-- Track Orders Section -->
+  <section class="section track-orders-section">
+    <div class="track-orders-container">
+      <div class="track-orders-header">
+        <h1 class="track-orders-title">Track Your Orders</h1>
+        <p class="track-orders-subtitle">View and track all your delivery orders</p>
+      </div>
 
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="../wine/all_wines.html">All Wines</a></li>
-                    <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
-                    <li><a href="../wine_farm/wine_farm.html">Wine Bars Near Me</a></li>
-                    <li><a href="../pairings/pairings.html">Pairings</a></li>
-                    <li><a href="../order/track_order.html">Track Order</a></li>
-                </ul>
-            </nav>
-
-            <div class="top-icons">
-                <a href="../cart/cart.html" class="icon cart-icon" id="cartIcon">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-                </a>
-                <a href="../user/profile.html" class="icon" id="userIcon">
-                    <i class="fas fa-user" id="userIconElement"></i>
-                </a>
-            </div>
+      <div id="trackOrdersContent">
+        <!-- Content will be loaded dynamically by JavaScript -->
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p style="color: #666;">Loading your orders...</p>
         </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Checkout Section -->
-    <section class="section checkout-section">
-        <div class="checkout-container">
-            <div class="checkout-header">
-                <h1 class="checkout-title">Checkout</h1>
-                <p class="checkout-subtitle">Review your order and complete payment</p>
-            </div>
-
-            <div class="checkout-layout">
-                <!-- Left Column: Order Details -->
-                <div class="order-summary-card">
-                    <!-- Payment Method -->
-                    <div class="section-header">
-                        <h2 class="section-title">PAYMENT METHOD</h2>
-                        <i class="fas fa-credit-card section-icon"></i>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-content">
-                            <i class="fas fa-payment info-icon"></i>
-                            <div class="info-text">
-                                <div class="info-label" id="paymentMethodLabel">Selected Payment Method</div>
-                                <div class="info-value" id="paymentMethodValue">Loading...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Delivery Address -->
-                    <div class="section-header">
-                        <h2 class="section-title">DELIVERY ADDRESS</h2>
-                        <i class="fas fa-location-dot section-icon"></i>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-content">
-                            <i class="fas fa-map-marker-alt info-icon"></i>
-                            <div class="info-text">
-                                <div class="info-label" id="deliveryAddressLabel">Delivery Address</div>
-                                <div class="info-value" id="deliveryAddressValue">Loading...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Order Items -->
-                    <div class="section-header">
-                        <h2 class="section-title">YOUR ORDER</h2>
-                        <i class="fas fa-shopping-cart section-icon"></i>
-                    </div>
-                    
-                    <div class="order-items" id="orderItems">
-                        <!-- Order items will be loaded here -->
-                        <div class="loading-state">
-                            <div class="loading-spinner"></div>
-                            <p>Loading order items...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Payment Summary -->
-                <div class="payment-summary-card">
-                    <h2 class="section-title">ORDER SUMMARY</h2>
-                    
-                    <div class="summary-details">
-                        <div class="summary-row">
-                            <span>Subtotal</span>
-                            <span class="value" id="subtotal">R0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Delivery Fee</span>
-                            <span class="value" id="deliveryFee">R0.00</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total</span>
-                            <span class="value" id="total">R0.00</span>
-                        </div>
-                    </div>
-
-                    <!-- Pay Now Button -->
-                    <button class="pay-btn" id="payBtn">
-                        <span>PAY NOW</span>
-                        <div class="spinner" id="paySpinner" style="display: none;"></div>
-                    </button>
-
-                    <p style="text-align: center; margin-top: 16px; color: #666; font-size: 14px;">
-                        <i class="fas fa-shield-alt"></i> Secure payment processing
-                    </p>
-                </div>
-            </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+        <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+        <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+        <div class="socials">
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
         </div>
-    </section>
+      </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-inner">
-            <div class="footer-brand">
-                <img src="../assets/categories/Logo_Botttom.png" alt="Wine & Bubbles Logo" class="footer-logo">
-                <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
-                <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
-                <div class="socials">
-                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
-
-            <div class="footer-links-grid">
-                <div class="footer-links-column">
-                    <h4 class="footer-heading">Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="../wine/all_wines.html">All Wines</a></li>
-                        <li><a href="../booking/booking.html">Bookings</a></li>
-                        <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
-                        <li><a href="../pairings/pairings.html">Pairings</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-links-column">
-                    <h4 class="footer-heading">&nbsp;</h4>
-                    <ul class="footer-links">
-                        <li><a href="../contact_us.html">Contact Us</a></li>
-                        <li><a href="/faq.html">FAQ</a></li>
-                        <li><a href="../terms_conditions.html">Terms & Conditions</a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="footer-links-grid">
+        <div class="footer-links-column">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="../wine/all_wines.html">All Wines</a></li>
+            <li><a href="../booking/booking.html">Bookings</a></li>
+            <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+            <li><a href="../pairings/pairings.html">Pairings</a></li>
+          </ul>
         </div>
-    </footer>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-dialog">
-            <div class="loading-spinner"></div>
-            <h3 class="loading-text">Processing Order...</h3>
-            <p class="loading-subtext">Please wait while we create your order</p>
+        <div class="footer-links-column">
+          <h4 class="footer-heading">&nbsp;</h4>
+          <ul class="footer-links">
+            <li><a href="../contact_us.html">Contact Us</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="../terms_conditions.html">Terms & Conditions</a></li>
+          </ul>
         </div>
+      </div>
     </div>
+  </footer>
 
-    <!-- Toast Notification -->
-    <div class="toast" id="toast"></div>
-
-    <!-- JavaScript -->
-    <script>
-    class CheckoutSystem {
-        constructor() {
-            this.payBtn = document.getElementById('payBtn');
-            this.paySpinner = document.getElementById('paySpinner');
-            this.isProcessing = false;
-            this.API_BASE_URL = '/api';
-            this.cartUtils = null;
-            this.userProfile = null;
-            this.advertItems = []; // Store advert items
-            
-            this.init();
-        }
-
-        init() {
-            this.waitForCartUtils(() => {
-                this.cartUtils = window.CartUtils;
-                this.setupAuthentication();
-                this.setupEventListeners();
-                this.updateCartBadge();
-                this.loadCheckoutData();
-                this.validateCheckout();
-                this.loadUserProfile();
-                this.loadAdvertItems(); // Load adverts from localStorage
-                console.log('✅ Checkout system initialized with CartUtils');
-                console.log('🔧 Using API URL:', this.API_BASE_URL);
-            });
-        }
-
-        loadAdvertItems() {
-            try {
-                // Get adverts from localStorage (saved when adding to cart)
-                const advertsData = localStorage.getItem('wineBubbles_adverts');
-                if (advertsData) {
-                    this.advertItems = JSON.parse(advertsData);
-                    console.log(`📢 Loaded ${this.advertItems.length} advert items from localStorage`);
-                    this.advertItems.forEach((advert, index) => {
-                        console.log(`   Advert ${index + 1}: ${advert.title} - Qty: ${advert.quantity || 1} - Price: R${advert.price}`);
-                    });
-                } else {
-                    console.log('📢 No advert items found in localStorage');
-                    this.advertItems = [];
-                }
-            } catch (error) {
-                console.error('Error loading advert items:', error);
-                this.advertItems = [];
-            }
-        }
-
-        async loadUserProfile() {
-            try {
-                const userData = localStorage.getItem('wineBubbles_user');
-                if (userData) {
-                    const user = JSON.parse(userData);
-                    const fullName = localStorage.getItem('wineBubbles_userFullName') || 
-                                    user.fullName || 
-                                    user.email.split('@')[0];
-                    const phoneNumber = localStorage.getItem('wineBubbles_userPhone') || 
-                                       user.phoneNumber || 
-                                       'Not provided';
-                    
-                    this.userProfile = {
-                        fullName: fullName,
-                        phoneNumber: phoneNumber,
-                        email: user.email,
-                        id: user.id
-                    };
-                    console.log('✅ User profile loaded:', this.userProfile);
-                } else {
-                    this.userProfile = {
-                        fullName: 'Valued Customer',
-                        phoneNumber: 'Not provided',
-                        email: 'unknown@example.com',
-                        id: null
-                    };
-                }
-            } catch (error) {
-                console.error('Error loading user profile:', error);
-                this.userProfile = {
-                    fullName: 'Valued Customer',
-                    phoneNumber: 'Not provided',
-                    email: 'unknown@example.com',
-                    id: null
-                };
-            }
-        }
-
-        waitForCartUtils(callback) {
-            const maxAttempts = 30;
-            let attempts = 0;
-            
-            const check = () => {
-                attempts++;
-                if (window.CartUtils && typeof window.CartUtils.getCart === 'function') {
-                    console.log('✅ CartUtils loaded successfully after', attempts, 'attempts');
-                    callback();
-                } else if (attempts >= maxAttempts) {
-                    console.error('❌ CartUtils failed to load after', maxAttempts, 'attempts');
-                    this.showError('Cart system failed to load. Please refresh the page.');
-                    this.loadCartUtilsDynamically(callback);
-                } else {
-                    console.log(`⏳ Waiting for CartUtils... (attempt ${attempts}/${maxAttempts})`);
-                    setTimeout(check, 300);
-                }
-            };
-            check();
-        }
-
-        loadCartUtilsDynamically(callback) {
-            console.log('🔄 Trying to load cart-utils.js dynamically');
-            const script = document.createElement('script');
-            script.src = '../cart/cart-utils.js';
-            script.onload = () => {
-                console.log('✅ Dynamically loaded cart-utils.js');
-                if (window.CartUtils && typeof window.CartUtils.getCart === 'function') {
-                    callback();
-                } else {
-                    this.showError('Cart system still not available. Please check console for errors.');
-                }
-            };
-            script.onerror = () => {
-                console.error('❌ Failed to load cart-utils.js dynamically');
-                this.showError('Failed to load cart system. Please check if cart-utils.js exists at: ../cart/cart-utils.js');
-            };
-            document.head.appendChild(script);
-        }
-
-        setupEventListeners() {
-            if (this.payBtn) {
-                this.payBtn.addEventListener('click', () => {
-                    this.processPayment();
-                });
-            }
-
-            window.addEventListener('cartUpdated', () => {
-                this.updateCartBadge();
-                this.loadOrderItems();
-                this.updateOrderSummary();
-            });
-
-            window.addEventListener('storage', (event) => {
-                if (event.key === 'wine_cart' || event.key === 'wineBubbles_adverts') {
-                    setTimeout(() => {
-                        this.loadAdvertItems();
-                        this.loadOrderItems();
-                        this.updateOrderSummary();
-                    }, 100);
-                }
-            });
-        }
-
-        loadCheckoutData() {
-            const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
-            const paymentElement = document.getElementById('paymentMethodValue');
-            if (paymentElement) {
-                paymentElement.textContent = paymentMethod || 'No payment method selected';
-            }
-
-            const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
-            const addressElement = document.getElementById('deliveryAddressValue');
-            if (addressElement) {
-                addressElement.textContent = deliveryAddress || 'No delivery address provided';
-            }
-
-            this.loadOrderItems();
-            this.updateOrderSummary();
-        }
-
-        loadOrderItems() {
-            if (!this.cartUtils) {
-                console.warn('CartUtils not available yet');
-                return;
-            }
-
-            try {
-                const cart = this.cartUtils.getCart();
-                const orderItemsContainer = document.getElementById('orderItems');
-
-                if ((!cart || !cart.items || cart.items.length === 0) && this.advertItems.length === 0) {
-                    orderItemsContainer.innerHTML = `
-                        <div class="empty-state" style="text-align: center; padding: 40px;">
-                            <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i>
-                            <h3 style="color: #666; margin-bottom: 8px;">Your cart is empty</h3>
-                            <p style="color: #999;">Add items to your cart before checkout</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                let itemsHTML = '';
-                
-                // Display wine items
-                if (cart && cart.items) {
-                    cart.items.forEach(item => {
-                        const itemTotal = item.price * item.quantity;
-                        const imageUrl = this.cartUtils.fixImageUrl(item.imageUrl);
-                        itemsHTML += `
-                            <div class="order-item">
-                                <div class="item-image">
-                                    <img src="${imageUrl}" 
-                                         alt="${item.name}"
-                                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">${item.name.charAt(0).toUpperCase()}</text></svg>';">
-                                </div>
-                                <div class="item-details">
-                                    <div class="item-name">${item.name}</div>
-                                    <div class="item-meta">
-                                        ${item.category ? `<span style="background: rgba(107, 13, 43, 0.1); color: #6b0d2b; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 8px;">${item.category}</span>` : ''}
-                                        ${item.type ? `<span>${item.type}</span>` : ''}
-                                    </div>
-                                    <div class="item-quantity-price">
-                                        <div class="item-quantity">Qty: ${item.quantity}</div>
-                                        <div class="item-price">R${itemTotal.toFixed(2)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                
-                // Display advert items
-                if (this.advertItems.length > 0) {
-                    this.advertItems.forEach(advert => {
-                        const quantity = advert.quantity || 1;
-                        const itemTotal = advert.price * quantity;
-                        const imageUrl = advert.imageUrl || '../assets/images/default_advert.jpg';
-                        itemsHTML += `
-                            <div class="order-item" style="border-left: 3px solid #03a9f4; padding-left: 10px; margin-left: 5px;">
-                                <div class="item-image">
-                                    <img src="${imageUrl}" 
-                                         alt="${advert.title}"
-                                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">📢</text></svg>';">
-                                </div>
-                                <div class="item-details">
-                                    <div class="item-name" style="color: #03a9f4;">📢 ${advert.title}</div>
-                                    <div class="item-meta">
-                                        <span style="background: rgba(3, 169, 244, 0.1); color: #03a9f4; padding: 2px 6px; border-radius: 4px; font-size: 12px;">Advert Placement</span>
-                                        ${advert.category ? `<span style="margin-left: 8px;">${advert.category}</span>` : ''}
-                                    </div>
-                                    ${advert.subtitle ? `<div style="color: #666; font-size: 12px; margin-bottom: 4px;">${advert.subtitle}</div>` : ''}
-                                    <div class="item-quantity-price">
-                                        <div class="item-quantity">Qty: ${quantity}</div>
-                                        <div class="item-price" style="color: #03a9f4;">R${itemTotal.toFixed(2)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                
-                orderItemsContainer.innerHTML = itemsHTML;
-            } catch (error) {
-                console.error('Error loading order items:', error);
-                this.showError('Failed to load cart items');
-            }
-        }
-
-        updateOrderSummary() {
-            if (!this.cartUtils) {
-                console.warn('CartUtils not available yet');
-                return;
-            }
-
-            try {
-                const cart = this.cartUtils.getCart();
-                let subtotal = cart.subtotal || 0;
-                
-                // Add advert subtotal
-                if (this.advertItems.length > 0) {
-                    const advertTotal = this.advertItems.reduce((sum, advert) => sum + (advert.price * (advert.quantity || 1)), 0);
-                    subtotal += advertTotal;
-                    console.log(`💰 Advert total: R${advertTotal.toFixed(2)}`);
-                }
-                
-                const deliveryFee = subtotal >= 500 ? 0 : 50;
-                const total = subtotal + deliveryFee;
-                
-                document.getElementById('subtotal').textContent = `R${subtotal.toFixed(2)}`;
-                document.getElementById('deliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `R${deliveryFee.toFixed(2)}`;
-                document.getElementById('total').textContent = `R${total.toFixed(2)}`;
-            } catch (error) {
-                console.error('Error updating order summary:', error);
-            }
-        }
-
-        validateCheckout() {
-            if (!this.isAuthenticated()) {
-                this.showToast('Please login to continue', 'error');
-                setTimeout(() => {
-                    window.location.href = '../login/login.html?redirect=checkout';
-                }, 2000);
-                return;
-            }
-
-            const cart = this.cartUtils ? this.cartUtils.getCart() : null;
-            const hasItems = (cart && cart.items && cart.items.length > 0) || this.advertItems.length > 0;
-            
-            if (!hasItems) {
-                this.showToast('Your cart is empty. Please add items before checkout.', 'error');
-                setTimeout(() => {
-                    window.location.href = '../cart/cart.html';
-                }, 2000);
-                return;
-            }
-
-            const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
-            if (!paymentMethod) {
-                this.showToast('Please select a payment method', 'error');
-                setTimeout(() => {
-                    window.location.href = '../payment/payment.html';
-                }, 2000);
-                return;
-            }
-
-            const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
-            const hasPhysicalItems = this.hasPhysicalItems() || this.advertItems.length > 0;
-            
-            if (hasPhysicalItems && !deliveryAddress) {
-                this.showToast('Please add a delivery address', 'error');
-                setTimeout(() => {
-                    window.location.href = '../delivery/delivery.html';
-                }, 2000);
-                return;
-            }
-        }
-
-        hasPhysicalItems() {
-            if (!this.cartUtils) return false;
-            try {
-                const cart = this.cartUtils.getCart();
-                return cart && cart.items && cart.items.some(item => item.type === 'wine' || item.type === 'addon');
-            } catch (error) {
-                return false;
-            }
-        }
+  <!-- Profile Authentication Script - ADDED TO MATCH HOMEPAGE -->
+  <script>
+    // Profile authentication logic for Track Order page - MATCHES HOMEPAGE
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📦 Track Order page loaded - checking authentication');
         
-        async processPayment() {
-            if (this.isProcessing) return;
-            
-            if (!this.cartUtils) {
-                this.showToast('Cart system not available', 'error');
-                return;
-            }
-
-            this.validateCheckout();
-            
-            const userData = localStorage.getItem('wineBubbles_user');
-            if (!userData) {
-                this.showToast('Please login to continue', 'error');
-                return;
-            }
-
-            this.isProcessing = true;
-            this.showLoading(true);
-            this.payBtn.disabled = true;
-            this.paySpinner.style.display = 'block';
-            this.payBtn.querySelector('span').textContent = 'PROCESSING...';
-
-            try {
-                const user = JSON.parse(userData);
-                const cart = this.cartUtils.getCart();
-                const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
-                const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
-                
-                const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
-                const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
-                
-                console.log('📧 ORDER DETAILS:');
-                console.log('   Customer:', userFullName);
-                console.log('   Email:', user.email);
-                console.log('   Phone:', userPhoneNumber);
-                console.log('   Adverts in cart:', this.advertItems.length);
-                console.log('   Wine items:', cart.items?.length || 0);
-
-                // Prepare wine items
-                const wineItems = (cart.items || []).filter(item => item.type === 'wine').map(item => ({
-                    id: parseInt(item.id) || 0,
-                    name: item.name || '',
-                    price: item.price || 0,
-                    quantity: item.quantity || 1,
-                    type: item.type || 'wine',
-                    category: item.category || '',
-                    description: item.description || '',
-                    imageUrl: item.imageUrl || '',
-                    isCase: item.isCase || false,
-                    itemType: 'wine'
-                }));
-
-                // Prepare add-on items
-                const addOns = (cart.items || []).filter(item => item.type === 'addon').map(item => ({
-                    id: parseInt(item.id) || 0,
-                    name: item.name || '',
-                    price: item.price || 0,
-                    category: item.category || '',
-                    description: item.description || '',
-                    imageUrl: item.imageUrl || ''
-                }));
-
-                // Prepare advert items (from localStorage)
-                const adverts = this.advertItems.map(advert => ({
-                    id: advert.id || String(advert._id || Math.random()),
-                    title: advert.title || advert.name || 'Advert Placement',
-                    subtitle: advert.subtitle || '',
-                    price: advert.price || 0,
-                    type: advert.type || 'advert',
-                    category: advert.category || 'marketing',
-                    imageUrl: advert.imageUrl || '',
-                    targetUrl: advert.targetUrl || '',
-                    quantity: advert.quantity || 1,
-                    itemType: 'advert'
-                }));
-
-                console.log('📦 Adverts prepared for delivery:', adverts.length);
-                adverts.forEach((advert, idx) => {
-                    console.log(`   Advert ${idx + 1}: ${advert.title} - Qty: ${advert.quantity} - Price: R${advert.price}`);
-                });
-
-                // Calculate total amount including adverts
-                const subtotal = (cart.subtotal || 0) + adverts.reduce((sum, a) => sum + (a.price * a.quantity), 0);
-                const deliveryFee = subtotal >= 500 ? 0 : 50;
-                const totalAmount = subtotal + deliveryFee;
-
-                const deliveryData = {
-                    userId: user.id || user.email,
-                    userEmail: user.email,
-                    address: deliveryAddress,
-                    totalAmount: totalAmount,
-                    paymentMethod: paymentMethod,
-                    items: wineItems,
-                    addOns: addOns,
-                    adverts: adverts  // Include adverts in delivery data
-                };
-
-                console.log('📦 Sending delivery to backend with adverts:', adverts.length);
-                console.log('📦 Delivery data:', JSON.stringify(deliveryData, null, 2));
-
-                const response = await this.createDelivery(deliveryData);
-
-                if (response.success) {
-                    console.log('✅ Delivery created successfully with adverts!');
-                    
-                    const emailData = {
-                        delivery: {
-                            _id: response.data._id,
-                            userId: response.data.userId,
-                            userEmail: response.data.userEmail,
-                            address: response.data.address,
-                            totalAmount: response.data.totalAmount,
-                            paymentMethod: response.data.paymentMethod,
-                            status: response.data.status,
-                            items: response.data.items,
-                            addOns: response.data.addOns,
-                            adverts: response.data.adverts || adverts,
-                            createdAt: response.data.createdAt
-                        },
-                        userEmail: user.email,
-                        userFullName: userFullName,
-                        userPhoneNumber: userPhoneNumber,
-                        adminEmail: 'winebubblesnow@gmail.com'
-                    };
-
-                    console.log('📧 Sending confirmation email with adverts...');
-                    let emailSent = false;
-                    
-                    const emailEndpoints = [
-                        `${this.API_BASE_URL}/email/send-delivery-confirmation`,
-                        `${this.API_BASE_URL}/email/send-delivery-confirmation-email`,
-                        `${this.API_BASE_URL}/email/delivery-confirmation`
-                    ];
-                    
-                    for (const endpoint of emailEndpoints) {
-                        try {
-                            const emailResponse = await fetch(endpoint, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json',
-                                    'Authorization': `Bearer ${localStorage.getItem('wineBubbles_token')}`
-                                },
-                                body: JSON.stringify(emailData)
-                            });
-                            
-                            const emailResult = await emailResponse.json();
-                            if (emailResponse.ok && emailResult.success) {
-                                console.log(`✅ Email sent via ${endpoint}`);
-                                emailSent = true;
-                                break;
-                            }
-                        } catch (endpointError) {
-                            console.warn(`⚠️ Email endpoint ${endpoint} failed:`, endpointError.message);
-                        }
-                    }
-                    
-                    if (emailSent) {
-                        this.showToast(`Order placed! Confirmation email sent to ${user.email}`, 'success');
-                    } else {
-                        this.showToast('Order placed successfully! (Email notification pending)', 'success');
-                    }
-                    
-                    // Save order locally
-                    this.saveOrderLocal({
-                        ...deliveryData,
-                        id: response.data._id || 'ORD-' + Date.now(),
-                        status: 'Order received',
-                        createdAt: new Date().toISOString(),
-                        userFullName: userFullName,
-                        userPhoneNumber: userPhoneNumber
-                    });
-
-                    // Clear cart and adverts
-                    this.cartUtils.clearCart();
-                    localStorage.removeItem('wineBubbles_adverts');
-                    localStorage.removeItem('wineBubbles_deliveryAddress');
-                    localStorage.removeItem('wineBubbles_deliveryAddressDetails');
-                    localStorage.removeItem('wineBubbles_paymentMethod');
-
-                    setTimeout(() => {
-                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
-                    }, 2000);
-                    
-                } else {
-                    throw new Error(response.message || 'Failed to create delivery');
-                }
-
-            } catch (error) {
-                console.error('Error processing payment:', error);
-                this.showToast(`Failed to process order: ${error.message}`, 'error');
-                this.resetProcessingState();
-            }
-        }
+        // Configuration - USE PROXY SERVER
+        const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
         
-        async createDelivery(deliveryData) {
-            try {
-                const token = localStorage.getItem('wineBubbles_token');
-                console.log('📡 Sending POST to:', `${this.API_BASE_URL}/deliveries`);
-                console.log('📡 With adverts count:', deliveryData.adverts?.length || 0);
-                
-                const response = await fetch(`${this.API_BASE_URL}/deliveries`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': token ? `Bearer ${token}` : ''
-                    },
-                    body: JSON.stringify(deliveryData)
-                });
-
-                const data = await response.json();
-                console.log('📡 Response status:', response.status);
-                console.log('📡 Response data:', data);
-                
-                if (!response.ok) {
-                    throw new Error(data.message || `HTTP ${response.status}`);
-                }
-                return data;
-            } catch (error) {
-                console.error('Error creating delivery:', error);
-                return {
-                    success: true,
-                    data: {
-                        _id: 'local-' + Date.now(),
-                        ...deliveryData,
-                        status: 'Order received',
-                        createdAt: new Date().toISOString()
-                    }
-                };
-            }
-        }
-
-        saveOrderLocal(order) {
-            const existingOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
-            const orderToSave = {
-                id: order.id || order._id || 'ORD-' + Date.now(),
-                _id: order._id || order.id,
-                total: order.total || order.totalAmount || 0,
-                totalAmount: order.totalAmount || order.total || 0,
-                paymentMethod: order.paymentMethod || 'Not specified',
-                createdAt: order.createdAt || new Date().toISOString(),
-                items: order.items || [],
-                addOns: order.addOns || [],
-                adverts: order.adverts || [],
-                address: order.address,
-                userId: order.userId,
-                userEmail: order.userEmail,
-                userFullName: order.userFullName,
-                userPhoneNumber: order.userPhoneNumber,
-                status: order.status || 'Order received'
-            };
-            existingOrders.push(orderToSave);
-            localStorage.setItem('wineBubbles_orders', JSON.stringify(existingOrders));
-            console.log('Order saved locally with', orderToSave.adverts?.length || 0, 'adverts');
-        }
-        
-        resetProcessingState() {
-            this.isProcessing = false;
-            this.showLoading(false);
-            this.payBtn.disabled = false;
-            this.paySpinner.style.display = 'none';
-            this.payBtn.querySelector('span').textContent = 'PAY NOW';
-        }
-
-        updateCartBadge() {
-            if (this.cartUtils) {
-                this.cartUtils.updateCartBadge();
-            }
-        }
-
-        setupAuthentication() {
-            const token = localStorage.getItem('wineBubbles_token');
-            const userData = localStorage.getItem('wineBubbles_user');
-            const isValidToken = this.isAuthenticated();
-            
-            const userIcon = document.getElementById('userIcon');
-            const userIconElement = document.getElementById('userIconElement');
-            
-            if (isValidToken && userData) {
-                try {
-                    const user = JSON.parse(userData);
-                    if (userIconElement) {
-                        userIconElement.className = 'fas fa-user-check';
-                        userIconElement.style.color = '#6b0d2b';
-                    }
-                    if (userIcon) {
-                        userIcon.href = '#';
-                        userIcon.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            this.toggleUserDropdown(user);
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error parsing user data:', error);
-                    this.resetUserIcon();
-                }
-            } else {
-                this.resetUserIcon();
-            }
-        }
-
-        isAuthenticated() {
+        // Token validation function
+        function isTokenValid() {
             const token = localStorage.getItem('wineBubbles_token');
             const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
+            
             if (!token || !timestamp) return false;
+            
             const tokenAge = Date.now() - parseInt(timestamp);
-            return tokenAge < (7 * 24 * 60 * 60 * 1000);
+            const sevenDays = 7 * 24 * 60 * 60 * 1000;
+            
+            return tokenAge < sevenDays;
         }
-
-        resetUserIcon() {
-            const userIcon = document.getElementById('userIcon');
-            const userIconElement = document.getElementById('userIconElement');
+        
+        // Clear user session function
+        function clearUserSession() {
+            localStorage.removeItem('wineBubbles_token');
+            localStorage.removeItem('wineBubbles_token_timestamp');
+            localStorage.removeItem('wineBubbles_user');
+            localStorage.removeItem('wineBubbles_isAdmin');
+            localStorage.removeItem('wineBubbles_isDriver');
+            localStorage.removeItem('wineBubbles_userFullName');
+            localStorage.removeItem('wineBubbles_userEmail');
+            localStorage.removeItem('wineBubbles_userPhone');
+            localStorage.removeItem('wineBubbles_userImage');
+            localStorage.removeItem('wineBubbles_userVerified');
+            localStorage.removeItem('wineBubbles_userCreated');
+        }
+        
+        // Check if user is logged in
+        const token = localStorage.getItem('wineBubbles_token');
+        const userData = localStorage.getItem('wineBubbles_user');
+        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+        const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
+        const isValidToken = isTokenValid();
+        
+        // Get user icon elements
+        const userIcon = document.getElementById('userIcon');
+        const userIconElement = document.getElementById('userIconElement');
+        
+        if (isValidToken && userData) {
+            console.log('✅ User is logged in on Track Order page');
+            
+            try {
+                const user = JSON.parse(userData);
+                
+                // Update user icon to show logged-in state (profile icon)
+                if (userIconElement) {
+                    userIconElement.className = 'fas fa-user-check';
+                    userIconElement.style.color = '#6b0d2b';
+                }
+                
+                // Update user icon link
+                if (userIcon) {
+                    userIcon.href = '#';
+                    userIcon.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleUserDropdown();
+                    });
+                }
+                
+                // Create appropriate dropdown based on user type
+                createUserDropdown(user, isAdmin, isDriver);
+                
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                clearUserSession();
+                resetUserIcon();
+            }
+            
+        } else {
+            console.log('❌ User is not logged in or token expired on Track Order page');
+            clearUserSession();
+            resetUserIcon();
+        }
+        
+        // Reset user icon to login state (sign-in icon)
+        function resetUserIcon() {
             if (userIcon) {
                 userIcon.href = '../login/login.html';
                 if (userIconElement) {
+                    // Change to login/sign-in icon
                     userIconElement.className = 'fas fa-sign-in-alt';
                     userIconElement.style.color = '#6b0d2b';
                 }
             }
         }
-
-        toggleUserDropdown(user) {
+        
+        // Toggle user dropdown
+        function toggleUserDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
             if (dropdown) {
                 dropdown.classList.toggle('show');
-            } else {
-                this.createUserDropdown(user);
-                document.querySelector('.user-dropdown').classList.add('show');
             }
         }
-
-        createUserDropdown(user) {
+        
+        // Create user dropdown menu
+        function createUserDropdown(user, isAdmin, isDriver) {
+            // Remove existing dropdown if any
             const existingDropdown = document.querySelector('.user-dropdown');
-            if (existingDropdown) existingDropdown.remove();
+            if (existingDropdown) {
+                existingDropdown.remove();
+            }
             
+            // Create dropdown container
             const dropdown = document.createElement('div');
             dropdown.className = 'user-dropdown';
             
+            // User info
             const userInfo = document.createElement('div');
             userInfo.className = 'user-dropdown-info';
             
             const userName = document.createElement('div');
             userName.className = 'user-dropdown-name';
             userName.textContent = user.fullName || user.email.split('@')[0];
+            
+            // Add badge for admin or driver
+            if (isAdmin) {
+                const adminBadge = document.createElement('span');
+                adminBadge.className = 'admin-badge';
+                adminBadge.textContent = 'ADMIN';
+                userName.appendChild(adminBadge);
+            } else if (isDriver) {
+                const driverBadge = document.createElement('span');
+                driverBadge.className = 'driver-badge';
+                driverBadge.textContent = 'DRIVER';
+                userName.appendChild(driverBadge);
+            }
             
             const userEmail = document.createElement('div');
             userEmail.className = 'user-dropdown-email';
@@ -1305,73 +870,528 @@
             userInfo.appendChild(userEmail);
             dropdown.appendChild(userInfo);
             
-            const items = [
-                { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' },
-                { text: 'My Orders', icon: 'fas fa-shopping-bag', href: '../user/orders.html' },
-                { text: 'My Bookings', icon: 'fas fa-calendar', href: '../user/bookings.html' }
-            ];
+            // Dropdown items based on user type
+            const items = [];
             
+            if (isAdmin) {
+                // Admin items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else if (isDriver) {
+                // Driver items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            } else {
+                // Regular user items - Only Profile, Logout, Delete Account
+                items.push(
+                    { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
+                );
+            }
+            
+            // Add items to dropdown
             items.forEach(item => {
                 const link = document.createElement('a');
                 link.href = item.href;
                 link.className = 'user-dropdown-link';
-                link.innerHTML = `<i class="${item.icon}"></i><span>${item.text}</span>`;
+                link.innerHTML = `
+                    <i class="${item.icon}"></i>
+                    <span>${item.text}</span>
+                `;
+                link.addEventListener('mouseenter', () => {
+                    link.style.color = '#6b0d2b';
+                });
+                link.addEventListener('mouseleave', () => {
+                    link.style.color = '#333';
+                });
                 dropdown.appendChild(link);
             });
             
+            // Logout button
             const logoutButton = document.createElement('button');
             logoutButton.className = 'user-dropdown-logout';
             logoutButton.textContent = 'Logout';
-            logoutButton.addEventListener('click', () => {
-                localStorage.clear();
-                this.showToast('Logged out successfully', 'success');
-                setTimeout(() => window.location.href = '../index.html', 1500);
+            logoutButton.addEventListener('click', function() {
+                clearUserSession();
+                window.location.href = '../index.html';
             });
+            
             dropdown.appendChild(logoutButton);
             document.body.appendChild(dropdown);
             
-            document.addEventListener('click', (event) => {
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
                 const dropdown = document.querySelector('.user-dropdown');
-                const userIcon = document.getElementById('userIcon');
-                if (dropdown && !dropdown.contains(event.target) && userIcon && !userIcon.contains(event.target)) {
+                if (dropdown && !dropdown.contains(event.target) && 
+                    userIcon && !userIcon.contains(event.target)) {
                     dropdown.classList.remove('show');
                 }
             });
+            
+            // Close dropdown on escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const dropdown = document.querySelector('.user-dropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            });
         }
+        
+        console.log('✅ Track Order page authentication initialized');
+    });
+  </script>
 
-        showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            if (!toast) return;
-            toast.textContent = message;
-            toast.className = `toast ${type}`;
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 5000);
-        }
+  <!-- JavaScript -->
+  <script>
+  class TrackOrderSystem {
+    constructor() {
+        this.API_BASE_URL = '/api';  // USE PROXY SERVER - works on both localhost and production
+        this.contentElement = document.getElementById('trackOrdersContent');
+        this.isLoading = false;
+        this.deliveries = [];
+        this.userId = null;
+        this.token = null;
+        
+        this.init();
+    }
 
-        showError(message) {
-            const content = document.getElementById('orderItems');
-            if (content) {
-                content.innerHTML = `<div class="empty-state" style="text-align: center; padding: 40px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 16px;"></i>
-                    <h3 style="color: #666; margin-bottom: 8px;">Error Loading Cart</h3>
-                    <p style="color: #999;">${message}</p>
-                    <button onclick="window.location.reload()" style="background: #6b0d2b; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-top: 16px;">
-                        <i class="fas fa-redo"></i> Refresh Page
-                    </button>
-                </div>`;
+    init() {
+        this.checkAuthentication();
+        this.setupEventListeners();
+        this.updateCartBadge();
+    }
+
+    checkAuthentication() {
+        const userData = localStorage.getItem('wineBubbles_user');
+        this.token = localStorage.getItem('wineBubbles_token');
+        
+        if (userData && this.token) {
+            try {
+                const user = JSON.parse(userData);
+                this.userId = user.id || user.email;
+                console.log('✅ User authenticated:', this.userId);
+                
+                // Load deliveries after a short delay
+                setTimeout(() => this.loadDeliveries(), 100);
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                this.showAuthRequired();
             }
-        }
-
-        showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) overlay.style.display = show ? 'flex' : 'none';
+        } else {
+            console.log('❌ User not authenticated');
+            this.showAuthRequired();
         }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('💰 Checkout page loaded');
-        window.checkoutSystem = new CheckoutSystem();
-    });
-    </script>
+    setupEventListeners() {
+        // Listen for cart updates
+        window.addEventListener('cartUpdated', () => {
+            this.updateCartBadge();
+        });
+    }
+
+    async loadDeliveries() {
+        if (this.isLoading) return;
+        
+        if (!this.userId || !this.token) {
+            this.showAuthRequired();
+            return;
+        }
+
+        this.isLoading = true;
+        this.showLoading();
+
+        try {
+            console.log('📦 Fetching deliveries for user:', this.userId);
+            console.log('🔧 Using API URL:', this.API_BASE_URL);
+            
+            const response = await fetch(`${this.API_BASE_URL}/deliveries/user/${this.userId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.status === 401) {
+                // Token expired or invalid
+                console.error('❌ Authentication failed - token invalid');
+                this.showAuthRequired();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('✅ API Response:', result);
+            
+            // Check if response has success flag and data array
+            if (result.success && Array.isArray(result.data)) {
+                this.deliveries = result.data;
+            } 
+            // Try direct array
+            else if (Array.isArray(result)) {
+                this.deliveries = result;
+            }
+            // Try different response format
+            else if (result.data && Array.isArray(result.data)) {
+                this.deliveries = result.data;
+            }
+            // Try deliveries property
+            else if (result.deliveries && Array.isArray(result.deliveries)) {
+                this.deliveries = result.deliveries;
+            }
+            else {
+                console.warn('⚠️ Unexpected response format:', result);
+                this.deliveries = [];
+            }
+            
+            console.log(`✅ Processed ${this.deliveries.length} deliveries`);
+            
+            if (this.deliveries.length === 0) {
+                this.showEmptyState();
+            } else {
+                this.renderDeliveries(this.deliveries);
+            }
+
+        } catch (error) {
+            console.error('❌ Error loading deliveries:', error);
+            this.showError(`Failed to load orders: ${error.message}`);
+            
+            // Debug: try to get deliveries from localStorage as fallback
+            this.tryLocalStorageFallback();
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    // Fallback to localStorage if API fails
+    tryLocalStorageFallback() {
+        try {
+            const savedOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
+            console.log(`🔄 Trying localStorage fallback: ${savedOrders.length} orders found`);
+            
+            if (savedOrders.length > 0) {
+                this.deliveries = savedOrders.map(order => ({
+                    _id: order.id || order._id || `local-${Date.now()}`,
+                    address: order.address || 'Address not saved',
+                    status: order.status || 'Order received',
+                    paymentMethod: order.paymentMethod || 'Not specified',
+                    totalAmount: order.total || order.totalAmount || 0,
+                    totalWineQuantity: (order.items?.length || 0) + (order.addOns?.length || 0),
+                    createdAt: order.createdAt || new Date().toISOString(),
+                    items: order.items || [],
+                    addOns: order.addOns || [],
+                    adverts: order.adverts || []
+                }));
+                
+                console.log(`✅ Using ${this.deliveries.length} orders from localStorage`);
+                this.renderDeliveries(this.deliveries);
+            } else {
+                this.showEmptyState();
+            }
+        } catch (error) {
+            console.error('❌ localStorage fallback failed:', error);
+            this.showEmptyState();
+        }
+    }
+
+    getStatusColor(status) {
+        const statusLower = status.toLowerCase();
+        
+        switch (statusLower) {
+            case 'order received': return 'status-received';
+            case 'processing': return 'status-processing';
+            case 'out for delivery': return 'status-delivery';
+            case 'delivered': return 'status-delivered';
+            case 'cancelled': return 'status-cancelled';
+            default: return 'status-processing';
+        }
+    }
+
+    getStatusIcon(status) {
+        const statusLower = status.toLowerCase();
+        
+        switch (statusLower) {
+            case 'order received': return 'fas fa-inventory-alt';
+            case 'processing': return 'fas fa-cog';
+            case 'out for delivery': return 'fas fa-shipping-fast';
+            case 'delivered': return 'fas fa-check-circle';
+            case 'cancelled': return 'fas fa-times-circle';
+            default: return 'fas fa-question-circle';
+        }
+    }
+
+    getStatusText(status) {
+        const statusLower = status.toLowerCase();
+        const isDelivered = statusLower === 'delivered';
+        const isCancelled = statusLower === 'cancelled';
+        
+        return isDelivered ? 'status-text-completed' : 
+               isCancelled ? 'status-text-cancelled' : 'status-text-progress';
+    }
+
+    getStatusDisplayText(status) {
+        const statusLower = status.toLowerCase();
+        switch (statusLower) {
+            case 'order received': return 'In Progress';
+            case 'processing': return 'In Progress';
+            case 'out for delivery': return 'In Progress';
+            case 'delivered': return 'Completed';
+            case 'cancelled': return 'Cancelled';
+            default: return 'In Progress';
+        }
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    }
+
+    renderDeliveries(deliveries) {
+        if (!this.contentElement) return;
+
+        const deliveriesHTML = deliveries.map(delivery => {
+            const statusColor = this.getStatusColor(delivery.status);
+            const statusIcon = this.getStatusIcon(delivery.status);
+            const statusTextClass = this.getStatusText(delivery.status);
+            const statusDisplayText = this.getStatusDisplayText(delivery.status);
+            
+            // Calculate total items including add-ons and adverts
+            const wineCount = (delivery.items?.length || 0);
+            const addOnCount = (delivery.addOns?.length || 0);
+            const advertCount = (delivery.adverts?.length || 0);
+            const totalItems = wineCount + addOnCount + advertCount;
+            
+            // Calculate wine bottle count (for cases, each case counts as 6 bottles)
+            let wineBottleCount = 0;
+            if (delivery.items && delivery.items.length > 0) {
+                wineBottleCount = delivery.items.reduce((sum, item) => {
+                    const quantity = item.quantity || 1;
+                    const isCase = item.isCase === true;
+                    if (isCase) {
+                        return sum + (quantity * 6);
+                    }
+                    return sum + quantity;
+                }, 0);
+            }
+            
+            // Calculate advert count
+            let advertTotalCount = 0;
+            if (delivery.adverts && delivery.adverts.length > 0) {
+                advertTotalCount = delivery.adverts.reduce((sum, advert) => {
+                    return sum + (advert.quantity || 1);
+                }, 0);
+            }
+            
+            // Extract the delivery ID
+            const deliveryId = delivery._id || delivery.id;
+            console.log('Delivery ID for link:', deliveryId);
+
+            return `
+                <div class="delivery-card" data-delivery-id="${deliveryId}">
+                    <div class="delivery-header">
+                        <div class="status-badge ${statusColor}">
+                            <i class="${statusIcon}"></i>
+                            <span>${delivery.status.toUpperCase()}</span>
+                        </div>
+                        <div class="delivery-date">
+                            ${this.formatDate(delivery.createdAt)}
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-content">
+                        <div class="delivery-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="delivery-details">
+                            <div class="delivery-address-title">DELIVERY ADDRESS</div>
+                            <div class="delivery-address">${delivery.address || 'No address provided'}</div>
+                            
+                            <div class="delivery-meta">
+                                <div class="meta-item">
+                                    <div class="meta-label">Payment Method</div>
+                                    <div class="meta-value">${delivery.paymentMethod || 'Not specified'}</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Total Items</div>
+                                    <div class="meta-value">${totalItems} item${totalItems !== 1 ? 's' : ''}</div>
+                                </div>
+                                ${wineCount > 0 ? `
+                                <div class="meta-item">
+                                    <div class="meta-label">Wine</div>
+                                    <div class="meta-value">${wineBottleCount} bottle${wineBottleCount !== 1 ? 's' : ''}</div>
+                                </div>
+                                ` : ''}
+                                ${addOnCount > 0 ? `
+                                <div class="meta-item">
+                                    <div class="meta-label">Add-ons</div>
+                                    <div class="meta-value">${addOnCount}</div>
+                                </div>
+                                ` : ''}
+                                ${advertCount > 0 ? `
+                                <div class="meta-item">
+                                    <div class="meta-label">Adverts</div>
+                                    <div class="meta-value">${advertTotalCount} placement${advertTotalCount !== 1 ? 's' : ''}</div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-footer">
+                        <div class="delivery-amount">
+                            <span class="delivery-amount-currency">R</span>
+                            ${delivery.totalAmount ? delivery.totalAmount.toFixed(2) : '0.00'}
+                        </div>
+                        <div class="delivery-status-text ${statusTextClass}">
+                            ${statusDisplayText}
+                        </div>
+                    </div>
+                    
+                    <button class="view-details-btn" data-delivery-id="${deliveryId}">
+                        <i class="fas fa-eye"></i>
+                        View Order Details
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        this.contentElement.innerHTML = deliveriesHTML;
+        
+        // Add event listeners after rendering
+        this.setupCardClickListeners();
+    }
+
+    setupCardClickListeners() {
+        // Add click event to view details buttons
+        const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+        viewDetailsButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click from firing
+                const deliveryId = button.getAttribute('data-delivery-id');
+                console.log('Button clicked for delivery:', deliveryId);
+                this.viewDeliveryDetails(deliveryId);
+            });
+        });
+
+        // Add click event to entire delivery cards
+        const deliveryCards = document.querySelectorAll('.delivery-card');
+        deliveryCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Only trigger if not clicking on the button
+                if (!e.target.closest('.view-details-btn')) {
+                    const deliveryId = card.getAttribute('data-delivery-id');
+                    console.log('Card clicked for delivery:', deliveryId);
+                    this.viewDeliveryDetails(deliveryId);
+                }
+            });
+        });
+    }
+    
+    viewDeliveryDetails(deliveryId) {
+        console.log('🔍 Viewing delivery details:', deliveryId);
+        window.location.href = `order_detail.html?id=${deliveryId}`;
+    }
+    
+    showAuthRequired() {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="auth-required-state">
+                <div class="auth-required-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="auth-required-title">Authentication Required</h2>
+                <p class="auth-required-text">Please log in to view your delivery orders and track their status.</p>
+                <button class="go-back-btn" onclick="window.location.href='../login/login.html'">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Go to Login
+                </button>
+            </div>
+        `;
+    }
+
+    showEmptyState() {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h2 class="empty-state-title">No Orders Yet</h2>
+                <p class="empty-state-text">Your order history will appear here once you place your first order.</p>
+                <p class="empty-state-subtext">Start exploring our collection to begin your wine journey!</p>
+                <button class="start-shopping-btn" onclick="window.location.href='../index.html'">
+                    <i class="fas fa-wine-bottle"></i>
+                    Start Shopping
+                </button>
+            </div>
+        `;
+    }
+
+    showLoading() {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p style="color: #666;">Loading your orders...</p>
+            </div>
+        `;
+    }
+
+    showError(message) {
+        if (!this.contentElement) return;
+
+        this.contentElement.innerHTML = `
+            <div class="error-state">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="error-message">${message}</div>
+                <button class="retry-btn" onclick="trackOrderSystem.loadDeliveries()">
+                    <i class="fas fa-redo"></i>
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+
+    updateCartBadge() {
+        // Use your existing CartUtils if available
+        if (window.CartUtils && typeof window.CartUtils.updateCartBadge === 'function') {
+            window.CartUtils.updateCartBadge();
+        } else {
+            // Fallback to manual badge update
+            const cart = JSON.parse(localStorage.getItem('wine_cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            const cartBadges = document.querySelectorAll('.cart-badge');
+            cartBadges.forEach(badge => {
+                badge.textContent = totalItems;
+                badge.style.display = totalItems > 0 ? 'flex' : 'none';
+            });
+        }
+    }
+  }
+
+  // Initialize the track order system
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('📦 Track Orders page loaded');
+    window.trackOrderSystem = new TrackOrderSystem();
+  });
+  </script>
 </body>
 </html>
