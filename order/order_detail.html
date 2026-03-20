@@ -273,7 +273,7 @@
             font-size: 16px;
         }
 
-        /* Add-ons Section - Now using same card style as wine items */
+        /* Add-ons Section */
         .addons-list {
             display: flex;
             flex-direction: column;
@@ -356,7 +356,103 @@
             font-weight: 600;
             color: #6b0d2b;
             font-size: 16px;
-            text-align: right;
+            margin-top: 8px;
+        }
+
+        /* Adverts Section */
+        .adverts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .advert-card {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(3, 169, 244, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .advert-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #03a9f4;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .advert-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(3, 169, 244, 0.15);
+        }
+
+        .advert-image {
+            width: 80px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .advert-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .advert-image .no-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdef5 100%);
+            color: #03a9f4;
+            font-size: 32px;
+        }
+
+        .advert-details {
+            flex: 1;
+        }
+
+        .advert-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #03a9f4;
+            margin-bottom: 4px;
+        }
+
+        .advert-subtitle {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .advert-category {
+            display: inline-block;
+            color: #666;
+            font-size: 11px;
+            margin-bottom: 8px;
+            background: rgba(3, 169, 244, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .advert-price {
+            font-weight: 600;
+            color: #03a9f4;
+            font-size: 16px;
             margin-top: 8px;
         }
 
@@ -491,11 +587,11 @@
                 grid-template-columns: 1fr;
             }
 
-            .item-card, .addon-card {
+            .item-card, .addon-card, .advert-card {
                 flex-direction: column;
             }
 
-            .item-image, .addon-image {
+            .item-image, .addon-image, .advert-image {
                 width: 100%;
                 height: 150px;
             }
@@ -803,7 +899,6 @@
         getOrderFromLocalStorage(orderId) {
             try {
                 const savedOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
-                
                 return savedOrders.find(order => 
                     order.id === orderId || 
                     order._id === orderId || 
@@ -818,7 +913,6 @@
 
         getStatusColor(status) {
             const statusLower = status.toLowerCase();
-            
             switch (statusLower) {
                 case 'order received': return 'status-received';
                 case 'processing': return 'status-processing';
@@ -831,7 +925,6 @@
 
         getStatusIcon(status) {
             const statusLower = status.toLowerCase();
-            
             switch (statusLower) {
                 case 'order received': return 'fas fa-inventory-alt';
                 case 'processing': return 'fas fa-cog';
@@ -855,18 +948,9 @@
         }
 
         fixImageUrl(imageUrl) {
-            if (!imageUrl) {
-                return null;
-            }
-            
-            if (imageUrl.startsWith('assets/')) {
-                return '../' + imageUrl;
-            }
-            
-            if (imageUrl.startsWith('../assets/') || imageUrl.startsWith('http') || imageUrl.startsWith('/')) {
-                return imageUrl;
-            }
-            
+            if (!imageUrl) return null;
+            if (imageUrl.startsWith('assets/')) return '../' + imageUrl;
+            if (imageUrl.startsWith('../assets/') || imageUrl.startsWith('http') || imageUrl.startsWith('/')) return imageUrl;
             return '../assets/' + imageUrl;
         }
 
@@ -881,8 +965,13 @@
             const paymentMethod = order.paymentMethod || 'Not specified';
             const status = order.status || 'Order received';
             
-            const totalItems = (order.items?.length || 0) + (order.addOns?.length || 0);
+            // Calculate total items including add-ons and adverts
+            const wineItemsCount = order.items?.length || 0;
+            const addOnsCount = order.addOns?.length || 0;
+            const advertsCount = order.adverts?.length || 0;
+            const totalItems = wineItemsCount + addOnsCount + advertsCount;
             
+            // Calculate subtotals
             let itemsSubtotal = 0;
             if (order.items) {
                 order.items.forEach(item => {
@@ -893,11 +982,18 @@
             let addonsSubtotal = 0;
             if (order.addOns) {
                 order.addOns.forEach(addon => {
-                    addonsSubtotal += addon.price || 0;
+                    addonsSubtotal += (addon.price || 0);
                 });
             }
             
-            const subtotal = itemsSubtotal + addonsSubtotal;
+            let advertsSubtotal = 0;
+            if (order.adverts) {
+                order.adverts.forEach(advert => {
+                    advertsSubtotal += (advert.price || 0) * (advert.quantity || 1);
+                });
+            }
+            
+            const subtotal = itemsSubtotal + addonsSubtotal + advertsSubtotal;
             const deliveryFee = order.totalAmount && subtotal ? order.totalAmount - subtotal : 0;
             const total = order.totalAmount || subtotal + deliveryFee;
 
@@ -1004,6 +1100,37 @@
                         </div>
                     ` : ''}
 
+                    ${order.adverts && order.adverts.length > 0 ? `
+                        <div class="items-section">
+                            <h2 class="section-title">Advert Placements</h2>
+                            <div class="adverts-list">
+                                ${order.adverts.map(advert => {
+                                    const imageUrl = this.fixImageUrl(advert.imageUrl);
+                                    const itemTotal = (advert.price || 0) * (advert.quantity || 1);
+                                    
+                                    return `
+                                        <div class="advert-card">
+                                            <div class="advert-image">
+                                                ${imageUrl ? 
+                                                    `<img src="${imageUrl}" 
+                                                         alt="${advert.title}"
+                                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'no-image\'><i class=\'fas fa-ad\'></i></div>';">` :
+                                                    `<div class="no-image"><i class="fas fa-ad"></i></div>`
+                                                }
+                                            </div>
+                                            <div class="advert-details">
+                                                <div class="advert-name">📢 ${advert.title}</div>
+                                                ${advert.subtitle ? `<div class="advert-subtitle">${advert.subtitle}</div>` : ''}
+                                                ${advert.category ? `<div class="advert-category">${advert.category}</div>` : ''}
+                                                <div class="advert-price">R${itemTotal.toFixed(2)} (${advert.quantity || 1} placement${(advert.quantity || 1) > 1 ? 's' : ''})</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
                     <div class="order-summary">
                         <h2 class="section-title" style="color: #e6c79c; margin-bottom: 20px;">Order Summary</h2>
                         ${itemsSubtotal > 0 ? `
@@ -1016,6 +1143,12 @@
                             <div class="summary-row">
                                 <span>Add-ons</span>
                                 <span class="value">R${addonsSubtotal.toFixed(2)}</span>
+                            </div>
+                        ` : ''}
+                        ${advertsSubtotal > 0 ? `
+                            <div class="summary-row">
+                                <span>Advert Placements</span>
+                                <span class="value">R${advertsSubtotal.toFixed(2)}</span>
                             </div>
                         ` : ''}
                         <div class="summary-row">
@@ -1057,7 +1190,6 @@
 
         showLoading() {
             if (!this.contentElement) return;
-            
             this.contentElement.innerHTML = `
                 <div class="loading-state">
                     <div class="loading-spinner"></div>
@@ -1068,12 +1200,7 @@
 
         showError(message) {
             if (!this.contentElement) return;
-
-            this.contentElement.innerHTML = `
-                <div class="error-state">
-                    ${message}
-                </div>
-            `;
+            this.contentElement.innerHTML = `<div class="error-state">${message}</div>`;
         }
 
         updateCartBadge() {
@@ -1083,33 +1210,25 @@
                 try {
                     const cartData = localStorage.getItem('wine_cart');
                     let totalItems = 0;
-                    
                     if (cartData) {
                         const cart = JSON.parse(cartData);
-                        
                         if (Array.isArray(cart)) {
                             totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                        }
-                        else if (cart && cart.items && Array.isArray(cart.items)) {
+                        } else if (cart && cart.items && Array.isArray(cart.items)) {
                             totalItems = cart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                        }
-                        else if (typeof cart === 'number') {
+                        } else if (typeof cart === 'number') {
                             totalItems = cart;
                         }
                     }
-                    
                     const cartBadges = document.querySelectorAll('.cart-badge');
                     cartBadges.forEach(badge => {
                         badge.textContent = totalItems;
                         badge.style.display = totalItems > 0 ? 'flex' : 'none';
                     });
-                    
                 } catch (error) {
                     console.error('❌ Error updating cart badge:', error);
                     const cartBadges = document.querySelectorAll('.cart-badge');
-                    cartBadges.forEach(badge => {
-                        badge.style.display = 'none';
-                    });
+                    cartBadges.forEach(badge => badge.style.display = 'none');
                 }
             }
         }
