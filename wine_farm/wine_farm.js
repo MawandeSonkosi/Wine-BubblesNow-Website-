@@ -1,6 +1,5 @@
-// Configuration
-const API_BASE_URL = 'https://www.wineandbubblesnow.co.za/api';
-const CORS_PROXY = 'https://corsproxy.io/?';
+// Configuration - USE PROXY SERVER (works on both localhost and production)
+const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
 
 // State
 let allWineFarms = [];
@@ -14,6 +13,7 @@ const searchInput = document.getElementById('searchInput');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🍇 Wine Farms page loaded');
+  console.log('🔧 Using API URL:', API_BASE_URL);
   fetchWineFarms();
   setupEventListeners();
 });
@@ -35,13 +35,15 @@ async function fetchWineFarms() {
     
     console.log('🌐 Fetching wine farms from API...');
     
-    // Use CORS proxy
-    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(`${API_BASE_URL}/winefarms`)}`;
+    const apiUrl = `${API_BASE_URL}/winefarms?_=${Date.now()}`;
+    console.log('📡 Fetching from:', apiUrl);
     
-    const response = await fetch(proxyUrl, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
     });
     
@@ -50,6 +52,7 @@ async function fetchWineFarms() {
     }
     
     const data = await response.json();
+    console.log('📦 API Response:', data);
     
     if (data.success) {
       const wineFarms = data.data;
