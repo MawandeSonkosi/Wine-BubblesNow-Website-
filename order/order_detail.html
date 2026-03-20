@@ -184,7 +184,7 @@
             border-bottom: 2px solid rgba(107, 13, 43, 0.1);
         }
 
-        /* Items List */
+        /* Items List - Updated for better addon display */
         .items-list {
             display: flex;
             flex-direction: column;
@@ -198,6 +198,12 @@
             background: #f8f9fa;
             border-radius: 12px;
             border: 1px solid rgba(107, 13, 43, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .item-image {
@@ -207,12 +213,26 @@
             overflow: hidden;
             background: #f5f5f5;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .item-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .item-image .no-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            color: #999;
+            font-size: 32px;
         }
 
         .item-details {
@@ -253,43 +273,91 @@
             font-size: 16px;
         }
 
-        /* Add-ons Section */
+        /* Add-ons Section - Now using same card style as wine items */
         .addons-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 16px;
-            margin-bottom: 30px;
         }
 
         .addon-card {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
             background: #f8f9fa;
             border-radius: 12px;
-            padding: 16px;
             border: 1px solid rgba(107, 13, 43, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .addon-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .addon-image {
+            width: 80px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .addon-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .addon-image .no-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            color: #999;
+            font-size: 32px;
+        }
+
+        .addon-details {
+            flex: 1;
         }
 
         .addon-name {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: #333;
             margin-bottom: 4px;
         }
 
         .addon-category {
+            display: inline-block;
             color: #666;
             font-size: 12px;
             margin-bottom: 8px;
             background: rgba(107, 13, 43, 0.1);
             padding: 2px 8px;
             border-radius: 12px;
-            display: inline-block;
+        }
+
+        .addon-description {
+            color: #666;
+            font-size: 12px;
+            margin-top: 8px;
+            line-height: 1.4;
         }
 
         .addon-price {
             font-weight: 600;
             color: #6b0d2b;
-            font-size: 14px;
+            font-size: 16px;
             text-align: right;
+            margin-top: 8px;
         }
 
         /* Order Summary */
@@ -423,11 +491,11 @@
                 grid-template-columns: 1fr;
             }
 
-            .item-card {
+            .item-card, .addon-card {
                 flex-direction: column;
             }
 
-            .item-image {
+            .item-image, .addon-image {
                 width: 100%;
                 height: 150px;
             }
@@ -454,10 +522,6 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
-            }
-
-            .addons-list {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -564,7 +628,7 @@
     <script>
     class OrderDetailSystem {
         constructor() {
-            this.API_BASE_URL = '/api';  // USE PROXY SERVER - works on both localhost and production
+            this.API_BASE_URL = '/api';
             this.contentElement = document.getElementById('orderDetailContent');
             this.isLoading = false;
             this.order = null;
@@ -578,7 +642,6 @@
             this.setupEventListeners();
             this.updateCartBadge();
             
-            // Get order ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('id');
             
@@ -600,7 +663,6 @@
                 return false;
             }
             
-            // Check if token is still valid (not expired)
             const tokenTimestamp = localStorage.getItem('wineBubbles_token_timestamp');
             if (tokenTimestamp) {
                 const tokenAge = Date.now() - parseInt(tokenTimestamp);
@@ -638,7 +700,6 @@
         }
 
         setupEventListeners() {
-            // Listen for cart updates
             window.addEventListener('cartUpdated', () => {
                 this.updateCartBadge();
             });
@@ -692,7 +753,6 @@
                 const result = await response.json();
                 console.log('✅ API Response:', result);
                 
-                // Parse the response - handle different response formats
                 let order = null;
                 if (result.success && result.data) {
                     order = result.data;
@@ -715,7 +775,6 @@
             } catch (error) {
                 console.error('❌ Error loading order details:', error);
                 
-                // Fallback to localStorage if API fails
                 console.log('🔄 Trying localStorage fallback...');
                 const localOrder = this.getOrderFromLocalStorage(orderId);
                 
@@ -745,7 +804,6 @@
             try {
                 const savedOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
                 
-                // Try to find order by different IDs
                 return savedOrders.find(order => 
                     order.id === orderId || 
                     order._id === orderId || 
@@ -798,7 +856,7 @@
 
         fixImageUrl(imageUrl) {
             if (!imageUrl) {
-                return '../assets/wines/breakfast/Noir.png';
+                return null;
             }
             
             if (imageUrl.startsWith('assets/')) {
@@ -823,10 +881,8 @@
             const paymentMethod = order.paymentMethod || 'Not specified';
             const status = order.status || 'Order received';
             
-            // Calculate total items
             const totalItems = (order.items?.length || 0) + (order.addOns?.length || 0);
             
-            // Calculate subtotal
             let itemsSubtotal = 0;
             if (order.items) {
                 order.items.forEach(item => {
@@ -886,9 +942,12 @@
                                     return `
                                         <div class="item-card">
                                             <div class="item-image">
-                                                <img src="${imageUrl}" 
-                                                     alt="${item.name}"
-                                                     onerror="this.onerror=null; this.src='../assets/wines/breakfast/Noir.png';">
+                                                ${imageUrl ? 
+                                                    `<img src="${imageUrl}" 
+                                                         alt="${item.name}"
+                                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'no-image\'><i class=\'fas fa-wine-bottle\'></i></div>';">` :
+                                                    `<div class="no-image"><i class="fas fa-wine-bottle"></i></div>`
+                                                }
                                             </div>
                                             <div class="item-details">
                                                 <div class="item-name">${item.name}</div>
@@ -916,16 +975,28 @@
                             <h2 class="section-title">Add-ons & Extras</h2>
                             <div class="addons-list">
                                 ${order.addOns.map(addon => {
+                                    const imageUrl = this.fixImageUrl(addon.imageUrl);
+                                    
                                     return `
                                         <div class="addon-card">
-                                            <div class="addon-name">${addon.name}</div>
-                                            ${addon.category ? `
-                                                <div class="addon-category">${addon.category}</div>
-                                            ` : ''}
-                                            ${addon.description ? `
-                                                <p style="color: #666; font-size: 12px; margin-top: 8px;">${addon.description.substring(0, 60)}${addon.description.length > 60 ? '...' : ''}</p>
-                                            ` : ''}
-                                            <div class="addon-price">R${(addon.price || 0).toFixed(2)}</div>
+                                            <div class="addon-image">
+                                                ${imageUrl ? 
+                                                    `<img src="${imageUrl}" 
+                                                         alt="${addon.name}"
+                                                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'no-image\'><i class=\'fas fa-glass-cheers\'></i></div>';">` :
+                                                    `<div class="no-image"><i class="fas fa-glass-cheers"></i></div>`
+                                                }
+                                            </div>
+                                            <div class="addon-details">
+                                                <div class="addon-name">${addon.name}</div>
+                                                ${addon.category ? `
+                                                    <div class="addon-category">${addon.category}</div>
+                                                ` : ''}
+                                                ${addon.description ? `
+                                                    <div class="addon-description">${addon.description}</div>
+                                                ` : ''}
+                                                <div class="addon-price">R${(addon.price || 0).toFixed(2)}</div>
+                                            </div>
                                         </div>
                                     `;
                                 }).join('')}
@@ -1006,34 +1077,27 @@
         }
 
         updateCartBadge() {
-            // Use your existing CartUtils if available
             if (window.CartUtils && typeof window.CartUtils.updateCartBadge === 'function') {
                 window.CartUtils.updateCartBadge();
             } else {
-                // Fallback to manual badge update with proper error handling
                 try {
                     const cartData = localStorage.getItem('wine_cart');
                     let totalItems = 0;
                     
                     if (cartData) {
-                        // Try to parse the cart data
                         const cart = JSON.parse(cartData);
                         
-                        // Check if cart is an array
                         if (Array.isArray(cart)) {
                             totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
                         }
-                        // Check if cart is an object with items array
                         else if (cart && cart.items && Array.isArray(cart.items)) {
                             totalItems = cart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
                         }
-                        // If cart is a number (simple count)
                         else if (typeof cart === 'number') {
                             totalItems = cart;
                         }
                     }
                     
-                    // Update cart badges in top navigation
                     const cartBadges = document.querySelectorAll('.cart-badge');
                     cartBadges.forEach(badge => {
                         badge.textContent = totalItems;
@@ -1042,7 +1106,6 @@
                     
                 } catch (error) {
                     console.error('❌ Error updating cart badge:', error);
-                    // Hide badges on error
                     const cartBadges = document.querySelectorAll('.cart-badge');
                     cartBadges.forEach(badge => {
                         badge.style.display = 'none';
@@ -1052,7 +1115,6 @@
         }
     }
 
-    // Initialize the order detail system
     document.addEventListener('DOMContentLoaded', () => {
         console.log('📦 Order Detail page loaded');
         window.orderDetailSystem = new OrderDetailSystem();
