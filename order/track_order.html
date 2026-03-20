@@ -730,8 +730,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📦 Track Order page loaded - checking authentication');
         
-        // Configuration
-        const API_BASE_URL = 'http://localhost:3000/api';
+        // Configuration - USE PROXY SERVER
+        const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
         
         // Token validation function
         function isTokenValid() {
@@ -947,7 +947,7 @@
   <script>
   class TrackOrderSystem {
     constructor() {
-        this.API_BASE_URL = 'http://localhost:3000/api';
+        this.API_BASE_URL = '/api';  // USE PROXY SERVER - works on both localhost and production
         this.contentElement = document.getElementById('trackOrdersContent');
         this.isLoading = false;
         this.deliveries = [];
@@ -1005,6 +1005,7 @@
 
         try {
             console.log('📦 Fetching deliveries for user:', this.userId);
+            console.log('🔧 Using API URL:', this.API_BASE_URL);
             
             const response = await fetch(`${this.API_BASE_URL}/deliveries/user/${this.userId}`, {
                 method: 'GET',

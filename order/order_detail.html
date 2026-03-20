@@ -564,7 +564,7 @@
     <script>
     class OrderDetailSystem {
         constructor() {
-            this.API_BASE_URL = 'http://localhost:3000/api';
+            this.API_BASE_URL = '/api';  // USE PROXY SERVER - works on both localhost and production
             this.contentElement = document.getElementById('orderDetailContent');
             this.isLoading = false;
             this.order = null;
