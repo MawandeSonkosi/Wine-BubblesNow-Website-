@@ -935,7 +935,8 @@
                     totalAmount: cart.total || 0,
                     paymentMethod: paymentMethod,
                     items: wineItems,
-                    addOns: addOns
+                    addOns: addOns,
+                    adverts: [] // Adverts array for future expansion
                 };
 
                 console.log('📦 Sending delivery to backend:', deliveryData);
@@ -945,7 +946,7 @@
                 const response = await this.createDelivery(deliveryData);
 
                 if (response.success) {
-                    // 2. Send confirmation email
+                    // 2. Send comprehensive delivery confirmation email (matches app functionality)
                     const emailData = {
                         delivery: response.data,
                         userEmail: user.email,
@@ -954,7 +955,15 @@
                     };
 
                     try {
-                        console.log('📧 Sending delivery confirmation email...');
+                        console.log('📧 Sending delivery confirmation email with user details...');
+                        console.log('   Customer:', emailData.userFullName);
+                        console.log('   Email:', emailData.userEmail);
+                        console.log('   Phone:', emailData.userPhoneNumber);
+                        console.log('   Order ID:', response.data._id);
+                        console.log('   Total Amount:', `R${response.data.totalAmount}`);
+                        console.log('   Items:', wineItems.length, 'wines,', addOns.length, 'add-ons');
+                        
+                        // Send to the dedicated delivery confirmation email endpoint
                         const emailResponse = await fetch(`${this.API_BASE_URL}/email/send-delivery-confirmation`, {
                             method: 'POST',
                             headers: {
@@ -966,7 +975,8 @@
 
                         const emailResult = await emailResponse.json();
                         if (emailResult.success) {
-                            console.log('✅ Delivery confirmation email sent successfully');
+                            console.log('✅ Delivery confirmation email sent successfully to:', user.email);
+                            console.log('✅ Admin notification also sent to: winebubblesnow@gmail.com');
                         } else {
                             console.warn('⚠️ Delivery email failed but order was created:', emailResult.message);
                         }
@@ -996,7 +1006,7 @@
 
                     // Redirect to order confirmation page
                     setTimeout(() => {
-                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}`;
+                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}&total=${deliveryData.totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
                     }, 1500);
                 } else {
                     throw new Error(response.message || 'Failed to create delivery');
