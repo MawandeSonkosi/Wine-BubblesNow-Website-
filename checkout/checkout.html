@@ -624,6 +624,7 @@
             this.isProcessing = false;
             this.API_BASE_URL = '/api'; // USE PROXY SERVER - works on both localhost and production
             this.cartUtils = null;
+            this.userProfile = null; // Store user profile with fullName and phoneNumber
             
             this.init();
         }
@@ -636,9 +637,55 @@
                 this.updateCartBadge();
                 this.loadCheckoutData();
                 this.validateCheckout();
+                this.loadUserProfile(); // Load user profile for fullName and phoneNumber
                 console.log('✅ Checkout system initialized with CartUtils');
                 console.log('🔧 Using API URL:', this.API_BASE_URL);
             });
+        }
+
+        async loadUserProfile() {
+            try {
+                const userData = localStorage.getItem('wineBubbles_user');
+                const token = localStorage.getItem('wineBubbles_token');
+                
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    console.log('👤 User data from localStorage:', user);
+                    
+                    // Check if we have fullName and phoneNumber in localStorage first
+                    const fullName = localStorage.getItem('wineBubbles_userFullName') || 
+                                    user.fullName || 
+                                    user.email.split('@')[0];
+                    const phoneNumber = localStorage.getItem('wineBubbles_userPhone') || 
+                                       user.phoneNumber || 
+                                       'Not provided';
+                    
+                    this.userProfile = {
+                        fullName: fullName,
+                        phoneNumber: phoneNumber,
+                        email: user.email,
+                        id: user.id
+                    };
+                    
+                    console.log('✅ User profile loaded:', this.userProfile);
+                } else {
+                    console.warn('⚠️ No user data found in localStorage');
+                    this.userProfile = {
+                        fullName: 'Valued Customer',
+                        phoneNumber: 'Not provided',
+                        email: 'unknown@example.com',
+                        id: null
+                    };
+                }
+            } catch (error) {
+                console.error('❌ Error loading user profile:', error);
+                this.userProfile = {
+                    fullName: 'Valued Customer',
+                    phoneNumber: 'Not provided',
+                    email: 'unknown@example.com',
+                    id: null
+                };
+            }
         }
 
         waitForCartUtils(callback) {
@@ -894,8 +941,14 @@
                 const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
                 const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
                 
-                // Get user profile details for email
-                const userProfile = JSON.parse(localStorage.getItem('wineBubbles_userProfile') || '{}');
+                // Use the user profile we loaded (with fullName and phoneNumber)
+                const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
+                const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
+                
+                console.log('📧 EMAIL DATA - User Details:');
+                console.log('   Full Name:', userFullName);
+                console.log('   Email:', user.email);
+                console.log('   Phone:', userPhoneNumber);
 
                 // Prepare items for delivery
                 const wineItems = [];
@@ -946,7 +999,7 @@
                 const response = await this.createDelivery(deliveryData);
 
                 if (response.success) {
-                    // Prepare email data exactly like the app does
+                    // Prepare email data EXACTLY like the app does
                     const emailData = {
                         delivery: {
                             _id: response.data._id,
@@ -962,17 +1015,18 @@
                             createdAt: response.data.createdAt
                         },
                         userEmail: user.email,
-                        userFullName: userProfile.fullName || user.email.split('@')[0],
-                        userPhoneNumber: userProfile.phoneNumber || 'Not provided',
+                        userFullName: userFullName,  // This matches app's userFullName
+                        userPhoneNumber: userPhoneNumber, // This matches app's userPhoneNumber
                         adminEmail: 'winebubblesnow@gmail.com'
                     };
 
-                    console.log('📧 Sending delivery confirmation email...');
-                    console.log('   Customer:', emailData.userFullName);
-                    console.log('   Email:', emailData.userEmail);
-                    console.log('   Phone:', emailData.userPhoneNumber);
+                    console.log('📧 Sending delivery confirmation email with user details:');
+                    console.log('   Customer Name:', emailData.userFullName);
+                    console.log('   Customer Email:', emailData.userEmail);
+                    console.log('   Customer Phone:', emailData.userPhoneNumber);
                     console.log('   Order ID:', response.data._id);
                     console.log('   Total:', `R${response.data.totalAmount}`);
+                    console.log('   Items:', wineItems.length, 'wines,', addOns.length, 'add-ons');
 
                     // Try multiple email endpoints for compatibility
                     let emailSent = false;
@@ -1001,6 +1055,8 @@
                             
                             if (emailResponse.ok && emailResult.success) {
                                 console.log(`✅ Email sent successfully via ${endpoint}`);
+                                console.log(`   ✓ Customer: ${emailData.userFullName} (${emailData.userEmail})`);
+                                console.log(`   ✓ Phone: ${emailData.userPhoneNumber}`);
                                 emailSent = true;
                                 break;
                             } else {
@@ -1014,8 +1070,7 @@
                     }
                     
                     if (emailSent) {
-                        console.log('✅ Delivery confirmation email sent successfully to:', user.email);
-                        this.showToast('Order placed! Confirmation email sent.', 'success');
+                        this.showToast(`Order placed! Confirmation email sent to ${user.email}`, 'success');
                     } else {
                         console.warn('⚠️ All email endpoints failed. Order created but no email sent.');
                         console.warn('Last error:', emailError);
@@ -1027,7 +1082,9 @@
                         ...deliveryData,
                         id: response.data._id || 'ORD-' + Date.now(),
                         status: 'Order received',
-                        createdAt: new Date().toISOString()
+                        createdAt: new Date().toISOString(),
+                        userFullName: userFullName,
+                        userPhoneNumber: userPhoneNumber
                     });
 
                     // Clear cart
@@ -1111,6 +1168,8 @@
                 address: order.address,
                 userId: order.userId,
                 userEmail: order.userEmail,
+                userFullName: order.userFullName || '',
+                userPhoneNumber: order.userPhoneNumber || '',
                 status: order.status || 'Order received'
             };
             
@@ -1121,6 +1180,10 @@
             localStorage.setItem('wineBubbles_orders', JSON.stringify(existingOrders));
             
             console.log('Order saved locally:', orderToSave.id);
+            if (orderToSave.userFullName) {
+                console.log('   Customer Name:', orderToSave.userFullName);
+                console.log('   Customer Phone:', orderToSave.userPhoneNumber);
+            }
         }
         
         resetProcessingState() {
