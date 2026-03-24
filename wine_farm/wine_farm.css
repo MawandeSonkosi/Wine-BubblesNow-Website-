@@ -68,16 +68,17 @@
   padding: 0 20px;
 }
 
-/* Wine Farms Grid - FULL WIDTH */
+/* Wine Farms Grid - FULL WIDTH with proper spacing */
 .wine-farms-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 0;
   margin: 0;
   width: 100%;
+  position: relative;
 }
 
-/* ===== CARD FILLS COMPLETELY FROM LEFT TO RIGHT, TOP TO BOTTOM ===== */
+/* ===== CARD STYLES - FULL VISIBILITY ===== */
 .wine-farm-card {
   background: #1b1b1b;
   overflow: hidden;
@@ -91,6 +92,7 @@
   flex-direction: column;
   border-radius: 0;
   margin: 0;
+  width: 100%;
 }
 
 .wine-farm-card:hover {
@@ -99,7 +101,7 @@
   z-index: 2;
 }
 
-/* Image takes over entire top portion - no gaps */
+/* Image container - ensure full visibility */
 .wine-farm-image-container {
   height: 220px;
   background: #1b1b1b;
@@ -107,14 +109,21 @@
   overflow: hidden;
   flex-shrink: 0;
   width: 100%;
+  display: block;
 }
 
+/* Image - ensure it fills the container */
 .wine-farm-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
   display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .wine-farm-card:hover .wine-farm-image {
@@ -131,6 +140,8 @@
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .wine-farm-title {
@@ -143,6 +154,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  color: #fff;
 }
 
 .wine-farm-location {
@@ -158,10 +170,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  color: #e6c79c;
 }
 
 .wine-farm-location i {
-  color: var(--maroon);
+  color: #e6c79c;
   font-size: 11px;
   flex-shrink: 0;
 }
@@ -180,6 +193,7 @@
   -webkit-box-orient: vertical;
   box-orient: vertical;
   width: 100%;
+  color: rgba(255,255,255,0.7);
 }
 
 /* Contact Info - compact */
@@ -200,7 +214,7 @@
 }
 
 .contact-item i {
-  color: var(--maroon);
+  color: #e6c79c;
   font-size: 10px;
   flex-shrink: 0;
 }
@@ -317,7 +331,7 @@
 /* Responsive - Full width on all screen sizes */
 @media (max-width: 1100px) {
   .wine-farms-grid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
   
   .wine-farm-card {
@@ -341,7 +355,7 @@
   }
   
   .wine-farms-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
   
   .wine-farm-card {

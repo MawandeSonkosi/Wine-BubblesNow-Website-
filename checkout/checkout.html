@@ -625,7 +625,7 @@
             this.API_BASE_URL = '/api';
             this.cartUtils = null;
             this.userProfile = null;
-            this.advertItems = []; // Store advert items
+            this.advertItems = [];
             
             this.init();
         }
@@ -639,28 +639,22 @@
                 this.loadCheckoutData();
                 this.validateCheckout();
                 this.loadUserProfile();
-                this.loadAdvertItems(); // Load adverts from localStorage
-                console.log('✅ Checkout system initialized with CartUtils');
-                console.log('🔧 Using API URL:', this.API_BASE_URL);
+                this.loadAdvertItems();
+                console.log('✅ Checkout system initialized');
             });
         }
 
         loadAdvertItems() {
             try {
-                // Get adverts from localStorage (saved when adding to cart)
                 const advertsData = localStorage.getItem('wineBubbles_adverts');
                 if (advertsData) {
                     this.advertItems = JSON.parse(advertsData);
-                    console.log(`📢 Loaded ${this.advertItems.length} advert items from localStorage`);
-                    this.advertItems.forEach((advert, index) => {
-                        console.log(`   Advert ${index + 1}: ${advert.title} - Qty: ${advert.quantity || 1} - Price: R${advert.price}`);
-                    });
+                    console.log(`📢 Loaded ${this.advertItems.length} advert items`);
                 } else {
-                    console.log('📢 No advert items found in localStorage');
                     this.advertItems = [];
                 }
             } catch (error) {
-                console.error('Error loading advert items:', error);
+                console.error('Error loading adverts:', error);
                 this.advertItems = [];
             }
         }
@@ -670,12 +664,8 @@
                 const userData = localStorage.getItem('wineBubbles_user');
                 if (userData) {
                     const user = JSON.parse(userData);
-                    const fullName = localStorage.getItem('wineBubbles_userFullName') || 
-                                    user.fullName || 
-                                    user.email.split('@')[0];
-                    const phoneNumber = localStorage.getItem('wineBubbles_userPhone') || 
-                                       user.phoneNumber || 
-                                       'Not provided';
+                    const fullName = localStorage.getItem('wineBubbles_userFullName') || user.fullName || user.email.split('@')[0];
+                    const phoneNumber = localStorage.getItem('wineBubbles_userPhone') || user.phoneNumber || 'Not provided';
                     
                     this.userProfile = {
                         fullName: fullName,
@@ -683,7 +673,6 @@
                         email: user.email,
                         id: user.id
                     };
-                    console.log('✅ User profile loaded:', this.userProfile);
                 } else {
                     this.userProfile = {
                         fullName: 'Valued Customer',
@@ -693,7 +682,6 @@
                     };
                 }
             } catch (error) {
-                console.error('Error loading user profile:', error);
                 this.userProfile = {
                     fullName: 'Valued Customer',
                     phoneNumber: 'Not provided',
@@ -710,14 +698,13 @@
             const check = () => {
                 attempts++;
                 if (window.CartUtils && typeof window.CartUtils.getCart === 'function') {
-                    console.log('✅ CartUtils loaded successfully after', attempts, 'attempts');
+                    console.log('✅ CartUtils loaded');
                     callback();
                 } else if (attempts >= maxAttempts) {
-                    console.error('❌ CartUtils failed to load after', maxAttempts, 'attempts');
-                    this.showError('Cart system failed to load. Please refresh the page.');
+                    console.error('❌ CartUtils failed to load');
+                    this.showError('Cart system failed to load');
                     this.loadCartUtilsDynamically(callback);
                 } else {
-                    console.log(`⏳ Waiting for CartUtils... (attempt ${attempts}/${maxAttempts})`);
                     setTimeout(check, 300);
                 }
             };
@@ -725,29 +712,24 @@
         }
 
         loadCartUtilsDynamically(callback) {
-            console.log('🔄 Trying to load cart-utils.js dynamically');
             const script = document.createElement('script');
             script.src = '../cart/cart-utils.js';
             script.onload = () => {
-                console.log('✅ Dynamically loaded cart-utils.js');
                 if (window.CartUtils && typeof window.CartUtils.getCart === 'function') {
                     callback();
                 } else {
-                    this.showError('Cart system still not available. Please check console for errors.');
+                    this.showError('Cart system still not available');
                 }
             };
             script.onerror = () => {
-                console.error('❌ Failed to load cart-utils.js dynamically');
-                this.showError('Failed to load cart system. Please check if cart-utils.js exists at: ../cart/cart-utils.js');
+                this.showError('Failed to load cart system');
             };
             document.head.appendChild(script);
         }
 
         setupEventListeners() {
             if (this.payBtn) {
-                this.payBtn.addEventListener('click', () => {
-                    this.processPayment();
-                });
+                this.payBtn.addEventListener('click', () => this.processPayment());
             }
 
             window.addEventListener('cartUpdated', () => {
@@ -770,60 +752,54 @@
         loadCheckoutData() {
             const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
             const paymentElement = document.getElementById('paymentMethodValue');
-            if (paymentElement) {
-                paymentElement.textContent = paymentMethod || 'No payment method selected';
-            }
+            if (paymentElement) paymentElement.textContent = paymentMethod || 'No payment method selected';
 
             const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
             const addressElement = document.getElementById('deliveryAddressValue');
-            if (addressElement) {
-                addressElement.textContent = deliveryAddress || 'No delivery address provided';
-            }
+            if (addressElement) addressElement.textContent = deliveryAddress || 'No delivery address provided';
 
             this.loadOrderItems();
             this.updateOrderSummary();
         }
 
         loadOrderItems() {
-            if (!this.cartUtils) {
-                console.warn('CartUtils not available yet');
-                return;
-            }
+            if (!this.cartUtils) return;
 
             try {
                 const cart = this.cartUtils.getCart();
                 const orderItemsContainer = document.getElementById('orderItems');
 
                 if ((!cart || !cart.items || cart.items.length === 0) && this.advertItems.length === 0) {
-                    orderItemsContainer.innerHTML = `
-                        <div class="empty-state" style="text-align: center; padding: 40px;">
-                            <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i>
-                            <h3 style="color: #666; margin-bottom: 8px;">Your cart is empty</h3>
-                            <p style="color: #999;">Add items to your cart before checkout</p>
-                        </div>
-                    `;
+                    orderItemsContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc;"></i>
+                        <h3>Your cart is empty</h3>
+                    </div>`;
                     return;
                 }
 
                 let itemsHTML = '';
                 
-                // Display wine items
+                // Display wine items (with case handling)
                 if (cart && cart.items) {
                     cart.items.forEach(item => {
-                        const itemTotal = item.price * item.quantity;
+                        const isCase = item.isCase === true;
+                        const unitPrice = isCase ? item.price * 6 : item.price;
+                        const itemTotal = unitPrice * item.quantity;
                         const imageUrl = this.cartUtils.fixImageUrl(item.imageUrl);
+                        const itemDisplayName = isCase ? `${item.name} (Case of 6)` : item.name;
+                        const itemTypeBadge = isCase ? 'Wine Case (6 bottles)' : (item.type || 'Wine');
+                        
                         itemsHTML += `
                             <div class="order-item">
                                 <div class="item-image">
-                                    <img src="${imageUrl}" 
-                                         alt="${item.name}"
-                                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">${item.name.charAt(0).toUpperCase()}</text></svg>';">
+                                    <img src="${imageUrl}" alt="${item.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">🍷</text></svg>';">
                                 </div>
                                 <div class="item-details">
-                                    <div class="item-name">${item.name}</div>
+                                    <div class="item-name">${itemDisplayName}</div>
                                     <div class="item-meta">
-                                        ${item.category ? `<span style="background: rgba(107, 13, 43, 0.1); color: #6b0d2b; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 8px;">${item.category}</span>` : ''}
-                                        ${item.type ? `<span>${item.type}</span>` : ''}
+                                        <span style="background: rgba(107,13,43,0.1); color:#6b0d2b; padding:2px 6px; border-radius:4px; font-size:12px;">${itemTypeBadge}</span>
+                                        ${item.category ? `<span style="margin-left:8px;">${item.category}</span>` : ''}
+                                        ${isCase ? `<span style="margin-left:8px; color:#666;">(6 bottles per case)</span>` : ''}
                                     </div>
                                     <div class="item-quantity-price">
                                         <div class="item-quantity">Qty: ${item.quantity}</div>
@@ -842,22 +818,20 @@
                         const itemTotal = advert.price * quantity;
                         const imageUrl = advert.imageUrl || '../assets/images/default_advert.jpg';
                         itemsHTML += `
-                            <div class="order-item" style="border-left: 3px solid #03a9f4; padding-left: 10px; margin-left: 5px;">
+                            <div class="order-item" style="border-left: 3px solid #03a9f4; padding-left: 10px;">
                                 <div class="item-image">
-                                    <img src="${imageUrl}" 
-                                         alt="${advert.title}"
-                                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">📢</text></svg>';">
+                                    <img src="${imageUrl}" alt="${advert.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">📢</text></svg>';">
                                 </div>
                                 <div class="item-details">
                                     <div class="item-name" style="color: #03a9f4;">📢 ${advert.title}</div>
                                     <div class="item-meta">
-                                        <span style="background: rgba(3, 169, 244, 0.1); color: #03a9f4; padding: 2px 6px; border-radius: 4px; font-size: 12px;">Advert Placement</span>
-                                        ${advert.category ? `<span style="margin-left: 8px;">${advert.category}</span>` : ''}
+                                        <span style="background: rgba(3,169,244,0.1); color:#03a9f4; padding:2px 6px; border-radius:4px; font-size:12px;">Advert Placement</span>
+                                        ${advert.category ? `<span style="margin-left:8px;">${advert.category}</span>` : ''}
                                     </div>
-                                    ${advert.subtitle ? `<div style="color: #666; font-size: 12px; margin-bottom: 4px;">${advert.subtitle}</div>` : ''}
+                                    ${advert.subtitle ? `<div style="color:#666; font-size:12px;">${advert.subtitle}</div>` : ''}
                                     <div class="item-quantity-price">
                                         <div class="item-quantity">Qty: ${quantity}</div>
-                                        <div class="item-price" style="color: #03a9f4;">R${itemTotal.toFixed(2)}</div>
+                                        <div class="item-price" style="color:#03a9f4;">R${itemTotal.toFixed(2)}</div>
                                     </div>
                                 </div>
                             </div>
@@ -867,16 +841,13 @@
                 
                 orderItemsContainer.innerHTML = itemsHTML;
             } catch (error) {
-                console.error('Error loading order items:', error);
+                console.error('Error loading items:', error);
                 this.showError('Failed to load cart items');
             }
         }
 
         updateOrderSummary() {
-            if (!this.cartUtils) {
-                console.warn('CartUtils not available yet');
-                return;
-            }
+            if (!this.cartUtils) return;
 
             try {
                 const cart = this.cartUtils.getCart();
@@ -884,9 +855,8 @@
                 
                 // Add advert subtotal
                 if (this.advertItems.length > 0) {
-                    const advertTotal = this.advertItems.reduce((sum, advert) => sum + (advert.price * (advert.quantity || 1)), 0);
+                    const advertTotal = this.advertItems.reduce((sum, a) => sum + (a.price * (a.quantity || 1)), 0);
                     subtotal += advertTotal;
-                    console.log(`💰 Advert total: R${advertTotal.toFixed(2)}`);
                 }
                 
                 const deliveryFee = subtotal >= 500 ? 0 : 50;
@@ -896,16 +866,14 @@
                 document.getElementById('deliveryFee').textContent = deliveryFee === 0 ? 'FREE' : `R${deliveryFee.toFixed(2)}`;
                 document.getElementById('total').textContent = `R${total.toFixed(2)}`;
             } catch (error) {
-                console.error('Error updating order summary:', error);
+                console.error('Error updating summary:', error);
             }
         }
 
         validateCheckout() {
             if (!this.isAuthenticated()) {
                 this.showToast('Please login to continue', 'error');
-                setTimeout(() => {
-                    window.location.href = '../login/login.html?redirect=checkout';
-                }, 2000);
+                setTimeout(() => window.location.href = '../login/login.html?redirect=checkout', 2000);
                 return;
             }
 
@@ -913,19 +881,15 @@
             const hasItems = (cart && cart.items && cart.items.length > 0) || this.advertItems.length > 0;
             
             if (!hasItems) {
-                this.showToast('Your cart is empty. Please add items before checkout.', 'error');
-                setTimeout(() => {
-                    window.location.href = '../cart/cart.html';
-                }, 2000);
+                this.showToast('Your cart is empty', 'error');
+                setTimeout(() => window.location.href = '../cart/cart.html', 2000);
                 return;
             }
 
             const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
             if (!paymentMethod) {
                 this.showToast('Please select a payment method', 'error');
-                setTimeout(() => {
-                    window.location.href = '../payment/payment.html';
-                }, 2000);
+                setTimeout(() => window.location.href = '../payment/payment.html', 2000);
                 return;
             }
 
@@ -934,9 +898,7 @@
             
             if (hasPhysicalItems && !deliveryAddress) {
                 this.showToast('Please add a delivery address', 'error');
-                setTimeout(() => {
-                    window.location.href = '../delivery/delivery.html';
-                }, 2000);
+                setTimeout(() => window.location.href = '../delivery/delivery.html', 2000);
                 return;
             }
         }
@@ -982,14 +944,7 @@
                 const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
                 const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
                 
-                console.log('📧 ORDER DETAILS:');
-                console.log('   Customer:', userFullName);
-                console.log('   Email:', user.email);
-                console.log('   Phone:', userPhoneNumber);
-                console.log('   Adverts in cart:', this.advertItems.length);
-                console.log('   Wine items:', cart.items?.length || 0);
-
-                // Prepare wine items
+                // Prepare wine items with case handling
                 const wineItems = (cart.items || []).filter(item => item.type === 'wine').map(item => ({
                     id: parseInt(item.id) || 0,
                     name: item.name || '',
@@ -1013,7 +968,7 @@
                     imageUrl: item.imageUrl || ''
                 }));
 
-                // Prepare advert items (from localStorage)
+                // Prepare advert items
                 const adverts = this.advertItems.map(advert => ({
                     id: advert.id || String(advert._id || Math.random()),
                     title: advert.title || advert.name || 'Advert Placement',
@@ -1027,13 +982,15 @@
                     itemType: 'advert'
                 }));
 
-                console.log('📦 Adverts prepared for delivery:', adverts.length);
-                adverts.forEach((advert, idx) => {
-                    console.log(`   Advert ${idx + 1}: ${advert.title} - Qty: ${advert.quantity} - Price: R${advert.price}`);
+                // Calculate total with wine case pricing
+                let subtotal = 0;
+                wineItems.forEach(item => {
+                    const unitPrice = item.isCase ? item.price * 6 : item.price;
+                    subtotal += unitPrice * item.quantity;
                 });
-
-                // Calculate total amount including adverts
-                const subtotal = (cart.subtotal || 0) + adverts.reduce((sum, a) => sum + (a.price * a.quantity), 0);
+                addOns.forEach(addon => subtotal += addon.price);
+                adverts.forEach(advert => subtotal += advert.price * advert.quantity);
+                
                 const deliveryFee = subtotal >= 500 ? 0 : 50;
                 const totalAmount = subtotal + deliveryFee;
 
@@ -1045,74 +1002,26 @@
                     paymentMethod: paymentMethod,
                     items: wineItems,
                     addOns: addOns,
-                    adverts: adverts  // Include adverts in delivery data
+                    adverts: adverts
                 };
 
-                console.log('📦 Sending delivery to backend with adverts:', adverts.length);
-                console.log('📦 Delivery data:', JSON.stringify(deliveryData, null, 2));
-
+                console.log('📦 Sending delivery with:', wineItems.length, 'wines,', addOns.length, 'add-ons,', adverts.length, 'adverts');
+                
                 const response = await this.createDelivery(deliveryData);
 
                 if (response.success) {
-                    console.log('✅ Delivery created successfully with adverts!');
+                    console.log('✅ Delivery created with adverts!');
                     
+                    // Send email
                     const emailData = {
-                        delivery: {
-                            _id: response.data._id,
-                            userId: response.data.userId,
-                            userEmail: response.data.userEmail,
-                            address: response.data.address,
-                            totalAmount: response.data.totalAmount,
-                            paymentMethod: response.data.paymentMethod,
-                            status: response.data.status,
-                            items: response.data.items,
-                            addOns: response.data.addOns,
-                            adverts: response.data.adverts || adverts,
-                            createdAt: response.data.createdAt
-                        },
+                        delivery: response.data,
                         userEmail: user.email,
                         userFullName: userFullName,
                         userPhoneNumber: userPhoneNumber,
                         adminEmail: 'winebubblesnow@gmail.com'
                     };
 
-                    console.log('📧 Sending confirmation email with adverts...');
-                    let emailSent = false;
-                    
-                    const emailEndpoints = [
-                        `${this.API_BASE_URL}/email/send-delivery-confirmation`,
-                        `${this.API_BASE_URL}/email/send-delivery-confirmation-email`,
-                        `${this.API_BASE_URL}/email/delivery-confirmation`
-                    ];
-                    
-                    for (const endpoint of emailEndpoints) {
-                        try {
-                            const emailResponse = await fetch(endpoint, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json',
-                                    'Authorization': `Bearer ${localStorage.getItem('wineBubbles_token')}`
-                                },
-                                body: JSON.stringify(emailData)
-                            });
-                            
-                            const emailResult = await emailResponse.json();
-                            if (emailResponse.ok && emailResult.success) {
-                                console.log(`✅ Email sent via ${endpoint}`);
-                                emailSent = true;
-                                break;
-                            }
-                        } catch (endpointError) {
-                            console.warn(`⚠️ Email endpoint ${endpoint} failed:`, endpointError.message);
-                        }
-                    }
-                    
-                    if (emailSent) {
-                        this.showToast(`Order placed! Confirmation email sent to ${user.email}`, 'success');
-                    } else {
-                        this.showToast('Order placed successfully! (Email notification pending)', 'success');
-                    }
+                    await this.sendEmail(emailData);
                     
                     // Save order locally
                     this.saveOrderLocal({
@@ -1128,19 +1037,18 @@
                     this.cartUtils.clearCart();
                     localStorage.removeItem('wineBubbles_adverts');
                     localStorage.removeItem('wineBubbles_deliveryAddress');
-                    localStorage.removeItem('wineBubbles_deliveryAddressDetails');
                     localStorage.removeItem('wineBubbles_paymentMethod');
 
+                    this.showToast('Order placed successfully!', 'success');
                     setTimeout(() => {
-                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id || 'local-order'}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
+                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
                     }, 2000);
-                    
                 } else {
                     throw new Error(response.message || 'Failed to create delivery');
                 }
 
             } catch (error) {
-                console.error('Error processing payment:', error);
+                console.error('Error:', error);
                 this.showToast(`Failed to process order: ${error.message}`, 'error');
                 this.resetProcessingState();
             }
@@ -1149,9 +1057,6 @@
         async createDelivery(deliveryData) {
             try {
                 const token = localStorage.getItem('wineBubbles_token');
-                console.log('📡 Sending POST to:', `${this.API_BASE_URL}/deliveries`);
-                console.log('📡 With adverts count:', deliveryData.adverts?.length || 0);
-                
                 const response = await fetch(`${this.API_BASE_URL}/deliveries`, {
                     method: 'POST',
                     headers: {
@@ -1163,12 +1068,7 @@
                 });
 
                 const data = await response.json();
-                console.log('📡 Response status:', response.status);
-                console.log('📡 Response data:', data);
-                
-                if (!response.ok) {
-                    throw new Error(data.message || `HTTP ${response.status}`);
-                }
+                if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
                 return data;
             } catch (error) {
                 console.error('Error creating delivery:', error);
@@ -1184,28 +1084,37 @@
             }
         }
 
+        async sendEmail(emailData) {
+            const endpoints = [
+                `${this.API_BASE_URL}/email/send-delivery-confirmation`,
+                `${this.API_BASE_URL}/email/send-delivery-confirmation-email`
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('wineBubbles_token')}`
+                        },
+                        body: JSON.stringify(emailData)
+                    });
+                    if (response.ok) {
+                        console.log('✅ Email sent via', endpoint);
+                        return true;
+                    }
+                } catch (error) {
+                    console.warn('Email failed:', endpoint);
+                }
+            }
+            return false;
+        }
+
         saveOrderLocal(order) {
             const existingOrders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
-            const orderToSave = {
-                id: order.id || order._id || 'ORD-' + Date.now(),
-                _id: order._id || order.id,
-                total: order.total || order.totalAmount || 0,
-                totalAmount: order.totalAmount || order.total || 0,
-                paymentMethod: order.paymentMethod || 'Not specified',
-                createdAt: order.createdAt || new Date().toISOString(),
-                items: order.items || [],
-                addOns: order.addOns || [],
-                adverts: order.adverts || [],
-                address: order.address,
-                userId: order.userId,
-                userEmail: order.userEmail,
-                userFullName: order.userFullName,
-                userPhoneNumber: order.userPhoneNumber,
-                status: order.status || 'Order received'
-            };
-            existingOrders.push(orderToSave);
+            existingOrders.push(order);
             localStorage.setItem('wineBubbles_orders', JSON.stringify(existingOrders));
-            console.log('Order saved locally with', orderToSave.adverts?.length || 0, 'adverts');
         }
         
         resetProcessingState() {
@@ -1217,22 +1126,17 @@
         }
 
         updateCartBadge() {
-            if (this.cartUtils) {
-                this.cartUtils.updateCartBadge();
-            }
+            if (this.cartUtils) this.cartUtils.updateCartBadge();
         }
 
         setupAuthentication() {
-            const token = localStorage.getItem('wineBubbles_token');
-            const userData = localStorage.getItem('wineBubbles_user');
             const isValidToken = this.isAuthenticated();
-            
             const userIcon = document.getElementById('userIcon');
             const userIconElement = document.getElementById('userIconElement');
             
-            if (isValidToken && userData) {
+            if (isValidToken) {
                 try {
-                    const user = JSON.parse(userData);
+                    const user = JSON.parse(localStorage.getItem('wineBubbles_user'));
                     if (userIconElement) {
                         userIconElement.className = 'fas fa-user-check';
                         userIconElement.style.color = '#6b0d2b';
@@ -1245,7 +1149,6 @@
                         });
                     }
                 } catch (error) {
-                    console.error('Error parsing user data:', error);
                     this.resetUserIcon();
                 }
             } else {
@@ -1257,8 +1160,7 @@
             const token = localStorage.getItem('wineBubbles_token');
             const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
             if (!token || !timestamp) return false;
-            const tokenAge = Date.now() - parseInt(timestamp);
-            return tokenAge < (7 * 24 * 60 * 60 * 1000);
+            return (Date.now() - parseInt(timestamp)) < (7 * 24 * 60 * 60 * 1000);
         }
 
         resetUserIcon() {
@@ -1279,61 +1181,37 @@
                 dropdown.classList.toggle('show');
             } else {
                 this.createUserDropdown(user);
-                document.querySelector('.user-dropdown').classList.add('show');
             }
         }
 
         createUserDropdown(user) {
-            const existingDropdown = document.querySelector('.user-dropdown');
-            if (existingDropdown) existingDropdown.remove();
+            const existing = document.querySelector('.user-dropdown');
+            if (existing) existing.remove();
             
             const dropdown = document.createElement('div');
             dropdown.className = 'user-dropdown';
+            dropdown.innerHTML = `
+                <div class="user-dropdown-info">
+                    <div class="user-dropdown-name">${user.fullName || user.email.split('@')[0]}</div>
+                    <div class="user-dropdown-email">${user.email}</div>
+                </div>
+                <a href="../user/profile.html" class="user-dropdown-link"><i class="fas fa-user"></i>My Profile</a>
+                <a href="../user/orders.html" class="user-dropdown-link"><i class="fas fa-shopping-bag"></i>My Orders</a>
+                <a href="../user/bookings.html" class="user-dropdown-link"><i class="fas fa-calendar"></i>My Bookings</a>
+                <button class="user-dropdown-logout">Logout</button>
+            `;
             
-            const userInfo = document.createElement('div');
-            userInfo.className = 'user-dropdown-info';
-            
-            const userName = document.createElement('div');
-            userName.className = 'user-dropdown-name';
-            userName.textContent = user.fullName || user.email.split('@')[0];
-            
-            const userEmail = document.createElement('div');
-            userEmail.className = 'user-dropdown-email';
-            userEmail.textContent = user.email;
-            
-            userInfo.appendChild(userName);
-            userInfo.appendChild(userEmail);
-            dropdown.appendChild(userInfo);
-            
-            const items = [
-                { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' },
-                { text: 'My Orders', icon: 'fas fa-shopping-bag', href: '../user/orders.html' },
-                { text: 'My Bookings', icon: 'fas fa-calendar', href: '../user/bookings.html' }
-            ];
-            
-            items.forEach(item => {
-                const link = document.createElement('a');
-                link.href = item.href;
-                link.className = 'user-dropdown-link';
-                link.innerHTML = `<i class="${item.icon}"></i><span>${item.text}</span>`;
-                dropdown.appendChild(link);
-            });
-            
-            const logoutButton = document.createElement('button');
-            logoutButton.className = 'user-dropdown-logout';
-            logoutButton.textContent = 'Logout';
-            logoutButton.addEventListener('click', () => {
+            dropdown.querySelector('.user-dropdown-logout').addEventListener('click', () => {
                 localStorage.clear();
-                this.showToast('Logged out successfully', 'success');
+                this.showToast('Logged out', 'success');
                 setTimeout(() => window.location.href = '../index.html', 1500);
             });
-            dropdown.appendChild(logoutButton);
-            document.body.appendChild(dropdown);
             
-            document.addEventListener('click', (event) => {
-                const dropdown = document.querySelector('.user-dropdown');
-                const userIcon = document.getElementById('userIcon');
-                if (dropdown && !dropdown.contains(event.target) && userIcon && !userIcon.contains(event.target)) {
+            document.body.appendChild(dropdown);
+            dropdown.classList.add('show');
+            
+            document.addEventListener('click', (e) => {
+                if (!dropdown.contains(e.target) && !document.getElementById('userIcon').contains(e.target)) {
                     dropdown.classList.remove('show');
                 }
             });
@@ -1351,13 +1229,11 @@
         showError(message) {
             const content = document.getElementById('orderItems');
             if (content) {
-                content.innerHTML = `<div class="empty-state" style="text-align: center; padding: 40px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #e74c3c; margin-bottom: 16px;"></i>
-                    <h3 style="color: #666; margin-bottom: 8px;">Error Loading Cart</h3>
-                    <p style="color: #999;">${message}</p>
-                    <button onclick="window.location.reload()" style="background: #6b0d2b; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-top: 16px;">
-                        <i class="fas fa-redo"></i> Refresh Page
-                    </button>
+                content.innerHTML = `<div style="text-align:center;padding:40px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:48px;color:#e74c3c;"></i>
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                    <button onclick="location.reload()" style="background:#6b0d2b;color:white;padding:12px 24px;border:none;border-radius:8px;">Refresh</button>
                 </div>`;
             }
         }
