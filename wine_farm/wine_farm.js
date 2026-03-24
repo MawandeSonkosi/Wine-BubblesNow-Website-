@@ -1,5 +1,5 @@
 // Configuration - USE PROXY SERVER (works on both localhost and production)
-const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
+const API_BASE_URL = '/api';
 
 // State
 let allWineFarms = [];
@@ -12,7 +12,7 @@ const searchInput = document.getElementById('searchInput');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🍇 Wine Farms page loaded');
+  console.log('🍷 Wine Bars page loaded');
   console.log('🔧 Using API URL:', API_BASE_URL);
   fetchWineFarms();
   setupEventListeners();
@@ -33,68 +33,106 @@ async function fetchWineFarms() {
   try {
     showLoading();
     
-    console.log('🌐 Fetching wine farms from API...');
+    console.log('🌐 Fetching wine bars from API...');
     
-    const apiUrl = `${API_BASE_URL}/winefarms?_=${Date.now()}`;
-    console.log('📡 Fetching from:', apiUrl);
+    // Try multiple possible endpoints
+    const endpoints = [
+      `${API_BASE_URL}/winefarms?_=${Date.now()}`,
+      `${API_BASE_URL}/wine-farms?_=${Date.now()}`,
+      `${API_BASE_URL}/winebars?_=${Date.now()}`
+    ];
     
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
+    let data = null;
+    let successEndpoint = null;
+    
+    for (const endpoint of endpoints) {
+      try {
+        console.log(`📡 Trying endpoint: ${endpoint}`);
+        const response = await fetch(endpoint, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log(`✅ Success from endpoint: ${endpoint}`);
+          data = result;
+          successEndpoint = endpoint;
+          break;
+        }
+      } catch (err) {
+        console.log(`❌ Endpoint failed: ${endpoint}`, err.message);
       }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
     }
     
-    const data = await response.json();
+    if (!data) {
+      throw new Error('No working endpoint found for wine bars');
+    }
+    
     console.log('📦 API Response:', data);
     
-    if (data.success) {
-      const wineFarms = data.data;
-      console.log(`✅ Success! Received ${wineFarms.length} wine farms`);
-      
-      allWineFarms = wineFarms;
-      filteredWineFarms = wineFarms;
-      
-      if (wineFarms.length === 0) {
-        showEmptyState('No wine farms found');
-      } else {
-        renderWineFarms();
-      }
-      
+    // Handle different response formats
+    let wineFarms = [];
+    if (data.success && Array.isArray(data.data)) {
+      wineFarms = data.data;
+    } else if (Array.isArray(data)) {
+      wineFarms = data;
+    } else if (data.wineFarms && Array.isArray(data.wineFarms)) {
+      wineFarms = data.wineFarms;
+    } else if (data.data && Array.isArray(data.data)) {
+      wineFarms = data.data;
     } else {
-      throw new Error(data.message || 'Failed to load wine farms');
+      wineFarms = [];
+    }
+    
+    console.log(`✅ Success! Received ${wineFarms.length} wine bars`);
+    
+    allWineFarms = wineFarms;
+    filteredWineFarms = wineFarms;
+    
+    if (wineFarms.length === 0) {
+      showEmptyState('No wine bars found');
+    } else {
+      renderWineFarms();
     }
     
   } catch (error) {
     console.error('Error:', error);
-    showError(`Failed to load wine farms: ${error.message}`);
+    showError(`Failed to load wine bars: ${error.message}`);
   }
 }
 
-// Fix image URLs
+// Fix image URLs - ensure images display properly
 function fixImageUrl(imageUrl) {
   if (!imageUrl || imageUrl === '') {
-    return '../assets/images/default_farm.jpg';
+    return '../assets/images/default_wine_bar.jpg';
   }
   
-  if (imageUrl.startsWith('../assets/')) {
+  // If it's already a full URL
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
   }
   
+  // If it starts with assets/
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
   
-  if (imageUrl.startsWith('http') || imageUrl.startsWith('/')) {
+  // If it starts with ../assets/
+  if (imageUrl.startsWith('../assets/')) {
     return imageUrl;
   }
   
+  // If it starts with /
+  if (imageUrl.startsWith('/')) {
+    return imageUrl;
+  }
+  
+  // Default: prepend ../assets/
   return '../assets/' + imageUrl;
 }
 
@@ -107,10 +145,10 @@ function truncateDescription(description, maxLength = 100) {
 
 // Render wine farms
 function renderWineFarms() {
-  console.log(`🎨 Rendering ${filteredWineFarms.length} wine farms...`);
+  console.log(`🎨 Rendering ${filteredWineFarms.length} wine bars...`);
   
   if (filteredWineFarms.length === 0) {
-    showEmptyState('No wine farms match your search');
+    showEmptyState('No wine bars match your search');
     return;
   }
   
@@ -127,7 +165,7 @@ function renderWineFarms() {
                alt="${farm.name}" 
                class="wine-farm-image"
                loading="lazy"
-               onerror="this.onerror=null; this.src='../assets/images/default_farm.jpg';">
+               onerror="this.onerror=null; this.src='../assets/images/default_wine_bar.jpg';">
           ${hasVideo ? `
             <div class="video-indicator">
               <i class="fas fa-video"></i>
@@ -136,14 +174,14 @@ function renderWineFarms() {
           ` : ''}
         </div>
         <div class="wine-farm-label">
-          <div class="wine-farm-title">${farm.name}</div>
+          <div class="wine-farm-title">${escapeHtml(farm.name)}</div>
           <div class="wine-farm-location">
             <i class="fas fa-map-marker-alt"></i>
-            ${farm.location}
+            ${escapeHtml(farm.location)}
           </div>
           ${description ? `
             <div class="wine-farm-description">
-              ${description}
+              ${escapeHtml(description)}
             </div>
           ` : ''}
           ${hasContactInfo ? `
@@ -151,13 +189,13 @@ function renderWineFarms() {
               ${farm.phoneNumber ? `
                 <div class="contact-item">
                   <i class="fas fa-phone"></i>
-                  <span>${farm.phoneNumber}</span>
+                  <span>${escapeHtml(farm.phoneNumber)}</span>
                 </div>
               ` : ''}
               ${farm.email ? `
                 <div class="contact-item">
                   <i class="fas fa-envelope"></i>
-                  <span>${farm.email}</span>
+                  <span>${escapeHtml(farm.email)}</span>
                 </div>
               ` : ''}
             </div>
@@ -170,9 +208,17 @@ function renderWineFarms() {
   console.log('✅ Render complete!');
 }
 
+// Helper function to escape HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // Navigate to wine farm detail page
 function navigateToWineFarmDetail(farmId) {
-  console.log(`📱 Navigating to wine farm detail: ${farmId}`);
+  console.log(`📱 Navigating to wine bar detail: ${farmId}`);
   window.location.href = `wine_farm_detail.html?id=${farmId}`;
 }
 
@@ -192,7 +238,7 @@ function filterWineFarms() {
     });
   }
   
-  console.log(`🔍 Filtered to ${filteredWineFarms.length} wine farms`);
+  console.log(`🔍 Filtered to ${filteredWineFarms.length} wine bars`);
   renderWineFarms();
 }
 
@@ -201,7 +247,7 @@ function showLoading() {
   wineFarmsGrid.innerHTML = `
     <div class="loading-state">
       <div class="loading-spinner"></div>
-      <p>Loading wine farms...</p>
+      <p>Loading wine bars...</p>
     </div>
   `;
 }
@@ -211,7 +257,7 @@ function showError(message) {
     <div class="error-state">
       <i class="fas fa-exclamation-circle"></i>
       <h3>Error</h3>
-      <p>${message}</p>
+      <p>${escapeHtml(message)}</p>
       <button onclick="fetchWineFarms()" class="btn-fill">
         Try Again
       </button>
@@ -223,7 +269,7 @@ function showEmptyState(message) {
   wineFarmsGrid.innerHTML = `
     <div class="empty-state">
       <i class="fas fa-wine-bottle"></i>
-      <h3>${message}</h3>
+      <h3>${escapeHtml(message)}</h3>
       <p>Try changing your search</p>
       <button onclick="resetSearch()" class="btn-fill" style="margin-top: 20px;">
         Clear Search
