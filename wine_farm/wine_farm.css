@@ -5,13 +5,14 @@
   background: #fafafa;
   position: relative;
   overflow-x: visible;
+  margin: 0;
 }
 
 .wine-farms-section .container {
-  max-width: 1600px;
+  max-width: 100%;
   width: 100%;
-  margin: 0 auto;
-  padding: 0 30px;
+  margin: 0;
+  padding: 0 20px;
   overflow-x: visible;
 }
 
@@ -81,38 +82,43 @@
   margin-bottom: 40px;
 }
 
-/* Wine Bars Grid - Extended card width */
+/* Wine Bars Grid - Full width with left edge alignment */
 .wine-farms-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  margin: 0 auto;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin: 0;
+  padding: 0;
   width: 100%;
-  max-width: 1400px;
   position: relative;
+  left: 0;
+  right: 0;
 }
 
-/* Card Styles - Wider */
+/* Card Styles - Full width cards with no gaps */
 .wine-farm-card {
   background: white;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   transition: all 0.3s ease;
   position: relative;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  border-radius: 12px;
+  border-radius: 0;
   width: 100%;
   min-width: 0;
+  border-right: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .wine-farm-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  z-index: 10;
 }
 
-/* Image container - Larger */
+/* Image container - Full width */
 .wine-farm-image-container {
   height: 260px;
   background: #f5f5f5;
@@ -122,7 +128,7 @@
   width: 100%;
 }
 
-/* Image */
+/* Image - Fill container completely */
 .wine-farm-image {
   width: 100%;
   height: 100%;
@@ -140,7 +146,7 @@
   transform: scale(1.05);
 }
 
-/* Content area - More padding for better visibility */
+/* Content area - Full width */
 .wine-farm-label {
   background: white;
   color: #333;
@@ -154,7 +160,7 @@
 
 .wine-farm-title {
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
   margin-bottom: 4px;
   line-height: 1.3;
   font-family: 'Montserrat', sans-serif;
@@ -166,7 +172,7 @@
 }
 
 .wine-farm-location {
-  font-size: 14px;
+  font-size: 13px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
   display: flex;
@@ -181,40 +187,40 @@
 
 .wine-farm-location i {
   color: #6b0d2b;
-  font-size: 13px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
 .wine-farm-description {
-  font-size: 14px;
+  font-size: 13px;
   color: #666;
-  margin: 8px 0;
-  line-height: 1.5;
+  margin: 4px 0;
+  line-height: 1.4;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   width: 100%;
-  min-height: 42px;
+  min-height: 36px;
 }
 
 /* Contact Info */
 .wine-farm-contact {
   display: flex;
-  gap: 16px;
-  margin-top: 12px;
+  gap: 12px;
+  margin-top: 8px;
   flex-wrap: wrap;
   width: 100%;
   border-top: 1px solid #f0f0f0;
-  padding-top: 12px;
+  padding-top: 10px;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 11px;
   color: #888;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -224,7 +230,7 @@
 
 .contact-item i {
   color: #6b0d2b;
-  font-size: 12px;
+  font-size: 11px;
   flex-shrink: 0;
 }
 
@@ -366,158 +372,78 @@
   font-weight: 600;
 }
 
-/* ========== FORCE FIX - EXTENDED WIDTH ========== */
-
-/* Reset any overflow issues */
-html, body {
-  overflow-x: hidden !important;
-  width: 100% !important;
-  position: relative !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-* {
-  box-sizing: border-box !important;
-}
-
-/* Force section to be full width */
-.wine-farms-section {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow: visible !important;
-  position: relative !important;
-  left: 0 !important;
-  right: 0 !important;
-  margin: 0 !important;
-  padding: 40px 0 !important;
-}
-
-/* Force container to be full width with more padding for wider cards */
-.wine-farms-section .container {
-  width: 100% !important;
-  max-width: 1600px !important;
-  margin: 0 auto !important;
-  padding: 0 30px !important;
-  overflow: visible !important;
-  position: relative !important;
-}
-
-/* Force grid to display with 3 columns for wider cards */
-.wine-farms-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 30px !important;
-  width: 100% !important;
-  max-width: 1400px !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  position: relative !important;
-  overflow: visible !important;
-}
-
-/* Force cards to be full width within grid */
-.wine-farm-card {
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  position: relative !important;
-  overflow: visible !important;
-  background: white !important;
-  border-radius: 12px !important;
-  margin: 0 !important;
-}
-
-/* Force image container to be full width and taller */
-.wine-farm-image-container {
-  width: 100% !important;
-  height: 260px !important;
-  position: relative !important;
-  overflow: hidden !important;
-  display: block !important;
-}
-
-/* Force image to fill container */
-.wine-farm-image {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-}
-
-/* Force content area to be full width with more padding */
-.wine-farm-label {
-  width: 100% !important;
-  padding: 20px !important;
-  background: white !important;
-  position: relative !important;
-}
-
-/* Force title to be larger */
-.wine-farm-title {
-  font-size: 20px !important;
-  margin-bottom: 8px !important;
-}
-
-/* Force location text to be larger */
-.wine-farm-location {
-  font-size: 14px !important;
-  margin-bottom: 8px !important;
-}
-
-/* Force description to be readable */
-.wine-farm-description {
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  min-height: 44px !important;
-}
-
-/* Responsive fixes */
+/* Responsive Design - Maintains full width on all screens */
 @media (max-width: 1200px) {
   .wine-farms-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 25px !important;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .wine-farms-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .wine-farms-grid {
-    grid-template-columns: 1fr !important;
-    gap: 20px !important;
-    max-width: 500px !important;
-    margin: 0 auto !important;
+  .search-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
   }
   
-  .wine-farms-section .container {
-    padding: 0 20px !important;
+  .search-box {
+    width: 100%;
+  }
+  
+  .wine-farms-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .wine-farm-image-container {
-    height: 240px !important;
+    height: 220px;
+  }
+  
+  .section-title {
+    font-size: 28px;
+  }
+  
+  .muted {
+    font-size: 14px;
+  }
+  
+  .wine-farm-title {
+    font-size: 16px;
+  }
+  
+  .wine-farms-section .container {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wine-farms-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .wine-farm-image-container {
+    height: 240px;
   }
 }
 
 @media (max-width: 480px) {
   .wine-farm-image-container {
-    height: 220px !important;
+    height: 220px;
   }
   
   .wine-farm-label {
-    padding: 16px !important;
+    padding: 16px;
   }
   
   .wine-farm-title {
-    font-size: 18px !important;
+    font-size: 15px;
   }
   
   .wine-farm-description {
-    font-size: 13px !important;
+    font-size: 12px;
   }
 }
