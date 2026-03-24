@@ -1,6 +1,6 @@
-/* Wine Bars Section */
+/* Wine Bars Section - FULL WIDTH NO PADDING */
 .wine-farms-section {
-  padding: 40px 0;
+  padding: 0;
   width: 100%;
   background: #fafafa;
   position: relative;
@@ -12,11 +12,11 @@
   max-width: 100%;
   width: 100%;
   margin: 0;
-  padding: 0 20px;
+  padding: 0;
   overflow-x: visible;
 }
 
-/* Search and Filter Bar */
+/* Search and Filter Bar - Centered with padding */
 .search-filter-bar {
   display: flex;
   gap: 20px;
@@ -24,7 +24,7 @@
   align-items: center;
   justify-content: center;
   max-width: 800px;
-  padding: 0;
+  padding: 0 20px;
 }
 
 .search-box {
@@ -73,6 +73,7 @@
   color: #6b0d2b;
   margin-bottom: 8px;
   text-align: center;
+  padding: 0 20px;
 }
 
 .muted {
@@ -80,12 +81,13 @@
   font-size: 16px;
   text-align: center;
   margin-bottom: 40px;
+  padding: 0 20px;
 }
 
-/* Wine Bars Grid - Full width with left edge alignment */
+/* Wine Bars Grid - 2 columns for MUCH wider cards */
 .wine-farms-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0;
   margin: 0;
   padding: 0;
@@ -95,7 +97,7 @@
   right: 0;
 }
 
-/* Card Styles - Full width cards with no gaps */
+/* Card Styles - Extra wide cards */
 .wine-farm-card {
   background: white;
   overflow: hidden;
@@ -118,9 +120,9 @@
   z-index: 10;
 }
 
-/* Image container - Full width */
+/* Image container - Larger height for better visibility */
 .wine-farm-image-container {
-  height: 260px;
+  height: 320px;
   background: #f5f5f5;
   position: relative;
   overflow: hidden;
@@ -146,81 +148,75 @@
   transform: scale(1.05);
 }
 
-/* Content area - Full width */
+/* Content area - More padding for extra wide cards */
 .wine-farm-label {
   background: white;
   color: #333;
-  padding: 20px;
+  padding: 28px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
 }
 
 .wine-farm-title {
   font-weight: 700;
-  font-size: 18px;
-  margin-bottom: 4px;
+  font-size: 24px;
+  margin-bottom: 8px;
   line-height: 1.3;
   font-family: 'Montserrat', sans-serif;
   color: #1b1b1b;
   width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .wine-farm-location {
-  font-size: 13px;
+  font-size: 16px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   color: #6b0d2b;
   width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .wine-farm-location i {
   color: #6b0d2b;
-  font-size: 12px;
+  font-size: 15px;
   flex-shrink: 0;
 }
 
 .wine-farm-description {
-  font-size: 13px;
+  font-size: 15px;
   color: #666;
-  margin: 4px 0;
-  line-height: 1.4;
+  margin: 10px 0;
+  line-height: 1.6;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   width: 100%;
-  min-height: 36px;
+  min-height: 72px;
 }
 
-/* Contact Info */
+/* Contact Info - Larger text */
 .wine-farm-contact {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 20px;
+  margin-top: 15px;
   flex-wrap: wrap;
   width: 100%;
   border-top: 1px solid #f0f0f0;
-  padding-top: 10px;
+  padding-top: 15px;
 }
 
 .contact-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  gap: 8px;
+  font-size: 13px;
   color: #888;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -230,7 +226,7 @@
 
 .contact-item i {
   color: #6b0d2b;
-  font-size: 11px;
+  font-size: 13px;
   flex-shrink: 0;
 }
 
@@ -372,10 +368,26 @@
   font-weight: 600;
 }
 
-/* Responsive Design - Maintains full width on all screens */
+/* Responsive Design - Maintains wide cards */
 @media (max-width: 1200px) {
   .wine-farms-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .wine-farm-image-container {
+    height: 300px;
+  }
+  
+  .wine-farm-title {
+    font-size: 22px;
+  }
+  
+  .wine-farm-description {
+    font-size: 14px;
+  }
+  
+  .wine-farm-label {
+    padding: 24px;
   }
 }
 
@@ -383,12 +395,21 @@
   .wine-farms-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  .wine-farm-image-container {
+    height: 280px;
+  }
+  
+  .wine-farm-title {
+    font-size: 20px;
+  }
 }
 
 @media (max-width: 768px) {
   .search-filter-bar {
     flex-direction: column;
     align-items: stretch;
+    padding: 0 16px;
   }
   
   .search-box {
@@ -396,11 +417,11 @@
   }
   
   .wine-farms-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
   
   .wine-farm-image-container {
-    height: 220px;
+    height: 280px;
   }
   
   .section-title {
@@ -412,27 +433,39 @@
   }
   
   .wine-farm-title {
-    font-size: 16px;
+    font-size: 20px;
   }
   
-  .wine-farms-section .container {
-    padding: 0 16px;
+  .wine-farm-description {
+    font-size: 14px;
+  }
+  
+  .wine-farm-label {
+    padding: 20px;
+  }
+  
+  .wine-farm-location {
+    font-size: 14px;
   }
 }
 
 @media (max-width: 600px) {
-  .wine-farms-grid {
-    grid-template-columns: 1fr;
+  .wine-farm-image-container {
+    height: 260px;
   }
   
-  .wine-farm-image-container {
-    height: 240px;
+  .wine-farm-label {
+    padding: 18px;
+  }
+  
+  .wine-farm-title {
+    font-size: 18px;
   }
 }
 
 @media (max-width: 480px) {
   .wine-farm-image-container {
-    height: 220px;
+    height: 240px;
   }
   
   .wine-farm-label {
@@ -440,10 +473,19 @@
   }
   
   .wine-farm-title {
-    font-size: 15px;
+    font-size: 17px;
   }
   
   .wine-farm-description {
-    font-size: 12px;
+    font-size: 13px;
+    min-height: 60px;
+  }
+  
+  .wine-farm-location {
+    font-size: 13px;
+  }
+  
+  .contact-item {
+    font-size: 11px;
   }
 }
