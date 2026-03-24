@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wine & Bubbles — Wine Farm Details</title>
+  <title>Wine & Bubbles — Wine Bar Details</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
@@ -17,7 +17,7 @@
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Wine Farm Detail CSS -->
+  <!-- Wine Bar Detail CSS -->
   <link rel="stylesheet" href="wine_farm_detail.css">
   <script src="/cart/cart-utils.js"></script>
 
@@ -183,7 +183,7 @@
     </div>
   </div>
 
-  <!-- Wine Farm Detail Content -->
+  <!-- Wine Bar Detail Content -->
   <section class="section wine-farm-detail-section">
     <div class="container">
       <!-- Back button and header -->
@@ -191,15 +191,15 @@
         <a href="javascript:history.back()" class="back-button">
           <i class="fas fa-arrow-left"></i>
         </a>
-        <h2 class="section-title">Wine Farm Details</h2>
+        <h2 class="section-title">Wine Bar Details</h2>
         <!-- Cart and Profile icons removed here - using top navigation instead -->
       </div>
 
-      <!-- Main Wine Farm Details -->
+      <!-- Main Wine Bar Details -->
       <div class="wine-farm-detail-container" id="wineFarmDetailContainer">
         <div class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Loading wine farm details...</p>
+          <p>Loading wine bar details...</p>
         </div>
       </div>
     </div>
@@ -209,7 +209,7 @@
   <div class="video-modal" id="videoModal">
     <div class="video-modal-content">
       <div class="video-modal-header">
-        <h3 id="videoTitle">Vineyard Tour</h3>
+        <h3 id="videoTitle">Wine Bar Tour</h3>
         <button class="close-modal-btn" id="closeVideoModal">
           <i class="fas fa-times"></i>
         </button>
@@ -283,9 +283,9 @@
 
   <!-- Profile Authentication Script - ADDED -->
   <script>
-    // Profile authentication logic for Wine Farm Detail page - MATCHES HOMEPAGE
+    // Profile authentication logic for Wine Bar Detail page - MATCHES HOMEPAGE
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🍇 Wine Farm Detail page loaded - checking authentication');
+        console.log('🍷 Wine Bar Detail page loaded - checking authentication');
         
         // Configuration
         const API_BASE_URL = 'http://localhost:3000/api';
@@ -330,7 +330,7 @@
         const userIconElement = document.getElementById('userIconElement');
         
         if (isValidToken && userData) {
-            console.log('✅ User is logged in on Wine Farm Detail page');
+            console.log('✅ User is logged in on Wine Bar Detail page');
             
             try {
                 const user = JSON.parse(userData);
@@ -360,7 +360,7 @@
             }
             
         } else {
-            console.log('❌ User is not logged in or token expired on Wine Farm Detail page');
+            console.log('❌ User is not logged in or token expired on Wine Bar Detail page');
             clearUserSession();
             resetUserIcon();
         }
@@ -496,7 +496,7 @@
             });
         }
         
-        console.log('✅ Wine Farm Detail page authentication initialized');
+        console.log('✅ Wine Bar Detail page authentication initialized');
     });
   </script>
 </body>
