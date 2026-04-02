@@ -20,8 +20,8 @@
       --maroon: #6b0d2b;
       --beige: #eadfcf;
       --muted: #6d6d6d;
-      --card-dark: #363636;
-      --bg-dark: #0F0F0F;
+      --card-dark: #2a2a2a;
+      --bg-dark: #121212;
       --card-round: 12px;
       --max-width: 1180px;
     }
@@ -167,16 +167,31 @@
       background: #f39c12;
     }
 
-    /* Confirmation Section */
+    /* Confetti Animation */
+    .confetti {
+      position: fixed;
+      top: -20px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Confirmation Section - Matching website theme */
     .confirmation-section {
-      background: var(--bg-dark);
+      background: #f8f8f8;
       min-height: calc(100vh - 160px);
-      padding: 40px 0;
-      color: var(--beige);
+      padding: 60px 0;
     }
 
     .confirmation-container {
-      max-width: 600px;
+      max-width: 700px;
       margin: 0 auto;
       padding: 0 24px;
     }
@@ -188,15 +203,16 @@
     }
 
     .success-icon-circle {
-      width: 80px;
-      height: 80px;
-      background: var(--maroon);
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, #6b0d2b 0%, #8a1e3d 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 20px;
       animation: checkmark 0.5s ease-out;
+      box-shadow: 0 8px 25px rgba(107, 13, 43, 0.2);
     }
 
     @keyframes checkmark {
@@ -212,66 +228,69 @@
     }
 
     .success-icon {
-      font-size: 40px;
-      color: var(--beige);
+      font-size: 45px;
+      color: #e6c79c;
     }
 
     .success-title {
       font-family: 'Playfair Display', serif;
-      font-size: 32px;
-      color: var(--beige);
+      font-size: 36px;
+      color: #1b1b1b;
       margin-bottom: 10px;
-      font-weight: bold;
+      font-weight: 700;
     }
 
     .success-subtitle {
-      color: rgba(216, 192, 157, 0.8);
+      color: #666;
       font-size: 16px;
       margin-bottom: 20px;
     }
 
     /* Confirmation Number */
     .confirmation-number {
-      background: rgba(122, 0, 38, 0.2);
-      border: 1px solid rgba(216, 192, 157, 0.3);
-      border-radius: 8px;
-      padding: 12px 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 12px 24px;
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid rgba(107, 13, 43, 0.1);
     }
 
     .confirmation-number i {
-      color: var(--beige);
+      color: #6b0d2b;
       font-size: 18px;
     }
 
     .confirmation-number span {
-      color: var(--beige);
+      color: #666;
       font-size: 14px;
     }
 
     .confirmation-number strong {
-      color: var(--beige);
-      font-weight: 600;
+      color: #6b0d2b;
+      font-weight: 700;
+      font-size: 16px;
     }
 
-    /* Details Container */
+    /* Details Container - Matching card style */
     .details-container {
-      background: rgba(255, 255, 255, 0.05);
+      background: white;
       border-radius: 16px;
-      padding: 30px;
+      padding: 35px;
       margin-bottom: 30px;
-      border: 1px solid rgba(216, 192, 157, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(107, 13, 43, 0.1);
     }
 
     /* Detail Row */
     .detail-row {
       display: flex;
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid rgba(216, 192, 157, 0.1);
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(107, 13, 43, 0.1);
     }
 
     .detail-row:last-child {
@@ -282,45 +301,53 @@
 
     .detail-label {
       min-width: 140px;
-      color: var(--beige);
+      color: #666;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .detail-value {
-      color: var(--beige);
+      color: #333;
       font-size: 16px;
+      font-weight: 500;
       flex: 1;
     }
 
     .detail-value.bold {
       font-weight: 600;
+      color: #6b0d2b;
     }
 
     /* Add-ons List */
     .addons-list {
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .addon-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-      color: var(--beige);
+      gap: 10px;
+      margin-bottom: 8px;
+      color: #333;
       font-size: 14px;
     }
 
     .addon-item i {
-      color: var(--maroon);
+      color: #6b0d2b;
       font-size: 12px;
+    }
+
+    .addon-item:last-child {
+      margin-bottom: 0;
     }
 
     /* Divider */
     .divider {
       height: 1px;
-      background: rgba(216, 192, 157, 0.3);
-      margin: 24px 0;
+      background: rgba(107, 13, 43, 0.2);
+      margin: 20px 0;
     }
 
     /* Total Row */
@@ -328,53 +355,83 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 16px;
-      border-top: 2px solid rgba(216, 192, 157, 0.3);
+      padding-top: 20px;
+      margin-top: 10px;
+      border-top: 2px solid rgba(107, 13, 43, 0.2);
     }
 
     .total-label {
-      color: var(--beige);
-      font-size: 18px;
-      font-weight: bold;
+      color: #1b1b1b;
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
     }
 
     .total-amount {
-      color: var(--beige);
-      font-size: 24px;
-      font-weight: bold;
+      color: #6b0d2b;
+      font-size: 28px;
+      font-weight: 700;
     }
 
     /* Back Button */
     .back-button {
       width: 100%;
-      background: var(--maroon);
-      color: var(--beige);
+      background: linear-gradient(135deg, #6b0d2b 0%, #8a1e3d 100%);
+      color: white;
       border: none;
       padding: 18px;
       border-radius: 12px;
       font-family: 'Montserrat', sans-serif;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
       transition: all 0.3s ease;
-      margin-top: 30px;
     }
 
     .back-button:hover {
-      background: #5a0b23;
+      background: linear-gradient(135deg, #5a0b23 0%, #791532 100%);
       transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(122, 0, 38, 0.3);
+      box-shadow: 0 6px 20px rgba(107, 13, 43, 0.3);
     }
 
     .back-button i {
-      font-size: 20px;
+      font-size: 18px;
     }
 
-    /* Status Badges */
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(107, 13, 43, 0.1);
+    }
+
+    .empty-state i {
+      font-size: 64px;
+      color: rgba(107, 13, 43, 0.3);
+      margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: #1b1b1b;
+      margin-bottom: 10px;
+    }
+
+    .empty-state p {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    /* Status Badge */
     .status-badge {
       display: inline-block;
       padding: 4px 12px;
@@ -386,46 +443,9 @@
     }
 
     .status-badge.pending {
-      background: rgba(255, 193, 7, 0.2);
-      color: #ffc107;
-      border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-
-    .status-badge.confirmed {
-      background: rgba(40, 167, 69, 0.2);
-      color: #28a745;
-      border: 1px solid rgba(40, 167, 69, 0.3);
-    }
-
-    .status-badge.completed {
-      background: rgba(0, 123, 255, 0.2);
-      color: #007bff;
-      border: 1px solid rgba(0, 123, 255, 0.3);
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--beige);
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      color: rgba(216, 192, 157, 0.3);
-      margin-bottom: 20px;
-    }
-
-    .empty-state h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
-    .empty-state p {
-      color: rgba(216, 192, 157, 0.6);
-      margin-bottom: 30px;
-      font-size: 16px;
+      background: rgba(255, 152, 0, 0.1);
+      color: #ff9800;
+      border: 1px solid rgba(255, 152, 0, 0.3);
     }
 
     /* Responsive Design */
@@ -439,7 +459,7 @@
       }
 
       .details-container {
-        padding: 20px;
+        padding: 24px;
       }
 
       .detail-row {
@@ -455,16 +475,24 @@
         padding: 16px;
         font-size: 16px;
       }
+
+      .total-label {
+        font-size: 18px;
+      }
+
+      .total-amount {
+        font-size: 24px;
+      }
     }
 
     @media (max-width: 480px) {
       .success-icon-circle {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
       }
 
       .success-icon {
-        font-size: 30px;
+        font-size: 35px;
       }
 
       .success-title {
@@ -472,7 +500,7 @@
       }
 
       .details-container {
-        padding: 16px;
+        padding: 20px;
       }
 
       .detail-label,
@@ -508,7 +536,7 @@
 
       <nav class="main-nav">
         <ul>
-          <li><a href="../all_wines/all_wines.html">All Wines</a></li>
+          <li><a href="../wine/all_wines.html">All Wines</a></li>
           <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
           <li><a href="../wine_farm/wine_farm.html">Wine Bars Near Me</a></li>
           <li><a href="../pairings/pairings.html">Pairings</a></li>
@@ -546,46 +574,43 @@
 
       <!-- Booking Details -->
       <div class="details-container">
-        <!-- Booking Details -->
         <div class="detail-row">
-          <span class="detail-label">Date:</span>
-          <span class="detail-value" id="bookingDate">November 15, 2023</span>
+          <span class="detail-label">Date</span>
+          <span class="detail-value" id="bookingDate">Loading...</span>
         </div>
 
         <div class="detail-row">
-          <span class="detail-label">Time:</span>
-          <span class="detail-value" id="bookingTime">6:00 PM</span>
+          <span class="detail-label">Time</span>
+          <span class="detail-value" id="bookingTime">Loading...</span>
         </div>
 
         <div class="detail-row">
-          <span class="detail-label">Guests:</span>
-          <span class="detail-value" id="bookingGuests">4</span>
+          <span class="detail-label">Guests</span>
+          <span class="detail-value" id="bookingGuests">Loading...</span>
         </div>
 
         <div class="detail-row">
-          <span class="detail-label">Event Type:</span>
-          <span class="detail-value" id="eventType">Corporate Event</span>
+          <span class="detail-label">Event Type</span>
+          <span class="detail-value" id="eventType">Loading...</span>
         </div>
 
         <!-- Sommelier Service -->
         <div class="detail-row" id="sommelierRow" style="display: none;">
-          <span class="detail-label">Sommelier:</span>
-          <span class="detail-value">Yes</span>
+          <span class="detail-label">Sommelier Service</span>
+          <span class="detail-value">Included (+R250.00)</span>
         </div>
 
         <!-- Add-ons -->
         <div class="detail-row" id="addonsRow" style="display: none;">
-          <span class="detail-label">Add-Ons:</span>
+          <span class="detail-label">Add-Ons</span>
           <div class="detail-value">
-            <div class="addons-list" id="addonsList">
-              <!-- Add-ons will be populated here -->
-            </div>
+            <div class="addons-list" id="addonsList"></div>
           </div>
         </div>
 
         <!-- Special Requests -->
         <div class="detail-row" id="specialRequestsRow" style="display: none;">
-          <span class="detail-label">Special Request:</span>
+          <span class="detail-label">Special Request</span>
           <span class="detail-value" id="specialRequest"></span>
         </div>
 
@@ -594,8 +619,13 @@
 
         <!-- Total Amount -->
         <div class="total-row">
-          <span class="total-label">Total Amount:</span>
-          <span class="total-amount" id="totalAmount">R1,200.00</span>
+          <span class="total-label">Total Amount</span>
+          <span class="total-amount" id="totalAmount">R0.00</span>
+        </div>
+
+        <!-- Status -->
+        <div style="margin-top: 20px; text-align: center;">
+          <span class="status-badge pending">Pending Confirmation</span>
         </div>
       </div>
 
@@ -637,7 +667,7 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="../all_wines/all_wines.html">All Wines</a></li>
+            <li><a href="../wine/all_wines.html">All Wines</a></li>
             <li><a href="../booking/booking.html">Bookings</a></li>
             <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
             <li><a href="../pairings/pairings.html">Pairings</a></li>
@@ -663,8 +693,8 @@
     // Configuration
     const CONFIG = {
       PRIMARY_COLOR: '#6b0d2b',
-      ACCENT_COLOR: '#d8c09d',
-      BG_COLOR: '#0F0F0F'
+      ACCENT_COLOR: '#e6c79c',
+      BG_COLOR: '#f8f8f8'
     };
 
     // Format date function
@@ -674,7 +704,6 @@
       try {
         const date = new Date(dateString);
         if (isNaN(date.getTime())) {
-          // If it's already a formatted string, return as is
           return dateString;
         }
         
@@ -694,12 +723,10 @@
     function formatTime(timeString) {
       if (!timeString) return 'Not specified';
       
-      // If time is already in 12-hour format with AM/PM, return as is
       if (timeString.includes('AM') || timeString.includes('PM')) {
         return timeString;
       }
       
-      // Otherwise, try to parse it
       try {
         const [hours, minutes] = timeString.split(':');
         const hour = parseInt(hours);
@@ -713,7 +740,7 @@
 
     // Format currency
     function formatCurrency(amount) {
-      return 'R' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+      return 'R' + parseFloat(amount).toFixed(2);
     }
 
     // Generate booking ID
@@ -729,7 +756,6 @@
       const bookingData = localStorage.getItem('lastBooking');
       
       if (!bookingData) {
-        // No booking data found, show empty state
         document.getElementById('emptyState').style.display = 'block';
         document.querySelector('.details-container').style.display = 'none';
         document.querySelector('.success-header').style.display = 'none';
@@ -739,38 +765,32 @@
       try {
         const booking = JSON.parse(bookingData);
         
-        // Generate and display booking ID
         const bookingId = generateBookingId();
         document.getElementById('confirmationNumber').textContent = `#${bookingId}`;
         
-        // Format and display date
         if (booking.date) {
           document.getElementById('bookingDate').textContent = formatDate(booking.date);
         }
         
-        // Format and display time
         if (booking.time) {
           document.getElementById('bookingTime').textContent = formatTime(booking.time);
         }
         
-        // Display number of guests
         if (booking.numberOfGuests) {
           document.getElementById('bookingGuests').textContent = booking.numberOfGuests;
         }
         
-        // Display event type
         if (booking.type) {
           document.getElementById('eventType').textContent = booking.type;
         }
         
-        // Display sommelier service if included
         if (booking.includesSommelier) {
           document.getElementById('sommelierRow').style.display = 'flex';
         }
         
-        // Display add-ons if any
         if (booking.addOns && booking.addOns.length > 0) {
           const addonsList = document.getElementById('addonsList');
+          addonsList.innerHTML = '';
           booking.addOns.forEach(addon => {
             const addonItem = document.createElement('div');
             addonItem.className = 'addon-item';
@@ -783,18 +803,15 @@
           document.getElementById('addonsRow').style.display = 'flex';
         }
         
-        // Display special requests if any
         if (booking.specialRequest && booking.specialRequest.trim() !== '') {
           document.getElementById('specialRequest').textContent = booking.specialRequest;
           document.getElementById('specialRequestsRow').style.display = 'flex';
         }
         
-        // Display total amount
         if (booking.totalAmount) {
           document.getElementById('totalAmount').textContent = formatCurrency(booking.totalAmount);
         }
         
-        // Store the booking ID for future reference
         localStorage.setItem('lastBookingId', bookingId);
         
       } catch (error) {
@@ -818,14 +835,10 @@
       }, 5000);
     }
 
-    // Handle back button click
+    // Setup back button
     function setupBackButton() {
       const backButton = document.getElementById('backButton');
       backButton.addEventListener('click', () => {
-        // Clear the booking data from localStorage if needed
-        // localStorage.removeItem('lastBooking');
-        
-        // Redirect to home page
         window.location.href = '../index.html';
       });
     }
@@ -840,17 +853,14 @@
       const cartIcon = document.getElementById('cartIcon');
       
       if (token && userData) {
-        // User is logged in
         try {
           const user = JSON.parse(userData);
           
-          // Update user icon
           if (userIconElement) {
             userIconElement.className = 'fas fa-user-check';
             userIconElement.style.color = CONFIG.PRIMARY_COLOR;
           }
           
-          // Setup user dropdown
           if (userIcon) {
             userIcon.href = '#';
             userIcon.addEventListener('click', function(e) {
@@ -866,22 +876,11 @@
           resetUserIcon();
         }
       } else {
-        // User is not logged in
         resetUserIcon();
       }
       
-      // Setup cart functionality
       if (cartIcon) {
         updateCartCount();
-        cartIcon.addEventListener('click', function(e) {
-          if (!token) {
-            e.preventDefault();
-            showToast('Please login to view your cart', 'error');
-            setTimeout(() => {
-              window.location.href = '../login/login.html';
-            }, 2000);
-          }
-        });
       }
     }
 
@@ -906,17 +905,14 @@
     }
 
     function createUserDropdown(user) {
-      // Remove existing dropdown if any
       const existingDropdown = document.querySelector('.user-dropdown');
       if (existingDropdown) {
         existingDropdown.remove();
       }
       
-      // Create dropdown container
       const dropdown = document.createElement('div');
       dropdown.className = 'user-dropdown';
       
-      // User info
       const userInfo = document.createElement('div');
       userInfo.className = 'user-dropdown-info';
       
@@ -932,25 +928,19 @@
       userInfo.appendChild(userEmail);
       dropdown.appendChild(userInfo);
       
-      // Dropdown items
       const items = [
         { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' },
         { text: 'My Bookings', icon: 'fas fa-calendar', href: '../user/bookings.html' }
       ];
       
-      // Add items to dropdown
       items.forEach(item => {
         const link = document.createElement('a');
         link.href = item.href;
         link.className = 'user-dropdown-link';
-        link.innerHTML = `
-          <i class="${item.icon}"></i>
-          <span>${item.text}</span>
-        `;
+        link.innerHTML = `<i class="${item.icon}"></i><span>${item.text}</span>`;
         dropdown.appendChild(link);
       });
       
-      // Logout button
       const logoutButton = document.createElement('button');
       logoutButton.className = 'user-dropdown-logout';
       logoutButton.textContent = 'Logout';
@@ -967,7 +957,6 @@
       dropdown.appendChild(logoutButton);
       document.body.appendChild(dropdown);
       
-      // Close dropdown when clicking outside
       document.addEventListener('click', function(event) {
         const dropdown = document.querySelector('.user-dropdown');
         const userIcon = document.getElementById('userIcon');
@@ -980,16 +969,18 @@
 
     function updateCartCount() {
       const cartBadge = document.getElementById('cartBadge');
-      const cartData = localStorage.getItem('wineBubbles_cart');
+      const cartData = localStorage.getItem('wine_cart');
       
       if (cartData) {
         try {
           const cart = JSON.parse(cartData);
-          const itemCount = cart.items ? cart.items.length : 0;
+          const itemCount = cart.items ? cart.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0;
           
           if (itemCount > 0 && cartBadge) {
             cartBadge.textContent = itemCount;
             cartBadge.style.display = 'flex';
+          } else if (cartBadge) {
+            cartBadge.style.display = 'none';
           }
         } catch (error) {
           console.error('Error parsing cart data:', error);
@@ -997,37 +988,19 @@
       }
     }
 
-    // Initialize everything when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('✅ Booking confirmation page loaded');
-      
-      // Load booking data
-      loadBookingData();
-      
-      // Setup back button
-      setupBackButton();
-      
-      // Setup user authentication
-      setupUserAuthentication();
-      
-      // Add some celebration confetti
-      createConfetti();
-    });
-
-    // Create confetti effect for celebration
+    // Create confetti effect
     function createConfetti() {
-      const colors = ['#6b0d2b', '#d8c09d', '#ffffff', '#ffd700'];
-      const confettiCount = 50;
+      const colors = ['#6b0d2b', '#e6c79c', '#ffffff', '#d4af37'];
+      const confettiCount = 60;
       
       for (let i = 0; i < confettiCount; i++) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti';
         
-        // Random properties
         const color = colors[Math.floor(Math.random() * colors.length)];
         const left = Math.random() * 100;
-        const width = Math.random() * 10 + 5;
-        const height = Math.random() * 20 + 10;
+        const width = Math.random() * 8 + 4;
+        const height = Math.random() * 15 + 8;
         const delay = Math.random() * 2;
         const duration = Math.random() * 2 + 2;
         
@@ -1043,12 +1016,21 @@
         
         document.body.appendChild(confetti);
         
-        // Remove confetti after animation completes
         setTimeout(() => {
           confetti.remove();
         }, (delay + duration) * 1000);
       }
     }
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('✅ Booking confirmation page loaded');
+      
+      loadBookingData();
+      setupBackButton();
+      setupUserAuthentication();
+      createConfetti();
+    });
   </script>
 </body>
 </html>
