@@ -1,8 +1,8 @@
 // Booking JavaScript - Main functionality with authentication protection
 
-// Configuration - UPDATED FOR PRODUCTION
+// Configuration - UPDATED FOR PRODUCTION (using proxy pattern)
 const CONFIG = {
-    API_BASE_URL: 'https://www.wineandbubblesnow.co.za/api',
+    API_BASE_URL: '/api',  // This works on both localhost and production
     PRICE_PER_GUEST: 300.00,
     SOMMELIER_PRICE: 250.00
 };
@@ -106,6 +106,31 @@ function showLoginRequired() {
     document.getElementById('cancelBtn').addEventListener('click', () => {
         window.history.back();
     });
+}
+
+// Helper function to fix image URLs
+function fixImageUrl(imageUrl) {
+    if (!imageUrl) {
+        return '../assets/categories/Icons.png';
+    }
+    
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl;
+    }
+    
+    if (imageUrl.startsWith('assets/')) {
+        return '../' + imageUrl;
+    }
+    
+    if (imageUrl.startsWith('../assets/')) {
+        return imageUrl;
+    }
+    
+    if (imageUrl.startsWith('/')) {
+        return imageUrl;
+    }
+    
+    return '../assets/' + imageUrl;
 }
 
 // Booking State Manager
@@ -251,6 +276,7 @@ class UIManager {
         this.state = new BookingState();
         this.datePicker = null;
         this.timePicker = null;
+        this.allAddOns = [];
     }
 
     initialize() {
@@ -460,18 +486,35 @@ class UIManager {
             this.showLoading(true);
             const token = localStorage.getItem('wineBubbles_token');
             
-            // UPDATED: Using production API endpoint
-            const response = await fetch(`${CONFIG.API_BASE_URL}/addons`, {
+            // UPDATED: Using production API endpoint with cache busting
+            const apiUrl = `${CONFIG.API_BASE_URL}/addons?all=true&_=${Date.now()}`;
+            console.log('🌐 Fetching add-ons from:', apiUrl);
+            
+            const response = await fetch(apiUrl, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Cache-Control': 'no-cache'
                 }
             });
             
             if (response.ok) {
-                const addOns = await response.json();
-                this.populateAddOnsDropdown(addOns);
+                let addOns = await response.json();
+                console.log('✅ Add-ons loaded from API:', addOns);
+                
+                // Handle different response formats
+                if (addOns.success && Array.isArray(addOns.data)) {
+                    addOns = addOns.data;
+                } else if (addOns.addOns && Array.isArray(addOns.addOns)) {
+                    addOns = addOns.addOns;
+                } else if (!Array.isArray(addOns)) {
+                    addOns = [];
+                }
+                
+                this.allAddOns = addOns;
+                console.log(`✅ Loaded ${this.allAddOns.length} add-ons with images`);
+                this.populateAddOnsDropdown(this.allAddOns);
             } else {
                 console.error('Failed to load add-ons:', response.status);
                 this.loadFallbackAddOns();
@@ -485,7 +528,7 @@ class UIManager {
     }
 
     loadFallbackAddOns() {
-        // Use images from assets/categories folder
+        console.log('📦 Using fallback add-ons');
         const fallbackAddOns = [
             { 
                 id: 1, 
@@ -545,6 +588,7 @@ class UIManager {
             }
         ];
         
+        this.allAddOns = fallbackAddOns;
         this.populateAddOnsDropdown(fallbackAddOns);
     }
 
@@ -561,13 +605,13 @@ class UIManager {
             option.value = addon.id;
             option.setAttribute('data-name', addon.name);
             option.setAttribute('data-price', addon.price);
-            option.setAttribute('data-image', addon.imageUrl || '../assets/categories/Icons.png');
+            option.setAttribute('data-image', fixImageUrl(addon.imageUrl));
             option.setAttribute('data-category', addon.category || 'Uncategorized');
             option.textContent = `${addon.name} - R${addon.price.toFixed(2)}`;
             select.appendChild(option);
         });
         
-        // Create custom dropdown for better display
+        // Create custom dropdown for better display with images
         this.createCustomDropdown(addOns);
     }
 
@@ -599,22 +643,24 @@ class UIManager {
         const dropdownOptions = document.createElement('div');
         dropdownOptions.className = 'dropdown-options';
         
-        // Add options
+        // Add options with images
         addOns.forEach(addon => {
             const option = document.createElement('div');
             option.className = 'dropdown-option';
             option.setAttribute('data-value', addon.id);
             option.setAttribute('data-name', addon.name);
             option.setAttribute('data-price', addon.price);
-            option.setAttribute('data-image', addon.imageUrl || '../assets/categories/Icons.png');
+            option.setAttribute('data-image', fixImageUrl(addon.imageUrl));
             option.setAttribute('data-category', addon.category || 'Uncategorized');
+            
+            const imageUrl = fixImageUrl(addon.imageUrl);
             
             option.innerHTML = `
                 <div class="option-content">
                     <div class="option-image">
-                        <img src="${addon.imageUrl || '../assets/categories/Icons.png'}" 
+                        <img src="${imageUrl}" 
                              alt="${addon.name}"
-                             onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" viewBox=\"0 0 40 40\"><rect width=\"40\" height=\"40\" fill=\"%23f0f0f0\"/><text x=\"20\" y=\"22\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"12\">${(addon.category || 'A').charAt(0).toUpperCase()}</text></svg>';">
+                             onerror="this.onerror=null; this.src='../assets/categories/Icons.png';">
                     </div>
                     <div class="option-details">
                         <div class="option-name">${addon.name}</div>
