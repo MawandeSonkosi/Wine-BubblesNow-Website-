@@ -4,8 +4,40 @@
 const CONFIG = {
     API_BASE_URL: '/api',  // This works on both localhost and production
     PRICE_PER_GUEST: 300.00,
-    SOMMELIER_PRICE: 250.00
+    SOMMELIER_PRICE: 250.00,
+    ADDONS_CACHE_KEY: 'wineBubbles_addons_cache',
+    ADDONS_CACHE_TIME: 5 * 60 * 1000 // 5 minutes cache
 };
+
+// Helper function to fix image URLs
+function fixImageUrl(imageUrl) {
+    if (!imageUrl) {
+        return '../assets/categories/Icons.png';
+    }
+    
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl;
+    }
+    
+    if (imageUrl.startsWith('assets/')) {
+        return '../' + imageUrl;
+    }
+    
+    if (imageUrl.startsWith('../assets/')) {
+        return imageUrl;
+    }
+    
+    if (imageUrl.startsWith('/')) {
+        return imageUrl;
+    }
+    
+    // For images from backend that might be in a different format
+    if (imageUrl.includes('/uploads/') || imageUrl.includes('/images/')) {
+        return imageUrl;
+    }
+    
+    return '../assets/' + imageUrl;
+}
 
 // Authentication check function
 function isAuthenticated() {
@@ -16,12 +48,10 @@ function isAuthenticated() {
         return false;
     }
     
-    // Check if token is expired (7 days)
     const tokenAge = Date.now() - parseInt(timestamp);
     const sevenDays = 7 * 24 * 60 * 60 * 1000;
     
     if (tokenAge >= sevenDays) {
-        // Token expired, clear session
         clearUserSession();
         return false;
     }
@@ -45,7 +75,6 @@ function clearUserSession() {
 
 // Show login required message
 function showLoginRequired() {
-    // Create a modal or overlay
     const loginOverlay = document.createElement('div');
     loginOverlay.style.cssText = `
         position: fixed;
@@ -78,7 +107,6 @@ function showLoginRequired() {
                     font-family: 'Montserrat', sans-serif;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: background-color 0.3s;
                 ">Login Now</button>
                 <button id="cancelBtn" style="
                     background: #f0f0f0;
@@ -89,7 +117,6 @@ function showLoginRequired() {
                     font-family: 'Montserrat', sans-serif;
                     font-weight: 600;
                     cursor: pointer;
-                    transition: background-color 0.3s;
                 ">Go Back</button>
             </div>
         </div>
@@ -97,7 +124,6 @@ function showLoginRequired() {
     
     document.body.appendChild(loginOverlay);
     
-    // Add event listeners
     document.getElementById('loginRedirectBtn').addEventListener('click', () => {
         const currentUrl = encodeURIComponent(window.location.href);
         window.location.href = `../login/login.html?redirect=${currentUrl}`;
@@ -106,31 +132,6 @@ function showLoginRequired() {
     document.getElementById('cancelBtn').addEventListener('click', () => {
         window.history.back();
     });
-}
-
-// Helper function to fix image URLs
-function fixImageUrl(imageUrl) {
-    if (!imageUrl) {
-        return '../assets/categories/Icons.png';
-    }
-    
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        return imageUrl;
-    }
-    
-    if (imageUrl.startsWith('assets/')) {
-        return '../' + imageUrl;
-    }
-    
-    if (imageUrl.startsWith('../assets/')) {
-        return imageUrl;
-    }
-    
-    if (imageUrl.startsWith('/')) {
-        return imageUrl;
-    }
-    
-    return '../assets/' + imageUrl;
 }
 
 // Booking State Manager
@@ -181,14 +182,12 @@ class BookingState {
     calculateTotal() {
         let total = CONFIG.PRICE_PER_GUEST * this.numberOfGuests;
         
-        // Add add-ons
         this.addOns.forEach(addon => {
             if (addon.quantity > 0) {
                 total += addon.price * addon.quantity;
             }
         });
         
-        // Add sommelier
         if (this.includesSommelier) {
             total += CONFIG.SOMMELIER_PRICE;
         }
@@ -240,7 +239,6 @@ class BookingState {
                 category: addon.category || 'Uncategorized'
             }));
         
-        // Add sommelier as add-on if selected
         if (this.includesSommelier) {
             addOnsData.push({
                 name: 'Sommelier Service',
@@ -280,19 +278,24 @@ class UIManager {
     }
 
     initialize() {
-        // First check authentication
         if (!this.setUserFromStorage()) {
             showLoginRequired();
-            return; // Stop initialization if not authenticated
+            return;
         }
         
         this.initializeDatePickers();
         this.attachEventListeners();
         this.loadAddOns();
         this.updateUI();
-        
-        // Update user icon in navbar
         this.updateUserIcon();
+        
+        // Auto-refresh add-ons every 5 minutes
+        setInterval(() => this.refreshAddOns(), CONFIG.ADDONS_CACHE_TIME);
+    }
+
+    async refreshAddOns() {
+        console.log('🔄 Auto-refreshing add-ons...');
+        await this.loadAddOns(true); // Force refresh
     }
 
     setUserFromStorage() {
@@ -340,7 +343,6 @@ class UIManager {
     }
 
     initializeDatePickers() {
-        // Date picker
         this.datePicker = flatpickr("#bookingDate", {
             dateFormat: "D, M d, Y",
             minDate: "today",
@@ -351,7 +353,6 @@ class UIManager {
             }
         });
 
-        // Time picker
         this.timePicker = flatpickr("#bookingTime", {
             enableTime: true,
             noCalendar: true,
@@ -368,7 +369,6 @@ class UIManager {
     }
 
     attachEventListeners() {
-        // Date/time picker buttons
         document.getElementById('datePickerBtn').addEventListener('click', () => {
             this.datePicker.open();
         });
@@ -377,7 +377,6 @@ class UIManager {
             this.timePicker.open();
         });
 
-        // Guest controls
         document.getElementById('decreaseGuests').addEventListener('click', () => {
             this.state.updateGuestCount(this.state.numberOfGuests - 1);
             document.getElementById('guests').value = this.state.numberOfGuests;
@@ -390,7 +389,6 @@ class UIManager {
             this.updateUI();
         });
 
-        // Input fields
         document.getElementById('eventType').addEventListener('input', (e) => {
             this.state.eventType = e.target.value;
         });
@@ -409,7 +407,6 @@ class UIManager {
             this.state.specialRequests = e.target.value;
         });
 
-        // Add-ons
         document.getElementById('addOns').addEventListener('change', (e) => {
             const selectedOption = e.target.options[e.target.selectedIndex];
             if (selectedOption.value) {
@@ -432,7 +429,6 @@ class UIManager {
             }
         });
 
-        // Add-on quantity controls
         document.getElementById('decreaseAddon').addEventListener('click', () => {
             const quantityInput = document.getElementById('addonQuantity');
             let quantity = parseInt(quantityInput.value);
@@ -451,7 +447,6 @@ class UIManager {
             }
         });
 
-        // Done button for add-on
         document.getElementById('doneAddonBtn').addEventListener('click', () => {
             const quantity = parseInt(document.getElementById('addonQuantity').value);
             if (quantity > 0 && this.state.selectedAddon) {
@@ -468,25 +463,38 @@ class UIManager {
                 this.updateUI();
             }
             
-            // Reset
             document.getElementById('addOns').value = '';
             document.getElementById('addonQuantityGroup').style.display = 'none';
             this.state.selectedAddon = null;
         });
 
-        // Form submission
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             await this.submitBooking();
         });
     }
 
-    async loadAddOns() {
+    async loadAddOns(forceRefresh = false) {
         try {
             this.showLoading(true);
             const token = localStorage.getItem('wineBubbles_token');
             
-            // UPDATED: Using production API endpoint with cache busting
+            // Check cache first
+            const cached = localStorage.getItem(CONFIG.ADDONS_CACHE_KEY);
+            const cacheTime = localStorage.getItem(`${CONFIG.ADDONS_CACHE_KEY}_time`);
+            
+            if (!forceRefresh && cached && cacheTime) {
+                const age = Date.now() - parseInt(cacheTime);
+                if (age < CONFIG.ADDONS_CACHE_TIME) {
+                    console.log('📦 Using cached add-ons');
+                    const cachedAddons = JSON.parse(cached);
+                    this.allAddOns = cachedAddons;
+                    this.populateAddOnsDropdown(cachedAddons);
+                    this.showLoading(false);
+                    return;
+                }
+            }
+            
             const apiUrl = `${CONFIG.API_BASE_URL}/addons?all=true&_=${Date.now()}`;
             console.log('🌐 Fetching add-ons from:', apiUrl);
             
@@ -513,7 +521,12 @@ class UIManager {
                 }
                 
                 this.allAddOns = addOns;
-                console.log(`✅ Loaded ${this.allAddOns.length} add-ons with images`);
+                
+                // Cache the results
+                localStorage.setItem(CONFIG.ADDONS_CACHE_KEY, JSON.stringify(addOns));
+                localStorage.setItem(`${CONFIG.ADDONS_CACHE_KEY}_time`, Date.now().toString());
+                
+                console.log(`✅ Loaded ${this.allAddOns.length} add-ons`);
                 this.populateAddOnsDropdown(this.allAddOns);
             } else {
                 console.error('Failed to load add-ons:', response.status);
@@ -611,13 +624,15 @@ class UIManager {
             select.appendChild(option);
         });
         
-        // Create custom dropdown for better display with images
+        // Create custom dropdown with images
         this.createCustomDropdown(addOns);
     }
 
     createCustomDropdown(addOns) {
         const dropdownContainer = document.querySelector('.dropdown-container');
         const originalSelect = document.getElementById('addOns');
+        
+        if (!dropdownContainer) return;
         
         // Remove existing custom dropdown if any
         const existingCustom = dropdownContainer.querySelector('.custom-dropdown');
@@ -671,16 +686,9 @@ class UIManager {
             `;
             
             option.addEventListener('click', () => {
-                // Update original select
                 originalSelect.value = addon.id;
-                
-                // Update custom display
                 dropdownDisplay.querySelector('.display-content').innerHTML = option.innerHTML;
-                
-                // Trigger change event
                 originalSelect.dispatchEvent(new Event('change'));
-                
-                // Close dropdown
                 dropdownOptions.classList.remove('show');
             });
             
@@ -716,7 +724,6 @@ class UIManager {
         
         let hasItems = false;
         
-        // Add add-ons
         this.state.addOns.forEach(addon => {
             if (addon.quantity > 0) {
                 const item = document.createElement('div');
@@ -731,7 +738,6 @@ class UIManager {
             }
         });
         
-        // Add sommelier if selected
         if (this.state.includesSommelier) {
             const item = document.createElement('div');
             item.className = 'selected-item';
@@ -748,7 +754,6 @@ class UIManager {
     }
 
     updateUI() {
-        // Update guests summary
         const guests = this.state.numberOfGuests;
         const basePrice = CONFIG.PRICE_PER_GUEST * guests;
         
@@ -758,13 +763,11 @@ class UIManager {
             `R${basePrice.toFixed(2)}`;
         document.getElementById('basePrice').textContent = basePrice.toFixed(2);
         
-        // Update add-ons summary
         const addonsSummary = document.getElementById('addonsSummary');
         addonsSummary.innerHTML = '';
         
         let addonsTotal = 0;
         
-        // Add add-ons to summary
         this.state.addOns.forEach(addon => {
             if (addon.quantity > 0) {
                 const addonTotal = addon.price * addon.quantity;
@@ -780,7 +783,6 @@ class UIManager {
             }
         });
         
-        // Add sommelier if selected
         if (this.state.includesSommelier) {
             addonsTotal += CONFIG.SOMMELIER_PRICE;
             const row = document.createElement('div');
@@ -792,7 +794,6 @@ class UIManager {
             addonsSummary.appendChild(row);
         }
         
-        // Update total
         const total = basePrice + addonsTotal;
         this.state.totalAmount = total;
         
@@ -800,7 +801,6 @@ class UIManager {
     }
 
     async submitBooking() {
-        // Validate form
         const validation = this.state.validate();
         if (!validation.isValid) {
             validation.errors.forEach(error => {
@@ -809,7 +809,6 @@ class UIManager {
             return;
         }
         
-        // Show loading
         this.showLoading(true);
         
         try {
@@ -817,9 +816,7 @@ class UIManager {
             const token = localStorage.getItem('wineBubbles_token');
             
             console.log('📋 Submitting booking to:', `${CONFIG.API_BASE_URL}/bookings`);
-            console.log('📋 Booking data:', bookingData);
             
-            // UPDATED: Using production API endpoint
             const response = await fetch(`${CONFIG.API_BASE_URL}/bookings`, {
                 method: 'POST',
                 headers: {
@@ -834,18 +831,15 @@ class UIManager {
             if (response.ok) {
                 this.showToast('Booking submitted successfully!', 'success');
                 
-                // Send booking confirmation email
                 await this.sendBookingEmail(bookingData);
                 
-                // Store for confirmation page
                 localStorage.setItem('lastBooking', JSON.stringify({
                     ...bookingData,
                     id: data._id || data.id || Date.now().toString()
                 }));
                 
-                // Redirect to confirmation page in the SAME FOLDER
                 setTimeout(() => {
-                    window.location.href = 'confirmation.html'; // Same folder
+                    window.location.href = 'confirmation.html';
                 }, 2000);
             } else {
                 this.showToast(data.message || 'Failed to submit booking', 'error');
@@ -862,7 +856,6 @@ class UIManager {
         try {
             const token = localStorage.getItem('wineBubbles_token');
             
-            // UPDATED: Using production email API
             const emailResponse = await fetch(`${CONFIG.API_BASE_URL}/email/send-booking-email`, {
                 method: 'POST',
                 headers: {
@@ -908,23 +901,18 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('📋 Booking page loading...');
     console.log('🌐 API Base URL:', CONFIG.API_BASE_URL);
     
-    // Check authentication first
     if (!isAuthenticated()) {
         console.log('❌ Authentication failed, showing login required');
-        return; // Stop here if not authenticated
+        return;
     }
     
-    // Initialize UI Manager
     const uiManager = new UIManager();
     uiManager.initialize();
     
     console.log('✅ Booking page initialized for authenticated user');
 });
 
-// Also add a global authentication check for direct navigation attempts
-// This ensures even if someone tries to bypass the initial check, they'll be redirected
 window.addEventListener('load', () => {
-    // Double-check authentication after page loads
     setTimeout(() => {
         if (!isAuthenticated()) {
             console.log('❌ Late authentication check failed');

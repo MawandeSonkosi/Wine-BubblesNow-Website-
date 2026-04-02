@@ -212,45 +212,115 @@
       background: #f39c12;
     }
 
-    /* Add-on dropdown item styles */
-    .addon-option {
-      display: flex;
-      align-items: center;
-      padding: 8px 4px;
+    /* Custom dropdown styles */
+    .dropdown-container {
+      position: relative;
+      width: 100%;
     }
-
-    .addon-option-image {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-      background: rgba(107, 13, 43, 0.1);
+    
+    .custom-dropdown {
+      position: relative;
+      width: 100%;
+    }
+    
+    .dropdown-display {
+      width: 100%;
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin-right: 12px;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+    
+    .dropdown-display:hover {
+      border-color: #6b0d2b;
+    }
+    
+    .dropdown-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .dropdown-options.show {
+      display: block;
+    }
+    
+    .dropdown-option {
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .dropdown-option:hover {
+      background: rgba(107, 13, 43, 0.05);
+    }
+    
+    .option-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .option-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
       overflow: hidden;
+      background: #f5f5f5;
+      flex-shrink: 0;
     }
-
-    .addon-option-image img {
+    
+    .option-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-
-    .addon-option-details {
+    
+    .option-details {
       flex: 1;
     }
-
-    .addon-option-name {
-      font-weight: 500;
+    
+    .option-name {
+      font-weight: 600;
       font-size: 14px;
-      color: #1b1b1b;
-      margin-bottom: 2px;
+      color: #333;
+      margin-bottom: 4px;
     }
-
-    .addon-option-price {
+    
+    .option-price {
       font-size: 12px;
-      color: rgba(107, 13, 43, 0.7);
+      color: #6b0d2b;
+      font-weight: 500;
+    }
+    
+    .option-category {
+      font-size: 11px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    .dropdown-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #999;
     }
   </style>
 </head>
@@ -281,10 +351,10 @@
       </nav>
 
       <div class="top-icons">
-       <a href="/cart/cart.html" class="icon cart-icon">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-badge" style="display: none;">0</span>
-  </a>
+        <a href="/cart/cart.html" class="icon cart-icon">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" style="display: none;">0</span>
+        </a>
         <a href="../user/profile.html" class="icon" id="userIcon">
           <i class="fas fa-user" id="userIconElement"></i>
         </a>
@@ -382,9 +452,8 @@
           <div class="form-group">
             <label for="addOns">Select Add-ons</label>
             <div class="dropdown-container">
-              <select id="addOns" name="addOns" class="addon-dropdown">
+              <select id="addOns" name="addOns" class="addon-dropdown" style="display: none;">
                 <option value="">Select an add-on</option>
-                <!-- Add-ons will be populated by JavaScript -->
               </select>
               <i class="fas fa-chevron-down dropdown-icon"></i>
             </div>
@@ -449,10 +518,7 @@
                 <span id="guestsSummary">1 Guests × R300.00</span>
                 <span id="basePriceSummary">R300.00</span>
               </div>
-              <!-- Add-ons will be added here -->
-              <div id="addonsSummary" class="addons-summary">
-                <!-- Add-ons price rows will be inserted here -->
-              </div>
+              <div id="addonsSummary" class="addons-summary"></div>
               <div class="price-divider"></div>
               <div class="price-total-row">
                 <span>Total</span>
@@ -496,7 +562,7 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="../all_wines/all_wines.html">All Wines</a></li>
+            <li><a href="../wine/all_wines.html">All Wines</a></li>
             <li><a href="../booking/booking.html">Bookings</a></li>
             <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
             <li><a href="../pairings/pairings.html">Pairings</a></li>
@@ -528,15 +594,41 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <!-- Time picker plugin -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/minuteIncrement.js"></script>
+  
   <script>
-    // Booking JavaScript - Main functionality with authentication protection
-
-    // Configuration
+    // Configuration - USING PRODUCTION API URL
     const CONFIG = {
-        API_BASE_URL: 'http://localhost:3000/api',
+        API_BASE_URL: '/api',  // This works on both localhost and production
         PRICE_PER_GUEST: 300.00,
-        SOMMELIER_PRICE: 250.00
+        SOMMELIER_PRICE: 250.00,
+        ADDONS_CACHE_KEY: 'wineBubbles_addons_cache',
+        ADDONS_CACHE_TIME: 5 * 60 * 1000 // 5 minutes cache
     };
+
+    // Helper function to fix image URLs
+    function fixImageUrl(imageUrl) {
+        if (!imageUrl) {
+            return '../assets/categories/Icons.png';
+        }
+        
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+            return imageUrl;
+        }
+        
+        if (imageUrl.startsWith('assets/')) {
+            return '../' + imageUrl;
+        }
+        
+        if (imageUrl.startsWith('../assets/')) {
+            return imageUrl;
+        }
+        
+        if (imageUrl.startsWith('/')) {
+            return imageUrl;
+        }
+        
+        return '../assets/' + imageUrl;
+    }
 
     // Authentication check function
     function isAuthenticated() {
@@ -547,12 +639,10 @@
             return false;
         }
         
-        // Check if token is expired (7 days)
         const tokenAge = Date.now() - parseInt(timestamp);
         const sevenDays = 7 * 24 * 60 * 60 * 1000;
         
         if (tokenAge >= sevenDays) {
-            // Token expired, clear session
             clearUserSession();
             return false;
         }
@@ -576,7 +666,6 @@
 
     // Show login required message
     function showLoginRequired() {
-        // Create a modal or overlay
         const loginOverlay = document.createElement('div');
         loginOverlay.style.cssText = `
             position: fixed;
@@ -600,35 +689,14 @@
                     Please login or create an account to continue.
                 </p>
                 <div style="display: flex; gap: 16px; justify-content: center;">
-                    <button id="loginRedirectBtn" style="
-                        background: #6b0d2b;
-                        color: white;
-                        border: none;
-                        padding: 12px 24px;
-                        border-radius: 8px;
-                        font-family: 'Montserrat', sans-serif;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: background-color 0.3s;
-                    ">Login Now</button>
-                    <button id="cancelBtn" style="
-                        background: #f0f0f0;
-                        color: #333;
-                        border: none;
-                        padding: 12px 24px;
-                        border-radius: 8px;
-                        font-family: 'Montserrat', sans-serif;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: background-color 0.3s;
-                    ">Go Back</button>
+                    <button id="loginRedirectBtn" style="background: #6b0d2b; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">Login Now</button>
+                    <button id="cancelBtn" style="background: #f0f0f0; color: #333; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">Go Back</button>
                 </div>
             </div>
         `;
         
         document.body.appendChild(loginOverlay);
         
-        // Add event listeners
         document.getElementById('loginRedirectBtn').addEventListener('click', () => {
             const currentUrl = encodeURIComponent(window.location.href);
             window.location.href = `../login/login.html?redirect=${currentUrl}`;
@@ -660,10 +728,6 @@
             this.numberOfGuests = Math.max(1, Math.min(100, count));
         }
 
-        toggleSommelier() {
-            this.includesSommelier = !this.includesSommelier;
-        }
-
         addAddOn(addonId, name, price, quantity, imageUrl = null, category = null) {
             const existingIndex = this.addOns.findIndex(a => a.id === addonId);
             if (existingIndex > -1) {
@@ -680,73 +744,26 @@
             }
         }
 
-        removeAddOn(addonId) {
-            this.addOns = this.addOns.filter(a => a.id !== addonId);
-        }
-
-        calculateTotal() {
-            let total = CONFIG.PRICE_PER_GUEST * this.numberOfGuests;
-            
-            // Add add-ons
-            this.addOns.forEach(addon => {
-                if (addon.quantity > 0) {
-                    total += addon.price * addon.quantity;
-                }
-            });
-            
-            // Add sommelier
-            if (this.includesSommelier) {
-                total += CONFIG.SOMMELIER_PRICE;
-            }
-            
-            this.totalAmount = total;
-            return total;
-        }
-
         validate() {
             const errors = [];
+            if (!this.userId) errors.push('User not logged in');
+            if (!this.selectedDate) errors.push('Please select a date');
+            if (!this.selectedTime) errors.push('Please select a time');
+            if (this.location.trim() === '') errors.push('Please enter your event location address');
+            if (this.numberOfGuests < 1) errors.push('Number of guests must be at least 1');
+            if (this.numberOfGuests > 100) errors.push('Maximum 100 guests allowed');
             
-            if (!this.userId) {
-                errors.push('User not logged in');
-            }
-            
-            if (!this.selectedDate) {
-                errors.push('Please select a date');
-            }
-            
-            if (!this.selectedTime) {
-                errors.push('Please select a time');
-            }
-            
-            if (this.location.trim() === '') {
-                errors.push('Please enter your event location address');
-            }
-            
-            if (this.numberOfGuests < 1) {
-                errors.push('Number of guests must be at least 1');
-            }
-            
-            if (this.numberOfGuests > 100) {
-                errors.push('Maximum 100 guests allowed');
-            }
-            
-            return {
-                isValid: errors.length === 0,
-                errors
-            };
+            return { isValid: errors.length === 0, errors };
         }
 
         toBookingData() {
-            const addOnsData = this.addOns
-                .filter(a => a.quantity > 0)
-                .map(addon => ({
-                    name: addon.name,
-                    price: addon.price,
-                    imageUrl: addon.imageUrl || null,
-                    category: addon.category || 'Uncategorized'
-                }));
+            const addOnsData = this.addOns.filter(a => a.quantity > 0).map(addon => ({
+                name: addon.name,
+                price: addon.price,
+                imageUrl: addon.imageUrl || null,
+                category: addon.category || 'Uncategorized'
+            }));
             
-            // Add sommelier as add-on if selected
             if (this.includesSommelier) {
                 addOnsData.push({
                     name: 'Sommelier Service',
@@ -766,10 +783,7 @@
                 includesSommelier: this.includesSommelier,
                 addOns: addOnsData,
                 specialRequest: this.specialRequests,
-                location: {
-                    name: "Custom Event Location",
-                    address: this.location
-                },
+                location: { name: "Custom Event Location", address: this.location },
                 totalAmount: this.totalAmount,
                 status: "pending"
             };
@@ -782,31 +796,33 @@
             this.state = new BookingState();
             this.datePicker = null;
             this.timePicker = null;
+            this.allAddOns = [];
         }
 
         initialize() {
-            // First check authentication
             if (!this.setUserFromStorage()) {
                 showLoginRequired();
-                return; // Stop initialization if not authenticated
+                return;
             }
             
             this.initializeDatePickers();
             this.attachEventListeners();
             this.loadAddOns();
             this.updateUI();
-            
-            // Update user icon in navbar
             this.updateUserIcon();
+            
+            // Auto-refresh add-ons every 5 minutes
+            setInterval(() => this.refreshAddOns(), CONFIG.ADDONS_CACHE_TIME);
+        }
+
+        async refreshAddOns() {
+            console.log('🔄 Auto-refreshing add-ons...');
+            await this.loadAddOns(true);
         }
 
         setUserFromStorage() {
-            const token = localStorage.getItem('wineBubbles_token');
             const userData = localStorage.getItem('wineBubbles_user');
-            
-            if (!token || !userData) {
-                return false;
-            }
+            if (!userData) return false;
             
             try {
                 const user = JSON.parse(userData);
@@ -839,13 +855,10 @@
 
         toggleUserDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('show');
-            }
+            if (dropdown) dropdown.classList.toggle('show');
         }
 
         initializeDatePickers() {
-            // Date picker
             this.datePicker = flatpickr("#bookingDate", {
                 dateFormat: "D, M d, Y",
                 minDate: "today",
@@ -856,7 +869,6 @@
                 }
             });
 
-            // Time picker
             this.timePicker = flatpickr("#bookingTime", {
                 enableTime: true,
                 noCalendar: true,
@@ -873,16 +885,9 @@
         }
 
         attachEventListeners() {
-            // Date/time picker buttons
-            document.getElementById('datePickerBtn').addEventListener('click', () => {
-                this.datePicker.open();
-            });
+            document.getElementById('datePickerBtn').addEventListener('click', () => this.datePicker.open());
+            document.getElementById('timePickerBtn').addEventListener('click', () => this.timePicker.open());
 
-            document.getElementById('timePickerBtn').addEventListener('click', () => {
-                this.timePicker.open();
-            });
-
-            // Guest controls
             document.getElementById('decreaseGuests').addEventListener('click', () => {
                 this.state.updateGuestCount(this.state.numberOfGuests - 1);
                 document.getElementById('guests').value = this.state.numberOfGuests;
@@ -895,68 +900,27 @@
                 this.updateUI();
             });
 
-            // Input fields
-            document.getElementById('eventType').addEventListener('input', (e) => {
-                this.state.eventType = e.target.value;
-            });
-
+            document.getElementById('eventType').addEventListener('input', (e) => this.state.eventType = e.target.value);
             document.getElementById('includesSommelier').addEventListener('change', (e) => {
                 this.state.includesSommelier = e.target.checked;
                 this.updateSelectedItems();
                 this.updateUI();
             });
+            document.getElementById('location').addEventListener('input', (e) => this.state.location = e.target.value);
+            document.getElementById('specialRequests').addEventListener('input', (e) => this.state.specialRequests = e.target.value);
 
-            document.getElementById('location').addEventListener('input', (e) => {
-                this.state.location = e.target.value;
-            });
-
-            document.getElementById('specialRequests').addEventListener('input', (e) => {
-                this.state.specialRequests = e.target.value;
-            });
-
-            // Add-ons
-            document.getElementById('addOns').addEventListener('change', (e) => {
-                const selectedOption = e.target.options[e.target.selectedIndex];
-                if (selectedOption.value) {
-                    const addonId = selectedOption.value;
-                    const addonName = selectedOption.getAttribute('data-name');
-                    const addonPrice = parseFloat(selectedOption.getAttribute('data-price'));
-                    const addonImage = selectedOption.getAttribute('data-image');
-                    const addonCategory = selectedOption.getAttribute('data-category');
-                    
-                    this.state.selectedAddon = { 
-                        id: addonId, 
-                        name: addonName, 
-                        price: addonPrice,
-                        imageUrl: addonImage,
-                        category: addonCategory
-                    };
-                    document.getElementById('selectedAddonName').textContent = addonName;
-                    document.getElementById('addonQuantityGroup').style.display = 'block';
-                    document.getElementById('addonQuantity').value = 0;
-                }
-            });
-
-            // Add-on quantity controls
             document.getElementById('decreaseAddon').addEventListener('click', () => {
-                const quantityInput = document.getElementById('addonQuantity');
-                let quantity = parseInt(quantityInput.value);
-                if (quantity > 0) {
-                    quantity--;
-                    quantityInput.value = quantity;
-                }
+                const input = document.getElementById('addonQuantity');
+                let val = parseInt(input.value);
+                if (val > 0) input.value = --val;
             });
 
             document.getElementById('increaseAddon').addEventListener('click', () => {
-                const quantityInput = document.getElementById('addonQuantity');
-                let quantity = parseInt(quantityInput.value);
-                if (quantity < 10) {
-                    quantity++;
-                    quantityInput.value = quantity;
-                }
+                const input = document.getElementById('addonQuantity');
+                let val = parseInt(input.value);
+                if (val < 10) input.value = ++val;
             });
 
-            // Done button for add-on
             document.getElementById('doneAddonBtn').addEventListener('click', () => {
                 const quantity = parseInt(document.getElementById('addonQuantity').value);
                 if (quantity > 0 && this.state.selectedAddon) {
@@ -968,40 +932,65 @@
                         this.state.selectedAddon.imageUrl,
                         this.state.selectedAddon.category
                     );
-                    
                     this.updateSelectedItems();
                     this.updateUI();
                 }
-                
-                // Reset
                 document.getElementById('addOns').value = '';
                 document.getElementById('addonQuantityGroup').style.display = 'none';
                 this.state.selectedAddon = null;
             });
 
-            // Form submission
             document.getElementById('bookingForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await this.submitBooking();
             });
         }
 
-        async loadAddOns() {
+        async loadAddOns(forceRefresh = false) {
             try {
                 this.showLoading(true);
                 const token = localStorage.getItem('wineBubbles_token');
                 
-                const response = await fetch(`${CONFIG.API_BASE_URL}/addons`, {
+                // Check cache
+                if (!forceRefresh) {
+                    const cached = localStorage.getItem(CONFIG.ADDONS_CACHE_KEY);
+                    const cacheTime = localStorage.getItem(`${CONFIG.ADDONS_CACHE_KEY}_time`);
+                    if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < CONFIG.ADDONS_CACHE_TIME) {
+                        console.log('📦 Using cached add-ons');
+                        this.allAddOns = JSON.parse(cached);
+                        this.populateAddOnsDropdown(this.allAddOns);
+                        this.showLoading(false);
+                        return;
+                    }
+                }
+                
+                const apiUrl = `${CONFIG.API_BASE_URL}/addons?all=true&_=${Date.now()}`;
+                console.log('🌐 Fetching add-ons from:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'Cache-Control': 'no-cache'
                     }
                 });
                 
                 if (response.ok) {
-                    const addOns = await response.json();
-                    this.populateAddOnsDropdown(addOns);
+                    let addOns = await response.json();
+                    console.log('✅ Add-ons loaded from API:', addOns);
+                    
+                    // Handle different response formats
+                    if (addOns.success && Array.isArray(addOns.data)) addOns = addOns.data;
+                    else if (addOns.addOns && Array.isArray(addOns.addOns)) addOns = addOns.addOns;
+                    else if (!Array.isArray(addOns)) addOns = [];
+                    
+                    this.allAddOns = addOns;
+                    localStorage.setItem(CONFIG.ADDONS_CACHE_KEY, JSON.stringify(addOns));
+                    localStorage.setItem(`${CONFIG.ADDONS_CACHE_KEY}_time`, Date.now().toString());
+                    
+                    console.log(`✅ Loaded ${this.allAddOns.length} add-ons`);
+                    this.populateAddOnsDropdown(this.allAddOns);
                 } else {
                     console.error('Failed to load add-ons:', response.status);
                     this.loadFallbackAddOns();
@@ -1015,137 +1004,54 @@
         }
 
         loadFallbackAddOns() {
-            // Use images from assets/categories folder
             const fallbackAddOns = [
-                { 
-                    id: 1, 
-                    name: 'Premium Wine Selection', 
-                    price: 500.00, 
-                    category: 'Wine',
-                    imageUrl: '../assets/categories/WINE_CASES copy.png'
-                },
-                { 
-                    id: 2, 
-                    name: 'Champagne Upgrade', 
-                    price: 800.00, 
-                    category: 'Champagne',
-                    imageUrl: '../assets/categories/CHAMPAGNE@3x-8.png'
-                },
-                { 
-                    id: 3, 
-                    name: 'Cheese Platter', 
-                    price: 350.00, 
-                    category: 'Food',
-                    imageUrl: '../assets/categories/PAIRINGS.png'
-                },
-                { 
-                    id: 4, 
-                    name: 'Chocolate Pairing', 
-                    price: 250.00, 
-                    category: 'Food',
-                    imageUrl: '../assets/categories/EVENT WINES.png'
-                },
-                { 
-                    id: 5, 
-                    name: 'Additional Hour', 
-                    price: 150.00, 
-                    category: 'Service',
-                    imageUrl: '../assets/categories/LUNCH WINES.png'
-                },
-                { 
-                    id: 6, 
-                    name: 'Wine Glasses', 
-                    price: 50.00, 
-                    category: 'Equipment',
-                    imageUrl: '../assets/categories/WHITE_WINE@3x-8.png'
-                },
-                { 
-                    id: 7, 
-                    name: 'Ice Buckets', 
-                    price: 30.00, 
-                    category: 'Equipment',
-                    imageUrl: '../assets/categories/DINNER WINES.png'
-                },
-                { 
-                    id: 8, 
-                    name: 'Premium Snacks', 
-                    price: 200.00, 
-                    category: 'Food',
-                    imageUrl: '../assets/categories/BREAKFAST WINES.png'
-                }
+                { id: 1, name: 'Premium Wine Selection', price: 500.00, category: 'Wine', imageUrl: '../assets/categories/WINE_CASES copy.png' },
+                { id: 2, name: 'Champagne Upgrade', price: 800.00, category: 'Champagne', imageUrl: '../assets/categories/CHAMPAGNE@3x-8.png' },
+                { id: 3, name: 'Cheese Platter', price: 350.00, category: 'Food', imageUrl: '../assets/categories/PAIRINGS.png' },
+                { id: 4, name: 'Chocolate Pairing', price: 250.00, category: 'Food', imageUrl: '../assets/categories/EVENT WINES.png' },
+                { id: 5, name: 'Additional Hour', price: 150.00, category: 'Service', imageUrl: '../assets/categories/LUNCH WINES.png' },
+                { id: 6, name: 'Wine Glasses', price: 50.00, category: 'Equipment', imageUrl: '../assets/categories/WHITE_WINE@3x-8.png' },
+                { id: 7, name: 'Ice Buckets', price: 30.00, category: 'Equipment', imageUrl: '../assets/categories/DINNER WINES.png' },
+                { id: 8, name: 'Premium Snacks', price: 200.00, category: 'Food', imageUrl: '../assets/categories/BREAKFAST WINES.png' }
             ];
-            
+            this.allAddOns = fallbackAddOns;
             this.populateAddOnsDropdown(fallbackAddOns);
         }
 
         populateAddOnsDropdown(addOns) {
-            const select = document.getElementById('addOns');
-            
-            // Clear existing options except the first one
-            while (select.options.length > 1) {
-                select.remove(1);
-            }
-            
-            addOns.forEach(addon => {
-                const option = document.createElement('option');
-                option.value = addon.id;
-                option.setAttribute('data-name', addon.name);
-                option.setAttribute('data-price', addon.price);
-                option.setAttribute('data-image', addon.imageUrl || '../assets/categories/Icons.png');
-                option.setAttribute('data-category', addon.category || 'Uncategorized');
-                option.textContent = `${addon.name} - R${addon.price.toFixed(2)}`;
-                select.appendChild(option);
-            });
-            
-            // Create custom dropdown for better display
-            this.createCustomDropdown(addOns);
-        }
-
-        createCustomDropdown(addOns) {
-            const dropdownContainer = document.querySelector('.dropdown-container');
+            const container = document.querySelector('.dropdown-container');
             const originalSelect = document.getElementById('addOns');
             
-            // Remove existing custom dropdown if any
-            const existingCustom = dropdownContainer.querySelector('.custom-dropdown');
-            if (existingCustom) {
-                existingCustom.remove();
-            }
+            // Remove existing custom dropdown
+            const existing = container.querySelector('.custom-dropdown');
+            if (existing) existing.remove();
             
             // Create custom dropdown
             const customDropdown = document.createElement('div');
             customDropdown.className = 'custom-dropdown';
             
-            // Create dropdown display
-            const dropdownDisplay = document.createElement('div');
-            dropdownDisplay.className = 'dropdown-display';
-            dropdownDisplay.innerHTML = `
-                <div class="display-content">
-                    <span class="placeholder">Select an add-on</span>
-                </div>
-                <i class="fas fa-chevron-down"></i>
-            `;
+            // Dropdown display
+            const display = document.createElement('div');
+            display.className = 'dropdown-display';
+            display.innerHTML = `<div class="display-content"><span class="placeholder">Select an add-on</span></div><i class="fas fa-chevron-down"></i>`;
             
-            // Create dropdown options container
-            const dropdownOptions = document.createElement('div');
-            dropdownOptions.className = 'dropdown-options';
+            // Dropdown options
+            const options = document.createElement('div');
+            options.className = 'dropdown-options';
             
-            // Add options
             addOns.forEach(addon => {
                 const option = document.createElement('div');
                 option.className = 'dropdown-option';
                 option.setAttribute('data-value', addon.id);
                 option.setAttribute('data-name', addon.name);
                 option.setAttribute('data-price', addon.price);
-                option.setAttribute('data-image', addon.imageUrl || '../assets/categories/Icons.png');
+                option.setAttribute('data-image', fixImageUrl(addon.imageUrl));
                 option.setAttribute('data-category', addon.category || 'Uncategorized');
                 
+                const imageUrl = fixImageUrl(addon.imageUrl);
                 option.innerHTML = `
                     <div class="option-content">
-                        <div class="option-image">
-                            <img src="${addon.imageUrl || '../assets/categories/Icons.png'}" 
-                                 alt="${addon.name}"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" viewBox=\"0 0 40 40\"><rect width=\"40\" height=\"40\" fill=\"%23f0f0f0\"/><text x=\"20\" y=\"22\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"12\">${(addon.category || 'A').charAt(0).toUpperCase()}</text></svg>';">
-                        </div>
+                        <div class="option-image"><img src="${imageUrl}" alt="${addon.name}" onerror="this.src='../assets/categories/Icons.png';"></div>
                         <div class="option-details">
                             <div class="option-name">${addon.name}</div>
                             <div class="option-price">R${addon.price.toFixed(2)}</div>
@@ -1155,41 +1061,37 @@
                 `;
                 
                 option.addEventListener('click', () => {
-                    // Update original select
                     originalSelect.value = addon.id;
-                    
-                    // Update custom display
-                    dropdownDisplay.querySelector('.display-content').innerHTML = option.innerHTML;
-                    
-                    // Trigger change event
+                    display.querySelector('.display-content').innerHTML = option.innerHTML;
                     originalSelect.dispatchEvent(new Event('change'));
+                    options.classList.remove('show');
                     
-                    // Close dropdown
-                    dropdownOptions.classList.remove('show');
+                    // Store selected addon for quantity
+                    this.state.selectedAddon = {
+                        id: addon.id,
+                        name: addon.name,
+                        price: addon.price,
+                        imageUrl: imageUrl,
+                        category: addon.category
+                    };
+                    document.getElementById('selectedAddonName').textContent = addon.name;
+                    document.getElementById('addonQuantityGroup').style.display = 'block';
+                    document.getElementById('addonQuantity').value = 0;
                 });
                 
-                dropdownOptions.appendChild(option);
+                options.appendChild(option);
             });
             
-            // Toggle dropdown on click
-            dropdownDisplay.addEventListener('click', (e) => {
+            display.addEventListener('click', (e) => {
                 e.stopPropagation();
-                dropdownOptions.classList.toggle('show');
+                options.classList.toggle('show');
             });
             
-            // Close dropdown when clicking outside
-            document.addEventListener('click', () => {
-                dropdownOptions.classList.remove('show');
-            });
+            document.addEventListener('click', () => options.classList.remove('show'));
             
-            // Assemble custom dropdown
-            customDropdown.appendChild(dropdownDisplay);
-            customDropdown.appendChild(dropdownOptions);
-            
-            // Insert before original select
-            dropdownContainer.insertBefore(customDropdown, originalSelect);
-            
-            // Hide original select
+            customDropdown.appendChild(display);
+            customDropdown.appendChild(options);
+            container.insertBefore(customDropdown, originalSelect);
             originalSelect.style.display = 'none';
         }
 
@@ -1197,33 +1099,22 @@
             const container = document.getElementById('selectedItemsContainer');
             const list = document.getElementById('selectedItemsList');
             list.innerHTML = '';
-            
             let hasItems = false;
             
-            // Add add-ons
             this.state.addOns.forEach(addon => {
                 if (addon.quantity > 0) {
                     const item = document.createElement('div');
                     item.className = 'selected-item';
-                    item.innerHTML = `
-                        <i class="fas fa-check-circle"></i>
-                        <span>${addon.name} (x${addon.quantity})</span>
-                        <span class="item-price">R${(addon.price * addon.quantity).toFixed(2)}</span>
-                    `;
+                    item.innerHTML = `<i class="fas fa-check-circle"></i><span>${addon.name} (x${addon.quantity})</span><span class="item-price">R${(addon.price * addon.quantity).toFixed(2)}</span>`;
                     list.appendChild(item);
                     hasItems = true;
                 }
             });
             
-            // Add sommelier if selected
             if (this.state.includesSommelier) {
                 const item = document.createElement('div');
                 item.className = 'selected-item';
-                item.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    <span>Sommelier Service</span>
-                    <span class="item-price">R${CONFIG.SOMMELIER_PRICE.toFixed(2)}</span>
-                `;
+                item.innerHTML = `<i class="fas fa-check-circle"></i><span>Sommelier Service</span><span class="item-price">R${CONFIG.SOMMELIER_PRICE.toFixed(2)}</span>`;
                 list.appendChild(item);
                 hasItems = true;
             }
@@ -1232,68 +1123,48 @@
         }
 
         updateUI() {
-            // Update guests summary
             const guests = this.state.numberOfGuests;
             const basePrice = CONFIG.PRICE_PER_GUEST * guests;
             
-            document.getElementById('guestsSummary').textContent = 
-                `${guests} Guests × R${CONFIG.PRICE_PER_GUEST.toFixed(2)}`;
-            document.getElementById('basePriceSummary').textContent = 
-                `R${basePrice.toFixed(2)}`;
+            document.getElementById('guestsSummary').textContent = `${guests} Guests × R${CONFIG.PRICE_PER_GUEST.toFixed(2)}`;
+            document.getElementById('basePriceSummary').textContent = `R${basePrice.toFixed(2)}`;
             document.getElementById('basePrice').textContent = basePrice.toFixed(2);
             
-            // Update add-ons summary
             const addonsSummary = document.getElementById('addonsSummary');
             addonsSummary.innerHTML = '';
-            
             let addonsTotal = 0;
             
-            // Add add-ons to summary
             this.state.addOns.forEach(addon => {
                 if (addon.quantity > 0) {
                     const addonTotal = addon.price * addon.quantity;
                     addonsTotal += addonTotal;
-                    
                     const row = document.createElement('div');
                     row.className = 'price-row addon-row';
-                    row.innerHTML = `
-                        <span>${addon.name} (x${addon.quantity})</span>
-                        <span>R${addonTotal.toFixed(2)}</span>
-                    `;
+                    row.innerHTML = `<span>${addon.name} (x${addon.quantity})</span><span>R${addonTotal.toFixed(2)}</span>`;
                     addonsSummary.appendChild(row);
                 }
             });
             
-            // Add sommelier if selected
             if (this.state.includesSommelier) {
                 addonsTotal += CONFIG.SOMMELIER_PRICE;
                 const row = document.createElement('div');
                 row.className = 'price-row addon-row';
-                row.innerHTML = `
-                    <span>Sommelier Service</span>
-                    <span>R${CONFIG.SOMMELIER_PRICE.toFixed(2)}</span>
-                `;
+                row.innerHTML = `<span>Sommelier Service</span><span>R${CONFIG.SOMMELIER_PRICE.toFixed(2)}</span>`;
                 addonsSummary.appendChild(row);
             }
             
-            // Update total
             const total = basePrice + addonsTotal;
             this.state.totalAmount = total;
-            
             document.getElementById('totalAmount').textContent = `R${total.toFixed(2)}`;
         }
 
         async submitBooking() {
-            // Validate form
             const validation = this.state.validate();
             if (!validation.isValid) {
-                validation.errors.forEach(error => {
-                    this.showToast(error, 'error');
-                });
+                validation.errors.forEach(error => this.showToast(error, 'error'));
                 return;
             }
             
-            // Show loading
             this.showLoading(true);
             
             try {
@@ -1302,10 +1173,7 @@
                 
                 const response = await fetch(`${CONFIG.API_BASE_URL}/bookings`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(bookingData)
                 });
                 
@@ -1313,17 +1181,8 @@
                 
                 if (response.ok) {
                     this.showToast('Booking submitted successfully!', 'success');
-                    
-                    // Store for confirmation page
-                    localStorage.setItem('lastBooking', JSON.stringify({
-                        ...bookingData,
-                        id: data._id || Date.now().toString()
-                    }));
-                    
-                    // Redirect to confirmation page in the SAME FOLDER
-                    setTimeout(() => {
-                        window.location.href = 'confirmation.html'; // Same folder
-                    }, 2000);
+                    localStorage.setItem('lastBooking', JSON.stringify({ ...bookingData, id: data._id || Date.now().toString() }));
+                    setTimeout(() => window.location.href = 'confirmation.html', 2000);
                 } else {
                     this.showToast(data.message || 'Failed to submit booking', 'error');
                 }
@@ -1340,10 +1199,7 @@
             toast.textContent = message;
             toast.className = `toast ${type}`;
             toast.style.display = 'block';
-            
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 5000);
+            setTimeout(() => toast.style.display = 'none', 5000);
         }
 
         showLoading(show) {
@@ -1352,34 +1208,19 @@
         }
     }
 
-    // Initialize when DOM is loaded
+    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
         console.log('📋 Booking page loading...');
+        console.log('🌐 API Base URL:', CONFIG.API_BASE_URL);
         
-        // Check authentication first
         if (!isAuthenticated()) {
             console.log('❌ Authentication failed, showing login required');
-            return; // Stop here if not authenticated
+            return;
         }
         
-        // Initialize UI Manager
         const uiManager = new UIManager();
         uiManager.initialize();
-        
-        console.log('✅ Booking page initialized for authenticated user');
-    });
-
-    // Also add a global authentication check for direct navigation attempts
-    // This ensures even if someone tries to bypass the initial check, they'll be redirected
-    window.addEventListener('load', () => {
-        // Double-check authentication after page loads
-        setTimeout(() => {
-            if (!isAuthenticated()) {
-                console.log('❌ Late authentication check failed');
-                const currentUrl = encodeURIComponent(window.location.href);
-                window.location.href = `../login/login.html?redirect=${currentUrl}`;
-            }
-        }, 100);
+        console.log('✅ Booking page initialized');
     });
   </script>
 </body>
