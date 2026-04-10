@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wine & Bubbles — Wine List</title>
-<link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
   <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
   <!-- Fonts -->
@@ -14,14 +14,14 @@
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="../style.css">
-  <!-- Wine-specific CSS -->
-  <link rel="stylesheet" href="wine.css">
+  <!-- Wine-specific CSS with cache busting -->
+  <link rel="stylesheet" href="wine.css?v=3">
   
   <!-- Cart Utils -->
-<script src="../cart/cart-utils.js"></script>
+  <script src="../cart/cart-utils.js?v=3"></script>
   
   <style>
-    /* Additional styles for user dropdown */
+    /* Additional styles for user dropdown - unchanged */
     .user-dropdown {
       position: absolute;
       top: 100px;
@@ -269,8 +269,8 @@
     </div>
   </footer>
 
-  <!-- JavaScript -->
-<script src="wine_list.js?v=2"></script>
+  <!-- JavaScript with cache busting -->
+  <script src="wine_list.js?v=3"></script>
   <script>
     // Authentication logic for Wine List page - UPDATED FOR UNIFIED CART
     document.addEventListener('DOMContentLoaded', function() {
