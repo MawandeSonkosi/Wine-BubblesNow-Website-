@@ -1,4 +1,4 @@
-// Wine Detail JavaScript - MATCHING FLUTTER APP
+// Wine Detail JavaScript - MATCHING FLUTTER APP WITH COMING SOON SUPPORT
 // Configuration - USE EXACT SAME API AS FLUTTER
 const API_BASE_URL = '/api';
 
@@ -198,15 +198,16 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render wine detail
+// Render wine detail with COMING SOON support
 function renderWineDetail(wine) {
+  const isComingSoon = !wine.isActive;
   const imageUrl = fixImageUrl(wine.imageUrl);
   const price = wine.price || 0;
   const type = wine.type || 'Wine';
   const category = wine.category || 'Uncategorized';
   const description = wine.description || 'No description available.';
   const stockCount = wine.stockCount || 0;
-  const isInStock = stockCount > 0;
+  const isInStock = stockCount > 0 && !isComingSoon;
   
   wineDetailContainer.innerHTML = `
     <div class="wine-detail-card">
@@ -216,11 +217,12 @@ function renderWineDetail(wine) {
              class="wine-detail-image"
              loading="lazy"
              onerror="this.onerror=null; this.src='../assets/wines/breakfast/Noir.png';">
+        ${isComingSoon ? '<div class="coming-soon-overlay-large"><span>COMING SOON</span></div>' : ''}
       </div>
       <div class="wine-detail-content">
-        <h1 class="wine-detail-name">${wine.name}</h1>
+        <h1 class="wine-detail-name" style="${isComingSoon ? 'color: #999;' : ''}">${wine.name}</h1>
         <div class="wine-detail-type">${type}</div>
-        <div class="wine-detail-price">R${price.toFixed(2)} per bottle</div>
+        ${!isComingSoon ? `<div class="wine-detail-price">R${price.toFixed(2)} per bottle</div>` : '<div class="wine-detail-price coming-soon-text">Coming Soon</div>'}
         
         <div class="wine-detail-meta">
           <div class="wine-meta-item">
@@ -233,13 +235,15 @@ function renderWineDetail(wine) {
           </div>
         </div>
         
-        <div class="stock-status ${isInStock ? 'stock-in' : 'stock-out'}">
-          ${isInStock ? 'In Stock' : 'Out of Stock'}
-        </div>
+        ${!isComingSoon ? `
+          <div class="stock-status ${isInStock ? 'stock-in' : 'stock-out'}">
+            ${isInStock ? 'In Stock' : 'Out of Stock'}
+          </div>
+        ` : ''}
         
         <p class="wine-detail-description">${description}</p>
         
-        ${isInStock ? `
+        ${!isComingSoon && isInStock ? `
           <div class="quantity-selector">
             <button class="quantity-btn" id="decrementBtn" ${quantity <= 1 ? 'disabled' : ''}>
               <i class="fas fa-minus"></i>
@@ -251,15 +255,15 @@ function renderWineDetail(wine) {
           </div>
         ` : ''}
         
-        <button class="add-to-cart-btn" id="addToCartBtn" ${!isInStock ? 'disabled' : ''}>
-          ${isInStock ? `Add ${quantity} ${quantity === 1 ? 'bottle' : 'bottles'} to Cart (R${(price * quantity).toFixed(2)})` : 'Out of Stock'}
+        <button class="add-to-cart-btn" id="addToCartBtn" ${(!isInStock || isComingSoon) ? 'disabled' : ''}>
+          ${isComingSoon ? 'Coming Soon' : (isInStock ? `Add ${quantity} ${quantity === 1 ? 'bottle' : 'bottles'} to Cart (R${(price * quantity).toFixed(2)})` : 'Out of Stock')}
         </button>
       </div>
     </div>
   `;
   
   // Setup quantity buttons
-  if (isInStock) {
+  if (!isComingSoon && isInStock) {
     const decrementBtn = document.getElementById('decrementBtn');
     const incrementBtn = document.getElementById('incrementBtn');
     const addToCartBtn = document.getElementById('addToCartBtn');
@@ -308,7 +312,7 @@ function updateQuantityDisplay() {
     incrementBtn.disabled = quantity >= 10;
   }
   
-  if (addToCartBtn && currentWine) {
+  if (addToCartBtn && currentWine && currentWine.isActive) {
     const price = currentWine.price || 0;
     addToCartBtn.textContent = `Add ${quantity} ${quantity === 1 ? 'bottle' : 'bottles'} to Cart (R${(price * quantity).toFixed(2)})`;
   }
@@ -319,6 +323,11 @@ function addToCart() {
   if (!currentWine) {
     console.error('❌ No current wine data');
     showToast('No wine data available', 'error');
+    return;
+  }
+  
+  if (!currentWine.isActive) {
+    showToast(`${currentWine.name} is coming soon`, 'error');
     return;
   }
   
@@ -366,12 +375,14 @@ function addToCart() {
   }
 }
 
-// Show related wines
+// Show related wines (only show active wines)
 function showRelatedWines() {
   if (!allWines.length) return;
   
   let related = allWines.filter(wine => {
     if (currentWine && wine.id === currentWine.id) return false;
+    // Only show active wines in related section
+    if (!wine.isActive) return false;
     
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase();
