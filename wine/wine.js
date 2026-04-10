@@ -207,7 +207,7 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render wines
+// Render wines with COMING SOON support
 function renderWines() {
   console.log('🎨 Rendering wines...');
   
@@ -221,21 +221,26 @@ function renderWines() {
     const price = wine.price || 0;
     const type = wine.type || 'Wine';
     const isInStock = (wine.stockCount || 0) > 0;
+    const isComingSoon = !wine.isActive;
     
     return `
-      <div class="wine-card ${!isInStock ? 'out-of-stock' : ''}" onclick="navigateToWineDetail(${wine.id})">
+      <div class="wine-card ${!isInStock && !isComingSoon ? 'out-of-stock' : ''} ${isComingSoon ? 'coming-soon' : ''}" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${wine.name}" 
                class="wine-image"
                loading="lazy"
                onerror="this.onerror=null; this.src='../assets/wines/breakfast/Noir.png';">
+          ${isComingSoon ? '<div class="coming-soon-overlay"><span>COMING SOON</span></div>' : ''}
+          ${!isComingSoon && !isInStock ? '<div class="out-of-stock-overlay"><span>OUT OF STOCK</span></div>' : ''}
         </div>
         <div class="wine-label">
           <div class="wine-title">${wine.name}</div>
           <div class="wine-sub">${type}</div>
           ${wine.description ? `<div class="wine-description">${wine.description.substring(0, 100)}${wine.description.length > 100 ? '...' : ''}</div>` : ''}
-          <div class="wine-price">R${price.toFixed(2)}</div>
+          ${!isComingSoon ? `<div class="wine-price">R${price.toFixed(2)}</div>` : '<div class="wine-price coming-soon-price">Coming Soon</div>'}
+          ${isComingSoon ? '<div class="coming-soon-badge">COMING SOON</div>' : ''}
+          ${!isComingSoon && !isInStock ? '<div class="out-of-stock-badge">OUT OF STOCK</div>' : ''}
         </div>
       </div>
     `;
