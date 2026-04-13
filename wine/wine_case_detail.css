@@ -108,27 +108,20 @@
   margin: 0 0 25px;
 }
 
+.wine-case-detail-subprice {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  margin: -20px 0 20px;
+  font-weight: 500;
+}
+
 .wine-case-detail-description {
   font-size: 16px;
   line-height: 1.6;
   color: #444;
   margin: 0 0 25px;
   text-align: center;
-}
-
-/* Case Size Badge */
-.case-size-badge {
-  display: inline-block;
-  background: var(--maroon);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 auto 15px;
-  text-align: center;
-  display: block;
-  width: fit-content;
 }
 
 .wine-case-detail-meta {
@@ -154,6 +147,21 @@
   font-size: 16px;
   color: #1b1b1b;
   font-weight: 500;
+}
+
+/* Case Size Badge */
+.case-size-badge {
+  display: inline-block;
+  background: var(--maroon);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 auto 15px;
+  display: block;
+  width: fit-content;
 }
 
 /* Stock Status */
@@ -299,6 +307,45 @@
   font-size: 20px;
 }
 
+/* Coming Soon Overlay for Detail Page */
+.coming-soon-overlay-large {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 16px;
+}
+
+.coming-soon-overlay-large span {
+  background: var(--maroon);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 20px;
+  letter-spacing: 2px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.coming-soon-text {
+  color: var(--maroon);
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.coming-soon-price {
+  color: var(--maroon);
+  opacity: 0.8;
+  font-weight: 500;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .wine-case-detail-image-container {
@@ -330,6 +377,11 @@
   
   .header-actions {
     gap: 10px;
+  }
+  
+  .coming-soon-overlay-large span {
+    padding: 10px 20px;
+    font-size: 18px;
   }
 }
 
@@ -366,6 +418,11 @@
   .quantity-display {
     width: 50px;
     height: 40px;
+  }
+  
+  .coming-soon-overlay-large span {
+    padding: 8px 16px;
+    font-size: 16px;
   }
 }
 
