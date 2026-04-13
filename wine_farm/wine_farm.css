@@ -122,7 +122,7 @@
 
 /* Image container - Increased height for better visibility */
 .wine-farm-image-container {
-  height: 220px; /* Increased from 180px to 220px */
+  height: 240px; /* Increased from 180px to 220px */
   background: #f5f5f5;
   position: relative;
   overflow: hidden;
