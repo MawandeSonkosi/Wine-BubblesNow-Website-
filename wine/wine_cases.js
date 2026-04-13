@@ -245,7 +245,7 @@ function renderWineCases() {
     const comingSoonClass = isComingSoon ? 'coming-soon' : '';
     
     return `
-      <div class="wine-card ${!isInStock && !isComingSoon ? 'out-of-stock' : ''} ${comingSoonClass}" onclick="navigateToWineCaseDetail(${wine.id})">
+      <div class="wine-card ${!isComingSoon && isOutOfStock ? 'out-of-stock' : ''} ${comingSoonClass}" onclick="navigateToWineCaseDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${escapeHtml(wine.name)}" 
