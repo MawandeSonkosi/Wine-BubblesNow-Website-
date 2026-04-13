@@ -5,17 +5,93 @@ const API_BASE_URL = '/api';
 let allWineFarms = [];
 let filteredWineFarms = [];
 let searchQuery = '';
+let selectedCity = 'All';
+
+// City options
+const cities = ['All', 'Cape Town', 'Johannesburg', 'Durban'];
 
 // DOM Elements
 const wineFarmsGrid = document.getElementById('wineFarmsGrid');
 const searchInput = document.getElementById('searchInput');
+const filterBtn = document.getElementById('filterBtn');
+const filterDropdown = document.getElementById('filterDropdown');
+
+// Helper to extract city from location string
+function extractCity(location) {
+  const locationLower = location.toLowerCase();
+  if (locationLower.includes('cape town')) return 'Cape Town';
+  if (locationLower.includes('johannesburg')) return 'Johannesburg';
+  if (locationLower.includes('durban')) return 'Durban';
+  return 'Other';
+}
+
+// Populate filter dropdown
+function populateFilterDropdown() {
+  if (!filterDropdown) return;
+  
+  filterDropdown.innerHTML = '';
+  
+  cities.forEach(city => {
+    const link = document.createElement('a');
+    link.href = '#';
+    link.dataset.city = city;
+    link.textContent = city;
+    
+    if (city === selectedCity) {
+      link.classList.add('active-filter');
+    }
+    
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      selectedCity = city;
+      updateFilterButton();
+      filterWineFarms();
+      filterDropdown.classList.remove('show');
+      
+      // Show toast notification
+      if (city !== 'All') {
+        showToast(`Filtering by: ${city}`);
+      }
+    });
+    filterDropdown.appendChild(link);
+  });
+}
+
+// Update filter button text
+function updateFilterButton() {
+  if (filterBtn) {
+    if (selectedCity === 'All') {
+      filterBtn.innerHTML = '<i class="fas fa-filter"></i> Filter';
+    } else {
+      filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${selectedCity}`;
+    }
+  }
+}
+
+// Show toast notification
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.innerHTML = `
+    <i class="fas fa-info-circle"></i>
+    <span>${message}</span>
+  `;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 2000);
+}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🍷 Wine Bars page loaded');
   console.log('🔧 Using API URL:', API_BASE_URL);
-  fetchWineFarms();
+  
+  populateFilterDropdown();
   setupEventListeners();
+  fetchWineFarms();
 });
 
 // Event Listeners
@@ -26,6 +102,21 @@ function setupEventListeners() {
       filterWineFarms();
     });
   }
+  
+  // Toggle filter dropdown
+  if (filterBtn) {
+    filterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      filterDropdown.classList.toggle('show');
+    });
+  }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (filterDropdown && !filterBtn.contains(e.target) && !filterDropdown.contains(e.target)) {
+      filterDropdown.classList.remove('show');
+    }
+  });
 }
 
 // Fetch wine farms from backend
@@ -35,10 +126,9 @@ async function fetchWineFarms() {
     
     console.log('🌐 Fetching wine bars from API...');
     
-    // Use the admin/all endpoint to get ALL farms (including inactive for Coming Soon)
     const endpoint = `${API_BASE_URL}/winefarms/admin/all?_=${Date.now()}`;
-    
     console.log(`📡 Trying endpoint: ${endpoint}`);
+    
     const response = await fetch(endpoint, {
       method: 'GET',
       headers: {
@@ -49,7 +139,6 @@ async function fetchWineFarms() {
     });
     
     if (!response.ok) {
-      // Fallback to regular endpoint if admin endpoint fails
       const fallbackEndpoint = `${API_BASE_URL}/winefarms?_=${Date.now()}`;
       console.log(`📡 Trying fallback endpoint: ${fallbackEndpoint}`);
       const fallbackResponse = await fetch(fallbackEndpoint, {
@@ -66,12 +155,12 @@ async function fetchWineFarms() {
       }
       
       const fallbackData = await fallbackResponse.json();
-      processWineFarmsData(fallbackData, fallbackEndpoint);
+      processWineFarmsData(fallbackData);
       return;
     }
     
     const data = await response.json();
-    processWineFarmsData(data, endpoint);
+    processWineFarmsData(data);
     
   } catch (error) {
     console.error('Error:', error);
@@ -79,10 +168,9 @@ async function fetchWineFarms() {
   }
 }
 
-function processWineFarmsData(data, endpoint) {
+function processWineFarmsData(data) {
   console.log('📦 API Response:', data);
   
-  // Handle different response formats
   let wineFarms = [];
   if (data.success && Array.isArray(data.data)) {
     wineFarms = data.data;
@@ -98,7 +186,6 @@ function processWineFarmsData(data, endpoint) {
   
   console.log(`✅ Success! Received ${wineFarms.length} wine bars`);
   
-  // Log each farm's active status
   wineFarms.forEach(farm => {
     console.log(`   - ${farm.name}: isActive = ${farm.isActive}`);
   });
@@ -113,38 +200,33 @@ function processWineFarmsData(data, endpoint) {
   }
 }
 
-// Fix image URLs - ensure images display properly
+// Fix image URLs
 function fixImageUrl(imageUrl) {
   if (!imageUrl || imageUrl === '') {
     return '../assets/images/default_wine_bar.jpg';
   }
   
-  // If it's already a full URL
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
   }
   
-  // If it starts with assets/
   if (imageUrl.startsWith('assets/')) {
     return '../' + imageUrl;
   }
   
-  // If it starts with ../assets/
   if (imageUrl.startsWith('../assets/')) {
     return imageUrl;
   }
   
-  // If it starts with /
   if (imageUrl.startsWith('/')) {
     return imageUrl;
   }
   
-  // Default: prepend ../assets/
   return '../assets/' + imageUrl;
 }
 
 // Truncate description
-function truncateDescription(description, maxLength = 100) {
+function truncateDescription(description, maxLength = 80) {
   if (!description) return '';
   if (description.length <= maxLength) return description;
   return description.substring(0, maxLength) + '...';
@@ -158,7 +240,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Render wine farms with Coming Soon support
+// Render wine farms
 function renderWineFarms() {
   console.log(`🎨 Rendering ${filteredWineFarms.length} wine bars...`);
   
@@ -186,7 +268,7 @@ function renderWineFarms() {
           ${hasVideo && !isComingSoon ? `
             <div class="video-indicator">
               <i class="fas fa-video"></i>
-              <span>Video Tour</span>
+              <span>Tour</span>
             </div>
           ` : ''}
           ${isComingSoon ? `
@@ -241,21 +323,31 @@ function navigateToWineFarmDetail(farmId) {
 
 // Filter wine farms
 function filterWineFarms() {
-  if (!searchQuery) {
-    filteredWineFarms = [...allWineFarms];
-  } else {
-    filteredWineFarms = allWineFarms.filter(farm => {
+  filteredWineFarms = allWineFarms.filter(farm => {
+    // Search filter
+    if (searchQuery) {
       const searchLower = searchQuery.toLowerCase().trim();
-      
       const matchesName = (farm.name || '').toLowerCase().includes(searchLower);
       const matchesLocation = (farm.location || '').toLowerCase().includes(searchLower);
       const matchesDescription = (farm.description || '').toLowerCase().includes(searchLower);
       
-      return matchesName || matchesLocation || matchesDescription;
-    });
-  }
+      if (!matchesName && !matchesLocation && !matchesDescription) {
+        return false;
+      }
+    }
+    
+    // City filter
+    if (selectedCity !== 'All') {
+      const farmCity = extractCity(farm.location);
+      if (farmCity !== selectedCity) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
   
-  console.log(`🔍 Filtered to ${filteredWineFarms.length} wine bars`);
+  console.log(`🔍 Filtered to ${filteredWineFarms.length} wine bars (Search: "${searchQuery}", City: ${selectedCity})`);
   renderWineFarms();
 }
 
@@ -287,23 +379,25 @@ function showEmptyState(message) {
     <div class="empty-state">
       <i class="fas fa-wine-bottle"></i>
       <h3>${escapeHtml(message)}</h3>
-      <p>Try changing your search</p>
-      <button onclick="resetSearch()" class="btn-fill" style="margin-top: 20px;">
-        Clear Search
+      <p>Try changing your search or filter</p>
+      <button onclick="resetFilters()" class="btn-fill" style="margin-top: 20px;">
+        Clear Filters
       </button>
     </div>
   `;
 }
 
-// Reset search
-function resetSearch() {
+// Reset filters
+function resetFilters() {
   searchQuery = '';
+  selectedCity = 'All';
   if (searchInput) searchInput.value = '';
+  updateFilterButton();
   filteredWineFarms = [...allWineFarms];
   renderWineFarms();
 }
 
 // Make functions available globally
 window.fetchWineFarms = fetchWineFarms;
-window.resetSearch = resetSearch;
+window.resetFilters = resetFilters;
 window.navigateToWineFarmDetail = navigateToWineFarmDetail;

@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wine & Bubbles — Wine Bars</title>
   
+  <!-- Cache Control Meta Tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
-  <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
-  <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png?v=4">
+  <link rel="shortcut icon" href="../assets/categories/Icons.png?v=4" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/categories/Icons.png?v=4">
   
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -16,10 +21,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Main CSS -->
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../style.css?v=4">
   <!-- Wine Bars CSS with cache busting -->
-  <link rel="stylesheet" href="wine_farm.css?v=5">
-  <script src="/cart/cart-utils.js"></script>
+  <link rel="stylesheet" href="wine_farm.css?v=6">
+  <script src="/cart/cart-utils.js?v=4"></script>
 
   <!-- Profile Dropdown Styles -->
   <style>
@@ -188,10 +193,72 @@
       color: #aaa;
     }
     
-    .wine-farm-price.coming-soon-price {
+    /* Filter Dropdown Styles */
+    .filter-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .filter-btn {
+      background: #6b0d2b;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+    }
+    
+    .filter-btn:hover {
+      background: #5a0b23;
+    }
+    
+    .filter-dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: white;
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 1000;
+      border-radius: 12px;
+      overflow: hidden;
+      right: 0;
+      margin-top: 5px;
+    }
+    
+    .filter-dropdown-content a {
+      color: #333;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background-color 0.3s;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+    }
+    
+    .filter-dropdown-content a:hover {
+      background-color: #f8f8f8;
       color: #6b0d2b;
-      opacity: 0.8;
-      font-weight: 500;
+    }
+    
+    .filter-dropdown-content a.active-filter {
+      background-color: #6b0d2b;
+      color: white !important;
+    }
+    
+    .filter-dropdown-content a:last-child {
+      border-bottom: none;
+    }
+    
+    .filter-dropdown-content.show {
+      display: block;
     }
   </style>
 </head>
@@ -207,7 +274,7 @@
     <div class="topbar-main-inner">
       <div class="logo">
         <a href="../index.html">
-          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+          <img src="../assets/categories/Logo_Top.png?v=4" alt="Wine & Bubbles Logo">
         </a>
       </div>
 
@@ -239,11 +306,20 @@
       <h2 class="section-title">Wine Bars</h2>
       <p class="muted">Discover beautiful wine bars near you</p>
       
-      <!-- Search Bar -->
+      <!-- Search Bar with Filter Button -->
       <div class="search-filter-bar">
         <div class="search-box">
           <i class="fas fa-search"></i>
           <input type="text" id="searchInput" placeholder="Search wine bars..." class="search-input">
+        </div>
+        <div class="filter-dropdown">
+          <button class="filter-btn" id="filterBtn">
+            <i class="fas fa-filter"></i>
+            Filter
+          </button>
+          <div class="filter-dropdown-content" id="filterDropdown">
+            <!-- Cities will be populated dynamically -->
+          </div>
         </div>
       </div>
 
@@ -262,7 +338,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <img src="../assets/categories/Logo_Botttom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+        <img src="../assets/categories/Logo_Botttom.png?v=4" alt="Wine & Bubbles Logo" class="footer-logo">
         <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
         <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
         <div class="socials">
@@ -297,7 +373,7 @@
   </footer>
 
   <!-- JavaScript with cache busting -->
-  <script src="wine_farm.js?v=3"></script>
+  <script src="wine_farm.js?v=5"></script>
 
   <!-- Profile Authentication Script -->
   <script>
