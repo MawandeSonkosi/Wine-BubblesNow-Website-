@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('📦 Wine Cases page loaded');
   console.log('🔧 Using API URL:', API_BASE_URL);
   
-  // Get URL parameters for filtering
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get('search');
   const typeParam = urlParams.get('type');
@@ -40,9 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
 });
 
-// Event Listeners
 function setupEventListeners() {
-  // Search input
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value.toLowerCase();
@@ -50,7 +47,6 @@ function setupEventListeners() {
     });
   }
   
-  // Toggle filter dropdown on button click
   if (filterBtn) {
     filterBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -58,7 +54,6 @@ function setupEventListeners() {
     });
   }
   
-  // Close dropdown when clicking outside
   document.addEventListener('click', (event) => {
     if (filterDropdown && !event.target.closest('.filter-dropdown')) {
       filterDropdown.classList.remove('show');
@@ -66,7 +61,6 @@ function setupEventListeners() {
   });
 }
 
-// Extract wine types for filter
 function extractWineTypes(wines) {
   const types = new Set(['All']);
   
@@ -79,7 +73,6 @@ function extractWineTypes(wines) {
   return Array.from(types).sort();
 }
 
-// Populate filter dropdown
 function populateFilterDropdown(wines) {
   if (!filterDropdown) return;
   
@@ -94,7 +87,6 @@ function populateFilterDropdown(wines) {
     link.dataset.filter = wineType === 'All' ? '' : wineType;
     link.textContent = wineType;
     
-    // Highlight current filter
     if (wineType === (currentFilter || 'All')) {
       link.classList.add('active-category');
     }
@@ -110,7 +102,6 @@ function populateFilterDropdown(wines) {
   });
 }
 
-// Update filter button
 function updateFilterButton() {
   if (filterBtn) {
     filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${currentFilter || 'Filter'}`;
@@ -122,6 +113,14 @@ function updateFilterButton() {
   }
 }
 
+// Escape HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // Fetch wine cases
 async function fetchWineCases() {
   try {
@@ -129,8 +128,8 @@ async function fetchWineCases() {
     
     console.log('🌐 Fetching wine cases from API...');
     
-    // Use relative URL through your proxy server
-    const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
+    // Use admin endpoint to get ALL wines (including inactive)
+    const apiUrl = `${API_BASE_URL}/wines/admin/all?_=${Date.now()}`;
     console.log('📡 Fetching from:', apiUrl);
     
     const response = await fetch(apiUrl, {
@@ -143,22 +142,29 @@ async function fetchWineCases() {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      // Fallback to regular endpoint
+      const fallbackUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
+      console.log('📡 Trying fallback endpoint:', fallbackUrl);
+      const fallbackResponse = await fetch(fallbackUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      if (!fallbackResponse.ok) {
+        throw new Error(`HTTP ${fallbackResponse.status}`);
+      }
+      
+      const fallbackData = await fallbackResponse.json();
+      processWinesData(fallbackData);
+      return;
     }
     
-    const wines = await response.json();
-    console.log(`📦 Received ${wines.length} wines total`);
-    
-    // Filter to only include allowed types for wine cases
-    allWines = wines.filter(wine => allowedTypes.includes(wine.type));
-    console.log(`📦 Filtered to ${allWines.length} wine cases (${allowedTypes.join(', ')})`);
-    
-    if (allWines.length === 0) {
-      showEmptyState('No wine cases found');
-    } else {
-      populateFilterDropdown(allWines);
-      filterWineCases();
-    }
+    const data = await response.json();
+    processWinesData(data);
     
   } catch (error) {
     console.error('Error:', error);
@@ -166,7 +172,39 @@ async function fetchWineCases() {
   }
 }
 
-// Fix image URLs
+function processWinesData(data) {
+  console.log('📦 API Response:', data);
+  
+  let wines = [];
+  if (data.success && Array.isArray(data.data)) {
+    wines = data.data;
+  } else if (Array.isArray(data)) {
+    wines = data;
+  } else {
+    wines = [];
+  }
+  
+  console.log(`📦 Received ${wines.length} wines total`);
+  
+  // Log each wine's active status
+  wines.forEach(wine => {
+    if (allowedTypes.includes(wine.type)) {
+      console.log(`   - ${wine.name}: isActive = ${wine.isActive}`);
+    }
+  });
+  
+  // Filter to only include allowed types for wine cases
+  allWines = wines.filter(wine => allowedTypes.includes(wine.type));
+  console.log(`📦 Filtered to ${allWines.length} wine cases (${allowedTypes.join(', ')})`);
+  
+  if (allWines.length === 0) {
+    showEmptyState('No wine cases found');
+  } else {
+    populateFilterDropdown(allWines);
+    filterWineCases();
+  }
+}
+
 function fixImageUrl(imageUrl) {
   if (!imageUrl) {
     return '../assets/wines/breakfast/Noir.png';
@@ -183,13 +221,12 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Navigate to wine case detail
 function navigateToWineCaseDetail(wineId) {
   console.log(`📱 Navigating to wine case detail: ${wineId}`);
   window.location.href = `wine_cases_detail.html?id=${wineId}`;
 }
 
-// Render wine cases
+// Render wine cases with Coming Soon support
 function renderWineCases() {
   console.log(`🎨 Rendering ${filteredWines.length} wine cases...`);
   
@@ -199,25 +236,39 @@ function renderWineCases() {
   }
   
   wineCasesGrid.innerHTML = filteredWines.map(wine => {
+    const isComingSoon = !wine.isActive;
     const imageUrl = fixImageUrl(wine.imageUrl);
     const price = wine.price || 0;
     const type = wine.type || 'Wine';
     const isOutOfStock = (wine.stockCount || 0) <= 0;
-    const casePrice = (price * 6).toFixed(2); // 6 bottles per case
+    const casePrice = (price * 6).toFixed(2);
+    const comingSoonClass = isComingSoon ? 'coming-soon' : '';
     
     return `
-      <div class="wine-card ${isOutOfStock ? 'out-of-stock' : ''}" onclick="navigateToWineCaseDetail(${wine.id})">
+      <div class="wine-card ${!isInStock && !isComingSoon ? 'out-of-stock' : ''} ${comingSoonClass}" onclick="navigateToWineCaseDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
-               alt="${wine.name}" 
+               alt="${escapeHtml(wine.name)}" 
                class="wine-image"
                loading="lazy"
                onerror="this.onerror=null; this.src='../assets/wines/breakfast/Noir.png';">
+          ${isComingSoon ? `
+            <div class="coming-soon-overlay">
+              <span>COMING SOON</span>
+            </div>
+          ` : ''}
+          ${!isComingSoon && isOutOfStock ? `
+            <div class="out-of-stock-overlay">
+              <span>OUT OF STOCK</span>
+            </div>
+          ` : ''}
         </div>
         <div class="wine-label">
-          <div class="wine-title">${wine.name}</div>
-          <div class="wine-sub">Wine Case • ${type}</div>
-          <div class="wine-price">R${casePrice}</div>
+          <div class="wine-title">${escapeHtml(wine.name)}</div>
+          <div class="wine-sub">Wine Case • ${escapeHtml(type)}</div>
+          ${!isComingSoon ? `<div class="wine-price">R${casePrice}</div>` : '<div class="wine-price coming-soon-price">Coming Soon</div>'}
+          ${isComingSoon ? '<div class="coming-soon-badge">COMING SOON</div>' : ''}
+          ${!isComingSoon && isOutOfStock ? '<div class="out-of-stock-badge">OUT OF STOCK</div>' : ''}
         </div>
       </div>
     `;
@@ -226,26 +277,21 @@ function renderWineCases() {
   console.log('✅ Wine cases render complete!');
 }
 
-// Filter wine cases
 function filterWineCases() {
   console.log(`🔍 Filtering wine cases: filter="${currentFilter}", search="${searchQuery}"`);
   
-  // Start with all wines (already filtered to allowed types)
   filteredWines = [...allWines];
   
-  // Filter by type
   if (currentFilter) {
     filteredWines = filteredWines.filter(wine => wine.type === currentFilter);
   }
   
-  // Filter by search query
   if (searchQuery) {
     const searchLower = searchQuery.toLowerCase().trim();
     if (searchLower !== '') {
       filteredWines = filteredWines.filter(wine => {
         const matchesName = (wine.name || '').toLowerCase().includes(searchLower);
         const matchesType = (wine.type || '').toLowerCase().includes(searchLower);
-        
         return matchesName || matchesType;
       });
     }
@@ -255,7 +301,6 @@ function filterWineCases() {
   renderWineCases();
 }
 
-// UI States
 function showLoading() {
   if (!wineCasesGrid) return;
   wineCasesGrid.innerHTML = `
@@ -272,7 +317,7 @@ function showError(message) {
     <div class="error-state">
       <i class="fas fa-exclamation-circle"></i>
       <h3>Error</h3>
-      <p>${message}</p>
+      <p>${escapeHtml(message)}</p>
       <button onclick="fetchWineCases()" class="btn-fill">
         Try Again
       </button>
@@ -285,7 +330,7 @@ function showEmptyState(message) {
   wineCasesGrid.innerHTML = `
     <div class="empty-state">
       <i class="fas fa-wine-bottle"></i>
-      <h3>${message}</h3>
+      <h3>${escapeHtml(message)}</h3>
       <p>Try changing your search or filter</p>
       <button onclick="resetFilters()" class="btn-fill" style="margin-top: 20px;">
         Show All Wine Cases
@@ -294,21 +339,18 @@ function showEmptyState(message) {
   `;
 }
 
-// Reset filters
 function resetFilters() {
   currentFilter = '';
   searchQuery = '';
   
   if (searchInput) searchInput.value = '';
   
-  // Clear URL parameters
   window.history.replaceState({}, document.title, window.location.pathname);
   
   updateFilterButton();
   filterWineCases();
 }
 
-// Make functions available globally
 window.fetchWineCases = fetchWineCases;
 window.resetFilters = resetFilters;
 window.navigateToWineCaseDetail = navigateToWineCaseDetail;
