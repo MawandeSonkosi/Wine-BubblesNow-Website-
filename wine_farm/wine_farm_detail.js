@@ -250,10 +250,11 @@ async function fetchWineFarmDetail(farmId) {
     
     console.log(`🌐 Fetching wine farm detail for ID: ${farmId}...`);
     
-    const apiUrl = `${API_BASE_URL}/winefarms/${farmId}?_=${Date.now()}`;
+    // Try admin endpoint first to get isActive status
+    let apiUrl = `${API_BASE_URL}/winefarms/admin/all?_=${Date.now()}`;
     console.log('📡 Fetching from:', apiUrl);
     
-    const response = await fetch(apiUrl, {
+    let response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -262,23 +263,46 @@ async function fetchWineFarmDetail(farmId) {
       }
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    let farm = null;
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        farm = data.data.find(f => f._id === farmId || f.id === farmId);
+      }
     }
     
-    const data = await response.json();
-    console.log('📦 API Response:', data);
-    
-    if (data.success) {
-      const farm = data.data;
-      console.log('✅ Wine farm detail received:', farm);
+    // If not found in admin endpoint, try single farm endpoint
+    if (!farm) {
+      apiUrl = `${API_BASE_URL}/winefarms/${farmId}?_=${Date.now()}`;
+      console.log('📡 Trying single endpoint:', apiUrl);
       
-      currentWineFarm = farm;
-      renderWineFarmDetail(farm);
+      response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
       
-    } else {
-      throw new Error(data.message || 'Failed to load wine farm details');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          farm = data.data;
+        }
+      }
     }
+    
+    if (!farm) {
+      throw new Error('Wine farm not found');
+    }
+    
+    console.log('✅ Wine farm detail received:', farm);
+    console.log('   - isActive:', farm.isActive);
+    
+    currentWineFarm = farm;
+    renderWineFarmDetail(farm);
     
   } catch (error) {
     console.error('Error:', error);
@@ -326,35 +350,49 @@ function fixVideoUrl(videoUrl) {
   return '../assets/' + videoUrl;
 }
 
-// Render wine farm detail
+// Escape HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Render wine farm detail with Coming Soon support
 function renderWineFarmDetail(farm) {
+  const isComingSoon = !farm.isActive;
   const imageUrl = fixImageUrl(farm.imageUrl);
   const videoUrl = fixVideoUrl(farm.videoUrl);
-  const hasVideo = videoUrl && videoUrl.trim() !== '';
-  const hasContactInfo = farm.phoneNumber || farm.email;
+  const hasVideo = videoUrl && videoUrl.trim() !== '' && !isComingSoon;
+  const hasContactInfo = (farm.phoneNumber || farm.email) && !isComingSoon;
   const featuredWines = farm.featuredWines || [];
   
   let template = `
     <div class="wine-farm-detail-card">
       <div class="wine-farm-detail-image-container">
         <img src="${imageUrl}" 
-             alt="${farm.name}" 
+             alt="${escapeHtml(farm.name)}" 
              class="wine-farm-detail-image"
              loading="lazy"
              onerror="this.onerror=null; this.src='../assets/images/default_farm.jpg';">
+        ${isComingSoon ? `
+          <div class="coming-soon-overlay-large">
+            <span>COMING SOON</span>
+          </div>
+        ` : ''}
       </div>
       <div class="wine-farm-detail-content">
-        <h1 class="wine-farm-detail-name">${farm.name}</h1>
+        <h1 class="wine-farm-detail-name" style="${isComingSoon ? 'color: #999;' : ''}">${escapeHtml(farm.name)}</h1>
         <div class="wine-farm-detail-location">
           <i class="fas fa-map-marker-alt"></i>
-          ${farm.location}
+          ${escapeHtml(farm.location)}
         </div>
         <div class="wine-farm-detail-description">
-          ${farm.description}
+          ${isComingSoon ? 'Coming soon - check back later!' : escapeHtml(farm.description)}
         </div>
   `;
   
-  // Contact Information
+  // Contact Information (only for active farms)
   if (hasContactInfo) {
     template += `
       <div class="wine-farm-contact-info">
@@ -366,7 +404,7 @@ function renderWineFarmDetail(farm) {
       template += `
         <div class="contact-info-item">
           <i class="fas fa-phone"></i>
-          <span>${farm.phoneNumber}</span>
+          <span>${escapeHtml(farm.phoneNumber)}</span>
         </div>
       `;
     }
@@ -375,7 +413,7 @@ function renderWineFarmDetail(farm) {
       template += `
         <div class="contact-info-item">
           <i class="fas fa-envelope"></i>
-          <span>${farm.email}</span>
+          <span>${escapeHtml(farm.email)}</span>
         </div>
       `;
     }
@@ -386,7 +424,7 @@ function renderWineFarmDetail(farm) {
     `;
   }
   
-  // Video Button
+  // Video Button (only for active farms with video)
   if (hasVideo) {
     template += `
       <button class="wine-farm-video-button" id="watchVideoBtn">
@@ -396,13 +434,23 @@ function renderWineFarmDetail(farm) {
     `;
   }
   
+  // Coming Soon Badge for inactive farms
+  if (isComingSoon) {
+    template += `
+      <div class="coming-soon-message">
+        <i class="fas fa-hourglass-half"></i>
+        <p>This wine bar is coming soon! Check back later for more information.</p>
+      </div>
+    `;
+  }
+  
   template += `
       </div>
     </div>
   `;
   
-  // Featured Wines Section
-  if (featuredWines.length > 0) {
+  // Featured Wines Section (only for active farms)
+  if (!isComingSoon && featuredWines.length > 0) {
     template += `
       <div class="featured-wines-section">
         <h3>Featured Wines</h3>
@@ -418,14 +466,14 @@ function renderWineFarmDetail(farm) {
         <div class="wine-card" onclick="navigateToWineDetail('${wine._id || wine.id}')">
           <div class="wine-image-container">
             <img src="${wineImageUrl}" 
-                 alt="${wine.name}" 
+                 alt="${escapeHtml(wine.name)}" 
                  class="wine-image"
                  loading="lazy"
                  onerror="this.onerror=null; this.src='../assets/wines/default_wine.png';">
           </div>
           <div class="wine-label">
-            <div class="wine-title">${wine.name}</div>
-            <div class="wine-sub">${wineType}</div>
+            <div class="wine-title">${escapeHtml(wine.name)}</div>
+            <div class="wine-sub">${escapeHtml(wineType)}</div>
             <div class="wine-price">R${winePrice.toFixed(2)}</div>
           </div>
         </div>
@@ -442,9 +490,12 @@ function renderWineFarmDetail(farm) {
   
   // Add event listener for video button
   if (hasVideo) {
-    document.getElementById('watchVideoBtn').addEventListener('click', () => {
-      playVideo(videoUrl, farm.name);
-    });
+    const videoBtn = document.getElementById('watchVideoBtn');
+    if (videoBtn) {
+      videoBtn.addEventListener('click', () => {
+        playVideo(videoUrl, farm.name);
+      });
+    }
   }
 }
 
@@ -545,9 +596,9 @@ function showError(message) {
     <div class="error-state">
       <i class="fas fa-exclamation-circle"></i>
       <h3>Error</h3>
-      <p>${message}</p>
+      <p>${escapeHtml(message)}</p>
       <button onclick="window.location.href='wine_farm.html'" class="btn-fill">
-        Back to Wine Farms
+        Back to Wine Bars
       </button>
     </div>
   `;

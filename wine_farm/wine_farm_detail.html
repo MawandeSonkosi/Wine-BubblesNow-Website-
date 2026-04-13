@@ -5,21 +5,26 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wine & Bubbles — Wine Bar Details</title>
   
+  <!-- Cache Control Meta Tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
-  <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
-  <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png?v=3">
+  <link rel="shortcut icon" href="../assets/categories/Icons.png?v=3" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/categories/Icons.png?v=3">
   
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="../style.css">
-  <!-- Wine Bar Detail CSS -->
-  <link rel="stylesheet" href="wine_farm_detail.css">
-  <script src="/cart/cart-utils.js"></script>
+  <!-- Main CSS with cache busting -->
+  <link rel="stylesheet" href="../style.css?v=3">
+  <!-- Wine Bar Detail CSS with cache busting -->
+  <link rel="stylesheet" href="wine_farm_detail.css?v=3">
+  <script src="/cart/cart-utils.js?v=3"></script>
 
   <!-- Profile Dropdown Styles - ADDED -->
   <style>
@@ -143,6 +148,65 @@
       margin-left: 8px;
       vertical-align: middle;
     }
+    
+    /* Coming Soon Overlay Styles */
+    .coming-soon-overlay-large {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    
+    .coming-soon-overlay-large span {
+      background: #6b0d2b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 24px;
+      letter-spacing: 2px;
+      border: 2px solid #D8C09D;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .coming-soon-message {
+      background: rgba(107, 13, 43, 0.1);
+      border: 1px solid #6b0d2b;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .coming-soon-message i {
+      font-size: 40px;
+      color: #6b0d2b;
+      margin-bottom: 12px;
+    }
+    
+    .coming-soon-message p {
+      color: #6b0d2b;
+      font-size: 16px;
+      margin: 0;
+    }
+    
+    .wine-farm-detail-image-container {
+      position: relative;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .coming-soon-overlay-large span {
+        padding: 8px 16px;
+        font-size: 18px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -157,7 +221,7 @@
     <div class="topbar-main-inner">
       <div class="logo">
         <a href="../index.html">
-          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+          <img src="../assets/categories/Logo_Top.png?v=3" alt="Wine & Bubbles Logo">
         </a>
       </div>
 
@@ -192,7 +256,6 @@
           <i class="fas fa-arrow-left"></i>
         </a>
         <h2 class="section-title">Wine Bar Details</h2>
-        <!-- Cart and Profile icons removed here - using top navigation instead -->
       </div>
 
       <!-- Main Wine Bar Details -->
@@ -215,7 +278,6 @@
         </button>
       </div>
       <div class="video-player-container">
-        <!-- Simple HTML5 video player -->
         <video id="farmVideo" controls preload="metadata" playsinline>
           Your browser does not support the video tag.
         </video>
@@ -244,7 +306,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <img src="../assets/categories/Logo_Botttom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+        <img src="../assets/categories/Logo_Botttom.png?v=3" alt="Wine & Bubbles Logo" class="footer-logo">
         <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
         <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
         <div class="socials">
@@ -261,7 +323,7 @@
           <ul class="footer-links">
             <li><a href="../wine/all_wines.html">All Wines</a></li>
             <li><a href="../booking/booking.html">Bookings</a></li>
-            <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+            <li><a href="wine_farm.html">Tastings</a></li>
             <li><a href="#">Blog</a></li>
           </ul>
         </div>
@@ -278,8 +340,8 @@
     </div>
   </footer>
 
-  <!-- JavaScript -->
-  <script src="wine_farm_detail.js"></script>
+  <!-- JavaScript with cache busting -->
+  <script src="wine_farm_detail.js?v=3"></script>
 
   <!-- Profile Authentication Script - ADDED -->
   <script>
@@ -430,17 +492,14 @@
             const items = [];
             
             if (isAdmin) {
-                // Admin items - Only Profile, Logout, Delete Account
                 items.push(
                     { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
                 );
             } else if (isDriver) {
-                // Driver items - Only Profile, Logout, Delete Account
                 items.push(
                     { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
                 );
             } else {
-                // Regular user items - Only Profile, Logout, Delete Account
                 items.push(
                     { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' }
                 );
