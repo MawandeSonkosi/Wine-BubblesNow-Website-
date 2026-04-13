@@ -122,8 +122,8 @@ async function fetchWines() {
     
     console.log('🌐 Fetching wines from API...');
     
-    // Use your proxy server - NO CORS PROXY NEEDED
-    const apiUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
+    // Use the admin/all endpoint to get ALL wines (including inactive for Coming Soon)
+    const apiUrl = `${API_BASE_URL}/wines/admin/all?_=${Date.now()}`;
     console.log('📡 Fetching from:', apiUrl);
     
     const response = await fetch(apiUrl, {
@@ -136,44 +136,87 @@ async function fetchWines() {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const wines = await response.json();
-    console.log(`✅ Success! Received ${wines.length} wines total`);
-    
-    allWines = wines;
-    
-    // Filter by category type if specified
-    if (currentCategoryType) {
-      // Filter wines by type OR category matching the category type
-      filteredWines = wines.filter(wine => {
-        // Check both type and category for matching (case insensitive)
-        const matchesType = wine.type && 
-                           wine.type.toLowerCase() === currentCategoryType.toLowerCase();
-        const matchesCategory = wine.category && 
-                               wine.category.toLowerCase() === currentCategoryType.toLowerCase();
-        
-        return matchesType || matchesCategory;
+      // Fallback to regular endpoint
+      const fallbackUrl = `${API_BASE_URL}/wines?all=true&_=${Date.now()}`;
+      console.log('📡 Trying fallback endpoint:', fallbackUrl);
+      const fallbackResponse = await fetch(fallbackUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
       });
       
-      console.log(`📊 Filtered to ${filteredWines.length} wines for category type "${currentCategoryType}"`);
-    } else {
-      // No category type specified, show all wines (including all types)
-      filteredWines = wines;
-      console.log(`📊 Showing all ${filteredWines.length} wines`);
+      if (!fallbackResponse.ok) {
+        throw new Error(`HTTP ${fallbackResponse.status}: ${fallbackResponse.statusText}`);
+      }
+      
+      const fallbackData = await fallbackResponse.json();
+      processWinesData(fallbackData);
+      return;
     }
     
-    if (filteredWines.length === 0) {
-      showEmptyState(`No ${currentCategoryType || 'wines'} found`);
-    } else {
-      populateFilterDropdown();
-      renderWines();
-    }
+    const data = await response.json();
+    processWinesData(data);
     
   } catch (error) {
     console.error('❌ Error:', error);
     showError(`Failed to load wines: ${error.message}`);
+  }
+}
+
+function processWinesData(data) {
+  console.log('📦 API Response:', data);
+  
+  // Handle different response formats
+  let wines = [];
+  if (data.success && Array.isArray(data.data)) {
+    wines = data.data;
+  } else if (Array.isArray(data)) {
+    wines = data;
+  } else if (data.wines && Array.isArray(data.wines)) {
+    wines = data.wines;
+  } else if (data.data && Array.isArray(data.data)) {
+    wines = data.data;
+  } else {
+    wines = [];
+  }
+  
+  console.log(`✅ Success! Received ${wines.length} wines total`);
+  
+  // Log each wine's active status
+  wines.forEach(wine => {
+    console.log(`   - ${wine.name}: isActive = ${wine.isActive}`);
+  });
+  
+  allWines = wines;
+  
+  // Filter by category type if specified
+  if (currentCategoryType) {
+    // Filter wines by type OR category matching the category type
+    filteredWines = wines.filter(wine => {
+      // Check both type and category for matching (case insensitive)
+      const matchesType = wine.type && 
+                         wine.type.toLowerCase() === currentCategoryType.toLowerCase();
+      const matchesCategory = wine.category && 
+                             wine.category.toLowerCase() === currentCategoryType.toLowerCase();
+      
+      return matchesType || matchesCategory;
+    });
+    
+    console.log(`📊 Filtered to ${filteredWines.length} wines for category type "${currentCategoryType}"`);
+  } else {
+    // No category type specified, show all wines (including all types)
+    filteredWines = wines;
+    console.log(`📊 Showing all ${filteredWines.length} wines`);
+  }
+  
+  if (filteredWines.length === 0) {
+    showEmptyState(`No ${currentCategoryType || 'wines'} found`);
+  } else {
+    populateFilterDropdown();
+    renderWines();
   }
 }
 
@@ -194,7 +237,15 @@ function fixImageUrl(imageUrl) {
   return '../assets/' + imageUrl;
 }
 
-// Render wines
+// Escape HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Render wines with Coming Soon support
 function renderWines() {
   console.log(`🎨 Rendering ${filteredWines.length} wines...`);
   
@@ -225,27 +276,40 @@ function renderWines() {
   }
   
   wineGrid.innerHTML = winesToShow.map(wine => {
+    const isComingSoon = !wine.isActive;
     const imageUrl = fixImageUrl(wine.imageUrl);
     const price = wine.price || 0;
     const type = wine.type || 'Wine';
     const category = wine.category || '';
     const isInStock = (wine.stockCount || 0) > 0;
+    const comingSoonClass = isComingSoon ? 'coming-soon' : '';
     
-    // Same card layout as all_wines.html
     return `
-      <div class="wine-card ${!isInStock ? 'out-of-stock' : ''}" onclick="navigateToWineDetail(${wine.id})">
+      <div class="wine-card ${!isInStock && !isComingSoon ? 'out-of-stock' : ''} ${comingSoonClass}" onclick="navigateToWineDetail(${wine.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
-               alt="${wine.name}" 
+               alt="${escapeHtml(wine.name)}" 
                class="wine-image"
                loading="lazy"
                onerror="this.onerror=null; this.src='../assets/wines/breakfast/Noir.png';">
+          ${isComingSoon ? `
+            <div class="coming-soon-overlay">
+              <span>COMING SOON</span>
+            </div>
+          ` : ''}
+          ${!isComingSoon && !isInStock ? `
+            <div class="out-of-stock-overlay">
+              <span>OUT OF STOCK</span>
+            </div>
+          ` : ''}
         </div>
         <div class="wine-label">
-          <div class="wine-title">${wine.name}</div>
-          <div class="wine-sub">${type}</div>
-          <div class="wine-sub">${category}</div>
-          <div class="wine-price">R${price.toFixed(2)}</div>
+          <div class="wine-title">${escapeHtml(wine.name)}</div>
+          <div class="wine-sub">${escapeHtml(type)}</div>
+          <div class="wine-sub">${escapeHtml(category)}</div>
+          ${!isComingSoon ? `<div class="wine-price">R${price.toFixed(2)}</div>` : '<div class="wine-price coming-soon-price">Coming Soon</div>'}
+          ${isComingSoon ? '<div class="coming-soon-badge">COMING SOON</div>' : ''}
+          ${!isComingSoon && !isInStock ? '<div class="out-of-stock-badge">OUT OF STOCK</div>' : ''}
         </div>
       </div>
     `;
@@ -281,7 +345,7 @@ function showError(message) {
     <div class="error-state">
       <i class="fas fa-exclamation-circle"></i>
       <h3>Error</h3>
-      <p>${message}</p>
+      <p>${escapeHtml(message)}</p>
       <button onclick="fetchWines()" class="btn-fill">
         Try Again
       </button>
@@ -293,7 +357,7 @@ function showEmptyState(message) {
   wineGrid.innerHTML = `
     <div class="empty-state">
       <i class="fas fa-wine-bottle"></i>
-      <h3>${message}</h3>
+      <h3>${escapeHtml(message)}</h3>
       <p>Try changing your search or filter</p>
       <button onclick="resetSearch()" class="btn-fill" style="margin-top: 20px;">
         Clear Search
