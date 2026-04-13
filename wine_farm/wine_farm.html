@@ -18,7 +18,7 @@
   <!-- Main CSS -->
   <link rel="stylesheet" href="../style.css">
   <!-- Wine Bars CSS with cache busting -->
-<link rel="stylesheet" href="wine_farm.css?v=4">
+  <link rel="stylesheet" href="wine_farm.css?v=5">
   <script src="/cart/cart-utils.js"></script>
 
   <!-- Profile Dropdown Styles -->
@@ -138,6 +138,61 @@
       margin-left: 8px;
       vertical-align: middle;
     }
+    
+    /* Coming Soon Badge Styles */
+    .coming-soon-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    
+    .coming-soon-overlay span {
+      background: #6b0d2b;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 1px;
+      border: 1px solid #D8C09D;
+    }
+    
+    .coming-soon-badge {
+      display: inline-block;
+      background: #6b0d2b;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+    
+    .wine-farm-card.coming-soon {
+      opacity: 0.9;
+    }
+    
+    .wine-farm-card.coming-soon .wine-farm-title {
+      color: #999;
+    }
+    
+    .wine-farm-card.coming-soon .wine-farm-description {
+      color: #aaa;
+    }
+    
+    .wine-farm-price.coming-soon-price {
+      color: #6b0d2b;
+      opacity: 0.8;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -224,7 +279,7 @@
           <ul class="footer-links">
             <li><a href="../wine/all_wines.html">All Wines</a></li>
             <li><a href="../booking/booking.html">Bookings</a></li>
-            <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+            <li><a href="wine_farm.html">Tastings</a></li>
             <li><a href="#">Blog</a></li>
           </ul>
         </div>
@@ -242,7 +297,7 @@
   </footer>
 
   <!-- JavaScript with cache busting -->
-  <script src="wine_farm.js?v=2"></script>
+  <script src="wine_farm.js?v=3"></script>
 
   <!-- Profile Authentication Script -->
   <script>

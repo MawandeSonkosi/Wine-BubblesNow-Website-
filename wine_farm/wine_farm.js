@@ -35,74 +35,81 @@ async function fetchWineFarms() {
     
     console.log('🌐 Fetching wine bars from API...');
     
-    // Try multiple possible endpoints
-    const endpoints = [
-      `${API_BASE_URL}/winefarms?_=${Date.now()}`,
-      `${API_BASE_URL}/wine-farms?_=${Date.now()}`,
-      `${API_BASE_URL}/winebars?_=${Date.now()}`
-    ];
+    // Use the admin/all endpoint to get ALL farms (including inactive for Coming Soon)
+    const endpoint = `${API_BASE_URL}/winefarms/admin/all?_=${Date.now()}`;
     
-    let data = null;
-    let successEndpoint = null;
-    
-    for (const endpoint of endpoints) {
-      try {
-        console.log(`📡 Trying endpoint: ${endpoint}`);
-        const response = await fetch(endpoint, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache'
-          }
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          console.log(`✅ Success from endpoint: ${endpoint}`);
-          data = result;
-          successEndpoint = endpoint;
-          break;
-        }
-      } catch (err) {
-        console.log(`❌ Endpoint failed: ${endpoint}`, err.message);
+    console.log(`📡 Trying endpoint: ${endpoint}`);
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
       }
+    });
+    
+    if (!response.ok) {
+      // Fallback to regular endpoint if admin endpoint fails
+      const fallbackEndpoint = `${API_BASE_URL}/winefarms?_=${Date.now()}`;
+      console.log(`📡 Trying fallback endpoint: ${fallbackEndpoint}`);
+      const fallbackResponse = await fetch(fallbackEndpoint, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      if (!fallbackResponse.ok) {
+        throw new Error('No working endpoint found for wine bars');
+      }
+      
+      const fallbackData = await fallbackResponse.json();
+      processWineFarmsData(fallbackData, fallbackEndpoint);
+      return;
     }
     
-    if (!data) {
-      throw new Error('No working endpoint found for wine bars');
-    }
-    
-    console.log('📦 API Response:', data);
-    
-    // Handle different response formats
-    let wineFarms = [];
-    if (data.success && Array.isArray(data.data)) {
-      wineFarms = data.data;
-    } else if (Array.isArray(data)) {
-      wineFarms = data;
-    } else if (data.wineFarms && Array.isArray(data.wineFarms)) {
-      wineFarms = data.wineFarms;
-    } else if (data.data && Array.isArray(data.data)) {
-      wineFarms = data.data;
-    } else {
-      wineFarms = [];
-    }
-    
-    console.log(`✅ Success! Received ${wineFarms.length} wine bars`);
-    
-    allWineFarms = wineFarms;
-    filteredWineFarms = wineFarms;
-    
-    if (wineFarms.length === 0) {
-      showEmptyState('No wine bars found');
-    } else {
-      renderWineFarms();
-    }
+    const data = await response.json();
+    processWineFarmsData(data, endpoint);
     
   } catch (error) {
     console.error('Error:', error);
     showError(`Failed to load wine bars: ${error.message}`);
+  }
+}
+
+function processWineFarmsData(data, endpoint) {
+  console.log('📦 API Response:', data);
+  
+  // Handle different response formats
+  let wineFarms = [];
+  if (data.success && Array.isArray(data.data)) {
+    wineFarms = data.data;
+  } else if (Array.isArray(data)) {
+    wineFarms = data;
+  } else if (data.wineFarms && Array.isArray(data.wineFarms)) {
+    wineFarms = data.wineFarms;
+  } else if (data.data && Array.isArray(data.data)) {
+    wineFarms = data.data;
+  } else {
+    wineFarms = [];
+  }
+  
+  console.log(`✅ Success! Received ${wineFarms.length} wine bars`);
+  
+  // Log each farm's active status
+  wineFarms.forEach(farm => {
+    console.log(`   - ${farm.name}: isActive = ${farm.isActive}`);
+  });
+  
+  allWineFarms = wineFarms;
+  filteredWineFarms = wineFarms;
+  
+  if (wineFarms.length === 0) {
+    showEmptyState('No wine bars found');
+  } else {
+    renderWineFarms();
   }
 }
 
@@ -143,7 +150,15 @@ function truncateDescription(description, maxLength = 100) {
   return description.substring(0, maxLength) + '...';
 }
 
-// Render wine farms
+// Escape HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Render wine farms with Coming Soon support
 function renderWineFarms() {
   console.log(`🎨 Rendering ${filteredWineFarms.length} wine bars...`);
   
@@ -153,23 +168,30 @@ function renderWineFarms() {
   }
   
   wineFarmsGrid.innerHTML = filteredWineFarms.map(farm => {
+    const isComingSoon = !farm.isActive;
     const imageUrl = fixImageUrl(farm.imageUrl);
     const description = truncateDescription(farm.description, 80);
     const hasVideo = farm.videoUrl && farm.videoUrl.trim() !== '';
     const hasContactInfo = farm.phoneNumber || farm.email;
+    const comingSoonClass = isComingSoon ? 'coming-soon' : '';
     
     return `
-      <div class="wine-farm-card" onclick="navigateToWineFarmDetail('${farm._id || farm.id}')">
+      <div class="wine-farm-card ${comingSoonClass}" onclick="navigateToWineFarmDetail('${farm._id || farm.id}')">
         <div class="wine-farm-image-container">
           <img src="${imageUrl}" 
-               alt="${farm.name}" 
+               alt="${escapeHtml(farm.name)}" 
                class="wine-farm-image"
                loading="lazy"
                onerror="this.onerror=null; this.src='../assets/images/default_wine_bar.jpg';">
-          ${hasVideo ? `
+          ${hasVideo && !isComingSoon ? `
             <div class="video-indicator">
               <i class="fas fa-video"></i>
               <span>Video Tour</span>
+            </div>
+          ` : ''}
+          ${isComingSoon ? `
+            <div class="coming-soon-overlay">
+              <span>COMING SOON</span>
             </div>
           ` : ''}
         </div>
@@ -181,10 +203,10 @@ function renderWineFarms() {
           </div>
           ${description ? `
             <div class="wine-farm-description">
-              ${escapeHtml(description)}
+              ${isComingSoon ? 'Coming soon - check back later!' : escapeHtml(description)}
             </div>
           ` : ''}
-          ${hasContactInfo ? `
+          ${!isComingSoon && hasContactInfo ? `
             <div class="wine-farm-contact">
               ${farm.phoneNumber ? `
                 <div class="contact-item">
@@ -200,20 +222,15 @@ function renderWineFarms() {
               ` : ''}
             </div>
           ` : ''}
+          ${isComingSoon ? `
+            <div class="coming-soon-badge">COMING SOON</div>
+          ` : ''}
         </div>
       </div>
     `;
   }).join('');
   
   console.log('✅ Render complete!');
-}
-
-// Helper function to escape HTML
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 // Navigate to wine farm detail page
