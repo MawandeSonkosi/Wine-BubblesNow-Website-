@@ -120,9 +120,9 @@
   z-index: 10;
 }
 
-/* Image container - Smaller height */
+/* Image container - Increased height for better visibility */
 .wine-farm-image-container {
-  height: 180px;
+  height: 220px; /* Increased from 180px to 220px */
   background: #f5f5f5;
   position: relative;
   overflow: hidden;
@@ -272,6 +272,31 @@
   text-align: center;
 }
 
+/* Coming Soon Overlay */
+.coming-soon-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.coming-soon-overlay span {
+  background: #6b0d2b;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 1px;
+  border: 1px solid #D8C09D;
+}
+
 /* Loading State */
 .loading-state {
   grid-column: 1 / -1;
@@ -387,6 +412,10 @@
   .wine-farms-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  .wine-farm-image-container {
+    height: 200px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -418,7 +447,7 @@
   }
   
   .wine-farm-image-container {
-    height: 200px;
+    height: 220px;
   }
   
   .section-title {
@@ -432,7 +461,7 @@
 
 @media (max-width: 480px) {
   .wine-farm-image-container {
-    height: 180px;
+    height: 200px;
   }
   
   .wine-farm-title {
@@ -449,5 +478,46 @@
   
   .wine-farm-label {
     padding: 12px;
+  }
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #6b0d2b;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideIn 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
   }
 }
