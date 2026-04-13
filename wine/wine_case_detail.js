@@ -278,11 +278,11 @@ function renderWineCaseDetail(wine) {
   const imageUrl = fixImageUrl(wine.imageUrl);
   const price = wine.price || 0;
   const type = wine.type || 'Wine';
+  const category = wine.category || 'Uncategorized';
   const description = wine.description || 'No description available.';
   const stockCount = wine.stockCount || 0;
   const isInStock = stockCount > 0 && !isComingSoon;
-  const casePrice = (price * 6).toFixed(2);
-  const savings = (price * 0.6).toFixed(2);
+  const casePrice = price * 6;
   
   wineCaseDetailContainer.innerHTML = `
     <div class="wine-case-detail-card">
@@ -303,18 +303,23 @@ function renderWineCaseDetail(wine) {
           <i class="fas fa-box"></i> Case of 6 Bottles
         </div>
         
-        <h1 class="wine-case-detail-name" style="${isComingSoon ? 'color: #999;' : ''}">${escapeHtml(wine.name)}</h1>
-        <div class="wine-case-detail-type">Wine Case • ${escapeHtml(type)}</div>
-        ${!isComingSoon ? `<div class="wine-case-detail-price">R${casePrice}</div>` : '<div class="wine-case-detail-price coming-soon-price">Coming Soon</div>'}
+        <h1 class="wine-case-detail-name" style="${isComingSoon ? 'color: #999;' : ''}">${escapeHtml(wine.name)} (Case of 6)</h1>
+        <div class="wine-case-detail-type">${escapeHtml(type)} • Case</div>
+        ${!isComingSoon ? `<div class="wine-case-detail-price">R${casePrice.toFixed(2)}</div>` : '<div class="wine-case-detail-price coming-soon-price">Coming Soon</div>'}
+        ${!isComingSoon ? `<p class="wine-case-detail-subprice">(R${price.toFixed(2)} per bottle)</p>` : ''}
         
         <div class="wine-case-detail-meta">
           <div class="wine-case-meta-item">
-            <div class="wine-case-meta-label">Single Bottle Price</div>
-            <div class="wine-case-meta-value">${!isComingSoon ? `R${price.toFixed(2)}` : 'TBA'}</div>
+            <div class="wine-case-meta-label">Category</div>
+            <div class="wine-case-meta-value">${escapeHtml(category)}</div>
           </div>
           <div class="wine-case-meta-item">
             <div class="wine-case-meta-label">Type</div>
             <div class="wine-case-meta-value">${escapeHtml(type)}</div>
+          </div>
+          <div class="wine-case-meta-item">
+            <div class="wine-case-meta-label">Package</div>
+            <div class="wine-case-meta-value">Case of 6 bottles</div>
           </div>
         </div>
         
@@ -326,10 +331,6 @@ function renderWineCaseDetail(wine) {
         
         <p class="wine-case-detail-description">
           ${isComingSoon ? 'Coming soon - check back later!' : escapeHtml(description)}
-        </p>
-        
-        <p class="wine-case-detail-description" style="font-style: italic; color: #666;">
-          ${isComingSoon ? 'This wine case is coming soon. Sign up for notifications!' : `This wine case contains 6 bottles of ${wine.name} ${type}. Perfect for events, gifting, or stocking your wine collection.`}
         </p>
         
         ${!isComingSoon && isInStock ? `
@@ -392,32 +393,103 @@ function addToCart() {
     return;
   }
   
-  const casePrice = (currentWine.price * 6).toFixed(2);
-  
-  const wineCaseItem = {
-    id: `case_${currentWine.id}`,
-    name: `${currentWine.name} Case`,
-    price: parseFloat(casePrice),
-    type: 'wine',
-    category: currentWine.category,
+  const cartItem = {
+    id: currentWine.id,
+    name: currentWine.name + ' (Case of 6)',
+    price: currentWine.price,
     imageUrl: currentWine.imageUrl,
-    description: currentWine.description || `Case of 6 bottles of ${currentWine.name}`,
+    type: 'wine',
+    category: currentWine.category || '',
+    description: 'Case of 6 bottles',
     quantity: quantity,
-    isCase: true,
-    pricePerBottle: currentWine.price
+    isCase: true
   };
   
-  cartUtils.addItem(wineCaseItem);
-  showToast(`Added ${quantity} ${currentWine.name} case${quantity > 1 ? 's' : ''} to cart (${6 * quantity} bottles total)`, 'success');
-  
-  quantity = 1;
-  updateQuantityDisplay();
+  if (window.CartUtils) {
+    window.CartUtils.addWineCase(cartItem);
+    showToast(`Added ${quantity} case${quantity === 1 ? '' : 's'} of ${currentWine.name} to cart`);
+    quantity = 1;
+    updateQuantityDisplay();
+  } else {
+    showToast('Cart system not available', 'error');
+  }
 }
 
 function updateCartBadge() {
   if (cartUtils) {
     cartUtils.updateCartBadge();
   }
+}
+
+function showRelatedWineCases() {
+  if (!allWines.length) return;
+  
+  let related = allWines.filter(wine => {
+    if (currentWine && wine.id === currentWine.id) return false;
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      const matchesName = (wine.name || '').toLowerCase().includes(searchLower);
+      const matchesType = (wine.type || '').toLowerCase().includes(searchLower);
+      if (!(matchesName || matchesType)) return false;
+    }
+    if (currentFilter && wine.type !== currentFilter) return false;
+    return true;
+  });
+  
+  if (related.length === 0) {
+    relatedWineCasesGrid.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <h3>No related wine cases found</h3>
+        <p>Try changing your search or filter</p>
+      </div>
+    `;
+  } else {
+    related = related.slice(0, 6);
+    relatedWineCasesGrid.innerHTML = related.map(wine => {
+      const imageUrl = fixImageUrl(wine.imageUrl);
+      const price = wine.price || 0;
+      const type = wine.type || 'Wine';
+      const category = wine.category || '';
+      const casePrice = price * 6;
+      const isComingSoon = !wine.isActive;
+      
+      return `
+        <div class="wine-card ${isComingSoon ? 'coming-soon' : ''}" onclick="navigateToWineCaseDetail(${wine.id})">
+          <div class="wine-image-container">
+            <img src="${imageUrl}" 
+                 alt="${escapeHtml(wine.name)}" 
+                 class="wine-image"
+                 loading="lazy"
+                 onerror="this.onerror=null; this.src='../assets/wines/breakfast/Noir.png';">
+            ${isComingSoon ? `<div class="coming-soon-overlay"><span>COMING SOON</span></div>` : ''}
+          </div>
+          <div class="wine-label">
+            <div class="wine-title">${escapeHtml(wine.name)}</div>
+            <div class="wine-sub">${escapeHtml(type)} • Case</div>
+            <div class="wine-sub">${escapeHtml(category)}</div>
+            ${!isComingSoon ? `<div class="wine-sub">R${casePrice.toFixed(2)}</div>` : '<div class="coming-soon-badge">COMING SOON</div>'}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  relatedWineCasesSection.style.display = 'block';
+}
+
+function hideRelatedWineCases() {
+  relatedWineCasesSection.style.display = 'none';
+  searchInput.value = '';
+  searchQuery = '';
+  currentFilter = '';
+  if (filterBtn) {
+    filterBtn.innerHTML = '<i class="fas fa-filter"></i> Filter';
+  }
+}
+
+function navigateToWineCaseDetail(wineId) {
+  window.location.href = `wine_cases_detail.html?id=${wineId}`;
 }
 
 function showLoading() {
