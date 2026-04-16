@@ -59,13 +59,118 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
+        /* City Selection Cards */
+        .city-selector {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .city-card {
+            flex: 1;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .city-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .city-card.selected {
+            border-color: #e6c79c;
+            background: rgba(107, 13, 43, 0.3);
+        }
+
+        .city-card i {
+            font-size: 32px;
+            color: #e6c79c;
+            margin-bottom: 12px;
+        }
+
+        .city-card h3 {
+            color: #e6c79c;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .city-card p {
+            color: rgba(230, 199, 156, 0.7);
+            font-size: 12px;
+        }
+
+        /* Quick Suburb Selector */
+        .quick-selector {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .quick-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quick-header i {
+            color: #ffc107;
+            font-size: 16px;
+        }
+
+        .quick-header h4 {
+            color: #e6c79c;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .quick-subtitle {
+            color: rgba(230, 199, 156, 0.6);
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .suburb-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .suburb-chip {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(107, 13, 43, 0.5);
+            border-radius: 8px;
+            color: rgba(230, 199, 156, 0.8);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suburb-chip:hover {
+            background: rgba(107, 13, 43, 0.3);
+            border-color: #e6c79c;
+            color: #e6c79c;
+        }
+
+        .suburb-chip.active {
+            background: #6b0d2b;
+            border-color: #e6c79c;
+            color: #e6c79c;
+        }
+
         /* Info Box */
         .info-box {
             background: rgba(107, 13, 43, 0.05);
             border: 1px solid rgba(107, 13, 43, 0.2);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .info-header {
@@ -173,7 +278,7 @@
             justify-content: center;
             gap: 12px;
             transition: all 0.3s ease;
-            margin-top: 40px;
+            margin-top: 24px;
         }
 
         .continue-btn:hover:not(:disabled) {
@@ -199,6 +304,28 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Heatmap Button */
+        .heatmap-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid #6b0d2b;
+            color: #6b0d2b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .heatmap-btn:hover {
+            background: rgba(107, 13, 43, 0.1);
+            transform: translateY(-2px);
         }
 
         /* Toast Notification */
@@ -274,6 +401,10 @@
                 padding: 16px;
                 font-size: 16px;
             }
+
+            .city-selector {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
@@ -306,9 +437,7 @@
 <body>
     <!-- Top bar with two sections -->
     <div class="topbar-top">
-        <div class="topbar-top-inner">
-            <!-- Empty - no content as requested -->
-        </div>
+        <div class="topbar-top-inner"></div>
     </div>
 
     <div class="topbar-main">
@@ -330,10 +459,10 @@
             </nav>
 
             <div class="top-icons">
-               <a href="/cart/cart.html" class="icon cart-icon">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-badge" style="display: none;">0</span>
-  </a>
+                <a href="/cart/cart.html" class="icon cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" style="display: none;">0</span>
+                </a>
                 <a href="../user/profile.html" class="icon" id="userIcon">
                     <i class="fas fa-user" id="userIconElement"></i>
                 </a>
@@ -350,6 +479,38 @@
             </div>
 
             <div class="delivery-card">
+                <!-- Heatmap Button -->
+                <div style="text-align: right;">
+                    <a href="heatmap.html" class="heatmap-btn">
+                        <i class="fas fa-map"></i>
+                        View Delivery Areas
+                    </a>
+                </div>
+
+                <!-- City Selection -->
+                <div class="city-selector" id="citySelector">
+                    <div class="city-card" data-city="Johannesburg" id="cityJhb">
+                        <i class="fas fa-city"></i>
+                        <h3>Johannesburg</h3>
+                        <p>Sandton • Rosebank • Hyde Park • Fourways • Midrand</p>
+                    </div>
+                    <div class="city-card" data-city="Durban" id="cityDbn">
+                        <i class="fas fa-beach"></i>
+                        <h3>Durban</h3>
+                        <p>Umhlanga • Ballito • Durban North • Westville</p>
+                    </div>
+                </div>
+
+                <!-- Quick Suburb Selector -->
+                <div class="quick-selector" id="quickSelector">
+                    <div class="quick-header">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Quick Select Suburb (Optional)</h4>
+                    </div>
+                    <div class="quick-subtitle">Tap a suburb below to auto-fill, or type any suburb name</div>
+                    <div class="suburb-chips" id="suburbChips"></div>
+                </div>
+
                 <!-- Info Box -->
                 <div class="info-box">
                     <div class="info-header">
@@ -357,8 +518,8 @@
                         <span class="info-title">Delivery Information</span>
                     </div>
                     <p class="info-text">
-                        Please provide your complete delivery address. Fields marked with * are required.
-                        Make sure to provide accurate information for successful delivery.
+                        We deliver to all areas in <span id="selectedCityName">Johannesburg</span> and surrounding suburbs.
+                        Fields marked with * are required.
                     </p>
                 </div>
 
@@ -371,10 +532,7 @@
                             <span>Building/Complex</span>
                             <span class="optional">(Optional)</span>
                         </label>
-                        <input type="text" 
-                               id="building" 
-                               class="form-input" 
-                               placeholder="e.g., Sandton City, Rosebank Mall">
+                        <input type="text" id="building" class="form-input" placeholder="e.g., Sandton City, Rosebank Mall">
                     </div>
 
                     <!-- Unit Number (Optional) -->
@@ -384,10 +542,7 @@
                             <span>Unit Number</span>
                             <span class="optional">(Optional)</span>
                         </label>
-                        <input type="text" 
-                               id="unit" 
-                               class="form-input" 
-                               placeholder="e.g., Unit 5, Shop 12">
+                        <input type="text" id="unit" class="form-input" placeholder="e.g., Unit 5, Shop 12">
                     </div>
 
                     <!-- Street Address (Required) -->
@@ -397,14 +552,8 @@
                             <span>Street Address</span>
                             <span class="required">*</span>
                         </label>
-                        <input type="text" 
-                               id="street" 
-                               class="form-input" 
-                               placeholder="e.g., 123 Main Street, Nelson Mandela Square"
-                               required>
-                        <div class="error-message" id="streetError">
-                            Street address is required (minimum 5 characters)
-                        </div>
+                        <input type="text" id="street" class="form-input" placeholder="e.g., 123 Main Street" required>
+                        <div class="error-message" id="streetError">Street address is required (minimum 5 characters)</div>
                     </div>
 
                     <!-- Suburb (Required) -->
@@ -414,31 +563,18 @@
                             <span>Suburb</span>
                             <span class="required">*</span>
                         </label>
-                        <input type="text" 
-                               id="suburb" 
-                               class="form-input" 
-                               placeholder="e.g., Sandton, Rosebank, Hyde Park"
-                               required>
-                        <div class="error-message" id="suburbError">
-                            Suburb is required (minimum 2 characters)
-                        </div>
+                        <input type="text" id="suburb" class="form-input" placeholder="e.g., Sandton, Rosebank, Umhlanga" required>
+                        <div class="error-message" id="suburbError">Suburb is required (minimum 2 characters)</div>
                     </div>
 
-                    <!-- City (Required) -->
+                    <!-- City (Required) - Auto-filled based on selection -->
                     <div class="form-group">
                         <label class="form-label">
                             <i class="fas fa-city"></i>
                             <span>City</span>
                             <span class="required">*</span>
                         </label>
-                        <input type="text" 
-                               id="city" 
-                               class="form-input" 
-                               placeholder="e.g., Johannesburg, Pretoria, Cape Town"
-                               required>
-                        <div class="error-message" id="cityError">
-                            City is required (minimum 2 characters)
-                        </div>
+                        <input type="text" id="city" class="form-input" readonly style="background: #f5f5f5;">
                     </div>
 
                     <!-- Postal Code (Required) -->
@@ -448,15 +584,8 @@
                             <span>Postal Code</span>
                             <span class="required">*</span>
                         </label>
-                        <input type="text" 
-                               id="postalCode" 
-                               class="form-input" 
-                               placeholder="e.g., 2196, 0001, 8001"
-                               maxlength="4"
-                               required>
-                        <div class="error-message" id="postalCodeError">
-                            Please enter a valid 4-digit postal code
-                        </div>
+                        <input type="text" id="postalCode" class="form-input" placeholder="e.g., 2196" maxlength="4" required>
+                        <div class="error-message" id="postalCodeError">Please enter a valid 4-digit postal code</div>
                     </div>
 
                     <!-- Continue Button -->
@@ -517,6 +646,21 @@
 
     <!-- JavaScript -->
     <script>
+        // Delivery zones data
+        const deliveryZones = {
+            'Johannesburg': [
+                'Sandton', 'Rosebank', 'Hyde Park', 'Illovo', 'Morningside',
+                'Bryanston', 'Parktown', 'Melville', 'Randburg', 'Fourways',
+                'Midrand', 'Ferndale'
+            ],
+            'Durban': [
+                'Umhlanga', 'Ballito', 'Durban North', 'Westville', 'Florida',
+                'Essenwood', 'Morningside (DBN)', 'Glenwood', 'Berea', 'La Lucia'
+            ]
+        };
+
+        let selectedCity = 'Johannesburg';
+
         class DeliveryAddressSystem {
             constructor() {
                 this.form = document.getElementById('deliveryForm');
@@ -532,10 +676,68 @@
                 this.setupEventListeners();
                 this.updateCartBadge();
                 this.validateCart();
+                this.setupCitySelection();
+                this.updateSuburbChips();
+            }
+
+            setupCitySelection() {
+                const cityJhb = document.getElementById('cityJhb');
+                const cityDbn = document.getElementById('cityDbn');
+                const cityInput = document.getElementById('city');
+                const cityNameSpan = document.getElementById('selectedCityName');
+
+                // Set initial city
+                cityInput.value = 'Johannesburg';
+                cityJhb.classList.add('selected');
+
+                cityJhb.addEventListener('click', () => {
+                    selectedCity = 'Johannesburg';
+                    cityJhb.classList.add('selected');
+                    cityDbn.classList.remove('selected');
+                    cityInput.value = 'Johannesburg';
+                    cityNameSpan.textContent = 'Johannesburg';
+                    this.updateSuburbChips();
+                    // Clear suburb when city changes
+                    document.getElementById('suburb').value = '';
+                    document.getElementById('postalCode').value = '';
+                });
+
+                cityDbn.addEventListener('click', () => {
+                    selectedCity = 'Durban';
+                    cityDbn.classList.add('selected');
+                    cityJhb.classList.remove('selected');
+                    cityInput.value = 'Durban';
+                    cityNameSpan.textContent = 'Durban';
+                    this.updateSuburbChips();
+                    // Clear suburb when city changes
+                    document.getElementById('suburb').value = '';
+                    document.getElementById('postalCode').value = '';
+                });
+            }
+
+            updateSuburbChips() {
+                const suburbChipsContainer = document.getElementById('suburbChips');
+                const suburbs = deliveryZones[selectedCity] || [];
+                
+                suburbChipsContainer.innerHTML = '';
+                
+                suburbs.forEach(suburb => {
+                    const chip = document.createElement('div');
+                    chip.className = 'suburb-chip';
+                    chip.textContent = suburb;
+                    chip.addEventListener('click', () => {
+                        document.getElementById('suburb').value = suburb;
+                        // Visual feedback
+                        chip.classList.add('active');
+                        setTimeout(() => {
+                            chip.classList.remove('active');
+                        }, 300);
+                    });
+                    suburbChipsContainer.appendChild(chip);
+                });
             }
 
             setupEventListeners() {
-                // Form submission
                 if (this.form) {
                     this.form.addEventListener('submit', (e) => {
                         e.preventDefault();
@@ -543,10 +745,8 @@
                     });
                 }
 
-                // Real-time validation
                 this.setupRealTimeValidation();
                 
-                // Listen for cart updates
                 window.addEventListener('cartUpdated', () => {
                     this.updateCartBadge();
                 });
@@ -556,7 +756,6 @@
                 const inputs = [
                     { id: 'street', minLength: 5, errorId: 'streetError' },
                     { id: 'suburb', minLength: 2, errorId: 'suburbError' },
-                    { id: 'city', minLength: 2, errorId: 'cityError' },
                     { id: 'postalCode', validator: this.validatePostalCode, errorId: 'postalCodeError' }
                 ];
 
@@ -624,7 +823,6 @@
                 const inputs = [
                     { id: 'street', minLength: 5, errorId: 'streetError' },
                     { id: 'suburb', minLength: 2, errorId: 'suburbError' },
-                    { id: 'city', minLength: 2, errorId: 'cityError' },
                     { id: 'postalCode', validator: this.validatePostalCode, errorId: 'postalCodeError' }
                 ];
 
@@ -648,7 +846,6 @@
             async submitAddress() {
                 if (this.isSubmitting) return;
                 
-                // Validate form
                 if (!this.validateForm()) {
                     this.showToast('Please fix the errors in the form', 'error');
                     return;
@@ -661,7 +858,6 @@
                 this.continueBtn.querySelector('span').textContent = 'PROCESSING...';
 
                 try {
-                    // Get form values
                     const building = document.getElementById('building').value.trim();
                     const unit = document.getElementById('unit').value.trim();
                     const street = document.getElementById('street').value.trim();
@@ -694,10 +890,8 @@
                     // Save address to localStorage
                     this.saveDeliveryAddress(fullAddress, address);
 
-                    // Show success message
                     this.showToast('Delivery address saved successfully!', 'success');
 
-                    // Redirect to payment page after delay
                     setTimeout(() => {
                         window.location.href = '../payment/payment.html';
                     }, 1500);
@@ -710,11 +904,9 @@
             }
 
             saveDeliveryAddress(fullAddress, addressDetails) {
-                // Save to localStorage
                 localStorage.setItem('wineBubbles_deliveryAddress', fullAddress);
                 localStorage.setItem('wineBubbles_deliveryAddressDetails', JSON.stringify(addressDetails));
                 
-                // Also save to cart in CartUtils if it exists
                 if (window.CartUtils) {
                     const cart = window.CartUtils.getCart();
                     cart.deliveryAddress = fullAddress;
@@ -750,9 +942,6 @@
             }
 
             setupAuthentication() {
-                // Configuration - USE PROXY SERVER (works on both localhost and production)
-                const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
-                
                 const token = localStorage.getItem('wineBubbles_token');
                 const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
                 const userData = localStorage.getItem('wineBubbles_user');
@@ -766,13 +955,11 @@
                     try {
                         const user = JSON.parse(userData);
                         
-                        // Update user icon
                         if (userIconElement) {
                             userIconElement.className = 'fas fa-user-check';
                             userIconElement.style.color = '#6b0d2b';
                         }
                         
-                        // Setup user dropdown
                         if (userIcon) {
                             userIcon.href = '#';
                             userIcon.addEventListener('click', (e) => {
@@ -781,7 +968,6 @@
                             });
                         }
                         
-                        // Cart functionality
                         if (cartIcon) {
                             cartIcon.addEventListener('click', (e) => {
                                 if (!isValidToken) {
@@ -801,7 +987,6 @@
                 } else {
                     this.resetUserIcon();
                     
-                    // Redirect to login if not authenticated
                     this.showToast('Please login to continue', 'error');
                     setTimeout(() => {
                         window.location.href = '../login/login.html?redirect=delivery';
@@ -845,17 +1030,12 @@
             }
 
             createUserDropdown(user) {
-                // Remove existing dropdown if any
                 const existingDropdown = document.querySelector('.user-dropdown');
-                if (existingDropdown) {
-                    existingDropdown.remove();
-                }
+                if (existingDropdown) existingDropdown.remove();
                 
-                // Create dropdown container
                 const dropdown = document.createElement('div');
                 dropdown.className = 'user-dropdown';
                 
-                // User info
                 const userInfo = document.createElement('div');
                 userInfo.className = 'user-dropdown-info';
                 
@@ -871,26 +1051,20 @@
                 userInfo.appendChild(userEmail);
                 dropdown.appendChild(userInfo);
                 
-                // Dropdown items
                 const items = [
                     { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' },
                     { text: 'My Orders', icon: 'fas fa-shopping-bag', href: '../user/orders.html' },
                     { text: 'My Bookings', icon: 'fas fa-calendar', href: '../user/bookings.html' }
                 ];
                 
-                // Add items to dropdown
                 items.forEach(item => {
                     const link = document.createElement('a');
                     link.href = item.href;
                     link.className = 'user-dropdown-link';
-                    link.innerHTML = `
-                        <i class="${item.icon}"></i>
-                        <span>${item.text}</span>
-                    `;
+                    link.innerHTML = `<i class="${item.icon}"></i><span>${item.text}</span>`;
                     dropdown.appendChild(link);
                 });
                 
-                // Logout button
                 const logoutButton = document.createElement('button');
                 logoutButton.className = 'user-dropdown-logout';
                 logoutButton.textContent = 'Logout';
@@ -907,7 +1081,6 @@
                 dropdown.appendChild(logoutButton);
                 document.body.appendChild(dropdown);
                 
-                // Close dropdown when clicking outside
                 document.addEventListener('click', (event) => {
                     const dropdown = document.querySelector('.user-dropdown');
                     const userIcon = document.getElementById('userIcon');
@@ -935,7 +1108,6 @@
             }
         }
 
-        // Initialize delivery system when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             console.log('📍 Delivery Address page loaded');
             window.deliverySystem = new DeliveryAddressSystem();
