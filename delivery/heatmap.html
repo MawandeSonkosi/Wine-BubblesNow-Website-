@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Wine & Bubbles — Delivery Coverage Map</title>
     <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
     <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
@@ -57,35 +57,38 @@
         }
 
         .city-btn {
-            padding: 16px 32px;
-            background: #2a2a2a;
-            border: 2px solid transparent;
+            flex: 1;
+            max-width: 250px;
+            padding: 16px 24px;
+            background: white;
+            border: 2px solid #e0e0e0;
             border-radius: 12px;
             cursor: pointer;
             text-align: center;
             transition: all 0.3s ease;
-            min-width: 180px;
         }
 
         .city-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .city-btn.selected {
-            border-color: #e6c79c;
-            background: rgba(107, 13, 43, 0.3);
+            border-color: #6b0d2b;
+            background: linear-gradient(135deg, #fff5f7, #ffffff);
+            box-shadow: 0 4px 15px rgba(107, 13, 43, 0.15);
         }
 
         .city-btn i {
-            font-size: 24px;
-            color: #e6c79c;
+            font-size: 28px;
+            color: #6b0d2b;
             margin-right: 12px;
         }
 
         .city-btn span {
-            color: #e6c79c;
+            color: #333;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         /* Heatmap Card */
@@ -99,18 +102,19 @@
 
         /* Heatmap Visualization */
         .heatmap-visualization {
-            height: 350px;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border-radius: 12px;
+            height: 380px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 16px;
             position: relative;
             overflow: hidden;
             margin-bottom: 24px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.3);
         }
 
-        .heatmap-canvas {
+        canvas {
             width: 100%;
             height: 100%;
-            position: relative;
+            display: block;
         }
 
         /* Legend */
@@ -120,6 +124,9 @@
             gap: 24px;
             margin-bottom: 24px;
             flex-wrap: wrap;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 40px;
         }
 
         .legend-item {
@@ -129,24 +136,21 @@
         }
 
         .legend-color {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
         }
 
-        .legend-color.red { background: #ff4444; box-shadow: 0 0 8px rgba(255,68,68,0.5); }
-        .legend-color.orange { background: #ff8844; box-shadow: 0 0 8px rgba(255,136,68,0.5); }
-        .legend-color.yellow { background: #ffcc44; box-shadow: 0 0 8px rgba(255,204,68,0.5); }
-        .legend-color.green { background: #44ff44; box-shadow: 0 0 8px rgba(68,255,68,0.5); }
-        .legend-color.blue { background: #4488ff; box-shadow: 0 0 8px rgba(68,136,255,0.5); }
-        .legend-color.cyan { background: #44ffff; box-shadow: 0 0 8px rgba(68,255,255,0.5); }
-        .legend-color.teal { background: #44ccaa; box-shadow: 0 0 8px rgba(68,204,170,0.5); }
-        .legend-color.lightblue { background: #88aaff; box-shadow: 0 0 8px rgba(136,170,255,0.5); }
-        .legend-color.lightgreen { background: #88ff88; box-shadow: 0 0 8px rgba(136,255,136,0.5); }
+        .legend-color.high { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
+        .legend-color.medium-high { background: #ff8844; box-shadow: 0 0 6px #ff8844; }
+        .legend-color.medium { background: #ffcc44; box-shadow: 0 0 6px #ffcc44; }
+        .legend-color.low-medium { background: #88ff88; box-shadow: 0 0 6px #88ff88; }
+        .legend-color.low { background: #4488ff; box-shadow: 0 0 6px #4488ff; }
 
         .legend-text {
-            color: #666;
+            color: #555;
             font-size: 12px;
+            font-weight: 500;
         }
 
         /* Clusters List */
@@ -154,13 +158,21 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            margin-bottom: 30px;
         }
 
         .cluster-card {
-            background: #2a2a2a;
-            border-radius: 12px;
+            background: #f8f8f8;
+            border-radius: 14px;
             padding: 20px;
             transition: all 0.3s ease;
+            border: 1px solid #eee;
+        }
+
+        .cluster-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #6b0d2b20;
         }
 
         .cluster-header {
@@ -171,90 +183,95 @@
         }
 
         .cluster-dot {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
+            box-shadow: 0 0 4px currentColor;
         }
 
         .cluster-name {
-            color: #e6c79c;
-            font-weight: bold;
+            color: #333;
+            font-weight: 700;
             font-size: 16px;
         }
 
         .suburbs-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .suburb-badge {
-            padding: 8px 16px;
-            background: rgba(107, 13, 43, 0.2);
-            border: 1px solid rgba(107, 13, 43, 0.3);
+            padding: 6px 14px;
+            background: white;
+            border: 1px solid #ddd;
             border-radius: 20px;
-            color: rgba(230, 199, 156, 0.9);
-            font-size: 13px;
-            transition: all 0.3s ease;
-        }
-
-        .suburb-badge:hover {
-            background: rgba(107, 13, 43, 0.4);
-            border-color: #e6c79c;
-            transform: translateY(-2px);
-        }
-
-        /* All Suburbs Grid */
-        .suburbs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
-        .suburb-item {
-            padding: 12px;
-            background: #2a2a2a;
-            border-radius: 8px;
-            text-align: center;
-            color: rgba(230, 199, 156, 0.8);
-            font-size: 13px;
+            color: #555;
+            font-size: 12px;
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
-        .suburb-item:hover {
-            background: rgba(107, 13, 43, 0.4);
+        .suburb-badge:hover {
+            background: #6b0d2b;
+            border-color: #6b0d2b;
+            color: white;
             transform: translateY(-2px);
-            color: #e6c79c;
         }
 
-        /* Section Titles */
+        /* All Suburbs Grid */
         .section-title {
             font-family: 'Playfair Display', serif;
             font-size: 20px;
             color: #6b0d2b;
             margin-bottom: 16px;
             padding-bottom: 8px;
-            border-bottom: 2px solid rgba(107, 13, 43, 0.2);
+            border-bottom: 2px solid rgba(107, 13, 43, 0.15);
+        }
+
+        .suburbs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .suburb-item {
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 10px;
+            text-align: center;
+            color: #555;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+
+        .suburb-item:hover {
+            background: #6b0d2b;
+            color: white;
+            transform: translateY(-2px);
+            border-color: #6b0d2b;
         }
 
         /* Back Button */
         .back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             background: #6b0d2b;
             color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 12px 28px;
+            border-radius: 40px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
-            margin-top: 24px;
+            margin-top: 10px;
         }
 
         .back-btn:hover {
-            background: #5a0b23;
+            background: #8a1e3d;
             transform: translateY(-2px);
         }
 
@@ -264,9 +281,18 @@
                 font-size: 28px;
             }
 
+            .city-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+
             .city-btn {
-                padding: 12px 20px;
-                min-width: 140px;
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .heatmap-visualization {
+                height: 280px;
             }
 
             .suburbs-grid {
@@ -279,12 +305,12 @@
                 font-size: 24px;
             }
 
-            .city-selector {
-                flex-direction: column;
+            .heatmap-visualization {
+                height: 220px;
             }
 
-            .city-btn {
-                width: 100%;
+            .legend {
+                gap: 12px;
             }
         }
 
@@ -356,15 +382,15 @@
                     <span>Johannesburg</span>
                 </div>
                 <div class="city-btn" data-city="Durban" id="cityDbnBtn">
-                    <i class="fas fa-beach"></i>
+                    <i class="fas fa-umbrella-beach"></i>
                     <span>Durban</span>
                 </div>
             </div>
 
             <!-- Heatmap Card -->
             <div class="heatmap-card">
-                <div class="heatmap-visualization" id="heatmapCanvas">
-                    <canvas id="heatmapCanvas" width="940" height="350" style="width:100%; height:100%;"></canvas>
+                <div class="heatmap-visualization">
+                    <canvas id="heatmapCanvas" width="940" height="380" style="width:100%; height:100%;"></canvas>
                 </div>
 
                 <!-- Legend -->
@@ -374,11 +400,11 @@
                 <div class="clusters-list" id="clustersList"></div>
 
                 <!-- All Suburbs -->
-                <h3 class="section-title" style="margin-top: 24px;">All Available Suburbs</h3>
+                <h3 class="section-title">All Available Suburbs</h3>
                 <div class="suburbs-grid" id="suburbsGrid"></div>
 
                 <!-- Back Button -->
-                <div style="text-align: center; margin-top: 24px;">
+                <div style="text-align: center;">
                     <a href="delivery.html" class="back-btn">
                         <i class="fas fa-arrow-left"></i>
                         Back to Delivery Address
@@ -427,35 +453,15 @@
     </footer>
 
     <script>
-        // Delivery zones data with clusters
+        // Delivery zones data with clusters and intensity colors
         const deliveryData = {
             'Johannesburg': {
                 clusters: [
-                    {
-                        name: 'Central Sandton Area',
-                        color: '#ff4444',
-                        suburbs: ['Sandton', 'Rosebank', 'Hyde Park']
-                    },
-                    {
-                        name: 'North-East Corridor',
-                        color: '#ff8844',
-                        suburbs: ['Illovo', 'Morningside']
-                    },
-                    {
-                        name: 'Western Suburbs',
-                        color: '#ffcc44',
-                        suburbs: ['Bryanston', 'Randburg']
-                    },
-                    {
-                        name: 'Northern Expansion',
-                        color: '#44ff44',
-                        suburbs: ['Fourways', 'Midrand']
-                    },
-                    {
-                        name: 'Inner Suburbs',
-                        color: '#4488ff',
-                        suburbs: ['Parktown', 'Melville', 'Ferndale']
-                    }
+                    { name: 'Central Sandton Area', color: '#ff4444', suburbs: ['Sandton', 'Rosebank', 'Hyde Park'] },
+                    { name: 'North-East Corridor', color: '#ff8844', suburbs: ['Illovo', 'Morningside'] },
+                    { name: 'Western Suburbs', color: '#ffcc44', suburbs: ['Bryanston', 'Randburg'] },
+                    { name: 'Northern Expansion', color: '#88ff88', suburbs: ['Fourways', 'Midrand'] },
+                    { name: 'Inner Suburbs', color: '#4488ff', suburbs: ['Parktown', 'Melville', 'Ferndale'] }
                 ],
                 allSuburbs: [
                     'Sandton', 'Rosebank', 'Hyde Park', 'Illovo', 'Morningside',
@@ -465,26 +471,10 @@
             },
             'Durban': {
                 clusters: [
-                    {
-                        name: 'Coastal Area',
-                        color: '#44ffff',
-                        suburbs: ['Umhlanga', 'Ballito', 'La Lucia']
-                    },
-                    {
-                        name: 'Northern Suburbs',
-                        color: '#44ccaa',
-                        suburbs: ['Durban North', 'Glenwood', 'Morningside (DBN)']
-                    },
-                    {
-                        name: 'Western Suburbs',
-                        color: '#88aaff',
-                        suburbs: ['Westville', 'Berea']
-                    },
-                    {
-                        name: 'South Suburbs',
-                        color: '#88ff88',
-                        suburbs: ['Florida', 'Essenwood']
-                    }
+                    { name: 'Coastal Area', color: '#ff4444', suburbs: ['Umhlanga', 'Ballito', 'La Lucia'] },
+                    { name: 'Northern Suburbs', color: '#ff8844', suburbs: ['Durban North', 'Glenwood', 'Morningside (DBN)'] },
+                    { name: 'Western Suburbs', color: '#ffcc44', suburbs: ['Westville', 'Berea'] },
+                    { name: 'South Suburbs', color: '#88ff88', suburbs: ['Florida', 'Essenwood'] }
                 ],
                 allSuburbs: [
                     'Umhlanga', 'Ballito', 'Durban North', 'Westville', 'Florida',
@@ -494,18 +484,20 @@
         };
 
         let selectedCity = 'Johannesburg';
+        let animationFrame = null;
 
         function drawHeatmap() {
             const canvas = document.getElementById('heatmapCanvas');
             if (!canvas) return;
             
-            const ctx = canvas.getContext('2d');
-            const width = canvas.clientWidth;
-            const height = canvas.clientHeight;
+            const container = canvas.parentElement;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
             
             canvas.width = width;
             canvas.height = height;
             
+            const ctx = canvas.getContext('2d');
             const data = deliveryData[selectedCity];
             const clusters = data.clusters;
             const centerX = width / 2;
@@ -515,22 +507,23 @@
             ctx.clearRect(0, 0, width, height);
             
             // Draw background gradient
-            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, width * 0.6);
-            gradient.addColorStop(0, 'rgba(107, 13, 43, 0.15)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.05)');
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.6);
+            gradient.addColorStop(0, 'rgba(107, 13, 43, 0.08)');
+            gradient.addColorStop(0.5, 'rgba(107, 13, 43, 0.04)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.02)');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
             
             // Draw city name
-            ctx.font = 'bold 24px "Playfair Display", serif';
-            ctx.fillStyle = '#e6c79c';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 8;
+            ctx.font = 'bold 26px "Playfair Display", serif';
+            ctx.fillStyle = '#6b0d2b';
+            ctx.shadowColor = 'rgba(0,0,0,0.1)';
+            ctx.shadowBlur = 4;
             ctx.textAlign = 'center';
-            ctx.fillText(selectedCity, centerX, centerY - 20);
+            ctx.fillText(selectedCity, centerX, centerY - 30);
             ctx.shadowBlur = 0;
             
-            // Draw clusters
+            // Draw connecting lines from center
             const angleStep = (Math.PI * 2) / clusters.length;
             
             clusters.forEach((cluster, index) => {
@@ -539,37 +532,56 @@
                 const clusterX = centerX + Math.cos(angle) * distance;
                 const clusterY = centerY + Math.sin(angle) * distance;
                 
+                // Draw connection line
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(clusterX, clusterY);
+                ctx.strokeStyle = cluster.color + '40';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                
                 // Draw glow
                 ctx.beginPath();
-                ctx.arc(clusterX, clusterY, 30, 0, Math.PI * 2);
-                ctx.fillStyle = cluster.color + '40';
+                ctx.arc(clusterX, clusterY, 32, 0, Math.PI * 2);
+                ctx.fillStyle = cluster.color + '20';
                 ctx.fill();
                 
                 // Draw cluster circle
                 ctx.beginPath();
-                ctx.arc(clusterX, clusterY, 22, 0, Math.PI * 2);
-                ctx.fillStyle = cluster.color + 'aa';
+                ctx.arc(clusterX, clusterY, 24, 0, Math.PI * 2);
+                ctx.fillStyle = cluster.color + 'cc';
                 ctx.fill();
                 ctx.strokeStyle = cluster.color;
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 
+                // Draw cluster label
+                ctx.font = 'bold 11px "Montserrat", sans-serif';
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 2;
+                ctx.fillText(cluster.name.split(' ')[0], clusterX - 20, clusterY + 4);
+                ctx.shadowBlur = 0;
+                
                 // Draw suburb dots
                 cluster.suburbs.forEach((suburb, sIndex) => {
-                    const suburbAngle = angle + (sIndex * 0.3) - 0.3;
-                    const suburbDistance = 50 + (sIndex * 10);
+                    const suburbAngle = angle + (sIndex * 0.25) - 0.25;
+                    const suburbDistance = 55 + (sIndex * 12);
                     const suburbX = clusterX + Math.cos(suburbAngle) * suburbDistance;
                     const suburbY = clusterY + Math.sin(suburbAngle) * suburbDistance;
                     
                     ctx.beginPath();
-                    ctx.arc(suburbX, suburbY, 8, 0, Math.PI * 2);
-                    ctx.fillStyle = cluster.color + 'cc';
+                    ctx.arc(suburbX, suburbY, 7, 0, Math.PI * 2);
+                    ctx.fillStyle = cluster.color + 'aa';
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(suburbX, suburbY, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
                     ctx.fill();
                     
                     ctx.font = '10px "Montserrat", sans-serif';
                     ctx.fillStyle = '#e6c79c';
                     ctx.shadowBlur = 2;
-                    ctx.fillText(suburb, suburbX - 15, suburbY - 10);
+                    ctx.fillText(suburb, suburbX - 18, suburbY - 8);
                     ctx.shadowBlur = 0;
                 });
             });
@@ -577,11 +589,13 @@
 
         function updateLegend() {
             const legendContainer = document.getElementById('legend');
-            const data = deliveryData[selectedCity];
-            
-            legendContainer.innerHTML = '<div class="legend-item"><div class="legend-color red"></div><span class="legend-text">High</span></div>' +
-                                       '<div class="legend-item"><div class="legend-color green"></div><span class="legend-text">Medium</span></div>' +
-                                       '<div class="legend-item"><div class="legend-color blue"></div><span class="legend-text">Low</span></div>';
+            legendContainer.innerHTML = `
+                <div class="legend-item"><div class="legend-color high"></div><span class="legend-text">High Intensity</span></div>
+                <div class="legend-item"><div class="legend-color medium-high"></div><span class="legend-text">Medium-High</span></div>
+                <div class="legend-item"><div class="legend-color medium"></div><span class="legend-text">Medium</span></div>
+                <div class="legend-item"><div class="legend-color low-medium"></div><span class="legend-text">Low-Medium</span></div>
+                <div class="legend-item"><div class="legend-color low"></div><span class="legend-text">Low Intensity</span></div>
+            `;
         }
 
         function updateClustersList() {
@@ -595,14 +609,23 @@
                 clusterCard.className = 'cluster-card';
                 clusterCard.innerHTML = `
                     <div class="cluster-header">
-                        <div class="cluster-dot" style="background: ${cluster.color}; box-shadow: 0 0 8px ${cluster.color};"></div>
+                        <div class="cluster-dot" style="background: ${cluster.color}; box-shadow: 0 0 6px ${cluster.color};"></div>
                         <span class="cluster-name">${cluster.name}</span>
                     </div>
                     <div class="suburbs-list">
-                        ${cluster.suburbs.map(suburb => `<span class="suburb-badge">${suburb}</span>`).join('')}
+                        ${cluster.suburbs.map(suburb => `<span class="suburb-badge" data-suburb="${suburb}">${suburb}</span>`).join('')}
                     </div>
                 `;
                 clustersContainer.appendChild(clusterCard);
+            });
+            
+            // Add click handlers to suburb badges
+            document.querySelectorAll('.suburb-badge').forEach(badge => {
+                badge.addEventListener('click', () => {
+                    const suburb = badge.getAttribute('data-suburb');
+                    localStorage.setItem('wineBubbles_selectedSuburb', suburb);
+                    window.location.href = 'delivery.html';
+                });
             });
         }
 
@@ -617,7 +640,6 @@
                 suburbItem.className = 'suburb-item';
                 suburbItem.textContent = suburb;
                 suburbItem.addEventListener('click', () => {
-                    // Go back to delivery page and fill the suburb
                     localStorage.setItem('wineBubbles_selectedSuburb', suburb);
                     window.location.href = 'delivery.html';
                 });
@@ -642,10 +664,16 @@
             
             // Update all displays
             drawHeatmap();
-            updateLegend();
             updateClustersList();
             updateSuburbsGrid();
         }
+
+        // Handle resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => drawHeatmap(), 200);
+        });
 
         // Authentication
         function setupAuthentication() {
@@ -736,20 +764,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupAuthentication();
             
-            // Update cart badge
             if (window.CartUtils) {
                 window.CartUtils.updateCartBadge();
             }
             
-            // Set up city buttons
             document.getElementById('cityJhbBtn').addEventListener('click', () => setCity('Johannesburg'));
             document.getElementById('cityDbnBtn').addEventListener('click', () => setCity('Durban'));
             
-            // Initial render
             setCity('Johannesburg');
-            
-            // Handle window resize
-            window.addEventListener('resize', () => drawHeatmap());
         });
     </script>
 </body>
