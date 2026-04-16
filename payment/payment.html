@@ -496,6 +496,20 @@
                         </div>
                         <div class="payment-radio" id="cardRadio"></div>
                     </div>
+
+                    <!-- Online Payment (PayFast) -->
+                    <div class="payment-option" id="onlineOption" data-method="Online Payment (PayFast)">
+                        <div class="payment-option-content">
+                            <div class="payment-icon">
+                                <i class="fab fa-paypal"></i>
+                            </div>
+                            <div class="payment-text">
+                                <div class="payment-name">Online Payment (PayFast)</div>
+                                <div class="payment-description">Pay securely with PayFast (Credit Card, EFT, SnapScan)</div>
+                            </div>
+                        </div>
+                        <div class="payment-radio" id="onlineRadio"></div>
+                    </div>
                 </div>
 
                 <!-- Continue Button -->
@@ -561,8 +575,10 @@
                 this.continueBtn = document.getElementById('continueBtn');
                 this.cashOption = document.getElementById('cashOption');
                 this.cardOption = document.getElementById('cardOption');
+                this.onlineOption = document.getElementById('onlineOption');
                 this.cashRadio = document.getElementById('cashRadio');
                 this.cardRadio = document.getElementById('cardRadio');
+                this.onlineRadio = document.getElementById('onlineRadio');
                 
                 this.init();
             }
@@ -590,6 +606,12 @@
                     });
                 }
 
+                if (this.onlineOption) {
+                    this.onlineOption.addEventListener('click', () => {
+                        this.selectPaymentMethod('Online Payment (PayFast)');
+                    });
+                }
+
                 // Continue button
                 if (this.continueBtn) {
                     this.continueBtn.addEventListener('click', () => {
@@ -607,17 +629,23 @@
             selectPaymentMethod(method) {
                 this.selectedMethod = method;
                 
-                // Update UI
+                // Reset all
+                [this.cashOption, this.cardOption, this.onlineOption].forEach(opt => {
+                    if (opt) opt.classList.remove('selected');
+                });
+                [this.cashRadio, this.cardRadio, this.onlineRadio].forEach(rad => {
+                    if (rad) rad.classList.remove('selected');
+                });
+
                 if (method === 'Cash on Delivery') {
                     this.cashOption.classList.add('selected');
                     this.cashRadio.classList.add('selected');
-                    this.cardOption.classList.remove('selected');
-                    this.cardRadio.classList.remove('selected');
                 } else if (method === 'Card Machine on Delivery') {
                     this.cardOption.classList.add('selected');
                     this.cardRadio.classList.add('selected');
-                    this.cashOption.classList.remove('selected');
-                    this.cashRadio.classList.remove('selected');
+                } else if (method === 'Online Payment (PayFast)') {
+                    this.onlineOption.classList.add('selected');
+                    this.onlineRadio.classList.add('selected');
                 }
             }
 
@@ -635,10 +663,8 @@
             }
 
             savePaymentMethod(method) {
-                // Save to localStorage
                 localStorage.setItem('wineBubbles_paymentMethod', method);
                 
-                // Also save to cart in CartUtils if it exists
                 if (window.CartUtils) {
                     const cart = window.CartUtils.getCart();
                     cart.paymentMethod = method;
@@ -649,8 +675,6 @@
             loadOrderSummary() {
                 if (window.CartUtils) {
                     const cart = window.CartUtils.getCart();
-                    
-                    // Update order summary
                     document.getElementById('subtotal').textContent = `R${cart.subtotal.toFixed(2)}`;
                     document.getElementById('deliveryFee').textContent = 
                         cart.deliveryFee === 0 ? 'FREE' : `R${cart.deliveryFee.toFixed(2)}`;
@@ -681,7 +705,6 @@
                     }
                 }
 
-                // Check if delivery address exists
                 const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
                 if (!deliveryAddress) {
                     this.showToast('Please add a delivery address first', 'error');
@@ -698,9 +721,6 @@
             }
 
             setupAuthentication() {
-                // Configuration - USE PROXY SERVER (works on both localhost and production)
-                const API_BASE_URL = '/api';  // This works on both localhost and app.wineandbubblesnow.co.za
-                
                 const token = localStorage.getItem('wineBubbles_token');
                 const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
                 const userData = localStorage.getItem('wineBubbles_user');
@@ -714,13 +734,11 @@
                     try {
                         const user = JSON.parse(userData);
                         
-                        // Update user icon
                         if (userIconElement) {
                             userIconElement.className = 'fas fa-user-check';
                             userIconElement.style.color = '#6b0d2b';
                         }
                         
-                        // Setup user dropdown
                         if (userIcon) {
                             userIcon.href = '#';
                             userIcon.addEventListener('click', (e) => {
@@ -729,7 +747,6 @@
                             });
                         }
                         
-                        // Cart functionality
                         if (cartIcon) {
                             cartIcon.addEventListener('click', (e) => {
                                 if (!isValidToken) {
@@ -749,7 +766,6 @@
                 } else {
                     this.resetUserIcon();
                     
-                    // Redirect to login if not authenticated
                     this.showToast('Please login to continue', 'error');
                     setTimeout(() => {
                         window.location.href = '../login/login.html?redirect=payment';
@@ -793,17 +809,14 @@
             }
 
             createUserDropdown(user) {
-                // Remove existing dropdown if any
                 const existingDropdown = document.querySelector('.user-dropdown');
                 if (existingDropdown) {
                     existingDropdown.remove();
                 }
                 
-                // Create dropdown container
                 const dropdown = document.createElement('div');
                 dropdown.className = 'user-dropdown';
                 
-                // User info
                 const userInfo = document.createElement('div');
                 userInfo.className = 'user-dropdown-info';
                 
@@ -819,26 +832,20 @@
                 userInfo.appendChild(userEmail);
                 dropdown.appendChild(userInfo);
                 
-                // Dropdown items
                 const items = [
                     { text: 'My Profile', icon: 'fas fa-user', href: '../user/profile.html' },
                     { text: 'My Orders', icon: 'fas fa-shopping-bag', href: '../user/orders.html' },
                     { text: 'My Bookings', icon: 'fas fa-calendar', href: '../user/bookings.html' }
                 ];
                 
-                // Add items to dropdown
                 items.forEach(item => {
                     const link = document.createElement('a');
                     link.href = item.href;
                     link.className = 'user-dropdown-link';
-                    link.innerHTML = `
-                        <i class="${item.icon}"></i>
-                        <span>${item.text}</span>
-                    `;
+                    link.innerHTML = `<i class="${item.icon}"></i><span>${item.text}</span>`;
                     dropdown.appendChild(link);
                 });
                 
-                // Logout button
                 const logoutButton = document.createElement('button');
                 logoutButton.className = 'user-dropdown-logout';
                 logoutButton.textContent = 'Logout';
@@ -855,7 +862,6 @@
                 dropdown.appendChild(logoutButton);
                 document.body.appendChild(dropdown);
                 
-                // Close dropdown when clicking outside
                 document.addEventListener('click', (event) => {
                     const dropdown = document.querySelector('.user-dropdown');
                     const userIcon = document.getElementById('userIcon');
@@ -883,7 +889,6 @@
             }
         }
 
-        // Initialize payment system when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             console.log('💳 Payment Method page loaded');
             window.paymentSystem = new PaymentMethodSystem();

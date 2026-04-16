@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Cancelled - Wine & Bubbles</title>
+    <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f8f8f8;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .cancel-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .cancel-icon {
+            width: 80px;
+            height: 80px;
+            background: #e74c3c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: white;
+            font-size: 40px;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #6b0d2b;
+            margin-bottom: 16px;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 8px;
+        }
+        
+        .btn-primary {
+            background: #6b0d2b;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a0b23;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #6b0d2b;
+            border: 2px solid #6b0d2b;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(107, 13, 43, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .cancel-container {
+                margin: 40px 16px;
+                padding: 24px;
+            }
+            
+            .btn {
+                display: block;
+                margin: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cancel-container">
+        <div class="cancel-icon">
+            <i class="fas fa-times"></i>
+        </div>
+        
+        <h1>Payment Cancelled</h1>
+        <p>Your payment was cancelled. No charges have been made to your account.</p>
+        <p>You can try again or choose a different payment method.</p>
+        
+        <div>
+            <a href="../cart/cart.html" class="btn btn-primary">
+                <i class="fas fa-shopping-cart"></i> Return to Cart
+            </a>
+            <a href="../payment/payment.html" class="btn btn-secondary">
+                <i class="fas fa-credit-card"></i> Try Again
+            </a>
+            <a href="../index.html" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</body>
+</html>

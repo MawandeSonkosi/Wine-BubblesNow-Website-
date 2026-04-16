@@ -13,7 +13,12 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/cart/cart-utils.js"></script>
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="../style.css">
+    
+    <!-- Cart Utils -->
+    <script src="../cart/cart-utils.js"></script>
 
     <style>
         body {
@@ -44,6 +49,10 @@
             margin: 0 auto 24px;
             color: white;
             font-size: 40px;
+        }
+        
+        .payment-pending-icon {
+            background: #f39c12;
         }
         
         h1 {
@@ -88,6 +97,24 @@
         .detail-value {
             color: #333;
             font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-paid {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-pending {
+            background: #f39c12;
+            color: white;
         }
         
         .action-buttons {
@@ -147,14 +174,51 @@
     </style>
 </head>
 <body>
-    <div class="confirmation-container">
-        <div class="success-icon">
+    <!-- Top bar with two sections -->
+    <div class="topbar-top">
+        <div class="topbar-top-inner">
+            <!-- Empty - no content as requested -->
+        </div>
+    </div>
+
+    <div class="topbar-main">
+        <div class="topbar-main-inner">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
+                </a>
+            </div>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="../wine/all_wines.html">All Wines</a></li>
+                    <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
+                    <li><a href="../wine_farm/wine_farm.html">Wine Bars Near Me</a></li>
+                    <li><a href="../pairings/pairings.html">Pairings</a></li>
+                    <li><a href="../order/track_order.html">Track Order</a></li>
+                </ul>
+            </nav>
+
+            <div class="top-icons">
+                <a href="../cart/cart.html" class="icon cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" style="display: none;">0</span>
+                </a>
+                <a href="../user/profile.html" class="icon" id="userIcon">
+                    <i class="fas fa-user" id="userIconElement"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="confirmation-container" id="confirmationContainer">
+        <div class="success-icon" id="successIcon">
             <i class="fas fa-check"></i>
         </div>
         
-        <h1>Order Confirmed!</h1>
-        <p>Thank you for your order. Your order has been successfully placed and is being processed.</p>
-        <p>An order confirmation email has been sent to your email address.</p>
+        <h1 id="titleText">Order Confirmed!</h1>
+        <p id="messageText">Thank you for your order. Your order has been successfully placed and is being processed.</p>
+        <p id="emailText">An order confirmation email has been sent to your email address.</p>
         
         <div class="order-details">
             <div class="detail-item">
@@ -173,6 +237,10 @@
                 <span class="detail-label">Payment Method:</span>
                 <span class="detail-value" id="paymentMethod">Loading...</span>
             </div>
+            <div class="detail-item">
+                <span class="detail-label">Payment Status:</span>
+                <span class="detail-value" id="paymentStatus">Loading...</span>
+            </div>
         </div>
         
         <div class="action-buttons">
@@ -187,17 +255,61 @@
         </div>
     </div>
 
-   <script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="../assets/categories/Logo_Botttom.png" alt="Wine & Bubbles Logo" class="footer-logo">
+                <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
+                <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
+                <div class="socials">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-grid">
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="../wine/all_wines.html">All Wines</a></li>
+                        <li><a href="../booking/booking.html">Bookings</a></li>
+                        <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+                        <li><a href="../pairings/pairings.html">Pairings</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links-column">
+                    <h4 class="footer-heading">&nbsp;</h4>
+                    <ul class="footer-links">
+                        <li><a href="../contact_us.html">Contact Us</a></li>
+                        <li><a href="/faq.html">FAQ</a></li>
+                        <li><a href="../terms_conditions.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Get order ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
+        const totalFromURL = urlParams.get('total');
+        const paymentFromURL = urlParams.get('payment');
+        
+        // Determine if this is from PayFast success
+        const isPayFastSuccess = window.location.pathname.includes('/checkout/success.html');
         
         // Get order from localStorage
         const orders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
         
         // Try to find order by different possible IDs
         let order = null;
+        let isOnlinePayment = false;
         
         if (orderId) {
             // Try exact match first
@@ -213,6 +325,63 @@
                 const localId = orderId.replace('local-', '');
                 order = orders.find(o => o.id && o.id.toString() === localId);
             }
+            
+            // Also check for order with this ID in pending status
+            if (!order) {
+                order = orders.find(o => o.id === orderId || o.m_payment_id === orderId);
+            }
+        }
+        
+        // If order found, check payment method
+        if (order) {
+            isOnlinePayment = order.paymentMethod === 'Online Payment (PayFast)' || 
+                            (paymentFromURL && decodeURIComponent(paymentFromURL) === 'Online Payment (PayFast)');
+        } else if (paymentFromURL) {
+            isOnlinePayment = decodeURIComponent(paymentFromURL) === 'Online Payment (PayFast)';
+        }
+        
+        // Update UI based on payment type
+        const successIcon = document.getElementById('successIcon');
+        const titleText = document.getElementById('titleText');
+        const messageText = document.getElementById('messageText');
+        const emailText = document.getElementById('emailText');
+        const paymentStatusSpan = document.getElementById('paymentStatus');
+        
+        if (isOnlinePayment) {
+            // For online payments, show appropriate message
+            if (isPayFastSuccess) {
+                // Payment completed successfully
+                successIcon.classList.add('success-icon');
+                titleText.textContent = 'Payment Successful!';
+                messageText.textContent = 'Your payment has been processed successfully. Your order is now confirmed and will be processed shortly.';
+                emailText.textContent = 'A payment receipt and order confirmation have been sent to your email address.';
+                if (paymentStatusSpan) {
+                    paymentStatusSpan.innerHTML = '<span class="status-badge status-paid">PAID</span>';
+                }
+                
+                // Update the order status in localStorage
+                if (order) {
+                    order.status = 'Order received';
+                    order.paymentStatus = 'paid';
+                    order.paidAt = new Date().toISOString();
+                    
+                    // Update orders array
+                    const updatedOrders = orders.map(o => 
+                        (o.id === order.id || o._id === order.id || o.m_payment_id === order.id) ? order : o
+                    );
+                    localStorage.setItem('wineBubbles_orders', JSON.stringify(updatedOrders));
+                }
+            } else {
+                // Regular order confirmation (shouldn't happen for online payment)
+                if (paymentStatusSpan) {
+                    paymentStatusSpan.innerHTML = '<span class="status-badge status-pending">PENDING</span>';
+                }
+            }
+        } else {
+            // For cash/card on delivery
+            if (paymentStatusSpan) {
+                paymentStatusSpan.innerHTML = '<span class="status-badge status-pending">PENDING (Pay on Delivery)</span>';
+            }
         }
         
         if (order) {
@@ -225,20 +394,18 @@
             const orderDate = order.createdAt || new Date().toISOString();
             document.getElementById('orderDate').textContent = new Date(orderDate).toLocaleDateString();
             
-            // Update total amount - use the correct property name
-            const total = order.total || order.totalAmount || order.Total || 0;
+            // Update total amount
+            const total = order.total || order.totalAmount || totalFromURL || 0;
             document.getElementById('orderTotal').textContent = `R${parseFloat(total).toFixed(2)}`;
             
             // Update payment method
-            document.getElementById('paymentMethod').textContent = order.paymentMethod || 'Not specified';
+            const paymentMethod = order.paymentMethod || (paymentFromURL ? decodeURIComponent(paymentFromURL) : 'Not specified');
+            document.getElementById('paymentMethod').textContent = paymentMethod;
             
-            // Update the success message based on email status
+            // Update the email message based on email status
             const emailSent = order.emailSent || false;
-            if (!emailSent) {
-                const successMsg = document.querySelector('p');
-                if (successMsg && successMsg.textContent.includes('email has been sent')) {
-                    successMsg.textContent = 'Thank you for your order. Your order has been successfully placed and is being processed.';
-                }
+            if (!emailSent && !isOnlinePayment) {
+                emailText.textContent = 'Thank you for your order. Your order has been successfully placed and is being processed.';
             }
         } else {
             console.warn('Order not found in localStorage:', orderId);
@@ -248,9 +415,6 @@
             document.getElementById('orderId').textContent = orderId || 'Not found';
             
             // Try to get data from URL params as fallback
-            const totalFromURL = urlParams.get('total');
-            const paymentFromURL = urlParams.get('payment');
-            
             if (totalFromURL) {
                 document.getElementById('orderTotal').textContent = `R${parseFloat(totalFromURL).toFixed(2)}`;
             } else {
@@ -258,7 +422,13 @@
             }
             
             if (paymentFromURL) {
-                document.getElementById('paymentMethod').textContent = decodeURIComponent(paymentFromURL);
+                const paymentMethod = decodeURIComponent(paymentFromURL);
+                document.getElementById('paymentMethod').textContent = paymentMethod;
+                if (paymentMethod === 'Online Payment (PayFast)' && isPayFastSuccess) {
+                    if (paymentStatusSpan) {
+                        paymentStatusSpan.innerHTML = '<span class="status-badge status-paid">PAID</span>';
+                    }
+                }
             } else {
                 document.getElementById('paymentMethod').textContent = 'Not specified';
             }
@@ -267,6 +437,6 @@
             document.getElementById('orderDate').textContent = new Date().toLocaleDateString();
         }
     });
-</script>
+    </script>
 </body>
 </html>
