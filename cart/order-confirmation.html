@@ -438,5 +438,27 @@
         }
     });
     </script>
+    <script>
+    // Add a "Back to Home" button with countdown if not already present
+    (function() {
+        const actionButtons = document.querySelector('.action-buttons');
+        if (actionButtons) {
+            // Check if home button already exists
+            const existingHomeBtn = actionButtons.querySelector('a[href="../index.html"]');
+            if (!existingHomeBtn) {
+                const homeBtn = document.createElement('a');
+                homeBtn.href = "../index.html";
+                homeBtn.className = "btn btn-secondary";
+                homeBtn.innerHTML = '<i class="fas fa-home"></i> Back to Home';
+                actionButtons.appendChild(homeBtn);
+            }
+        }
+        
+        // Optional: Auto-redirect after 10 seconds
+        setTimeout(() => {
+            window.location.href = "../index.html";
+        }, 10000);
+    })();
+</script>
 </body>
 </html>
