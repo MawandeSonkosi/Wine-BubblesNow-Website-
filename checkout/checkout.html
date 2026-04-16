@@ -1063,153 +1063,153 @@
             }
         }
 
-        async processPayFastPayment() {
-            if (this.isProcessing) return;
+       async processPayFastPayment() {
+    if (this.isProcessing) return;
 
-            const userData = localStorage.getItem('wineBubbles_user');
-            if (!userData) {
-                this.showToast('Please login to continue', 'error');
-                return;
-            }
+    const userData = localStorage.getItem('wineBubbles_user');
+    if (!userData) {
+        this.showToast('Please login to continue', 'error');
+        return;
+    }
 
-            this.isProcessing = true;
-            this.showLoading(true);
-            this.payBtn.disabled = true;
-            this.paySpinner.style.display = 'block';
-            this.payBtn.querySelector('span').textContent = 'PROCESSING...';
+    this.isProcessing = true;
+    this.showLoading(true);
+    this.payBtn.disabled = true;
+    this.paySpinner.style.display = 'block';
+    this.payBtn.querySelector('span').textContent = 'PROCESSING...';
 
-            try {
-                const user = JSON.parse(userData);
-                const cart = this.cartUtils.getCart();
-                const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
-                const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
+    try {
+        const user = JSON.parse(userData);
+        const cart = this.cartUtils.getCart();
+        const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
+        const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
 
-                const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
-                const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
+        const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
+        const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
 
-                // Calculate total with wine case pricing
-                let subtotal = 0;
-                (cart.items || []).forEach(item => {
-                    const isCase = item.isCase === true;
-                    const unitPrice = isCase ? item.price * 6 : item.price;
-                    subtotal += unitPrice * item.quantity;
-                });
-                (this.advertItems || []).forEach(advert => {
-                    subtotal += advert.price * (advert.quantity || 1);
-                });
+        // Calculate total
+        let subtotal = 0;
+        (cart.items || []).forEach(item => {
+            const isCase = item.isCase === true;
+            const unitPrice = isCase ? item.price * 6 : item.price;
+            subtotal += unitPrice * item.quantity;
+        });
+        (this.advertItems || []).forEach(advert => {
+            subtotal += advert.price * (advert.quantity || 1);
+        });
 
-                const deliveryFee = subtotal >= 500 ? 0 : 50;
-                const totalAmount = subtotal + deliveryFee;
-                const orderId = `ORD_${Date.now()}_${user.id || 'guest'}`;
+        const deliveryFee = subtotal >= 500 ? 0 : 50;
+        const totalAmount = subtotal + deliveryFee;
+        const orderId = `ORD_${Date.now()}_${user.id || 'guest'}`;
 
-                // Prepare wine items for order storage
-                const wineItems = (cart.items || []).filter(item => item.type === 'wine').map(item => ({
-                    id: parseInt(item.id) || 0,
-                    name: item.name || '',
-                    price: item.price || 0,
-                    quantity: item.quantity || 1,
-                    type: item.type || 'wine',
-                    category: item.category || '',
-                    description: item.description || '',
-                    imageUrl: item.imageUrl || '',
-                    isCase: item.isCase || false,
-                    itemType: 'wine'
-                }));
+        // Prepare wine items for order storage
+        const wineItems = (cart.items || []).filter(item => item.type === 'wine').map(item => ({
+            id: parseInt(item.id) || 0,
+            name: item.name || '',
+            price: item.price || 0,
+            quantity: item.quantity || 1,
+            type: item.type || 'wine',
+            category: item.category || '',
+            description: item.description || '',
+            imageUrl: item.imageUrl || '',
+            isCase: item.isCase || false,
+            itemType: 'wine'
+        }));
 
-                const addOns = (cart.items || []).filter(item => item.type === 'addon').map(item => ({
-                    id: parseInt(item.id) || 0,
-                    name: item.name || '',
-                    price: item.price || 0,
-                    category: item.category || '',
-                    description: item.description || '',
-                    imageUrl: item.imageUrl || ''
-                }));
+        const addOns = (cart.items || []).filter(item => item.type === 'addon').map(item => ({
+            id: parseInt(item.id) || 0,
+            name: item.name || '',
+            price: item.price || 0,
+            category: item.category || '',
+            description: item.description || '',
+            imageUrl: item.imageUrl || ''
+        }));
 
-                const adverts = this.advertItems.map(advert => ({
-                    id: advert.id || String(advert._id || Math.random()),
-                    title: advert.title || advert.name || 'Advert Placement',
-                    subtitle: advert.subtitle || '',
-                    price: advert.price || 0,
-                    type: advert.type || 'advert',
-                    category: advert.category || 'marketing',
-                    imageUrl: advert.imageUrl || '',
-                    targetUrl: advert.targetUrl || '',
-                    quantity: advert.quantity || 1,
-                    itemType: 'advert'
-                }));
+        const adverts = this.advertItems.map(advert => ({
+            id: advert.id || String(advert._id || Math.random()),
+            title: advert.title || advert.name || 'Advert Placement',
+            subtitle: advert.subtitle || '',
+            price: advert.price || 0,
+            type: advert.type || 'advert',
+            category: advert.category || 'marketing',
+            imageUrl: advert.imageUrl || '',
+            targetUrl: advert.targetUrl || '',
+            quantity: advert.quantity || 1,
+            itemType: 'advert'
+        }));
 
-                // Save order locally first (pending payment)
-                const pendingOrder = {
-                    id: orderId,
-                    userId: user.id || user.email,
-                    userEmail: user.email,
-                    address: deliveryAddress,
-                    totalAmount: totalAmount,
-                    paymentMethod: paymentMethod,
-                    items: wineItems,
-                    addOns: addOns,
-                    adverts: adverts,
-                    status: 'Pending Payment',
-                    createdAt: new Date().toISOString(),
-                    userFullName: userFullName,
-                    userPhoneNumber: userPhoneNumber,
-                    paymentStatus: 'pending'
-                };
+        // Save order locally first (pending payment)
+        const pendingOrder = {
+            id: orderId,
+            userId: user.id || user.email,
+            userEmail: user.email,
+            address: deliveryAddress,
+            totalAmount: totalAmount,
+            paymentMethod: paymentMethod,
+            items: wineItems,
+            addOns: addOns,
+            adverts: adverts,
+            status: 'Pending Payment',
+            createdAt: new Date().toISOString(),
+            userFullName: userFullName,
+            userPhoneNumber: userPhoneNumber,
+            paymentStatus: 'pending'
+        };
 
-                this.saveOrderLocal(pendingOrder);
+        this.saveOrderLocal(pendingOrder);
 
-                // Build PayFast form data
-                const payFastData = {
-                    merchant_id: '25233413',
-                    merchant_key: '4tvvj2efmay1d',
-                    amount: totalAmount.toFixed(2),
-                    item_name: `Wine & Bubbles Order ${orderId.substring(0, 15)}`,
-                    item_description: 'Wine order from Wine & Bubbles',
-                    return_url: `${window.location.origin}/checkout/success.html?orderId=${orderId}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}`,
-                    cancel_url: `${window.location.origin}/payment/cancel.html?orderId=${orderId}`,
-                    notify_url: `${window.location.origin}/api/payments/payfast-notify`,
-                    name_first: userFullName.split(' ')[0],
-                    name_last: userFullName.split(' ').slice(1).join(' ') || 'Customer',
-                    email_address: user.email,
-                    m_payment_id: orderId
-                };
+        // Build PayFast form data
+        const payFastData = {
+            merchant_id: '25233413',
+            merchant_key: '4tvvj2efmay1d',
+            amount: totalAmount.toFixed(2),
+            item_name: `Wine & Bubbles Order ${orderId.substring(0, 15)}`,
+            item_description: 'Wine order from Wine & Bubbles',
+            // Use absolute URLs with your domain
+            return_url: `${window.location.origin}/cart/order-confirmation.html?orderId=${orderId}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}&status=success`,
+            cancel_url: `${window.location.origin}/index.html?payment=cancelled`,
+            notify_url: `${window.location.origin}/api/payments/payfast-notify`,
+            name_first: userFullName.split(' ')[0],
+            name_last: userFullName.split(' ').slice(1).join(' ') || 'Customer',
+            email_address: user.email,
+            m_payment_id: orderId
+        };
 
-                // Create and submit form to PayFast
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'https://www.payfast.co.za/eng/process';
-                form.target = '_self';
+        // Create and submit form to PayFast
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://www.payfast.co.za/eng/process';
+        form.target = '_self';
 
-                Object.keys(payFastData).forEach(key => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = payFastData[key];
-                    form.appendChild(input);
-                });
+        Object.keys(payFastData).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = payFastData[key];
+            form.appendChild(input);
+        });
 
-                document.body.appendChild(form);
-                
-                // Clear cart and adverts before redirect
-                this.cartUtils.clearCart();
-                localStorage.removeItem('wineBubbles_adverts');
-                localStorage.removeItem('wineBubbles_deliveryAddress');
-                localStorage.removeItem('wineBubbles_paymentMethod');
-
-                this.showToast('Redirecting to PayFast...', 'success');
-                
-                // Small delay to ensure toast is shown
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
-                
-            } catch (error) {
-                console.error('PayFast error:', error);
-                this.showToast('Payment failed. Please try again.', 'error');
-                this.resetProcessingState();
-            }
-        }
+        document.body.appendChild(form);
         
+        // Clear cart and adverts before redirect
+        this.cartUtils.clearCart();
+        localStorage.removeItem('wineBubbles_adverts');
+        localStorage.removeItem('wineBubbles_deliveryAddress');
+        localStorage.removeItem('wineBubbles_paymentMethod');
+
+        this.showToast('Redirecting to PayFast...', 'success');
+        
+        // Small delay to ensure toast is shown
+        setTimeout(() => {
+            form.submit();
+        }, 500);
+        
+    } catch (error) {
+        console.error('PayFast error:', error);
+        this.showToast('Payment failed. Please try again.', 'error');
+        this.resetProcessingState();
+    }
+}
         async createDelivery(deliveryData) {
             try {
                 const token = localStorage.getItem('wineBubbles_token');

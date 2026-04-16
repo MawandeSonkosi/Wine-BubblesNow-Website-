@@ -161,6 +161,20 @@
             transform: translateY(-2px);
         }
         
+        .countdown {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(107, 13, 43, 0.05);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .countdown span {
+            font-weight: bold;
+            color: #6b0d2b;
+        }
+        
         @media (max-width: 768px) {
             .confirmation-container {
                 margin: 40px 16px;
@@ -176,9 +190,7 @@
 <body>
     <!-- Top bar with two sections -->
     <div class="topbar-top">
-        <div class="topbar-top-inner">
-            <!-- Empty - no content as requested -->
-        </div>
+        <div class="topbar-top-inner"></div>
     </div>
 
     <div class="topbar-main">
@@ -244,14 +256,16 @@
         </div>
         
         <div class="action-buttons">
-            <a href="../index.html" class="btn btn-secondary">
-                <i class="fas fa-home"></i>
-                Back to Home
+            <a href="../index.html" class="btn btn-secondary" id="homeBtn">
+                <i class="fas fa-home"></i> Back to Home
             </a>
             <a href="../order/track_order.html" class="btn btn-primary">
-                <i class="fas fa-shopping-bag"></i>
-                View My Orders
+                <i class="fas fa-shopping-bag"></i> Track My Order
             </a>
+        </div>
+        
+        <div class="countdown" id="countdownDiv">
+            Redirecting to <a href="../index.html" style="color: #6b0d2b;">homepage</a> in <span id="countdown">10</span> seconds...
         </div>
     </div>
 
@@ -275,9 +289,9 @@
                     <h4 class="footer-heading">Quick Links</h4>
                     <ul class="footer-links">
                         <li><a href="../wine/all_wines.html">All Wines</a></li>
-                        <li><a href="../booking/booking.html">Bookings</a></li>
-                        <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
+                        <li><a href="../wine/wine_cases_list.html">Wine Cases</a></li>
                         <li><a href="../pairings/pairings.html">Pairings</a></li>
+                        <li><a href="../wine_farm/wine_farm.html">Tastings</a></li>
                     </ul>
                 </div>
 
@@ -295,49 +309,29 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Get order ID from URL
+        // Get parameters from URL
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('orderId');
         const totalFromURL = urlParams.get('total');
         const paymentFromURL = urlParams.get('payment');
+        const statusFromURL = urlParams.get('status');
         
-        // Determine if this is from PayFast success
-        const isPayFastSuccess = window.location.pathname.includes('/checkout/success.html');
+        // Determine if this is a successful payment
+        const isPayFastSuccess = statusFromURL === 'success';
         
         // Get order from localStorage
         const orders = JSON.parse(localStorage.getItem('wineBubbles_orders') || '[]');
         
-        // Try to find order by different possible IDs
         let order = null;
-        let isOnlinePayment = false;
         
         if (orderId) {
-            // Try exact match first
             order = orders.find(o => o.id === orderId);
-            
-            // Try _id field (from backend)
             if (!order) {
                 order = orders.find(o => o._id === orderId);
             }
-            
-            // Try ID field without 'local-' prefix
-            if (!order && orderId.startsWith('local-')) {
-                const localId = orderId.replace('local-', '');
-                order = orders.find(o => o.id && o.id.toString() === localId);
-            }
-            
-            // Also check for order with this ID in pending status
             if (!order) {
-                order = orders.find(o => o.id === orderId || o.m_payment_id === orderId);
+                order = orders.find(o => o.id && o.id.toString() === orderId);
             }
-        }
-        
-        // If order found, check payment method
-        if (order) {
-            isOnlinePayment = order.paymentMethod === 'Online Payment (PayFast)' || 
-                            (paymentFromURL && decodeURIComponent(paymentFromURL) === 'Online Payment (PayFast)');
-        } else if (paymentFromURL) {
-            isOnlinePayment = decodeURIComponent(paymentFromURL) === 'Online Payment (PayFast)';
         }
         
         // Update UI based on payment type
@@ -346,36 +340,33 @@
         const messageText = document.getElementById('messageText');
         const emailText = document.getElementById('emailText');
         const paymentStatusSpan = document.getElementById('paymentStatus');
+        const countdownDiv = document.getElementById('countdownDiv');
         
-        if (isOnlinePayment) {
-            // For online payments, show appropriate message
-            if (isPayFastSuccess) {
-                // Payment completed successfully
-                successIcon.classList.add('success-icon');
-                titleText.textContent = 'Payment Successful!';
-                messageText.textContent = 'Your payment has been processed successfully. Your order is now confirmed and will be processed shortly.';
-                emailText.textContent = 'A payment receipt and order confirmation have been sent to your email address.';
-                if (paymentStatusSpan) {
-                    paymentStatusSpan.innerHTML = '<span class="status-badge status-paid">PAID</span>';
-                }
+        if (isPayFastSuccess) {
+            // Payment completed successfully via PayFast
+            successIcon.classList.add('success-icon');
+            titleText.textContent = 'Payment Successful!';
+            messageText.textContent = 'Your payment has been processed successfully. Your order is now confirmed and will be processed shortly.';
+            emailText.textContent = 'A payment receipt and order confirmation have been sent to your email address.';
+            if (paymentStatusSpan) {
+                paymentStatusSpan.innerHTML = '<span class="status-badge status-paid">PAID</span>';
+            }
+            
+            // Update the order status in localStorage if order exists
+            if (order) {
+                order.status = 'Order received';
+                order.paymentStatus = 'paid';
+                order.paidAt = new Date().toISOString();
                 
-                // Update the order status in localStorage
-                if (order) {
-                    order.status = 'Order received';
-                    order.paymentStatus = 'paid';
-                    order.paidAt = new Date().toISOString();
-                    
-                    // Update orders array
-                    const updatedOrders = orders.map(o => 
-                        (o.id === order.id || o._id === order.id || o.m_payment_id === order.id) ? order : o
-                    );
-                    localStorage.setItem('wineBubbles_orders', JSON.stringify(updatedOrders));
-                }
-            } else {
-                // Regular order confirmation (shouldn't happen for online payment)
-                if (paymentStatusSpan) {
-                    paymentStatusSpan.innerHTML = '<span class="status-badge status-pending">PENDING</span>';
-                }
+                const updatedOrders = orders.map(o => 
+                    (o.id === order.id || o._id === order.id) ? order : o
+                );
+                localStorage.setItem('wineBubbles_orders', JSON.stringify(updatedOrders));
+            }
+        } else if (paymentFromURL && decodeURIComponent(paymentFromURL) === 'Online Payment (PayFast)') {
+            // This is for regular order confirmation after PayFast
+            if (paymentStatusSpan) {
+                paymentStatusSpan.innerHTML = '<span class="status-badge status-paid">PAID</span>';
             }
         } else {
             // For cash/card on delivery
@@ -386,79 +377,56 @@
         
         if (order) {
             console.log('Found order:', order);
-            
-            // Update order ID display
             document.getElementById('orderId').textContent = order.id || order._id || orderId;
             
-            // Update order date
             const orderDate = order.createdAt || new Date().toISOString();
             document.getElementById('orderDate').textContent = new Date(orderDate).toLocaleDateString();
             
-            // Update total amount
             const total = order.total || order.totalAmount || totalFromURL || 0;
             document.getElementById('orderTotal').textContent = `R${parseFloat(total).toFixed(2)}`;
             
-            // Update payment method
             const paymentMethod = order.paymentMethod || (paymentFromURL ? decodeURIComponent(paymentFromURL) : 'Not specified');
             document.getElementById('paymentMethod').textContent = paymentMethod;
-            
-            // Update the email message based on email status
-            const emailSent = order.emailSent || false;
-            if (!emailSent && !isOnlinePayment) {
-                emailText.textContent = 'Thank you for your order. Your order has been successfully placed and is being processed.';
-            }
         } else {
             console.warn('Order not found in localStorage:', orderId);
-            console.log('Available orders:', orders);
-            
-            // Show at least the order ID from URL
             document.getElementById('orderId').textContent = orderId || 'Not found';
             
-            // Try to get data from URL params as fallback
             if (totalFromURL) {
                 document.getElementById('orderTotal').textContent = `R${parseFloat(totalFromURL).toFixed(2)}`;
-            } else {
-                document.getElementById('orderTotal').textContent = 'R0.00';
             }
             
             if (paymentFromURL) {
-                const paymentMethod = decodeURIComponent(paymentFromURL);
-                document.getElementById('paymentMethod').textContent = paymentMethod;
-                if (paymentMethod === 'Online Payment (PayFast)' && isPayFastSuccess) {
-                    if (paymentStatusSpan) {
-                        paymentStatusSpan.innerHTML = '<span class="status-badge status-paid">PAID</span>';
-                    }
-                }
-            } else {
-                document.getElementById('paymentMethod').textContent = 'Not specified';
+                document.getElementById('paymentMethod').textContent = decodeURIComponent(paymentFromURL);
             }
             
-            // Set current date
             document.getElementById('orderDate').textContent = new Date().toLocaleDateString();
+        }
+        
+        // Auto-redirect to homepage after 10 seconds
+        let secondsLeft = 10;
+        const countdownElement = document.getElementById('countdown');
+        const homeBtn = document.getElementById('homeBtn');
+        
+        const timer = setInterval(() => {
+            secondsLeft--;
+            if (countdownElement) {
+                countdownElement.textContent = secondsLeft;
+            }
+            
+            if (secondsLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = '../index.html';
+            }
+        }, 1000);
+        
+        if (homeBtn) {
+            homeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                clearInterval(timer);
+                window.location.href = '../index.html';
+            });
         }
     });
     </script>
-    <script>
-    // Add a "Back to Home" button with countdown if not already present
-    (function() {
-        const actionButtons = document.querySelector('.action-buttons');
-        if (actionButtons) {
-            // Check if home button already exists
-            const existingHomeBtn = actionButtons.querySelector('a[href="../index.html"]');
-            if (!existingHomeBtn) {
-                const homeBtn = document.createElement('a');
-                homeBtn.href = "../index.html";
-                homeBtn.className = "btn btn-secondary";
-                homeBtn.innerHTML = '<i class="fas fa-home"></i> Back to Home';
-                actionButtons.appendChild(homeBtn);
-            }
-        }
-        
-        // Optional: Auto-redirect after 10 seconds
-        setTimeout(() => {
-            window.location.href = "../index.html";
-        }, 10000);
-    })();
-</script>
 </body>
 </html>
