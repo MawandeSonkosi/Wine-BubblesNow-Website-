@@ -18,16 +18,19 @@
   <link rel="stylesheet" href="../style.css" />
 
   <style>
-    /* Admin Dashboard Specific Styles - matching Flutter app design with website layout */
+    /* Admin Dashboard Styles - Matching Website Light Theme */
     :root {
-      --admin-primary: #7A0026;
-      --admin-accent: #E6C79C;
-      --admin-bg-dark: #0F0F0F;
-      --admin-card-bg: #1e1e1e;
+      --admin-primary: #6b0d2b;
+      --admin-accent: #d4af37;
+      --admin-bg-light: #faf8f5;
+      --admin-card-white: #ffffff;
+      --admin-text-dark: #1b1b1b;
+      --admin-text-muted: #6d6d6d;
+      --admin-border: #eae3da;
     }
 
     body {
-      background: #faf8f5;
+      background: var(--admin-bg-light);
     }
 
     /* Hide customer navigation on admin pages */
@@ -45,6 +48,95 @@
 
     .top-icons {
       margin-left: auto;
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    /* User dropdown styles */
+    .user-dropdown {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 16px;
+      min-width: 240px;
+      z-index: 1000;
+      display: none;
+      border: 1px solid var(--admin-border);
+    }
+
+    .user-dropdown.show {
+      display: block !important;
+    }
+
+    .user-dropdown-info {
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .user-dropdown-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: var(--admin-text-dark);
+      margin-bottom: 4px;
+    }
+
+    .user-dropdown-email {
+      font-size: 13px;
+      color: var(--admin-text-muted);
+    }
+
+    .user-dropdown-link {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      color: var(--admin-text-dark);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+      gap: 10px;
+    }
+
+    .user-dropdown-link i {
+      width: 20px;
+      color: var(--admin-primary);
+    }
+
+    .user-dropdown-link:hover {
+      color: var(--admin-primary);
+    }
+
+    .user-dropdown-logout {
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: var(--admin-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .user-dropdown-logout:hover {
+      background: #8a1e3d;
+    }
+
+    .admin-badge {
+      display: inline-block;
+      background: var(--admin-primary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      margin-left: 8px;
+      vertical-align: middle;
     }
 
     /* Admin Dashboard Wrapper */
@@ -54,7 +146,7 @@
       padding: 0 24px;
     }
 
-    /* Stats Grid - exactly like Flutter */
+    /* Stats Grid - Light Theme */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -63,22 +155,23 @@
     }
 
     .stat-card {
-      background: var(--admin-card-bg);
+      background: var(--admin-card-white);
       border-radius: 20px;
       padding: 24px 20px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      border: 1px solid rgba(230, 199, 156, 0.15);
+      transition: all 0.25s ease;
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     }
 
     .stat-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 12px 24px rgba(107, 13, 43, 0.08);
     }
 
     .stat-icon {
       width: 52px;
       height: 52px;
-      background: rgba(122, 0, 38, 0.2);
+      background: rgba(107, 13, 43, 0.08);
       border-radius: 16px;
       display: flex;
       align-items: center;
@@ -88,34 +181,36 @@
 
     .stat-icon i {
       font-size: 28px;
-      color: var(--admin-accent);
+      color: var(--admin-primary);
     }
 
     .stat-value {
       font-family: 'Playfair Display', serif;
       font-size: 36px;
       font-weight: 700;
-      color: var(--admin-accent);
+      color: var(--admin-text-dark);
       margin-bottom: 6px;
     }
 
     .stat-label {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--admin-text-muted);
       font-weight: 500;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    /* Admin Tabs - matching Flutter bottom nav */
+    /* Admin Tabs - Light Theme */
     .admin-tabs {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 32px;
-      background: var(--admin-bg-dark);
+      background: white;
       border-radius: 60px;
       padding: 6px;
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .admin-tab-btn {
@@ -125,7 +220,7 @@
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.6);
+      color: var(--admin-text-muted);
       cursor: pointer;
       border-radius: 50px;
       transition: all 0.2s;
@@ -140,8 +235,8 @@
 
     .admin-tab-btn.active {
       background: var(--admin-primary);
-      color: var(--admin-accent);
-      box-shadow: 0 4px 12px rgba(122, 0, 38, 0.4);
+      color: white;
+      box-shadow: 0 4px 12px rgba(107, 13, 43, 0.2);
     }
 
     .admin-tab-pane {
@@ -158,18 +253,19 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Cards & Tables */
+    /* Cards & Tables - Light Theme */
     .admin-card {
-      background: var(--admin-card-bg);
+      background: var(--admin-card-white);
       border-radius: 24px;
       overflow: hidden;
       margin-bottom: 30px;
-      border: 1px solid rgba(230, 199, 156, 0.1);
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     .admin-card-header {
       padding: 20px 28px;
-      border-bottom: 1px solid rgba(230, 199, 156, 0.1);
+      border-bottom: 1px solid var(--admin-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -181,28 +277,33 @@
       font-family: 'Playfair Display', serif;
       font-size: 22px;
       font-weight: 700;
-      color: var(--admin-accent);
+      color: var(--admin-text-dark);
       margin: 0;
+    }
+
+    .admin-card-header h3 i {
+      color: var(--admin-primary);
+      margin-right: 10px;
     }
 
     .search-box {
       display: flex;
       align-items: center;
-      background: rgba(255, 255, 255, 0.08);
+      background: #f8f7f5;
       border-radius: 40px;
       padding: 8px 18px;
       gap: 10px;
-      border: 1px solid rgba(230, 199, 156, 0.2);
+      border: 1px solid var(--admin-border);
     }
 
     .search-box i {
-      color: var(--admin-accent);
+      color: var(--admin-primary);
     }
 
     .search-box input {
       background: transparent;
       border: none;
-      color: white;
+      color: var(--admin-text-dark);
       font-size: 14px;
       width: 220px;
       font-family: 'Montserrat', sans-serif;
@@ -210,7 +311,7 @@
     }
 
     .search-box input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--admin-text-muted);
     }
 
     .admin-table {
@@ -222,15 +323,15 @@
     .admin-table td {
       padding: 16px 20px;
       text-align: left;
-      border-bottom: 1px solid rgba(230, 199, 156, 0.08);
+      border-bottom: 1px solid var(--admin-border);
       vertical-align: middle;
-      color: #e0e0e0;
+      color: var(--admin-text-dark);
     }
 
     .admin-table th {
-      background: rgba(122, 0, 38, 0.3);
+      background: #fbf9f7;
       font-weight: 600;
-      color: var(--admin-accent);
+      color: var(--admin-primary);
       font-size: 13px;
       letter-spacing: 0.5px;
     }
@@ -243,11 +344,11 @@
       font-weight: 600;
     }
 
-    .badge-admin { background: rgba(230, 199, 156, 0.2); color: var(--admin-accent); }
-    .badge-verified { background: rgba(46, 125, 50, 0.2); color: #4caf50; }
-    .badge-pending { background: rgba(245, 166, 35, 0.2); color: #ffb74d; }
-    .badge-confirmed { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
-    .badge-cancelled { background: rgba(244, 67, 54, 0.2); color: #ef5350; }
+    .badge-admin { background: rgba(107, 13, 43, 0.1); color: var(--admin-primary); }
+    .badge-verified { background: rgba(46, 125, 50, 0.1); color: #2e7d32; }
+    .badge-pending { background: rgba(245, 166, 35, 0.1); color: #b85c00; }
+    .badge-confirmed { background: rgba(46, 125, 50, 0.1); color: #2e7d32; }
+    .badge-cancelled { background: rgba(211, 47, 47, 0.1); color: #c62828; }
 
     .action-btn {
       background: none;
@@ -256,41 +357,36 @@
       font-size: 18px;
       margin: 0 6px;
       transition: 0.2s;
-      color: rgba(255, 255, 255, 0.6);
+      color: var(--admin-text-muted);
     }
 
     .action-btn:hover {
-      color: var(--admin-accent);
+      color: var(--admin-primary);
       transform: scale(1.1);
     }
 
     .status-select {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(230, 199, 156, 0.3);
+      background: white;
+      border: 1px solid var(--admin-border);
       border-radius: 20px;
       padding: 6px 12px;
-      color: white;
+      color: var(--admin-text-dark);
       font-size: 12px;
       cursor: pointer;
       font-family: 'Montserrat', sans-serif;
     }
 
-    .status-select option {
-      background: #1e1e1e;
-      color: white;
-    }
-
     .loading-state, .empty-state {
       text-align: center;
       padding: 60px;
-      color: rgba(255, 255, 255, 0.6);
+      color: var(--admin-text-muted);
     }
 
     .loading-spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid rgba(230, 199, 156, 0.2);
-      border-top-color: var(--admin-accent);
+      border: 3px solid rgba(107, 13, 43, 0.1);
+      border-top-color: var(--admin-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto 16px;
@@ -300,9 +396,9 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Welcome Card */
+    /* Welcome Card - Light Theme */
     .welcome-card {
-      background: linear-gradient(135deg, var(--admin-primary) 0%, #5a001c 100%);
+      background: linear-gradient(135deg, #fff 0%, #fef5e8 100%);
       border-radius: 24px;
       padding: 28px 32px;
       margin-bottom: 32px;
@@ -310,12 +406,14 @@
       align-items: center;
       gap: 20px;
       flex-wrap: wrap;
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     }
 
     .welcome-avatar {
       width: 70px;
       height: 70px;
-      background: var(--admin-accent);
+      background: var(--admin-primary);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -324,22 +422,22 @@
 
     .welcome-avatar i {
       font-size: 36px;
-      color: var(--admin-primary);
+      color: white;
     }
 
     .welcome-text h2 {
       font-family: 'Playfair Display', serif;
       font-size: 24px;
-      color: var(--admin-accent);
+      color: var(--admin-text-dark);
       margin-bottom: 6px;
     }
 
     .welcome-text p {
-      color: rgba(255, 255, 255, 0.8);
+      color: var(--admin-text-muted);
       font-size: 14px;
     }
 
-    /* Quick Actions Grid - exactly like Flutter */
+    /* Quick Actions Grid */
     .quick-actions-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -348,19 +446,19 @@
     }
 
     .quick-action-card {
-      background: var(--admin-card-bg);
+      background: white;
       border-radius: 16px;
       padding: 20px 12px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s;
-      border: 1px solid rgba(230, 199, 156, 0.1);
+      border: 1px solid var(--admin-border);
     }
 
     .quick-action-card:hover {
       transform: translateY(-4px);
-      background: rgba(122, 0, 38, 0.3);
-      border-color: var(--admin-accent);
+      border-color: var(--admin-primary);
+      box-shadow: 0 8px 20px rgba(107, 13, 43, 0.1);
     }
 
     .quick-action-card i {
@@ -372,14 +470,15 @@
     .quick-action-card span {
       font-size: 13px;
       font-weight: 600;
-      color: white;
+      color: var(--admin-text-dark);
     }
 
     .section-title {
-      color: var(--admin-accent);
+      color: var(--admin-text-dark);
       font-size: 20px;
       font-weight: bold;
       margin: 24px 0 16px;
+      font-family: 'Playfair Display', serif;
     }
 
     /* Responsive */
@@ -390,12 +489,13 @@
       .admin-tab-btn { padding: 8px 16px; font-size: 12px; }
       .admin-tab-btn i { font-size: 14px; }
       .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+      .user-dropdown { position: fixed; top: 70px; right: 10px; left: auto; min-width: 200px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- TOPBAR (Admin version - no customer nav) -->
+  <!-- TOPBAR (Admin version - customer nav hidden, cart removed) -->
   <div class="topbar-top">
     <div class="topbar-top-inner"></div>
   </div>
@@ -406,13 +506,11 @@
           <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
         </a>
       </div>
+      <!-- Customer navigation hidden -->
       <div class="top-icons">
-        <a href="../cart/cart.html" class="icon cart-icon">
-          <i class="fas fa-shopping-cart"></i>
-          <span class="cart-badge" style="display: none;">0</span>
-        </a>
+        <!-- Cart icon REMOVED as requested -->
         <a href="#" class="icon" id="userIcon">
-          <i class="fas fa-user-check" style="color:#E6C79C;"></i>
+          <i class="fas fa-user-circle" id="userIconElement" style="font-size: 24px; color: #6b0d2b;"></i>
         </a>
       </div>
     </div>
@@ -439,7 +537,7 @@
       <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-value" id="totalBookings">—</div><div class="stat-label">Total Bookings</div></div>
     </div>
 
-    <!-- Admin Tabs (Bottom Navigation style) -->
+    <!-- Admin Tabs -->
     <div class="admin-tabs">
       <button class="admin-tab-btn active" data-tab="overview"><i class="fas fa-chart-line"></i> Overview</button>
       <button class="admin-tab-btn" data-tab="users"><i class="fas fa-users"></i> Users</button>
@@ -496,7 +594,7 @@
     <div id="deliveriesPane" class="admin-tab-pane">
       <div class="admin-card">
         <div class="admin-card-header"><h3><i class="fas fa-truck"></i> Delivery Management</h3></div>
-        <div class="loading-state"><i class="fas fa-truck fa-3x" style="margin-bottom: 16px; opacity: 0.5;"></i><p>Delivery module ready. Full tracking coming soon.</p></div>
+        <div class="empty-state"><i class="fas fa-truck fa-3x" style="margin-bottom: 16px; opacity: 0.5; color: var(--admin-primary);"></i><p>Delivery module coming soon. Full tracking and assignment panel will be available.</p></div>
       </div>
     </div>
 
@@ -504,7 +602,7 @@
     <div id="driversPane" class="admin-tab-pane">
       <div class="admin-card">
         <div class="admin-card-header"><h3><i class="fas fa-id-card"></i> Driver Accounts</h3></div>
-        <div class="loading-state"><i class="fas fa-users fa-3x" style="margin-bottom: 16px; opacity: 0.5;"></i><p>Driver verification panel — coming soon.</p></div>
+        <div class="empty-state"><i class="fas fa-users fa-3x" style="margin-bottom: 16px; opacity: 0.5; color: var(--admin-primary);"></i><p>Driver verification and management panel — coming soon.</p></div>
       </div>
     </div>
   </div>
@@ -517,26 +615,33 @@
         <p class="brand-tagline">Admin Dashboard — Complete Control</p>
         <div class="socials"><a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-icon"><i class="fab fa-instagram"></i></a></div>
       </div>
-      <div class="footer-links-grid"><div class="footer-links-column"><h4 class="footer-heading">Admin Tools</h4><ul class="footer-links"><li><a href="#" onclick="switchTab('users');return false;">User Management</a></li><li><a href="#" onclick="switchTab('bookings');return false;">Booking Console</a></li></ul></div></div>
+      <div class="footer-links-grid">
+        <div class="footer-links-column">
+          <h4 class="footer-heading">Admin Tools</h4>
+          <ul class="footer-links">
+            <li><a href="#" onclick="switchTab('users');return false;">User Management</a></li>
+            <li><a href="#" onclick="switchTab('bookings');return false;">Booking Console</a></li>
+            <li><a href="#" onclick="switchTab('deliveries');return false;">Delivery Hub</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </footer>
 
-  <script src="../cart/cart-utils.js"></script>
   <script>
     const API_BASE = window.location.origin;
     let currentUsers = [];
     let currentBookings = [];
 
-    // Quick Actions mapping (exactly like Flutter app)
+    // Quick Actions
     const quickActions = [
-      { title: 'Manage Users', icon: 'fa-users', color: '#E6C79C', action: () => switchTab('users') },
-      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#4caf50', action: () => switchTab('bookings') },
-      { title: 'Manage Deliveries', icon: 'fa-truck', color: '#ff9800', action: () => switchTab('deliveries') },
-      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#E6C79C', action: () => switchTab('drivers') },
-      { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#E6C79C', action: () => window.location.href = '../wine/all_wines.html' },
-      { title: 'Manage Add-Ons', icon: 'fa-gift', color: '#9c27b0', action: () => showComingSoon() },
-      { title: 'Manage Adverts', icon: 'fa-bullhorn', color: '#673ab7', action: () => showComingSoon() },
-      { title: 'Warehouse', icon: 'fa-warehouse', color: '#795548', action: () => showComingSoon() }
+      { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => switchTab('users') },
+      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => switchTab('bookings') },
+      { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => switchTab('deliveries') },
+      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => switchTab('drivers') },
+      { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#6b0d2b', action: () => window.location.href = '../wine/all_wines.html' },
+      { title: 'Manage Adverts', icon: 'fa-bullhorn', color: '#6a1b9a', action: () => showComingSoon() },
+      { title: 'Warehouse', icon: 'fa-warehouse', color: '#bf360c', action: () => showComingSoon() }
     ];
 
     function renderQuickActions() {
@@ -551,7 +656,7 @@
     }
 
     function showComingSoon() {
-      alert('Feature coming soon! 🚀');
+      showToast('Feature coming soon! 🚀', 'info');
     }
 
     // Tab switching
@@ -564,7 +669,58 @@
       if (tabId === 'bookings') renderBookingsTable(currentBookings);
     };
 
-    // Auth & redirect
+    // User Dropdown
+    function toggleUserDropdown() {
+      const dropdown = document.querySelector('.user-dropdown');
+      if (dropdown) dropdown.classList.toggle('show');
+    }
+
+    function createUserDropdown(user) {
+      const existingDropdown = document.querySelector('.user-dropdown');
+      if (existingDropdown) existingDropdown.remove();
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'user-dropdown';
+
+      const userInfo = document.createElement('div');
+      userInfo.className = 'user-dropdown-info';
+      userInfo.innerHTML = `
+        <div class="user-dropdown-name">${escapeHtml(user.fullName || user.email.split('@')[0])} <span class="admin-badge">ADMIN</span></div>
+        <div class="user-dropdown-email">${escapeHtml(user.email)}</div>
+      `;
+      dropdown.appendChild(userInfo);
+
+      const profileLink = document.createElement('a');
+      profileLink.href = '../user/profile.html';
+      profileLink.className = 'user-dropdown-link';
+      profileLink.innerHTML = '<i class="fas fa-user"></i> My Profile';
+      dropdown.appendChild(profileLink);
+
+      const logoutBtn = document.createElement('button');
+      logoutBtn.className = 'user-dropdown-logout';
+      logoutBtn.textContent = 'Logout';
+      logoutBtn.onclick = () => {
+        localStorage.removeItem('wineBubbles_token');
+        localStorage.removeItem('wineBubbles_token_timestamp');
+        localStorage.removeItem('wineBubbles_user');
+        localStorage.removeItem('wineBubbles_isAdmin');
+        localStorage.removeItem('wineBubbles_isDriver');
+        window.location.href = '../login/login.html';
+      };
+      dropdown.appendChild(logoutBtn);
+
+      document.body.appendChild(dropdown);
+
+      document.addEventListener('click', function(event) {
+        const dropdownEl = document.querySelector('.user-dropdown');
+        const userIconEl = document.getElementById('userIcon');
+        if (dropdownEl && !dropdownEl.contains(event.target) && userIconEl && !userIconEl.contains(event.target)) {
+          dropdownEl.classList.remove('show');
+        }
+      });
+    }
+
+    // Auth check
     function checkAdminAuth() {
       const token = localStorage.getItem('wineBubbles_token');
       const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
@@ -580,6 +736,15 @@
         try {
           const user = JSON.parse(userData);
           document.getElementById('welcomeTitle').innerHTML = `Welcome, ${user.fullName?.split(' ')[0] || 'Admin'}!`;
+          createUserDropdown(user);
+          
+          const userIcon = document.getElementById('userIcon');
+          if (userIcon) {
+            userIcon.addEventListener('click', (e) => {
+              e.preventDefault();
+              toggleUserDropdown();
+            });
+          }
         } catch(e) {}
       }
       return true;
@@ -753,8 +918,7 @@
     function showToast(msg, type = 'info') {
       const toast = document.createElement('div');
       toast.textContent = msg;
-      toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#7A0026; color:#E6C79C; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px;`;
-      if (type === 'success') toast.style.background = '#2e7d32';
+      toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#6b0d2b'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 2500);
     }
@@ -775,7 +939,6 @@
       renderQuickActions();
       fetchUsers();
       fetchBookings();
-      if (window.CartUtils) window.CartUtils.updateCartBadge();
     }
   </script>
 </body>
