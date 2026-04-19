@@ -356,4 +356,4 @@ document.getElementById('addUserBtn')?.addEventListener('click', () => {
 // Initialize
 if (checkAuth()) {
     fetchUsers();
-}
+} 

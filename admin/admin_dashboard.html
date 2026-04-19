@@ -200,46 +200,6 @@
       text-transform: uppercase;
     }
 
-    /* Admin Tabs - Light Theme - Now as navigation buttons */
-    .admin-nav-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    .admin-nav-btn {
-      background: white;
-      border: 1px solid var(--admin-border);
-      padding: 14px 32px;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--admin-text-muted);
-      cursor: pointer;
-      border-radius: 50px;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .admin-nav-btn i {
-      font-size: 18px;
-    }
-
-    .admin-nav-btn:hover {
-      border-color: var(--admin-primary);
-      color: var(--admin-primary);
-    }
-
-    .admin-nav-btn.active {
-      background: var(--admin-primary);
-      color: white;
-      border-color: var(--admin-primary);
-      box-shadow: 0 4px 12px rgba(107, 13, 43, 0.2);
-    }
-
     /* Cards */
     .admin-card {
       background: var(--admin-card-white);
@@ -370,14 +330,6 @@
       color: var(--admin-text-dark);
     }
 
-    .section-title {
-      color: var(--admin-text-dark);
-      font-size: 20px;
-      font-weight: bold;
-      margin: 24px 0 16px;
-      font-family: 'Playfair Display', serif;
-    }
-
     /* Recent Orders Card */
     .recent-orders-card {
       background: white;
@@ -411,8 +363,6 @@
     @media (max-width: 768px) {
       .admin-dashboard { padding: 0 16px; margin-top: 20px; }
       .stat-value { font-size: 28px; }
-      .admin-nav-btn { padding: 10px 20px; font-size: 13px; }
-      .admin-nav-btn i { font-size: 14px; }
       .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
       .user-dropdown { position: fixed; top: 70px; right: 10px; left: auto; min-width: 200px; }
     }
@@ -529,9 +479,9 @@
       `).join('');
     }
 
-    function showComingSoon(feature) {
+    window.showComingSoon = function(feature) {
       showToast(`${feature} - Coming soon! 🚀`, 'info');
-    }
+    };
 
     // User Dropdown
     function toggleUserDropdown() {
@@ -614,39 +564,64 @@
       return true;
     }
 
-    // Fetch stats from API
+    // Fetch ALL users with no limit for accurate stats
     async function fetchStats() {
       try {
         const token = localStorage.getItem('wineBubbles_token');
         
-        // Fetch users to get stats
-        const usersRes = await fetch(`${API_BASE}/api/users`, {
+        // Fetch ALL users - use a large limit to get all users
+        const usersUrl = `${API_BASE}/api/users?limit=10000&page=0`;
+        console.log('📡 Fetching all users for stats from:', usersUrl);
+        
+        const usersRes = await fetch(usersUrl, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+        
         if (usersRes.ok) {
           const usersData = await usersRes.json();
+          // Handle { success: true, data: [...] } format
           const users = usersData.data || (Array.isArray(usersData) ? usersData : []);
           
+          console.log(`✅ Loaded ${users.length} total users for stats`);
+          
           const total = users.length;
-          const admins = users.filter(u => u.isAdmin).length;
-          const verified = users.filter(u => u.isVerified).length;
+          const admins = users.filter(u => u.isAdmin === true).length;
+          const verified = users.filter(u => u.isVerified === true).length;
           
           document.getElementById('totalUsers').innerText = total;
           document.getElementById('adminUsers').innerText = admins;
           document.getElementById('verifiedUsers').innerText = verified;
+        } else {
+          console.error('Failed to fetch users:', usersRes.status);
+          document.getElementById('totalUsers').innerText = 'Error';
+          document.getElementById('adminUsers').innerText = 'Error';
+          document.getElementById('verifiedUsers').innerText = 'Error';
         }
         
-        // Fetch bookings for count
-        const bookingsRes = await fetch(`${API_BASE}/api/bookings`, {
+        // Fetch bookings for count - also with no limit
+        const bookingsUrl = `${API_BASE}/api/bookings?limit=10000&page=0`;
+        console.log('📡 Fetching all bookings from:', bookingsUrl);
+        
+        const bookingsRes = await fetch(bookingsUrl, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+        
         if (bookingsRes.ok) {
           const bookingsData = await bookingsRes.json();
           const bookings = bookingsData.data || (Array.isArray(bookingsData) ? bookingsData : []);
           document.getElementById('totalBookings').innerText = bookings.length;
+          console.log(`✅ Loaded ${bookings.length} total bookings`);
+        } else {
+          console.error('Failed to fetch bookings:', bookingsRes.status);
+          document.getElementById('totalBookings').innerText = 'Error';
         }
+        
       } catch (err) {
         console.error('Error fetching stats:', err);
+        document.getElementById('totalUsers').innerText = 'Error';
+        document.getElementById('adminUsers').innerText = 'Error';
+        document.getElementById('verifiedUsers').innerText = 'Error';
+        document.getElementById('totalBookings').innerText = 'Error';
       }
     }
 
@@ -655,10 +630,13 @@
       toast.textContent = msg;
       toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#6b0d2b'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
       document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 2500);
+      setTimeout(() => toast.remove(), 3000);
     }
 
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+    function escapeHtml(str) { 
+      if (!str) return ''; 
+      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
+    }
 
     // Initialize
     if (checkAdminAuth()) {
