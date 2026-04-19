@@ -200,26 +200,21 @@
       text-transform: uppercase;
     }
 
-    /* Admin Tabs - Light Theme */
-    .admin-tabs {
+    /* Admin Tabs - Light Theme - Now as navigation buttons */
+    .admin-nav-buttons {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 12px;
       margin-bottom: 32px;
-      background: white;
-      border-radius: 60px;
-      padding: 6px;
-      border: 1px solid var(--admin-border);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
-    .admin-tab-btn {
-      background: transparent;
-      border: none;
-      padding: 12px 28px;
+    .admin-nav-btn {
+      background: white;
+      border: 1px solid var(--admin-border);
+      padding: 14px 32px;
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       color: var(--admin-text-muted);
       cursor: pointer;
       border-radius: 50px;
@@ -229,31 +224,23 @@
       gap: 10px;
     }
 
-    .admin-tab-btn i {
+    .admin-nav-btn i {
       font-size: 18px;
     }
 
-    .admin-tab-btn.active {
+    .admin-nav-btn:hover {
+      border-color: var(--admin-primary);
+      color: var(--admin-primary);
+    }
+
+    .admin-nav-btn.active {
       background: var(--admin-primary);
       color: white;
+      border-color: var(--admin-primary);
       box-shadow: 0 4px 12px rgba(107, 13, 43, 0.2);
     }
 
-    .admin-tab-pane {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .admin-tab-pane.active-pane {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Cards & Tables - Light Theme */
+    /* Cards */
     .admin-card {
       background: var(--admin-card-white);
       border-radius: 24px;
@@ -284,96 +271,6 @@
     .admin-card-header h3 i {
       color: var(--admin-primary);
       margin-right: 10px;
-    }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      background: #f8f7f5;
-      border-radius: 40px;
-      padding: 8px 18px;
-      gap: 10px;
-      border: 1px solid var(--admin-border);
-    }
-
-    .search-box i {
-      color: var(--admin-primary);
-    }
-
-    .search-box input {
-      background: transparent;
-      border: none;
-      color: var(--admin-text-dark);
-      font-size: 14px;
-      width: 220px;
-      font-family: 'Montserrat', sans-serif;
-      outline: none;
-    }
-
-    .search-box input::placeholder {
-      color: var(--admin-text-muted);
-    }
-
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .admin-table th,
-    .admin-table td {
-      padding: 16px 20px;
-      text-align: left;
-      border-bottom: 1px solid var(--admin-border);
-      vertical-align: middle;
-      color: var(--admin-text-dark);
-    }
-
-    .admin-table th {
-      background: #fbf9f7;
-      font-weight: 600;
-      color: var(--admin-primary);
-      font-size: 13px;
-      letter-spacing: 0.5px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .badge-admin { background: rgba(107, 13, 43, 0.1); color: var(--admin-primary); }
-    .badge-verified { background: rgba(46, 125, 50, 0.1); color: #2e7d32; }
-    .badge-pending { background: rgba(245, 166, 35, 0.1); color: #b85c00; }
-    .badge-confirmed { background: rgba(46, 125, 50, 0.1); color: #2e7d32; }
-    .badge-cancelled { background: rgba(211, 47, 47, 0.1); color: #c62828; }
-
-    .action-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      margin: 0 6px;
-      transition: 0.2s;
-      color: var(--admin-text-muted);
-    }
-
-    .action-btn:hover {
-      color: var(--admin-primary);
-      transform: scale(1.1);
-    }
-
-    .status-select {
-      background: white;
-      border: 1px solid var(--admin-border);
-      border-radius: 20px;
-      padding: 6px 12px;
-      color: var(--admin-text-dark);
-      font-size: 12px;
-      cursor: pointer;
-      font-family: 'Montserrat', sans-serif;
     }
 
     .loading-state, .empty-state {
@@ -488,6 +385,7 @@
       padding: 28px;
       text-align: center;
       border: 1px solid var(--admin-border);
+      margin-bottom: 32px;
     }
 
     .recent-orders-card i {
@@ -512,10 +410,9 @@
     /* Responsive */
     @media (max-width: 768px) {
       .admin-dashboard { padding: 0 16px; margin-top: 20px; }
-      .admin-table th, .admin-table td { padding: 12px; font-size: 12px; }
       .stat-value { font-size: 28px; }
-      .admin-tab-btn { padding: 8px 16px; font-size: 12px; }
-      .admin-tab-btn i { font-size: 14px; }
+      .admin-nav-btn { padding: 10px 20px; font-size: 13px; }
+      .admin-nav-btn i { font-size: 14px; }
       .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
       .user-dropdown { position: fixed; top: 70px; right: 10px; left: auto; min-width: 200px; }
     }
@@ -564,78 +461,19 @@
     </div>
 
     <!-- Recent Orders Section -->
-    <div class="recent-orders-card" style="margin-bottom: 32px;">
+    <div class="recent-orders-card">
       <i class="fas fa-truck"></i>
       <h4>Recent Orders</h4>
-      <p>Delivery management system is ready! Switch to the Deliveries tab to view orders.</p>
+      <p>Delivery management system is ready! Click "Manage Deliveries" below to get started.</p>
     </div>
 
-    <!-- Admin Tabs -->
-    <div class="admin-tabs">
-      <button class="admin-tab-btn active" data-tab="overview"><i class="fas fa-chart-line"></i> Overview</button>
-      <button class="admin-tab-btn" data-tab="users"><i class="fas fa-users"></i> Users</button>
-      <button class="admin-tab-btn" data-tab="bookings"><i class="fas fa-calendar-alt"></i> Bookings</button>
-      <button class="admin-tab-btn" data-tab="deliveries"><i class="fas fa-truck"></i> Deliveries</button>
-      <button class="admin-tab-btn" data-tab="drivers"><i class="fas fa-id-card"></i> Drivers</button>
-    </div>
-
-    <!-- Overview Pane -->
-    <div id="overviewPane" class="admin-tab-pane active-pane">
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3><i class="fas fa-rocket"></i> Quick Actions</h3>
-        </div>
-        <div style="padding: 20px 28px 28px;">
-          <div class="quick-actions-grid" id="quickActionsGrid"></div>
-        </div>
+    <!-- Quick Actions Section -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3><i class="fas fa-rocket"></i> Quick Actions</h3>
       </div>
-    </div>
-
-    <!-- Users Pane -->
-    <div id="usersPane" class="admin-tab-pane">
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3><i class="fas fa-user-edit"></i> System Users</h3>
-          <div class="search-box"><i class="fas fa-search"></i><input type="text" id="userSearch" placeholder="Search users..."></div>
-        </div>
-        <div style="overflow-x: auto;">
-          <table class="admin-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Verified</th><th>Actions</th></tr></thead>
-            <tbody id="usersTableBody"><tr><td colspan="6" class="loading-state"><div class="loading-spinner"></div>Loading users...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bookings Pane -->
-    <div id="bookingsPane" class="admin-tab-pane">
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3><i class="fas fa-calendar-week"></i> Booking Requests</h3>
-          <div class="search-box"><i class="fas fa-search"></i><input type="text" id="bookingSearch" placeholder="Search by user or event"></div>
-        </div>
-        <div style="overflow-x: auto;">
-          <table class="admin-table">
-            <thead><tr><th>ID</th><th>Customer</th><th>Event Type</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="bookingsTableBody"><tr><td colspan="6" class="loading-state"><div class="loading-spinner"></div>Loading bookings...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Deliveries Pane -->
-    <div id="deliveriesPane" class="admin-tab-pane">
-      <div class="admin-card">
-        <div class="admin-card-header"><h3><i class="fas fa-truck"></i> Delivery Management</h3></div>
-        <div class="empty-state"><i class="fas fa-truck fa-3x" style="margin-bottom: 16px; opacity: 0.5; color: var(--admin-primary);"></i><p>Delivery module coming soon. Full tracking and assignment panel will be available.</p></div>
-      </div>
-    </div>
-
-    <!-- Drivers Pane -->
-    <div id="driversPane" class="admin-tab-pane">
-      <div class="admin-card">
-        <div class="admin-card-header"><h3><i class="fas fa-id-card"></i> Driver Accounts</h3></div>
-        <div class="empty-state"><i class="fas fa-users fa-3x" style="margin-bottom: 16px; opacity: 0.5; color: var(--admin-primary);"></i><p>Driver verification and management panel — coming soon.</p></div>
+      <div style="padding: 20px 28px 28px;">
+        <div class="quick-actions-grid" id="quickActionsGrid"></div>
       </div>
     </div>
   </div>
@@ -652,9 +490,9 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Admin Tools</h4>
           <ul class="footer-links">
-            <li><a href="#" onclick="switchTab('users');return false;">User Management</a></li>
-            <li><a href="#" onclick="switchTab('bookings');return false;">Booking Console</a></li>
-            <li><a href="#" onclick="switchTab('deliveries');return false;">Delivery Hub</a></li>
+            <li><a href="user_management/user_management_screen.html">User Management</a></li>
+            <li><a href="#" onclick="showComingSoon('Booking Management');return false;">Booking Console</a></li>
+            <li><a href="#" onclick="showComingSoon('Delivery Hub');return false;">Delivery Hub</a></li>
           </ul>
         </div>
       </div>
@@ -663,15 +501,13 @@
 
   <script>
     const API_BASE = window.location.origin;
-    let currentUsers = [];
-    let currentBookings = [];
-
-    // Complete Quick Actions - Matching Flutter app
+    
+    // Complete Quick Actions - All navigate to separate screens
     const quickActions = [
-      { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => switchTab('users') },
-      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => switchTab('bookings') },
-      { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => switchTab('deliveries') },
-      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => switchTab('drivers') },
+      { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => window.location.href = 'user_management/user_management_screen.html' },
+      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => showComingSoon('Booking Management') },
+      { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => showComingSoon('Delivery Management') },
+      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => showComingSoon('Driver Management') },
       { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#6b0d2b', action: () => window.location.href = '../wine/all_wines.html' },
       { title: 'Manage Add-Ons', icon: 'fa-gift', color: '#9c27b0', action: () => showComingSoon('Add-Ons Management') },
       { title: 'Manage Wine Farms', icon: 'fa-tree', color: '#8d6e63', action: () => showComingSoon('Wine Farms Management') },
@@ -696,16 +532,6 @@
     function showComingSoon(feature) {
       showToast(`${feature} - Coming soon! 🚀`, 'info');
     }
-
-    // Tab switching
-    window.switchTab = function(tabId) {
-      document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.admin-tab-pane').forEach(pane => pane.classList.remove('active-pane'));
-      document.querySelector(`.admin-tab-btn[data-tab="${tabId}"]`).classList.add('active');
-      document.getElementById(`${tabId}Pane`).classList.add('active-pane');
-      if (tabId === 'users') renderUsersTable(currentUsers);
-      if (tabId === 'bookings') renderBookingsTable(currentBookings);
-    };
 
     // User Dropdown
     function toggleUserDropdown() {
@@ -758,7 +584,7 @@
       });
     }
 
-    // Auth check
+    // Auth check and fetch stats
     function checkAdminAuth() {
       const token = localStorage.getItem('wineBubbles_token');
       const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
@@ -788,187 +614,56 @@
       return true;
     }
 
-    // API Calls - Fetch real data from backend
-    async function fetchUsers() {
+    // Fetch stats from API
+    async function fetchStats() {
       try {
         const token = localStorage.getItem('wineBubbles_token');
-        const res = await fetch(`${API_BASE}/api/users`, {
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
-        });
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-        // Handle { success: true, data: [...] } format
-        currentUsers = data.data || (Array.isArray(data) ? data : []);
-        renderUsersTable(currentUsers);
-        updateStats(currentUsers);
-      } catch (err) {
-        console.error('Error loading users:', err);
-        document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-state">Failed to load users. Please refresh.</td></tr>';
-        currentUsers = [];
-        updateStats([]);
-      }
-    }
-
-    async function fetchBookings() {
-      try {
-        const token = localStorage.getItem('wineBubbles_token');
-        const res = await fetch(`${API_BASE}/api/bookings`, {
+        
+        // Fetch users to get stats
+        const usersRes = await fetch(`${API_BASE}/api/users`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        currentBookings = data.data || (Array.isArray(data) ? data : []);
-        renderBookingsTable(currentBookings);
-        document.getElementById('totalBookings').innerText = currentBookings.length;
+        if (usersRes.ok) {
+          const usersData = await usersRes.json();
+          const users = usersData.data || (Array.isArray(usersData) ? usersData : []);
+          
+          const total = users.length;
+          const admins = users.filter(u => u.isAdmin).length;
+          const verified = users.filter(u => u.isVerified).length;
+          
+          document.getElementById('totalUsers').innerText = total;
+          document.getElementById('adminUsers').innerText = admins;
+          document.getElementById('verifiedUsers').innerText = verified;
+        }
+        
+        // Fetch bookings for count
+        const bookingsRes = await fetch(`${API_BASE}/api/bookings`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (bookingsRes.ok) {
+          const bookingsData = await bookingsRes.json();
+          const bookings = bookingsData.data || (Array.isArray(bookingsData) ? bookingsData : []);
+          document.getElementById('totalBookings').innerText = bookings.length;
+        }
       } catch (err) {
-        console.error('Error loading bookings:', err);
-        currentBookings = [];
-        document.getElementById('totalBookings').innerText = '0';
-        renderBookingsTable([]);
+        console.error('Error fetching stats:', err);
       }
     }
-
-    function updateStats(users) {
-      const total = users.length;
-      const admins = users.filter(u => u.isAdmin).length;
-      const verified = users.filter(u => u.isVerified).length;
-      document.getElementById('totalUsers').innerText = total;
-      document.getElementById('adminUsers').innerText = admins;
-      document.getElementById('verifiedUsers').innerText = verified;
-    }
-
-    function renderUsersTable(users, search = '') {
-      const tbody = document.getElementById('usersTableBody');
-      let filtered = users;
-      if (search) filtered = users.filter(u => (u.fullName || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search));
-      
-      if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No users found</td></tr>';
-        return;
-      }
-      
-      tbody.innerHTML = filtered.map(user => `
-        <tr>
-          <td>${escapeHtml(user.fullName || '—')}</td>
-          <td>${escapeHtml(user.email)}</td>
-          <td>${escapeHtml(user.phoneNumber || '—')}</td>
-          <td>${user.isAdmin ? '<span class="badge badge-admin">Admin</span>' : '<span class="badge">User</span>'}</td>
-          <td>${user.isVerified ? '<span class="badge badge-verified">Verified</span>' : '<span class="badge badge-pending">Pending</span>'}</td>
-          <td>
-            <button class="action-btn" onclick="toggleAdmin('${user.id}', ${!user.isAdmin})" title="Toggle Admin"><i class="fas fa-user-shield"></i></button>
-            <button class="action-btn" onclick="toggleVerify('${user.id}', ${!user.isVerified})" title="Verify"><i class="fas fa-check-circle"></i></button>
-            <button class="action-btn" onclick="window.location.href='user_management/user_edit_screen.html?id=${user.id}'" title="Edit"><i class="fas fa-edit"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderBookingsTable(bookings, search = '') {
-      const tbody = document.getElementById('bookingsTableBody');
-      let filtered = bookings;
-      if (search) filtered = bookings.filter(b => (b.type || '').toLowerCase().includes(search) || (b.id || '').toLowerCase().includes(search));
-      
-      if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No bookings found</td></tr>';
-        return;
-      }
-      
-      tbody.innerHTML = filtered.map(b => {
-        let statusClass = b.status === 'pending' ? 'badge-pending' : (b.status === 'confirmed' ? 'badge-confirmed' : 'badge-cancelled');
-        return `
-          <tr>
-            <td>${escapeHtml(b.id)}</td>
-            <td>${escapeHtml(getUserName(b.userId))}</td>
-            <td>${escapeHtml(b.type)}</td>
-            <td>${b.date || '—'}</td>
-            <td><span class="badge ${statusClass}">${b.status || 'pending'}</span></td>
-            <td>
-              <select class="status-select" onchange="updateBookingStatus('${b.id}', this.value)">
-                <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>Pending</option>
-                <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                <option value="cancelled" ${b.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-              </select>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function getUserName(userId) {
-      const user = currentUsers.find(u => u.id == userId);
-      return user ? user.fullName : `User ${userId}`;
-    }
-
-    // Admin Actions
-    window.toggleAdmin = async (userId, isAdmin) => {
-      try {
-        const token = localStorage.getItem('wineBubbles_token');
-        await fetch(`${API_BASE}/api/users/${userId}/admin`, {
-          method: 'PATCH',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isAdmin })
-        });
-        fetchUsers();
-        showToast('Admin status updated', 'success');
-      } catch(e) {
-        showToast('Failed to update admin status', 'error');
-      }
-    };
-
-    window.toggleVerify = async (userId, isVerified) => {
-      try {
-        const token = localStorage.getItem('wineBubbles_token');
-        await fetch(`${API_BASE}/api/users/${userId}/verify`, {
-          method: 'PATCH',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isVerified })
-        });
-        fetchUsers();
-        showToast('Verification updated', 'success');
-      } catch(e) {
-        showToast('Failed to update verification', 'error');
-      }
-    };
-
-    window.updateBookingStatus = async (bookingId, newStatus) => {
-      try {
-        const token = localStorage.getItem('wineBubbles_token');
-        await fetch(`${API_BASE}/api/bookings/${bookingId}`, {
-          method: 'PATCH',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus })
-        });
-        fetchBookings();
-        showToast(`Booking ${newStatus}`, 'success');
-      } catch(e) {
-        showToast('Failed to update status', 'error');
-      }
-    };
 
     function showToast(msg, type = 'info') {
       const toast = document.createElement('div');
       toast.textContent = msg;
-      toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : type === 'error' ? '#d32f2f' : '#6b0d2b'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
+      toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#6b0d2b'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 2500);
     }
 
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
-    // Search listeners
-    document.getElementById('userSearch')?.addEventListener('input', (e) => renderUsersTable(currentUsers, e.target.value.toLowerCase()));
-    document.getElementById('bookingSearch')?.addEventListener('input', (e) => renderBookingsTable(currentBookings, e.target.value.toLowerCase()));
-
-    // Tab click handlers
-    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
-
     // Initialize
     if (checkAdminAuth()) {
       renderQuickActions();
-      fetchUsers();
-      fetchBookings();
+      fetchStats();
     }
   </script>
 </body>
