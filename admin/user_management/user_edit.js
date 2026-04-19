@@ -35,6 +35,7 @@ let showPassword = false;
 function checkAuth() {
     const token = localStorage.getItem('wineBubbles_token');
     const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+    
     if (!token || !isAdmin) {
         alert('Admin access required');
         window.location.href = '../../login/login.html';
@@ -74,13 +75,24 @@ async function loadUserData() {
     try {
         showLoading(true);
         const token = localStorage.getItem('wineBubbles_token');
+        console.log('📡 Fetching user:', `${API_BASE}/api/users/${userId}`);
+        
         const response = await fetch(`${API_BASE}/api/users/${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) throw new Error('Failed to load user');
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('User not found');
+            }
+            throw new Error(`Failed to load user: ${response.status}`);
+        }
         
         const data = await response.json();
+        console.log('📦 User data:', data);
+        
         const user = data.data || data;
         
         fullNameInput.value = user.fullName || '';
@@ -91,6 +103,7 @@ async function loadUserData() {
         passwordInput.value = '';
         
     } catch (error) {
+        console.error('Load user error:', error);
         showError('Failed to load user data: ' + error.message);
     } finally {
         showLoading(false);
@@ -180,13 +193,13 @@ async function saveUser(event) {
         isVerified: isVerifiedCheckbox.checked
     };
     
-    // Only include password if provided (for edit) or required (for create)
+    // Only include password if provided
     const password = passwordInput.value;
     if (password) {
         userData.password = password;
-    } else if (!userId) {
-        userData.password = 'temp123'; // Fallback - should be handled by validation
     }
+    
+    console.log('📤 Saving user data:', { ...userData, password: password ? '***' : '(not set)' });
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
@@ -194,6 +207,7 @@ async function saveUser(event) {
         
         if (userId) {
             // UPDATE existing user
+            console.log('📡 PUT to:', `${API_BASE}/api/users/${userId}`);
             response = await fetch(`${API_BASE}/api/users/${userId}`, {
                 method: 'PUT',
                 headers: {
@@ -204,6 +218,7 @@ async function saveUser(event) {
             });
         } else {
             // CREATE new user
+            console.log('📡 POST to:', `${API_BASE}/api/users`);
             response = await fetch(`${API_BASE}/api/users`, {
                 method: 'POST',
                 headers: {
@@ -214,10 +229,12 @@ async function saveUser(event) {
             });
         }
         
+        console.log('📡 Response status:', response.status);
         const data = await response.json();
+        console.log('📦 Response data:', data);
         
         if (!response.ok) {
-            throw new Error(data.message || 'Failed to save user');
+            throw new Error(data.message || data.error || 'Failed to save user');
         }
         
         showToast(userId ? 'User updated successfully!' : 'User created successfully!', 'success');
@@ -244,13 +261,16 @@ async function deleteUser() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
+        console.log('📡 DELETE to:', `${API_BASE}/api/users/${userId}`);
+        
         const response = await fetch(`${API_BASE}/api/users/${userId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            const data = await response.json();
             throw new Error(data.message || 'Failed to delete user');
         }
         
@@ -261,6 +281,7 @@ async function deleteUser() {
         }, 1500);
         
     } catch (error) {
+        console.error('Delete error:', error);
         showError(error.message);
         showLoading(false);
     }

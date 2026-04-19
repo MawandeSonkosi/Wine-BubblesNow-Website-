@@ -8,6 +8,9 @@ let searchQuery = '';
 function checkAuth() {
     const token = localStorage.getItem('wineBubbles_token');
     const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+    
+    console.log('🔐 Auth check - Token:', !!token, 'IsAdmin:', isAdmin);
+    
     if (!token || !isAdmin) {
         alert('Admin access required. Please log in as admin.');
         window.location.href = '../../login/login.html';
@@ -26,7 +29,9 @@ function checkAuth() {
                     toggleUserDropdown(user);
                 });
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error('Error parsing user data:', e);
+        }
     }
     return true;
 }
@@ -69,26 +74,53 @@ function toggleUserDropdown(user) {
 
 // ========== FETCH USERS ==========
 async function fetchUsers() {
+    const container = document.getElementById('usersContainer');
+    container.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Loading users...</p></div>';
+    
     try {
         const token = localStorage.getItem('wineBubbles_token');
+        console.log('📡 Fetching users from:', `${API_BASE}/api/users`);
+        
         const response = await fetch(`${API_BASE}/api/users`, {
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${token}`, 
+                'Content-Type': 'application/json'
+            }
         });
         
+        console.log('📡 Response status:', response.status);
+        
         if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
-                throw new Error('Unauthorized. Please login again.');
+            if (response.status === 401) {
+                throw new Error('Session expired. Please login again.');
             }
-            throw new Error('Failed to fetch users');
+            if (response.status === 403) {
+                throw new Error('Access denied. Admin privileges required.');
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const data = await response.json();
+        console.log('📦 Response data:', data);
+        
         // Handle different API response structures
-        allUsers = Array.isArray(data) ? data : (data.users || data.data || []);
+        if (data.success === true) {
+            allUsers = data.data || [];
+        } else if (Array.isArray(data)) {
+            allUsers = data;
+        } else if (data.users) {
+            allUsers = data.users;
+        } else {
+            allUsers = [];
+        }
+        
+        console.log(`✅ Loaded ${allUsers.length} users`);
         renderUsers();
+        
     } catch (error) {
-        console.error('Error fetching users:', error);
-        document.getElementById('usersContainer').innerHTML = `
+        console.error('❌ Error fetching users:', error);
+        container.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i>
                 <p>${error.message}</p>
@@ -206,7 +238,6 @@ async function viewUserDetails(userId) {
             <div class="detail-row"><div class="detail-label">User ID:</div><div class="detail-value"><code>${user.id}</code></div></div>
             <div class="detail-row"><div class="detail-label">Joined:</div><div class="detail-value">${formatDate(user.createdAt)}</div></div>
             <div class="detail-row"><div class="detail-label">Loyalty Points:</div><div class="detail-value">${user.loyaltyPoints || 0}</div></div>
-            <div class="detail-row"><div class="detail-label">Bookings:</div><div class="detail-value">${user.bookings?.length || 0}</div></div>
             <div style="display:flex; gap:12px; margin-top:24px;">
                 <button class="btn-primary" onclick="closeModal(); editUser('${userId}')" style="flex:1;"><i class="fas fa-edit"></i> Edit User</button>
                 <button onclick="closeModal()" style="background:#f0f0f0; border:none; padding:12px 20px; border-radius:40px; cursor:pointer;">Close</button>
@@ -232,11 +263,18 @@ window.toggleAdmin = async (userId, newStatus) => {
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ isAdmin: newStatus })
         });
-        if (!response.ok) throw new Error('Failed to update');
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to update');
+        }
+        
         showToast(`Admin status updated`, 'success');
         fetchUsers();
     } catch (error) {
-        showToast('Failed to update admin status', 'error');
+        console.error('Toggle admin error:', error);
+        showToast(error.message || 'Failed to update admin status', 'error');
     }
 };
 
@@ -251,11 +289,18 @@ window.toggleVerify = async (userId, newStatus) => {
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ isVerified: newStatus })
         });
-        if (!response.ok) throw new Error('Failed to update');
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to update');
+        }
+        
         showToast(`User ${newStatus ? 'verified' : 'unverified'}`, 'success');
         fetchUsers();
     } catch (error) {
-        showToast('Failed to update verification status', 'error');
+        console.error('Toggle verify error:', error);
+        showToast(error.message || 'Failed to update verification status', 'error');
     }
 };
 
@@ -272,11 +317,17 @@ async function deleteUser(userId) {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) throw new Error('Failed to delete');
+        
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to delete');
+        }
+        
         showToast('User deleted successfully', 'success');
         fetchUsers();
     } catch (error) {
-        showToast('Failed to delete user', 'error');
+        console.error('Delete error:', error);
+        showToast(error.message || 'Failed to delete user', 'error');
     }
 }
 
@@ -290,6 +341,7 @@ document.getElementById('addUserBtn')?.addEventListener('click', () => {
     window.location.href = 'user_edit_screen.html';
 });
 
+// Initialize
 if (checkAuth()) {
     fetchUsers();
 }
