@@ -481,6 +481,34 @@
       font-family: 'Playfair Display', serif;
     }
 
+    /* Recent Orders Card */
+    .recent-orders-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      text-align: center;
+      border: 1px solid var(--admin-border);
+    }
+
+    .recent-orders-card i {
+      font-size: 48px;
+      color: var(--admin-primary);
+      opacity: 0.6;
+      margin-bottom: 16px;
+    }
+
+    .recent-orders-card h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--admin-text-dark);
+    }
+
+    .recent-orders-card p {
+      color: var(--admin-text-muted);
+      font-size: 14px;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .admin-dashboard { padding: 0 16px; margin-top: 20px; }
@@ -495,7 +523,7 @@
 </head>
 <body>
 
-  <!-- TOPBAR (Admin version - customer nav hidden, cart removed) -->
+  <!-- TOPBAR (Admin version) -->
   <div class="topbar-top">
     <div class="topbar-top-inner"></div>
   </div>
@@ -506,9 +534,7 @@
           <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
         </a>
       </div>
-      <!-- Customer navigation hidden -->
       <div class="top-icons">
-        <!-- Cart icon REMOVED as requested -->
         <a href="#" class="icon" id="userIcon">
           <i class="fas fa-user-circle" id="userIconElement" style="font-size: 24px; color: #6b0d2b;"></i>
         </a>
@@ -535,6 +561,13 @@
       <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-shield"></i></div><div class="stat-value" id="adminUsers">—</div><div class="stat-label">Admin Users</div></div>
       <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="verifiedUsers">—</div><div class="stat-label">Verified Users</div></div>
       <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-value" id="totalBookings">—</div><div class="stat-label">Total Bookings</div></div>
+    </div>
+
+    <!-- Recent Orders Section -->
+    <div class="recent-orders-card" style="margin-bottom: 32px;">
+      <i class="fas fa-truck"></i>
+      <h4>Recent Orders</h4>
+      <p>Delivery management system is ready! Switch to the Deliveries tab to view orders.</p>
     </div>
 
     <!-- Admin Tabs -->
@@ -633,15 +666,20 @@
     let currentUsers = [];
     let currentBookings = [];
 
-    // Quick Actions
+    // Complete Quick Actions - Matching Flutter app
     const quickActions = [
       { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => switchTab('users') },
       { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => switchTab('bookings') },
       { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => switchTab('deliveries') },
       { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => switchTab('drivers') },
       { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#6b0d2b', action: () => window.location.href = '../wine/all_wines.html' },
-      { title: 'Manage Adverts', icon: 'fa-bullhorn', color: '#6a1b9a', action: () => showComingSoon() },
-      { title: 'Warehouse', icon: 'fa-warehouse', color: '#bf360c', action: () => showComingSoon() }
+      { title: 'Manage Add-Ons', icon: 'fa-gift', color: '#9c27b0', action: () => showComingSoon('Add-Ons Management') },
+      { title: 'Manage Wine Farms', icon: 'fa-tree', color: '#8d6e63', action: () => showComingSoon('Wine Farms Management') },
+      { title: 'Manage Suppliers', icon: 'fa-truck', color: '#0288d1', action: () => showComingSoon('Supplier Management') },
+      { title: 'Manage Adverts', icon: 'fa-bullhorn', color: '#7b1fa2', action: () => showComingSoon('Adverts Management') },
+      { title: 'Marketing Management', icon: 'fa-chart-line', color: '#00897b', action: () => showComingSoon('Marketing Management') },
+      { title: 'Warehouse', icon: 'fa-warehouse', color: '#bf360c', action: () => showComingSoon('Warehouse Management') },
+      { title: 'Manage Restaurants', icon: 'fa-utensils', color: '#d84315', action: () => showComingSoon('Restaurant Management') }
     ];
 
     function renderQuickActions() {
@@ -655,8 +693,8 @@
       `).join('');
     }
 
-    function showComingSoon() {
-      showToast('Feature coming soon! 🚀', 'info');
+    function showComingSoon(feature) {
+      showToast(`${feature} - Coming soon! 🚀`, 'info');
     }
 
     // Tab switching
@@ -750,7 +788,7 @@
       return true;
     }
 
-    // API Calls
+    // API Calls - Fetch real data from backend
     async function fetchUsers() {
       try {
         const token = localStorage.getItem('wineBubbles_token');
@@ -759,7 +797,8 @@
         });
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
-        currentUsers = Array.isArray(data) ? data : (data.users || []);
+        // Handle { success: true, data: [...] } format
+        currentUsers = data.data || (Array.isArray(data) ? data : []);
         renderUsersTable(currentUsers);
         updateStats(currentUsers);
       } catch (err) {
@@ -778,7 +817,7 @@
         });
         if (!res.ok) throw new Error();
         const data = await res.json();
-        currentBookings = Array.isArray(data) ? data : (data.bookings || []);
+        currentBookings = data.data || (Array.isArray(data) ? data : []);
         renderBookingsTable(currentBookings);
         document.getElementById('totalBookings').innerText = currentBookings.length;
       } catch (err) {
@@ -813,11 +852,12 @@
           <td>${escapeHtml(user.fullName || '—')}</td>
           <td>${escapeHtml(user.email)}</td>
           <td>${escapeHtml(user.phoneNumber || '—')}</td>
-          <td>${user.isAdmin ? '<span class="badge badge-admin">Admin</span>' : (user.isDriver ? '<span class="badge">Driver</span>' : '<span class="badge">User</span>')}</td>
+          <td>${user.isAdmin ? '<span class="badge badge-admin">Admin</span>' : '<span class="badge">User</span>'}</td>
           <td>${user.isVerified ? '<span class="badge badge-verified">Verified</span>' : '<span class="badge badge-pending">Pending</span>'}</td>
           <td>
-            <button class="action-btn" onclick="toggleAdmin(${user.id}, ${!user.isAdmin})" title="Toggle Admin"><i class="fas fa-user-shield"></i></button>
-            <button class="action-btn" onclick="toggleVerify(${user.id}, ${!user.isVerified})" title="Verify"><i class="fas fa-check-circle"></i></button>
+            <button class="action-btn" onclick="toggleAdmin('${user.id}', ${!user.isAdmin})" title="Toggle Admin"><i class="fas fa-user-shield"></i></button>
+            <button class="action-btn" onclick="toggleVerify('${user.id}', ${!user.isVerified})" title="Verify"><i class="fas fa-check-circle"></i></button>
+            <button class="action-btn" onclick="window.location.href='user_management/user_edit_screen.html?id=${user.id}'" title="Edit"><i class="fas fa-edit"></i></button>
           </td>
         </tr>
       `).join('');
@@ -871,11 +911,7 @@
         fetchUsers();
         showToast('Admin status updated', 'success');
       } catch(e) {
-        const idx = currentUsers.findIndex(u => u.id == userId);
-        if (idx !== -1) currentUsers[idx].isAdmin = isAdmin;
-        renderUsersTable(currentUsers);
-        updateStats(currentUsers);
-        showToast('Updated locally', 'info');
+        showToast('Failed to update admin status', 'error');
       }
     };
 
@@ -890,10 +926,7 @@
         fetchUsers();
         showToast('Verification updated', 'success');
       } catch(e) {
-        const idx = currentUsers.findIndex(u => u.id == userId);
-        if (idx !== -1) currentUsers[idx].isVerified = isVerified;
-        renderUsersTable(currentUsers);
-        showToast('Updated locally', 'info');
+        showToast('Failed to update verification', 'error');
       }
     };
 
@@ -908,17 +941,14 @@
         fetchBookings();
         showToast(`Booking ${newStatus}`, 'success');
       } catch(e) {
-        const idx = currentBookings.findIndex(b => b.id == bookingId);
-        if (idx !== -1) currentBookings[idx].status = newStatus;
-        renderBookingsTable(currentBookings);
-        showToast(`Status changed to ${newStatus}`, 'info');
+        showToast('Failed to update status', 'error');
       }
     };
 
     function showToast(msg, type = 'info') {
       const toast = document.createElement('div');
       toast.textContent = msg;
-      toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#6b0d2b'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
+      toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : type === 'error' ? '#d32f2f' : '#6b0d2b'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 2500);
     }
