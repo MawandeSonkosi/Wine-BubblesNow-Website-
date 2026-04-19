@@ -39,9 +39,9 @@
     .form-group { margin-bottom: 24px; }
     .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--admin-text); font-size: 14px; }
     .form-label i { margin-right: 8px; color: var(--admin-primary); }
-    .form-input, .status-select { width: 100%; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px; font-family: 'Montserrat', sans-serif; background: white; }
-    .form-input:focus, .status-select:focus { outline: none; border-color: var(--admin-primary); }
-    textarea.form-input { resize: vertical; min-height: 80px; }
+    .form-input, .status-select, .driver-select { width: 100%; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px; font-family: 'Montserrat', sans-serif; background: white; cursor: pointer; }
+    .form-input:focus, .status-select:focus, .driver-select:focus { outline: none; border-color: var(--admin-primary); }
+    textarea.form-input { resize: vertical; min-height: 80px; cursor: text; }
     
     .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-size: 15px; transition: all 0.2s; }
     .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
@@ -57,6 +57,9 @@
     
     .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-error); }
     .warning-message { background: rgba(237,108,2,0.1); border: 1px solid var(--admin-warning); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-warning); }
+    .info-message { background: rgba(2,136,209,0.1); border: 1px solid var(--admin-info); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-info); }
+    
+    .driver-info { margin-top: 8px; padding: 10px; background: #f8f7f5; border-radius: 8px; font-size: 12px; color: var(--admin-muted); }
     
     @media (max-width: 768px) { .form-card { padding: 24px; } .info-row { flex-direction: column; gap: 4px; } .info-label { width: auto; } }
   </style>
@@ -73,32 +76,35 @@
   <div class="admin-container">
     <div class="form-card">
       <h1 class="form-title" id="formTitle">Edit Delivery</h1>
-      <p class="form-subtitle" id="formSubtitle">Update delivery status and information</p>
+      <p class="form-subtitle" id="formSubtitle">Update delivery status, assign driver, or cancel order</p>
       
       <div id="errorContainer" class="error-message" style="display:none;"></div>
       <div id="warningContainer" class="warning-message" style="display:none;"></div>
+      <div id="infoContainer" class="info-message" style="display:none;"></div>
       <div id="loadingContainer" style="display:none;"><div class="loading-overlay"><div class="loading-spinner"></div></div></div>
       
       <div id="deliveryInfo"></div>
       
+      <!-- Status Update Section - Only Processing and Cancel available based on Flutter -->
       <div class="form-group">
-        <label class="form-label"><i class="fas fa-tag"></i> Delivery Status</label>
+        <label class="form-label"><i class="fas fa-tag"></i> Update Status</label>
         <select id="statusSelect" class="status-select">
-          <option value="Order received">📋 Order Received</option>
-          <option value="Processing">⚙️ Processing</option>
-          <option value="Out for delivery">🚚 Out for Delivery</option>
-          <option value="Delivered">✅ Delivered</option>
-          <option value="Cancelled">❌ Cancelled</option>
+          <option value="">Select new status...</option>
         </select>
+        <div id="statusInfo" class="info-message" style="display:none; margin-top: 8px; font-size: 12px;"></div>
       </div>
       
+      <!-- Driver Assignment Section -->
       <div class="form-group">
-        <label class="form-label"><i class="fas fa-map-marker-alt"></i> Delivery Address</label>
-        <textarea id="addressInput" class="form-input" placeholder="Enter delivery address..." rows="3"></textarea>
+        <label class="form-label"><i class="fas fa-user"></i> Assign Driver</label>
+        <select id="driverSelect" class="driver-select">
+          <option value="">No driver assigned</option>
+        </select>
+        <div id="driverInfo" class="driver-info" style="display:none;"></div>
       </div>
       
       <div class="form-actions">
-        <button class="btn-primary" id="updateBtn"><i class="fas fa-save"></i> Update Delivery</button>
+        <button class="btn-primary" id="updateBtn"><i class="fas fa-save"></i> Save Changes</button>
         <button class="btn-secondary" onclick="window.location.href='delivery_management_screen.html'"><i class="fas fa-arrow-left"></i> Back to Deliveries</button>
         <button class="btn-secondary btn-danger" id="deleteBtn" style="display:none;"><i class="fas fa-trash-alt"></i> Delete Delivery</button>
       </div>

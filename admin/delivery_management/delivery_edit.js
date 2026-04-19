@@ -1,10 +1,11 @@
-// Delivery Edit JavaScript - Matches Flutter DeliveryEditScreen
+// Delivery Edit JavaScript - Matches Flutter DeliveryEditScreen functionality
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
 const deliveryId = urlParams.get('id');
 
 let allUsers = [];
+let allDrivers = [];
 let deliveryData = null;
 let originalStatus = '';
 
@@ -37,6 +38,52 @@ async function fetchUsers() {
     }
 }
 
+// ========== FETCH DRIVERS ==========
+async function fetchDrivers() {
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        // Fetch users with isDriver = true
+        const response = await fetch(`${API_BASE}/api/users?limit=1000`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const users = data.data || (Array.isArray(data) ? data : []);
+            allDrivers = users.filter(user => user.isDriver === true);
+            console.log(`✅ Loaded ${allDrivers.length} active drivers`);
+            populateDriverSelect();
+        }
+    } catch (error) {
+        console.error('Error fetching drivers:', error);
+    }
+}
+
+function populateDriverSelect() {
+    const driverSelect = document.getElementById('driverSelect');
+    if (!driverSelect) return;
+    
+    driverSelect.innerHTML = '<option value="">No driver assigned</option>';
+    
+    allDrivers.forEach(driver => {
+        const option = document.createElement('option');
+        option.value = driver.id;
+        option.textContent = `${driver.fullName} ${driver.phoneNumber ? `- ${driver.phoneNumber}` : ''}`;
+        driverSelect.appendChild(option);
+    });
+    
+    if (deliveryData && deliveryData.driverId) {
+        driverSelect.value = deliveryData.driverId;
+        const driverInfo = document.getElementById('driverInfo');
+        if (driverInfo && deliveryData.driverId) {
+            const driver = allDrivers.find(d => d.id == deliveryData.driverId);
+            if (driver) {
+                driverInfo.style.display = 'block';
+                driverInfo.innerHTML = `<i class="fas fa-check-circle"></i> Currently assigned to: ${driver.fullName}`;
+            }
+        }
+    }
+}
+
 function getUserName(userId) {
     const user = allUsers.find(u => u.id === userId || u._id === userId);
     return user ? user.fullName : 'Unknown User';
@@ -50,6 +97,70 @@ function getUserEmail(userId) {
 function getUserPhone(userId) {
     const user = allUsers.find(u => u.id === userId || u._id === userId);
     return user ? (user.phoneNumber || '—') : '—';
+}
+
+// ========== GET ALLOWED STATUSES BASED ON CURRENT STATUS (Matches Flutter) ==========
+function getAllowedStatuses(currentStatus) {
+    switch (currentStatus.toLowerCase()) {
+        case 'order received':
+            return ['Processing', 'Cancelled'];
+        case 'processing':
+            return ['Out for delivery', 'Cancelled'];
+        case 'out for delivery':
+            return ['Delivered', 'Cancelled'];
+        case 'delivered':
+            return [];
+        case 'cancelled':
+            return [];
+        default:
+            return ['Processing', 'Cancelled'];
+    }
+}
+
+function populateStatusSelect() {
+    const statusSelect = document.getElementById('statusSelect');
+    if (!statusSelect || !deliveryData) return;
+    
+    const allowedStatuses = getAllowedStatuses(deliveryData.status);
+    const statusInfo = document.getElementById('statusInfo');
+    
+    if (allowedStatuses.length === 0) {
+        statusSelect.innerHTML = '<option value="">No status changes available</option>';
+        statusSelect.disabled = true;
+        if (statusInfo) {
+            statusInfo.style.display = 'block';
+            statusInfo.innerHTML = `<i class="fas fa-lock"></i> This order is ${deliveryData.status.toLowerCase()} and cannot be modified.`;
+        }
+    } else {
+        statusSelect.innerHTML = '<option value="">Select new status...</option>';
+        allowedStatuses.forEach(status => {
+            const option = document.createElement('option');
+            option.value = status;
+            let icon = '';
+            if (status === 'Processing') icon = '⚙️ ';
+            else if (status === 'Out for delivery') icon = '🚚 ';
+            else if (status === 'Delivered') icon = '✅ ';
+            else if (status === 'Cancelled') icon = '❌ ';
+            option.textContent = icon + status;
+            statusSelect.appendChild(option);
+        });
+        statusSelect.disabled = false;
+        
+        if (statusInfo) {
+            if (deliveryData.status === 'Order received') {
+                statusInfo.style.display = 'block';
+                statusInfo.innerHTML = `<i class="fas fa-info-circle"></i> You can process this order or cancel it. Processing will move it to the next stage.`;
+            } else if (deliveryData.status === 'Processing') {
+                statusInfo.style.display = 'block';
+                statusInfo.innerHTML = `<i class="fas fa-info-circle"></i> Order is being processed. You can mark it as "Out for delivery" or cancel it.`;
+            } else if (deliveryData.status === 'Out for delivery') {
+                statusInfo.style.display = 'block';
+                statusInfo.innerHTML = `<i class="fas fa-info-circle"></i> Order is out for delivery. You can mark it as "Delivered" or cancel it.`;
+            } else {
+                statusInfo.style.display = 'none';
+            }
+        }
+    }
 }
 
 // ========== FETCH DELIVERY ==========
@@ -75,12 +186,8 @@ async function fetchDelivery() {
         console.log('📦 Delivery data:', deliveryData);
         
         renderDeliveryInfo();
-        
-        // Set form values
-        const statusSelect = document.getElementById('statusSelect');
-        const addressInput = document.getElementById('addressInput');
-        if (statusSelect) statusSelect.value = deliveryData.status;
-        if (addressInput) addressInput.value = deliveryData.address || '';
+        populateStatusSelect();
+        populateDriverSelect();
         
         // Show delete button
         const deleteBtn = document.getElementById('deleteBtn');
@@ -92,8 +199,6 @@ async function fetchDelivery() {
             if (warningContainer) {
                 warningContainer.style.display = 'block';
                 warningContainer.innerHTML = `<i class="fas fa-lock"></i> This order has been ${deliveryData.status.toLowerCase()} and cannot be modified.`;
-                if (statusSelect) statusSelect.disabled = true;
-                if (addressInput) addressInput.disabled = true;
                 const updateBtn = document.getElementById('updateBtn');
                 if (updateBtn) updateBtn.disabled = true;
             }
@@ -128,10 +233,12 @@ function renderDeliveryInfo() {
         </div>
         <div class="info-section">
             <h3><i class="fas fa-shopping-cart"></i> Order #${orderId}</h3>
+            <div class="info-row"><div class="info-label">Delivery Address:</div><div class="info-value">${escapeHtml(deliveryData.address || '—')}</div></div>
             <div class="info-row"><div class="info-label">Payment Method:</div><div class="info-value">${escapeHtml(deliveryData.paymentMethod || '—')}</div></div>
             <div class="info-row"><div class="info-label">Total Amount:</div><div class="info-value">R${(deliveryData.totalAmount || 0).toFixed(2)}</div></div>
             <div class="info-row"><div class="info-label">Order Date:</div><div class="info-value">${formatDateTime(deliveryData.createdAt)}</div></div>
-            <div class="info-row"><div class="info-label">Current Status:</div><div class="info-value"><span class="delivery-status ${getStatusClass(deliveryData.status)}">${deliveryData.status}</span></div></div>
+            <div class="info-row"><div class="info-label">Current Status:</div><div class="info-value"><span style="display:inline-block; padding:4px 12px; border-radius:20px; background:${getStatusColor(deliveryData.status)}20; color:${getStatusColor(deliveryData.status)}; font-weight:600;">${deliveryData.status}</span></div></div>
+            ${deliveryData.driverId ? `<div class="info-row"><div class="info-label">Assigned Driver:</div><div class="info-value">${escapeHtml(getDriverName(deliveryData.driverId))}</div></div>` : ''}
         </div>
         ${deliveryData.items && deliveryData.items.length > 0 ? `
         <div class="info-section">
@@ -168,14 +275,19 @@ function renderDeliveryInfo() {
     `;
 }
 
-function getStatusClass(status) {
+function getDriverName(driverId) {
+    const driver = allDrivers.find(d => d.id == driverId);
+    return driver ? driver.fullName : 'Unknown Driver';
+}
+
+function getStatusColor(status) {
     switch(status) {
-        case 'Order received': return 'order-received';
-        case 'Processing': return 'processing';
-        case 'Out for delivery': return 'out-for-delivery';
-        case 'Delivered': return 'delivered';
-        case 'Cancelled': return 'cancelled';
-        default: return 'order-received';
+        case 'Order received': return '#6b0d2b';
+        case 'Processing': return '#ed6c02';
+        case 'Out for delivery': return '#0288d1';
+        case 'Delivered': return '#2e7d32';
+        case 'Cancelled': return '#d32f2f';
+        default: return '#6b0d2b';
     }
 }
 
@@ -187,31 +299,43 @@ function getCaseCount(delivery) {
 // ========== UPDATE DELIVERY ==========
 async function updateDelivery() {
     const statusSelect = document.getElementById('statusSelect');
-    const addressInput = document.getElementById('addressInput');
+    const driverSelect = document.getElementById('driverSelect');
     const newStatus = statusSelect.value;
-    const newAddress = addressInput.value.trim();
+    const newDriverId = driverSelect.value ? parseInt(driverSelect.value) : null;
     
     if (!deliveryData || !deliveryId) return;
     
-    if (!newAddress) {
-        showError('Address is required');
-        return;
-    }
-    
-    const hasChanges = newStatus !== originalStatus || newAddress !== deliveryData.address;
-    if (!hasChanges) {
-        showToast('No changes to save', 'info');
+    // Check if status was selected
+    if (!newStatus && newDriverId === deliveryData.driverId) {
+        showError('Please select a new status or assign a driver to update');
         return;
     }
     
     // Show confirmation dialog for status change
-    if (newStatus !== originalStatus) {
-        const confirmMsg = newStatus === 'Processing' ? 
-            'Process this order? This will move it to processing stage.' :
-            newStatus === 'Out for delivery' ? 'Mark this order as out for delivery?' :
-            newStatus === 'Delivered' ? 'Mark this order as delivered? This will complete the order.' :
-            newStatus === 'Cancelled' ? 'Cancel this order? This action can be reversed later.' :
-            `Change status from "${originalStatus}" to "${newStatus}"?`;
+    if (newStatus && newStatus !== originalStatus) {
+        let confirmMsg = '';
+        let warningHtml = '';
+        
+        switch (newStatus) {
+            case 'Processing':
+                confirmMsg = `Process this order from "${originalStatus}" to "Processing"?\n\nThis will move the order to the processing stage.`;
+                warningHtml = 'Processing will move the order forward in the workflow.';
+                break;
+            case 'Out for delivery':
+                confirmMsg = `Mark this order as "Out for delivery"?\n\nThis will notify the customer that their order is on the way.`;
+                warningHtml = 'Make sure a driver has been assigned before marking as out for delivery.';
+                break;
+            case 'Delivered':
+                confirmMsg = `Mark this order as "Delivered"?\n\nThis will complete the order.`;
+                warningHtml = 'This action cannot be reversed.';
+                break;
+            case 'Cancelled':
+                confirmMsg = `Cancel this order?\n\nThis will cancel the order and notify the customer.`;
+                warningHtml = 'Cancellation cannot be reversed.';
+                break;
+            default:
+                confirmMsg = `Change status from "${originalStatus}" to "${newStatus}"?`;
+        }
         
         if (!confirm(confirmMsg)) return;
     }
@@ -220,16 +344,26 @@ async function updateDelivery() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
+        const updateData = {};
         
-        // Use PUT endpoint to update delivery completely
+        // Only include fields that are being updated
+        if (newStatus && newStatus !== originalStatus) {
+            updateData.status = newStatus;
+        }
+        
+        if (newDriverId !== deliveryData.driverId) {
+            updateData.driverId = newDriverId;
+        }
+        
+        // Also always send address (keep existing if not changed)
+        updateData.address = deliveryData.address;
+        
+        console.log('📤 Updating delivery with:', updateData);
+        
         const response = await fetch(`${API_BASE}/api/deliveries/${deliveryId}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                address: newAddress,
-                status: newStatus,
-                driverId: null
-            })
+            body: JSON.stringify(updateData)
         });
         
         if (!response.ok) {
@@ -237,9 +371,23 @@ async function updateDelivery() {
             throw new Error(error.message || 'Failed to update');
         }
         
-        const successMsg = newStatus !== originalStatus ? 
-            `Delivery status updated to "${newStatus}"` : 
-            'Delivery updated successfully';
+        let successMsg = '';
+        if (newStatus && newStatus !== originalStatus) {
+            successMsg = `Delivery status updated to "${newStatus}"`;
+            if (newStatus === 'Processing') {
+                successMsg += ' - Order is now being processed.';
+            } else if (newStatus === 'Out for delivery') {
+                successMsg += ' - Driver has been notified.';
+            } else if (newStatus === 'Delivered') {
+                successMsg += ' - Order completed successfully.';
+            } else if (newStatus === 'Cancelled') {
+                successMsg += ' - Order has been cancelled.';
+            }
+        } else if (newDriverId !== deliveryData.driverId) {
+            successMsg = newDriverId ? 'Driver assigned successfully' : 'Driver unassigned successfully';
+        } else {
+            successMsg = 'Delivery updated successfully';
+        }
         
         showToast(successMsg, 'success');
         
@@ -337,5 +485,9 @@ document.getElementById('updateBtn')?.addEventListener('click', updateDelivery);
 document.getElementById('deleteBtn')?.addEventListener('click', deleteDelivery);
 
 if (checkAuth()) {
-    fetchUsers().then(() => fetchDelivery());
+    fetchUsers().then(() => {
+        fetchDrivers().then(() => {
+            fetchDelivery();
+        });
+    });
 }

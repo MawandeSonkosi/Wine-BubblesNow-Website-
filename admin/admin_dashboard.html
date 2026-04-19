@@ -825,12 +825,15 @@
     }
     
     window.markNotificationRead = function(id, link) {
-      const notif = notifications.find(n => n.id === id);
-      if (notif) notif.read = true;
-      updateNotificationBadge();
-      renderNotifications();
-      if (link) window.location.href = link;
-    };
+    // Remove the notification from the array
+    const index = notifications.findIndex(n => n.id === id);
+    if (index !== -1) {
+        notifications.splice(index, 1);
+    }
+    updateNotificationBadge();
+    renderNotifications();
+    if (link) window.location.href = link;
+};
     
     function toggleNotificationDropdown() {
       const dropdown = document.getElementById('notificationDropdown');
