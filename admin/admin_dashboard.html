@@ -146,10 +146,10 @@
       padding: 0 24px;
     }
 
-    /* Stats Grid - Light Theme */
+    /* Stats Grid - Light Theme (3 cards now) */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 24px;
       margin-bottom: 40px;
     }
@@ -365,6 +365,7 @@
       .stat-value { font-size: 28px; }
       .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
       .user-dropdown { position: fixed; top: 70px; right: 10px; left: auto; min-width: 200px; }
+      .stats-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -402,12 +403,11 @@
       </div>
     </div>
 
-    <!-- Stats Grid -->
+    <!-- Stats Grid - Only 3 cards (Total Bookings removed) -->
     <div class="stats-grid" id="statsGrid">
       <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="totalUsers">—</div><div class="stat-label">Total Users</div></div>
       <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-shield"></i></div><div class="stat-value" id="adminUsers">—</div><div class="stat-label">Admin Users</div></div>
       <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="verifiedUsers">—</div><div class="stat-label">Verified Users</div></div>
-      <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-value" id="totalBookings">—</div><div class="stat-label">Total Bookings</div></div>
     </div>
 
     <!-- Recent Orders Section -->
@@ -441,7 +441,7 @@
           <h4 class="footer-heading">Admin Tools</h4>
           <ul class="footer-links">
             <li><a href="user_management/user_management_screen.html">User Management</a></li>
-            <li><a href="#" onclick="showComingSoon('Booking Management');return false;">Booking Console</a></li>
+            <li><a href="booking_management/booking_management_screen.html">Booking Management</a></li>
             <li><a href="#" onclick="showComingSoon('Delivery Hub');return false;">Delivery Hub</a></li>
           </ul>
         </div>
@@ -455,7 +455,7 @@
     // Complete Quick Actions - All navigate to separate screens
     const quickActions = [
       { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => window.location.href = 'user_management/user_management_screen.html' },
-      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => showComingSoon('Booking Management') },
+      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => window.location.href = 'booking_management/booking_management_screen.html' },
       { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => showComingSoon('Delivery Management') },
       { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => showComingSoon('Driver Management') },
       { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#6b0d2b', action: () => window.location.href = '../wine/all_wines.html' },
@@ -598,30 +598,11 @@
           document.getElementById('verifiedUsers').innerText = 'Error';
         }
         
-        // Fetch bookings for count - also with no limit
-        const bookingsUrl = `${API_BASE}/api/bookings?limit=10000&page=0`;
-        console.log('📡 Fetching all bookings from:', bookingsUrl);
-        
-        const bookingsRes = await fetch(bookingsUrl, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (bookingsRes.ok) {
-          const bookingsData = await bookingsRes.json();
-          const bookings = bookingsData.data || (Array.isArray(bookingsData) ? bookingsData : []);
-          document.getElementById('totalBookings').innerText = bookings.length;
-          console.log(`✅ Loaded ${bookings.length} total bookings`);
-        } else {
-          console.error('Failed to fetch bookings:', bookingsRes.status);
-          document.getElementById('totalBookings').innerText = 'Error';
-        }
-        
       } catch (err) {
         console.error('Error fetching stats:', err);
         document.getElementById('totalUsers').innerText = 'Error';
         document.getElementById('adminUsers').innerText = 'Error';
         document.getElementById('verifiedUsers').innerText = 'Error';
-        document.getElementById('totalBookings').innerText = 'Error';
       }
     }
 
