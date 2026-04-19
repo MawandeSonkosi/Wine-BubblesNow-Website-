@@ -84,4 +84,18 @@
         <div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Full Name *</label><input type="text" id="fullName" class="form-input" placeholder="Enter full name"><div class="error-text" id="fullNameError">Full name is required</div></div>
         <div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> Email *</label><input type="email" id="email" class="form-input" placeholder="user@example.com"><div class="error-text" id="emailError">Valid email is required</div></div>
         <div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Phone Number</label><input type="tel" id="phoneNumber" class="form-input" placeholder="+27 XX XXX XXXX"><div class="error-text" id="phoneError"></div></div>
-        <div class="form-group"><label class="form-label"><i class="fas fa-lock"></i> Password <span id="passwordRequired">*</span
+        <div class="form-group"><label class="form-label"><i class="fas fa-lock"></i> Password <span id="passwordRequired">*</span></label><div class="password-wrapper"><input type="password" id="password" class="form-input" placeholder="Enter password"><button type="button" class="password-toggle" id="togglePassword"><i class="fas fa-eye"></i></button></div><div class="error-text" id="passwordError">Password must be at least 6 characters</div><small id="passwordHint" style="color:#6d6d6d; font-size:12px;"></small></div>
+        
+        <div class="switch-group"><div class="switch-label"><i class="fas fa-user-shield"></i> Admin User</div><label class="switch"><input type="checkbox" id="isAdmin"><span class="slider"></span></label></div>
+        <div class="switch-group"><div class="switch-label"><i class="fas fa-check-circle"></i> Verified User</div><label class="switch"><input type="checkbox" id="isVerified"><span class="slider"></span></label></div>
+        
+        <div class="form-actions"><button type="submit" class="btn-primary" id="submitBtn">Create User</button><button type="button" class="btn-secondary" onclick="window.location.href='user_management_screen.html'">Cancel</button></div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Edit User</p></div></div></footer>
+
+  <script src="user_edit.js"></script>
+</body>
+</html>
