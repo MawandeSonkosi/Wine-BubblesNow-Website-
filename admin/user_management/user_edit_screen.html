@@ -11,13 +11,11 @@
   <style>
     :root {
       --admin-primary: #6b0d2b;
-      --admin-accent: #d4af37;
       --admin-bg: #faf8f5;
       --admin-card: #ffffff;
       --admin-text: #1b1b1b;
       --admin-muted: #6d6d6d;
       --admin-border: #eae3da;
-      --admin-success: #2e7d32;
       --admin-error: #d32f2f;
     }
     body { background: var(--admin-bg); }
@@ -30,13 +28,12 @@
     .form-subtitle { color: var(--admin-muted); margin-bottom: 32px; font-size: 14px; }
     .form-group { margin-bottom: 24px; }
     .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--admin-text); font-size: 14px; }
-    .form-label i { margin-right: 8px; color: var(--admin-primary); width: 18px; }
-    .form-input { width: 100%; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px; font-family: 'Montserrat', sans-serif; transition: all 0.2s; background: white; }
+    .form-label i { margin-right: 8px; color: var(--admin-primary); }
+    .form-input { width: 100%; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px; font-family: 'Montserrat', sans-serif; background: white; }
     .form-input:focus { outline: none; border-color: var(--admin-primary); box-shadow: 0 0 0 3px rgba(107,13,43,0.1); }
-    .form-input.error { border-color: var(--admin-error); }
     .error-text { color: var(--admin-error); font-size: 12px; margin-top: 6px; display: none; }
     
-    .switch-group { background: #f8f7f5; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border: 1px solid var(--admin-border); }
+    .switch-group { background: #f8f7f5; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--admin-border); }
     .switch-label { display: flex; align-items: center; gap: 12px; font-weight: 500; }
     .switch-label i { font-size: 20px; color: var(--admin-primary); }
     .switch { position: relative; display: inline-block; width: 52px; height: 26px; }
@@ -50,16 +47,15 @@
     .password-toggle { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--admin-muted); }
     
     .form-actions { display: flex; gap: 16px; margin-top: 32px; }
-    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; flex: 1; font-family: 'Montserrat', sans-serif; font-size: 15px; transition: all 0.2s; }
-    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 14px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; flex: 1; font-family: 'Montserrat', sans-serif; font-size: 15px; }
+    .btn-primary:hover { background: #8a1e3d; }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 14px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; }
     .btn-secondary:hover { background: #f5f5f5; }
-    .btn-danger { background: transparent; border: 1px solid var(--admin-error); color: var(--admin-error); }
-    .btn-danger:hover { background: rgba(211,47,47,0.1); }
+    .btn-danger { border-color: var(--admin-error); color: var(--admin-error); }
     
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     
     @media (max-width: 768px) { .form-card { padding: 24px; } .form-actions { flex-direction: column; } }
   </style>
@@ -77,25 +73,280 @@
     <div class="form-card">
       <h1 class="form-title" id="formTitle">Create New User</h1>
       <p class="form-subtitle" id="formSubtitle">Fill in the user details below</p>
-      
       <div id="errorContainer" style="display:none; background:rgba(211,47,47,0.1); border:1px solid #d32f2f; border-radius:12px; padding:14px; margin-bottom:24px; color:#d32f2f;"></div>
       
       <form id="userForm">
-        <div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Full Name *</label><input type="text" id="fullName" class="form-input" placeholder="Enter full name"><div class="error-text" id="fullNameError">Full name is required</div></div>
-        <div class="form-group"><label class="form-label"><i class="fas fa-envelope"></i> Email *</label><input type="email" id="email" class="form-input" placeholder="user@example.com"><div class="error-text" id="emailError">Valid email is required</div></div>
-        <div class="form-group"><label class="form-label"><i class="fas fa-phone"></i> Phone Number</label><input type="tel" id="phoneNumber" class="form-input" placeholder="+27 XX XXX XXXX"><div class="error-text" id="phoneError"></div></div>
-        <div class="form-group"><label class="form-label"><i class="fas fa-lock"></i> Password <span id="passwordRequired">*</span></label><div class="password-wrapper"><input type="password" id="password" class="form-input" placeholder="Enter password"><button type="button" class="password-toggle" id="togglePassword"><i class="fas fa-eye"></i></button></div><div class="error-text" id="passwordError">Password must be at least 6 characters</div><small id="passwordHint" style="color:#6d6d6d; font-size:12px;"></small></div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-user"></i> Full Name *</label>
+          <input type="text" id="fullName" class="form-input" placeholder="Enter full name">
+          <div class="error-text" id="fullNameError">Full name is required</div>
+        </div>
         
-        <div class="switch-group"><div class="switch-label"><i class="fas fa-user-shield"></i> Admin User</div><label class="switch"><input type="checkbox" id="isAdmin"><span class="slider"></span></label></div>
-        <div class="switch-group"><div class="switch-label"><i class="fas fa-check-circle"></i> Verified User</div><label class="switch"><input type="checkbox" id="isVerified"><span class="slider"></span></label></div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-envelope"></i> Email *</label>
+          <input type="email" id="email" class="form-input" placeholder="user@example.com">
+          <div class="error-text" id="emailError">Valid email is required</div>
+        </div>
         
-        <div class="form-actions"><button type="submit" class="btn-primary" id="submitBtn">Create User</button><button type="button" class="btn-secondary" onclick="window.location.href='user_management_screen.html'">Cancel</button></div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+          <input type="tel" id="phoneNumber" class="form-input" placeholder="+27 XX XXX XXXX">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-lock"></i> Password <span id="passwordRequired">*</span></label>
+          <div class="password-wrapper">
+            <input type="password" id="password" class="form-input" placeholder="Enter password">
+            <button type="button" class="password-toggle" id="togglePassword"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="error-text" id="passwordError">Password must be at least 6 characters</div>
+          <small id="passwordHint" style="color:#6d6d6d; font-size:12px;"></small>
+        </div>
+        
+        <div class="switch-group">
+          <div class="switch-label"><i class="fas fa-user-shield"></i> Admin User</div>
+          <label class="switch"><input type="checkbox" id="isAdmin"><span class="slider"></span></label>
+        </div>
+        
+        <div class="switch-group">
+          <div class="switch-label"><i class="fas fa-check-circle"></i> Verified User</div>
+          <label class="switch"><input type="checkbox" id="isVerified"><span class="slider"></span></label>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="submitBtn">Create User</button>
+          <button type="button" class="btn-secondary" onclick="window.location.href='user_management_screen.html'">Cancel</button>
+        </div>
       </form>
     </div>
   </div>
 
   <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Edit User</p></div></div></footer>
 
-  <script src="user_edit.js"></script>
+  <script>
+    // ========== USER EDIT JAVASCRIPT ==========
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
+    
+    // DOM elements
+    const formTitle = document.getElementById('formTitle');
+    const formSubtitle = document.getElementById('formSubtitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const fullNameInput = document.getElementById('fullName');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phoneNumber');
+    const passwordInput = document.getElementById('password');
+    const isAdminCheckbox = document.getElementById('isAdmin');
+    const isVerifiedCheckbox = document.getElementById('isVerified');
+    const errorContainer = document.getElementById('errorContainer');
+    const passwordRequired = document.getElementById('passwordRequired');
+    const passwordHint = document.getElementById('passwordHint');
+    
+    let showPassword = false;
+    
+    // Password toggle
+    document.getElementById('togglePassword')?.addEventListener('click', () => {
+        showPassword = !showPassword;
+        passwordInput.type = showPassword ? 'text' : 'password';
+        document.getElementById('togglePassword').innerHTML = showPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+    });
+    
+    // Check authentication
+    function checkAuth() {
+        const token = localStorage.getItem('wineBubbles_token');
+        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+        if (!token || !isAdmin) {
+            alert('Admin access required');
+            window.location.href = '../../login/login.html';
+            return false;
+        }
+        return true;
+    }
+    
+    // Load user data for editing
+    async function loadUserData() {
+        if (!userId) {
+            formTitle.textContent = 'Create New User';
+            formSubtitle.textContent = 'Fill in the user details below';
+            submitBtn.textContent = 'Create User';
+            passwordRequired.textContent = '*';
+            passwordHint.textContent = 'Password is required for new users (min. 6 characters)';
+            return;
+        }
+        
+        formTitle.textContent = 'Edit User';
+        formSubtitle.textContent = 'Update user information';
+        submitBtn.textContent = 'Update User';
+        passwordRequired.textContent = '(optional)';
+        passwordHint.textContent = 'Leave blank to keep current password';
+        
+        // Add delete button
+        const formActions = document.querySelector('.form-actions');
+        if (formActions && !document.querySelector('.btn-danger')) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn-secondary btn-danger';
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete User';
+            deleteBtn.onclick = deleteUser;
+            formActions.insertBefore(deleteBtn, formActions.children[1]);
+        }
+        
+        try {
+            showLoading(true);
+            const token = localStorage.getItem('wineBubbles_token');
+            const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!response.ok) throw new Error('Failed to load user');
+            
+            const data = await response.json();
+            const user = data.data || data;
+            
+            fullNameInput.value = user.fullName || '';
+            emailInput.value = user.email || '';
+            phoneInput.value = user.phoneNumber || '';
+            isAdminCheckbox.checked = user.isAdmin === true;
+            isVerifiedCheckbox.checked = user.isVerified === true;
+            passwordInput.value = '';
+        } catch (error) {
+            showError('Failed to load user data');
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    function validateForm() {
+        let isValid = true;
+        document.querySelectorAll('.error-text').forEach(el => el.style.display = 'none');
+        
+        if (!fullNameInput.value.trim()) {
+            document.getElementById('fullNameError').style.display = 'block';
+            isValid = false;
+        }
+        
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            document.getElementById('emailError').style.display = 'block';
+            isValid = false;
+        }
+        
+        const password = passwordInput.value;
+        if (!userId && (!password || password.length < 6)) {
+            document.getElementById('passwordError').style.display = 'block';
+            isValid = false;
+        } else if (userId && password && password.length < 6) {
+            document.getElementById('passwordError').style.display = 'block';
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    function showError(message) {
+        errorContainer.textContent = message;
+        errorContainer.style.display = 'block';
+        setTimeout(() => errorContainer.style.display = 'none', 5000);
+    }
+    
+    function showLoading(show) {
+        let overlay = document.querySelector('.loading-overlay');
+        if (show && !overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = '<div class="loading-spinner"></div>';
+            document.body.appendChild(overlay);
+            submitBtn.disabled = true;
+        } else if (!show && overlay) {
+            overlay.remove();
+            submitBtn.disabled = false;
+        }
+    }
+    
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px;`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    async function saveUser(event) {
+        event.preventDefault();
+        if (!validateForm()) return;
+        
+        showLoading(true);
+        
+        const userData = {
+            fullName: fullNameInput.value.trim(),
+            email: emailInput.value.trim().toLowerCase(),
+            phoneNumber: phoneInput.value.trim(),
+            isAdmin: isAdminCheckbox.checked,
+            isVerified: isVerifiedCheckbox.checked
+        };
+        
+        const password = passwordInput.value;
+        if (password) userData.password = password;
+        
+        try {
+            const token = localStorage.getItem('wineBubbles_token');
+            let response;
+            
+            if (userId) {
+                response = await fetch(`${API_BASE}/api/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+            } else {
+                response = await fetch(`${API_BASE}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+            }
+            
+            const data = await response.json();
+            
+            if (!response.ok) throw new Error(data.message || 'Failed to save user');
+            
+            showToast(userId ? 'User updated!' : 'User created!', 'success');
+            setTimeout(() => window.location.href = 'user_management_screen.html', 1500);
+        } catch (error) {
+            showError(error.message);
+            showLoading(false);
+        }
+    }
+    
+    async function deleteUser() {
+        if (!userId) return;
+        if (!confirm('⚠️ Permanently delete this user? This cannot be undone.')) return;
+        
+        showLoading(true);
+        try {
+            const token = localStorage.getItem('wineBubbles_token');
+            const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!response.ok) throw new Error('Delete failed');
+            
+            showToast('User deleted', 'success');
+            setTimeout(() => window.location.href = 'user_management_screen.html', 1500);
+        } catch (error) {
+            showError('Failed to delete user');
+            showLoading(false);
+        }
+    }
+    
+    document.getElementById('userForm')?.addEventListener('submit', saveUser);
+    
+    if (checkAuth()) {
+        loadUserData();
+    }
+  </script>
 </body>
 </html>
