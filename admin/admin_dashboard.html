@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <title>Admin Dashboard | Wine & Bubbles Now</title>
+  
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
   <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png" />
@@ -13,17 +14,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Main site style (imported from root) -->
+  <!-- Main site style -->
   <link rel="stylesheet" href="../style.css" />
 
   <style>
-    /* ----- ADMIN DASHBOARD SPECIFIC OVERRIDES (keeps website layout) ----- */
+    /* Admin Dashboard Specific Styles - matching Flutter app design with website layout */
     :root {
-      --admin-primary: #6b0d2b;
-      --admin-accent: #d4af37;
-      --admin-bg-dark: #0f0f0f;
-      --admin-card: #1e1e1e;
-      --admin-text: #ffffff;
+      --admin-primary: #7A0026;
+      --admin-accent: #E6C79C;
+      --admin-bg-dark: #0F0F0F;
+      --admin-card-bg: #1e1e1e;
     }
 
     body {
@@ -35,7 +35,6 @@
       display: none !important;
     }
 
-    /* Adjust topbar layout when nav is hidden */
     .topbar-main-inner {
       justify-content: space-between;
     }
@@ -48,13 +47,14 @@
       margin-left: auto;
     }
 
-    .admin-dashboard-wrapper {
+    /* Admin Dashboard Wrapper */
+    .admin-dashboard {
       max-width: 1400px;
       margin: 30px auto 50px;
       padding: 0 24px;
     }
 
-    /* Dashboard header stats */
+    /* Stats Grid - exactly like Flutter */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -63,25 +63,22 @@
     }
 
     .stat-card {
-      background: white;
+      background: var(--admin-card-bg);
       border-radius: 20px;
       padding: 24px 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-      transition: all 0.25s ease;
-      border: 1px solid rgba(107, 13, 43, 0.1);
-      position: relative;
-      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid rgba(230, 199, 156, 0.15);
     }
 
     .stat-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 32px rgba(107, 13, 43, 0.12);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
     }
 
     .stat-icon {
       width: 52px;
       height: 52px;
-      background: #6b0d2b10;
+      background: rgba(122, 0, 38, 0.2);
       border-radius: 16px;
       display: flex;
       align-items: center;
@@ -91,33 +88,34 @@
 
     .stat-icon i {
       font-size: 28px;
-      color: var(--admin-primary);
+      color: var(--admin-accent);
     }
 
     .stat-value {
       font-family: 'Playfair Display', serif;
       font-size: 36px;
       font-weight: 700;
-      color: #1b1b1b;
+      color: var(--admin-accent);
       margin-bottom: 6px;
     }
 
     .stat-label {
       font-size: 14px;
-      color: #6d6d6d;
+      color: rgba(255, 255, 255, 0.7);
       font-weight: 500;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    /* Dashboard sections (tabs style) */
+    /* Admin Tabs - matching Flutter bottom nav */
     .admin-tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px;
       margin-bottom: 32px;
-      border-bottom: 2px solid #eae3da;
-      padding-bottom: 8px;
+      background: var(--admin-bg-dark);
+      border-radius: 60px;
+      padding: 6px;
     }
 
     .admin-tab-btn {
@@ -126,21 +124,24 @@
       padding: 12px 28px;
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
-      font-size: 15px;
-      color: #5a5a5a;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
       cursor: pointer;
-      border-radius: 40px;
+      border-radius: 50px;
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .admin-tab-btn i {
-      margin-right: 8px;
+      font-size: 18px;
     }
 
     .admin-tab-btn.active {
       background: var(--admin-primary);
-      color: white;
-      box-shadow: 0 4px 12px rgba(107, 13, 43, 0.3);
+      color: var(--admin-accent);
+      box-shadow: 0 4px 12px rgba(122, 0, 38, 0.4);
     }
 
     .admin-tab-pane {
@@ -153,59 +154,63 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px);}
-      to { opacity: 1; transform: translateY(0);}
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Tables & Cards */
+    /* Cards & Tables */
     .admin-card {
-      background: white;
+      background: var(--admin-card-bg);
       border-radius: 24px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
       overflow: hidden;
       margin-bottom: 30px;
-      border: 1px solid #f0eae4;
+      border: 1px solid rgba(230, 199, 156, 0.1);
     }
 
     .admin-card-header {
       padding: 20px 28px;
-      background: #ffffff;
-      border-bottom: 1px solid #eee6df;
+      border-bottom: 1px solid rgba(230, 199, 156, 0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      gap: 16px;
     }
 
     .admin-card-header h3 {
       font-family: 'Playfair Display', serif;
       font-size: 22px;
       font-weight: 700;
-      color: #2c2c2c;
+      color: var(--admin-accent);
       margin: 0;
     }
 
-    .search-box-sm {
+    .search-box {
       display: flex;
       align-items: center;
-      background: #f8f7f5;
+      background: rgba(255, 255, 255, 0.08);
       border-radius: 40px;
       padding: 8px 18px;
-      gap: 8px;
-      border: 1px solid #e2dbd3;
+      gap: 10px;
+      border: 1px solid rgba(230, 199, 156, 0.2);
     }
 
-    .search-box-sm i {
-      color: var(--admin-primary);
+    .search-box i {
+      color: var(--admin-accent);
     }
 
-    .search-box-sm input {
-      border: none;
+    .search-box input {
       background: transparent;
+      border: none;
+      color: white;
       font-size: 14px;
-      width: 200px;
+      width: 220px;
       font-family: 'Montserrat', sans-serif;
       outline: none;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
     }
 
     .admin-table {
@@ -213,17 +218,19 @@
       border-collapse: collapse;
     }
 
-    .admin-table th, .admin-table td {
+    .admin-table th,
+    .admin-table td {
       padding: 16px 20px;
       text-align: left;
-      border-bottom: 1px solid #f1ede8;
+      border-bottom: 1px solid rgba(230, 199, 156, 0.08);
       vertical-align: middle;
+      color: #e0e0e0;
     }
 
     .admin-table th {
-      background: #fbf9f7;
+      background: rgba(122, 0, 38, 0.3);
       font-weight: 600;
-      color: #3a2c2a;
+      color: var(--admin-accent);
       font-size: 13px;
       letter-spacing: 0.5px;
     }
@@ -236,93 +243,159 @@
       font-weight: 600;
     }
 
-    .badge-admin { background: #6b0d2b20; color: #6b0d2b; }
-    .badge-verified { background: #2e7d3220; color: #2e7d32; }
-    .badge-pending { background: #f5a62320; color: #b85c00; }
-    .badge-confirmed { background: #1e6b0d20; color: #1e6b0d; }
-    .badge-cancelled { background: #d32f2f20; color: #b71c1c; }
+    .badge-admin { background: rgba(230, 199, 156, 0.2); color: var(--admin-accent); }
+    .badge-verified { background: rgba(46, 125, 50, 0.2); color: #4caf50; }
+    .badge-pending { background: rgba(245, 166, 35, 0.2); color: #ffb74d; }
+    .badge-confirmed { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+    .badge-cancelled { background: rgba(244, 67, 54, 0.2); color: #ef5350; }
 
     .action-btn {
       background: none;
       border: none;
       cursor: pointer;
       font-size: 18px;
-      margin: 0 5px;
+      margin: 0 6px;
       transition: 0.2s;
-      color: #7f8c8d;
+      color: rgba(255, 255, 255, 0.6);
     }
-    .action-btn:hover { color: var(--admin-primary); transform: scale(1.1);}
-    .btn-sm {
-      background: var(--admin-primary);
+
+    .action-btn:hover {
+      color: var(--admin-accent);
+      transform: scale(1.1);
+    }
+
+    .status-select {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(230, 199, 156, 0.3);
+      border-radius: 20px;
+      padding: 6px 12px;
       color: white;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 30px;
       font-size: 12px;
-      font-weight: 500;
       cursor: pointer;
-      transition: 0.2s;
-    }
-    .btn-sm:hover {
-      background: #8a1e3d;
-    }
-
-    /* Loading/Empty */
-    .loading-row {
-      text-align: center;
-      padding: 40px;
-      color: #aaa;
-    }
-
-    /* welcome toast style (inline) */
-    .welcome-toast-admin {
-      position: fixed;
-      top: 100px;
-      right: 20px;
-      background: linear-gradient(135deg, #6b0d2b 0%, #8a1e3d 100%);
-      color: white;
-      padding: 18px 28px;
-      border-radius: 14px;
-      z-index: 10001;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      animation: slideInRight 0.4s ease;
       font-family: 'Montserrat', sans-serif;
     }
 
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+    .status-select option {
+      background: #1e1e1e;
+      color: white;
     }
 
-    /* Admin-specific status message */
-    .admin-status-banner {
-      background: #e8f0fe;
-      border-left: 4px solid #6b0d2b;
-      padding: 12px 20px;
-      margin-bottom: 24px;
-      border-radius: 12px;
+    .loading-state, .empty-state {
+      text-align: center;
+      padding: 60px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(230, 199, 156, 0.2);
+      border-top-color: var(--admin-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Welcome Card */
+    .welcome-card {
+      background: linear-gradient(135deg, var(--admin-primary) 0%, #5a001c 100%);
+      border-radius: 24px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      color: #2c3e50;
+      gap: 20px;
+      flex-wrap: wrap;
     }
 
+    .welcome-avatar {
+      width: 70px;
+      height: 70px;
+      background: var(--admin-accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .welcome-avatar i {
+      font-size: 36px;
+      color: var(--admin-primary);
+    }
+
+    .welcome-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: var(--admin-accent);
+      margin-bottom: 6px;
+    }
+
+    .welcome-text p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+    }
+
+    /* Quick Actions Grid - exactly like Flutter */
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .quick-action-card {
+      background: var(--admin-card-bg);
+      border-radius: 16px;
+      padding: 20px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid rgba(230, 199, 156, 0.1);
+    }
+
+    .quick-action-card:hover {
+      transform: translateY(-4px);
+      background: rgba(122, 0, 38, 0.3);
+      border-color: var(--admin-accent);
+    }
+
+    .quick-action-card i {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .quick-action-card span {
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .section-title {
+      color: var(--admin-accent);
+      font-size: 20px;
+      font-weight: bold;
+      margin: 24px 0 16px;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-      .admin-dashboard-wrapper { padding: 0 16px; margin-top: 20px; }
-      .admin-table th, .admin-table td { padding: 12px; font-size: 13px; }
+      .admin-dashboard { padding: 0 16px; margin-top: 20px; }
+      .admin-table th, .admin-table td { padding: 12px; font-size: 12px; }
       .stat-value { font-size: 28px; }
-      .search-box-sm input { width: 140px; }
-      .admin-tab-btn { padding: 8px 16px; font-size: 13px; }
+      .admin-tab-btn { padding: 8px 16px; font-size: 12px; }
+      .admin-tab-btn i { font-size: 14px; }
+      .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-  <!-- ========== TOPBAR (admin only - customer nav removed) ========== -->
+  <!-- TOPBAR (Admin version - no customer nav) -->
   <div class="topbar-top">
     <div class="topbar-top-inner"></div>
   </div>
@@ -333,62 +406,71 @@
           <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
         </a>
       </div>
-      
-      <!-- Customer navigation REMOVED as requested - admin panel only -->
-      
       <div class="top-icons">
         <a href="../cart/cart.html" class="icon cart-icon">
           <i class="fas fa-shopping-cart"></i>
           <span class="cart-badge" style="display: none;">0</span>
         </a>
-        <a href="../user/profile.html" class="icon" id="userIcon">
-          <i class="fas fa-user-check" id="userIconElement" style="color:#6b0d2b;"></i>
+        <a href="#" class="icon" id="userIcon">
+          <i class="fas fa-user-check" style="color:#E6C79C;"></i>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- ========== ADMIN DASHBOARD CONTENT ========== -->
-  <div class="admin-dashboard-wrapper">
-    <!-- Admin context hint -->
-    <div class="admin-status-banner">
-      <i class="fas fa-shield-alt" style="color:#6b0d2b; font-size: 20px;"></i>
-      <span><strong>Admin Control Panel</strong> — You have full access to users, bookings, and system management.</span>
-    </div>
-
-    <!-- Welcome row + stats -->
-    <div id="dashboardOverview">
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="totalUsers">-</div><div class="stat-label">Total Users</div></div>
-        <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-shield"></i></div><div class="stat-value" id="adminUsers">-</div><div class="stat-label">Admin Users</div></div>
-        <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="verifiedUsers">-</div><div class="stat-label">Verified Users</div></div>
-        <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-value" id="totalBookings">-</div><div class="stat-label">Total Bookings</div></div>
+  <!-- Admin Dashboard Content -->
+  <div class="admin-dashboard">
+    <!-- Welcome Card -->
+    <div class="welcome-card" id="welcomeCard">
+      <div class="welcome-avatar">
+        <i class="fas fa-user-shield"></i>
+      </div>
+      <div class="welcome-text">
+        <h2 id="welcomeTitle">Welcome, Admin!</h2>
+        <p>Manage users, bookings, deliveries, drivers and monitor system activity</p>
       </div>
     </div>
 
-    <!-- Admin Tabs (mirror app structure) -->
+    <!-- Stats Grid -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="totalUsers">—</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-shield"></i></div><div class="stat-value" id="adminUsers">—</div><div class="stat-label">Admin Users</div></div>
+      <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="verifiedUsers">—</div><div class="stat-label">Verified Users</div></div>
+      <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-value" id="totalBookings">—</div><div class="stat-label">Total Bookings</div></div>
+    </div>
+
+    <!-- Admin Tabs (Bottom Navigation style) -->
     <div class="admin-tabs">
-      <button class="admin-tab-btn active" data-tab="users"><i class="fas fa-users"></i> Users</button>
+      <button class="admin-tab-btn active" data-tab="overview"><i class="fas fa-chart-line"></i> Overview</button>
+      <button class="admin-tab-btn" data-tab="users"><i class="fas fa-users"></i> Users</button>
       <button class="admin-tab-btn" data-tab="bookings"><i class="fas fa-calendar-alt"></i> Bookings</button>
       <button class="admin-tab-btn" data-tab="deliveries"><i class="fas fa-truck"></i> Deliveries</button>
       <button class="admin-tab-btn" data-tab="drivers"><i class="fas fa-id-card"></i> Drivers</button>
-      <button class="admin-tab-btn" data-tab="wines"><i class="fas fa-wine-bottle"></i> Wine Mgmt</button>
+    </div>
+
+    <!-- Overview Pane -->
+    <div id="overviewPane" class="admin-tab-pane active-pane">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3><i class="fas fa-rocket"></i> Quick Actions</h3>
+        </div>
+        <div style="padding: 20px 28px 28px;">
+          <div class="quick-actions-grid" id="quickActionsGrid"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Users Pane -->
-    <div id="usersPane" class="admin-tab-pane active-pane">
+    <div id="usersPane" class="admin-tab-pane">
       <div class="admin-card">
         <div class="admin-card-header">
           <h3><i class="fas fa-user-edit"></i> System Users</h3>
-          <div class="search-box-sm"><i class="fas fa-search"></i><input type="text" id="userSearch" placeholder="Search users..."></div>
+          <div class="search-box"><i class="fas fa-search"></i><input type="text" id="userSearch" placeholder="Search users..."></div>
         </div>
         <div style="overflow-x: auto;">
-          <table class="admin-table" id="usersTable">
-            <thead>
-              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Verified</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="usersTableBody"><tr><td colspan="6" class="loading-row"><i class="fas fa-spinner fa-pulse"></i> Loading users...</td></tr>
-            </tbody>
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Verified</th><th>Actions</th></tr></thead>
+            <tbody id="usersTableBody"><tr><td colspan="6" class="loading-state"><div class="loading-spinner"></div>Loading users...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -399,164 +481,147 @@
       <div class="admin-card">
         <div class="admin-card-header">
           <h3><i class="fas fa-calendar-week"></i> Booking Requests</h3>
-          <div class="search-box-sm"><i class="fas fa-search"></i><input type="text" id="bookingSearch" placeholder="Search by user or event"></div>
+          <div class="search-box"><i class="fas fa-search"></i><input type="text" id="bookingSearch" placeholder="Search by user or event"></div>
         </div>
         <div style="overflow-x: auto;">
           <table class="admin-table">
             <thead><tr><th>ID</th><th>Customer</th><th>Event Type</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="bookingsTableBody"><tr><td colspan="6" class="loading-row">Loading bookings...</td></tr></tbody>
+            <tbody id="bookingsTableBody"><tr><td colspan="6" class="loading-state"><div class="loading-spinner"></div>Loading bookings...</td></tr></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- Deliveries & Drivers panes (quick overview) -->
+    <!-- Deliveries Pane -->
     <div id="deliveriesPane" class="admin-tab-pane">
       <div class="admin-card">
-        <div class="admin-card-header"><h3><i class="fas fa-shipping-fast"></i> Active Deliveries</h3></div>
-        <div style="padding: 40px; text-align: center;">
-          <i class="fas fa-truck fa-4x" style="color:#6b0d2b; opacity:0.5; margin-bottom: 16px; display: block;"></i>
-          <p style="margin-bottom: 20px; color: #5a5a5a;">Delivery management module — assign drivers, track orders in real time.</p>
-          <button class="btn-sm" onclick="showComingSoon()"><i class="fas fa-plus-circle"></i> Manage Deliveries</button>
-        </div>
+        <div class="admin-card-header"><h3><i class="fas fa-truck"></i> Delivery Management</h3></div>
+        <div class="loading-state"><i class="fas fa-truck fa-3x" style="margin-bottom: 16px; opacity: 0.5;"></i><p>Delivery module ready. Full tracking coming soon.</p></div>
       </div>
     </div>
+
+    <!-- Drivers Pane -->
     <div id="driversPane" class="admin-tab-pane">
       <div class="admin-card">
         <div class="admin-card-header"><h3><i class="fas fa-id-card"></i> Driver Accounts</h3></div>
-        <div style="padding: 40px; text-align: center;">
-          <i class="fas fa-users fa-4x" style="color:#6b0d2b; opacity:0.5;"></i>
-          <p style="margin: 16px 0; color: #5a5a5a;">Driver verification, document management, and assignment panel.</p>
-          <button class="btn-sm" onclick="showComingSoon()"><i class="fas fa-user-plus"></i> Manage Drivers</button>
-        </div>
-      </div>
-    </div>
-    <div id="winesPane" class="admin-tab-pane">
-      <div class="admin-card">
-        <div class="admin-card-header"><h3><i class="fas fa-wine-bottle"></i> Wine Inventory Control</h3></div>
-        <div style="padding: 40px; text-align: center;">
-          <i class="fas fa-wine-bottle fa-4x" style="color:#6b0d2b; margin-bottom: 16px;"></i>
-          <p style="margin-bottom: 20px;">Manage wine catalog, pricing, stock levels, and featured items.</p>
-          <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-            <a href="../wine/all_wines.html" class="btn-sm" style="background:#6b0d2b; text-decoration:none; display:inline-block;">Browse All Wines</a>
-            <button class="btn-sm" onclick="showComingSoon()"><i class="fas fa-plus"></i> Add New Wine</button>
-            <button class="btn-sm" onclick="showComingSoon()"><i class="fas fa-tags"></i> Manage Categories</button>
-          </div>
-        </div>
+        <div class="loading-state"><i class="fas fa-users fa-3x" style="margin-bottom: 16px; opacity: 0.5;"></i><p>Driver verification panel — coming soon.</p></div>
       </div>
     </div>
   </div>
 
-  <!-- Footer (consistent with website) -->
+  <!-- Footer -->
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
         <img src="../assets/categories/Logo_Botttom.png" alt="Wine & Bubbles Logo" class="footer-logo">
-        <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
-        <p class="brand-description">Admin dashboard — complete control over platform operations.</p>
+        <p class="brand-tagline">Admin Dashboard — Complete Control</p>
         <div class="socials"><a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-icon"><i class="fab fa-instagram"></i></a></div>
       </div>
-      <div class="footer-links-grid">
-        <div class="footer-links-column">
-          <h4 class="footer-heading">Admin Tools</h4>
-          <ul class="footer-links">
-            <li><a href="#" onclick="switchTab('users');return false;">User Management</a></li>
-            <li><a href="#" onclick="switchTab('bookings');return false;">Booking Console</a></li>
-            <li><a href="#" onclick="switchTab('deliveries');return false;">Delivery Hub</a></li>
-            <li><a href="#" onclick="switchTab('wines');return false;">Wine Catalog</a></li>
-          </ul>
-        </div>
-        <div class="footer-links-column">
-          <h4 class="footer-heading">Support</h4>
-          <ul class="footer-links">
-            <li><a href="/contact_us.html">Contact Support</a></li>
-            <li><a href="/faq.html">Admin FAQ</a></li>
-            <li><a href="/terms_conditions.html">Terms</a></li>
-          </ul>
-        </div>
-      </div>
+      <div class="footer-links-grid"><div class="footer-links-column"><h4 class="footer-heading">Admin Tools</h4><ul class="footer-links"><li><a href="#" onclick="switchTab('users');return false;">User Management</a></li><li><a href="#" onclick="switchTab('bookings');return false;">Booking Console</a></li></ul></div></div>
     </div>
   </footer>
 
+  <script src="../cart/cart-utils.js"></script>
   <script>
-    // ---------- GLOBALS ----------
-    const API_BASE = window.location.origin;   // production or local
+    const API_BASE = window.location.origin;
     let currentUsers = [];
     let currentBookings = [];
 
-    // Helper to switch tabs programmatically
+    // Quick Actions mapping (exactly like Flutter app)
+    const quickActions = [
+      { title: 'Manage Users', icon: 'fa-users', color: '#E6C79C', action: () => switchTab('users') },
+      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#4caf50', action: () => switchTab('bookings') },
+      { title: 'Manage Deliveries', icon: 'fa-truck', color: '#ff9800', action: () => switchTab('deliveries') },
+      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#E6C79C', action: () => switchTab('drivers') },
+      { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#E6C79C', action: () => window.location.href = '../wine/all_wines.html' },
+      { title: 'Manage Add-Ons', icon: 'fa-gift', color: '#9c27b0', action: () => showComingSoon() },
+      { title: 'Manage Adverts', icon: 'fa-bullhorn', color: '#673ab7', action: () => showComingSoon() },
+      { title: 'Warehouse', icon: 'fa-warehouse', color: '#795548', action: () => showComingSoon() }
+    ];
+
+    function renderQuickActions() {
+      const container = document.getElementById('quickActionsGrid');
+      if (!container) return;
+      container.innerHTML = quickActions.map(action => `
+        <div class="quick-action-card" onclick="(${action.action.toString()})()">
+          <i class="fas ${action.icon}" style="color: ${action.color}"></i>
+          <span>${action.title}</span>
+        </div>
+      `).join('');
+    }
+
+    function showComingSoon() {
+      alert('Feature coming soon! 🚀');
+    }
+
+    // Tab switching
     window.switchTab = function(tabId) {
-      const btns = document.querySelectorAll('.admin-tab-btn');
-      const panes = document.querySelectorAll('.admin-tab-pane');
-      btns.forEach(btn => {
-        if(btn.dataset.tab === tabId) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-      panes.forEach(pane => pane.classList.remove('active-pane'));
+      document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-pane').forEach(pane => pane.classList.remove('active-pane'));
+      document.querySelector(`.admin-tab-btn[data-tab="${tabId}"]`).classList.add('active');
       document.getElementById(`${tabId}Pane`).classList.add('active-pane');
-      if(tabId === 'users') renderUsersTable(currentUsers);
-      if(tabId === 'bookings') renderBookingsTable(currentBookings);
+      if (tabId === 'users') renderUsersTable(currentUsers);
+      if (tabId === 'bookings') renderBookingsTable(currentBookings);
     };
 
-    // Authentication check: only admin can view
-    function checkAdminAndRedirect() {
+    // Auth & redirect
+    function checkAdminAuth() {
       const token = localStorage.getItem('wineBubbles_token');
       const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
       const userData = localStorage.getItem('wineBubbles_user');
+      
       if (!token || !isAdmin) {
-        alert("Access denied. Admin privileges required.");
-        window.location.href = "../index.html";
+        alert('Access denied. Admin privileges required.');
+        window.location.href = '../login/login.html';
         return false;
       }
-      // show welcome toast for admin
+      
       if (userData) {
         try {
           const user = JSON.parse(userData);
-          showAdminWelcomeToast(user.fullName || "Admin");
+          document.getElementById('welcomeTitle').innerHTML = `Welcome, ${user.fullName?.split(' ')[0] || 'Admin'}!`;
         } catch(e) {}
       }
       return true;
     }
 
-    function showAdminWelcomeToast(name) {
-      const toastDiv = document.createElement('div');
-      toastDiv.className = 'welcome-toast-admin';
-      toastDiv.innerHTML = `<i class="fas fa-crown" style="font-size:26px;"></i><div><strong style="font-size:18px;">Welcome ${name}</strong><br/><span style="font-size:13px;">Admin Dashboard ready</span></div><i class="fas fa-times-circle" style="cursor:pointer; margin-left:12px;" onclick="this.parentElement.remove()"></i>`;
-      document.body.appendChild(toastDiv);
-      setTimeout(() => { if(toastDiv) toastDiv.remove(); }, 4500);
-    }
-
-    // Fetch users from backend (GET /api/users)
+    // API Calls
     async function fetchUsers() {
       try {
         const token = localStorage.getItem('wineBubbles_token');
         const res = await fetch(`${API_BASE}/api/users`, {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
-        if (!res.ok) throw new Error('Failed to fetch users');
+        if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         currentUsers = Array.isArray(data) ? data : (data.users || []);
         renderUsersTable(currentUsers);
         updateStats(currentUsers);
       } catch (err) {
-        console.error(err);
-        // fallback demo data to show layout
-        currentUsers = demoUsers();
-        renderUsersTable(currentUsers);
-        updateStats(currentUsers);
+        console.error('Error loading users:', err);
+        document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-state">Failed to load users. Please refresh.</td></tr>';
+        currentUsers = [];
+        updateStats([]);
       }
     }
 
-    function demoUsers() {
-      return [
-        { id:1, fullName:"Jane Cooper", email:"jane@example.com", phoneNumber:"+27 11 234 5678", isAdmin:true, isVerified:true, isDriver:false },
-        { id:2, fullName:"John Doe", email:"john@wine.com", phoneNumber:"+27 82 123 4567", isAdmin:false, isVerified:true, isDriver:false },
-        { id:3, fullName:"Driver Mike", email:"mike@drive.com", phoneNumber:"+27 71 234 5678", isAdmin:false, isVerified:true, isDriver:true },
-        { id:4, fullName:"Sarah Williams", email:"sarah@winebubbles.com", phoneNumber:"+27 83 456 7890", isAdmin:false, isVerified:false, isDriver:false }
-      ];
+    async function fetchBookings() {
+      try {
+        const token = localStorage.getItem('wineBubbles_token');
+        const res = await fetch(`${API_BASE}/api/bookings`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        currentBookings = Array.isArray(data) ? data : (data.bookings || []);
+        renderBookingsTable(currentBookings);
+        document.getElementById('totalBookings').innerText = currentBookings.length;
+      } catch (err) {
+        console.error('Error loading bookings:', err);
+        currentBookings = [];
+        document.getElementById('totalBookings').innerText = '0';
+        renderBookingsTable([]);
+      }
     }
 
     function updateStats(users) {
@@ -568,209 +633,150 @@
       document.getElementById('verifiedUsers').innerText = verified;
     }
 
-    async function fetchBookings() {
-      try {
-        const token = localStorage.getItem('wineBubbles_token');
-        const res = await fetch(`${API_BASE}/api/bookings`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error();
-        let data = await res.json();
-        currentBookings = Array.isArray(data) ? data : (data.bookings || []);
-        renderBookingsTable(currentBookings);
-        document.getElementById('totalBookings').innerText = currentBookings.length;
-      } catch (err) {
-        console.warn("Using fallback bookings");
-        currentBookings = demoBookings();
-        renderBookingsTable(currentBookings);
-        document.getElementById('totalBookings').innerText = currentBookings.length;
-      }
-    }
-
-    function demoBookings() {
-      return [
-        { id:"B1001", userId:2, type:"Wine Tasting", date:"2025-05-15", status:"pending", location:"Johannesburg" },
-        { id:"B1002", userId:1, type:"Private Dinner", date:"2025-05-20", status:"confirmed", location:"Cape Town" },
-        { id:"B1003", userId:3, type:"Corporate Event", date:"2025-06-01", status:"cancelled", location:"Durban" },
-        { id:"B1004", userId:4, type:"Champagne Brunch", date:"2025-05-25", status:"pending", location:"Pretoria" }
-      ];
-    }
-
-    function renderUsersTable(users, searchTerm="") {
+    function renderUsersTable(users, search = '') {
       const tbody = document.getElementById('usersTableBody');
       let filtered = users;
-      if (searchTerm) {
-        filtered = users.filter(u => u.fullName?.toLowerCase().includes(searchTerm) || u.email?.toLowerCase().includes(searchTerm));
-      }
+      if (search) filtered = users.filter(u => (u.fullName || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search));
+      
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="loading-row">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No users found</td></tr>';
         return;
       }
+      
       tbody.innerHTML = filtered.map(user => `
         <tr>
           <td>${escapeHtml(user.fullName || '—')}</td>
           <td>${escapeHtml(user.email)}</td>
           <td>${escapeHtml(user.phoneNumber || '—')}</td>
-          <td>${user.isAdmin ? '<span class="badge badge-admin">Admin</span>' : (user.isDriver ? '<span class="badge" style="background:#d4af3720;color:#7d5d1a;">Driver</span>' : '<span class="badge">User</span>')}</td>
-          <td>${user.isVerified ? '<span class="badge badge-verified">Verified</span>' : '<span class="badge" style="background:#ffc10720;color:#b78103;">Pending</span>'}</td>
+          <td>${user.isAdmin ? '<span class="badge badge-admin">Admin</span>' : (user.isDriver ? '<span class="badge">Driver</span>' : '<span class="badge">User</span>')}</td>
+          <td>${user.isVerified ? '<span class="badge badge-verified">Verified</span>' : '<span class="badge badge-pending">Pending</span>'}</td>
           <td>
-            <button class="action-btn" onclick="toggleAdminStatus(${user.id}, ${!user.isAdmin})" title="Toggle Admin"><i class="fas fa-user-shield"></i></button>
-            <button class="action-btn" onclick="toggleVerifyStatus(${user.id}, ${!user.isVerified})" title="Verify User"><i class="fas fa-check-circle"></i></button>
-            <button class="action-btn" onclick="deleteUserPrompt(${user.id})" style="color:#b33;"><i class="fas fa-trash-alt"></i></button>
+            <button class="action-btn" onclick="toggleAdmin(${user.id}, ${!user.isAdmin})" title="Toggle Admin"><i class="fas fa-user-shield"></i></button>
+            <button class="action-btn" onclick="toggleVerify(${user.id}, ${!user.isVerified})" title="Verify"><i class="fas fa-check-circle"></i></button>
           </td>
         </tr>
       `).join('');
     }
 
-    function renderBookingsTable(bookings, search="") {
+    function renderBookingsTable(bookings, search = '') {
       const tbody = document.getElementById('bookingsTableBody');
       let filtered = bookings;
-      if (search) {
-        filtered = bookings.filter(b => (b.type?.toLowerCase().includes(search) || (b.id?.toLowerCase().includes(search))));
-      }
+      if (search) filtered = bookings.filter(b => (b.type || '').toLowerCase().includes(search) || (b.id || '').toLowerCase().includes(search));
+      
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="loading-row">No bookings</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No bookings found</td></tr>';
         return;
       }
+      
       tbody.innerHTML = filtered.map(b => {
-        let statusClass = '';
-        if (b.status === 'pending') statusClass = 'badge-pending';
-        else if (b.status === 'confirmed') statusClass = 'badge-confirmed';
-        else statusClass = 'badge-cancelled';
-        return `<tr>
-          <td>${escapeHtml(b.id)}</td>
-          <td>${escapeHtml(getUserNameById(b.userId))}</td>
-          <td>${escapeHtml(b.type)}</td>
-          <td>${b.date}</td>
-          <td><span class="badge ${statusClass}">${b.status}</span></td>
-          <td>
-            <select onchange="updateBookingStatus('${b.id}', this.value)" class="btn-sm" style="background:white; color:#6b0d2b; border:1px solid #6b0d2b; margin-right:8px;">
-              <option value="pending" ${b.status==='pending' ? 'selected' : ''}>Pending</option>
-              <option value="confirmed" ${b.status==='confirmed' ? 'selected' : ''}>Confirmed</option>
-              <option value="cancelled" ${b.status==='cancelled' ? 'selected' : ''}>Cancelled</option>
-            </select>
-            <button class="action-btn" onclick="deleteBooking('${b.id}')"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>`;
+        let statusClass = b.status === 'pending' ? 'badge-pending' : (b.status === 'confirmed' ? 'badge-confirmed' : 'badge-cancelled');
+        return `
+          <tr>
+            <td>${escapeHtml(b.id)}</td>
+            <td>${escapeHtml(getUserName(b.userId))}</td>
+            <td>${escapeHtml(b.type)}</td>
+            <td>${b.date || '—'}</td>
+            <td><span class="badge ${statusClass}">${b.status || 'pending'}</span></td>
+            <td>
+              <select class="status-select" onchange="updateBookingStatus('${b.id}', this.value)">
+                <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                <option value="cancelled" ${b.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </td>
+          </tr>
+        `;
       }).join('');
     }
 
-    function getUserNameById(uid) {
-      const user = currentUsers.find(u => u.id == uid);
-      return user ? user.fullName : `User ${uid}`;
+    function getUserName(userId) {
+      const user = currentUsers.find(u => u.id == userId);
+      return user ? user.fullName : `User ${userId}`;
     }
 
-    // Admin actions (simulate API calls with graceful fallback)
-    window.toggleAdminStatus = async (userId, newAdminFlag) => {
+    // Admin Actions
+    window.toggleAdmin = async (userId, isAdmin) => {
       try {
         const token = localStorage.getItem('wineBubbles_token');
         await fetch(`${API_BASE}/api/users/${userId}/admin`, {
           method: 'PATCH',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isAdmin: newAdminFlag })
+          body: JSON.stringify({ isAdmin })
         });
-        showSnackbar(`Admin status updated`, 'success');
         fetchUsers();
+        showToast('Admin status updated', 'success');
       } catch(e) {
-        const userIdx = currentUsers.findIndex(u => u.id == userId);
-        if (userIdx !== -1) currentUsers[userIdx].isAdmin = newAdminFlag;
+        const idx = currentUsers.findIndex(u => u.id == userId);
+        if (idx !== -1) currentUsers[idx].isAdmin = isAdmin;
         renderUsersTable(currentUsers);
         updateStats(currentUsers);
-        showSnackbar(`Admin status updated locally`, 'info');
+        showToast('Updated locally', 'info');
       }
     };
-    window.toggleVerifyStatus = async (userId, verified) => {
+
+    window.toggleVerify = async (userId, isVerified) => {
       try {
         const token = localStorage.getItem('wineBubbles_token');
-        await fetch(`${API_BASE}/api/users/${userId}/verify`, { method: 'PATCH', headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}, body: JSON.stringify({ isVerified: verified }) });
-        fetchUsers();
-      } catch(e) {
-        const userIdx = currentUsers.findIndex(u => u.id == userId);
-        if(userIdx !== -1) currentUsers[userIdx].isVerified = verified;
-        renderUsersTable(currentUsers);
-        showSnackbar("Verification updated", "info");
-      }
-    };
-    window.deleteUserPrompt = (userId) => {
-      if(confirm('Delete user permanently? This action cannot be undone.')) deleteUser(userId);
-    };
-    async function deleteUser(userId){
-      try{
-        const token = localStorage.getItem('wineBubbles_token');
-        await fetch(`${API_BASE}/api/users/${userId}`, { method:'DELETE', headers:{'Authorization':`Bearer ${token}`} });
-        fetchUsers();
-      } catch(e){ 
-        currentUsers = currentUsers.filter(u => u.id != userId);
-        renderUsersTable(currentUsers);
-        updateStats(currentUsers);
-        showSnackbar("User deleted", "success");
-      }
-    }
-    window.updateBookingStatus = async (bookingId, newStatus) => {
-      try{
-        const token = localStorage.getItem('wineBubbles_token');
-        await fetch(`${API_BASE}/api/bookings/${bookingId}`, { method:'PATCH', headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'}, body: JSON.stringify({ status: newStatus }) });
-        fetchBookings();
-        showSnackbar(`Booking ${newStatus}`, 'success');
-      } catch(e){
-        const idx = currentBookings.findIndex(b => b.id == bookingId);
-        if(idx !== -1) currentBookings[idx].status = newStatus;
-        renderBookingsTable(currentBookings);
-        showSnackbar(`Status changed to ${newStatus}`, 'info');
-      }
-    };
-    window.deleteBooking = (bookingId) => {
-      if(confirm('Cancel/delete this booking?')){
-        currentBookings = currentBookings.filter(b => b.id != bookingId);
-        renderBookingsTable(currentBookings);
-        showSnackbar("Booking removed", "success");
-      }
-    };
-    window.showComingSoon = () => showSnackbar("Feature in active development", "info");
-
-    function showSnackbar(msg, type="info") {
-      const snack = document.createElement('div');
-      snack.className = `snackbar show ${type}`;
-      snack.textContent = msg;
-      snack.style.position='fixed'; snack.style.bottom='30px'; snack.style.left='50%'; snack.style.transform='translateX(-50%)';
-      snack.style.backgroundColor='#6b0d2b'; snack.style.color='white'; snack.style.padding='12px 24px'; snack.style.borderRadius='40px'; snack.style.zIndex='10002'; snack.style.fontFamily='Montserrat, sans-serif';
-      if(type==='success') snack.style.backgroundColor='#2e7d32';
-      else if(type==='info') snack.style.backgroundColor='#2c3e50';
-      document.body.appendChild(snack);
-      setTimeout(() => snack.remove(), 2500);
-    }
-
-    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-    // Tab switching + search listeners
-    function initTabs() {
-      const btns = document.querySelectorAll('.admin-tab-btn');
-      const panes = document.querySelectorAll('.admin-tab-pane');
-      btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tabId = btn.dataset.tab;
-          btns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          panes.forEach(pane => pane.classList.remove('active-pane'));
-          document.getElementById(`${tabId}Pane`).classList.add('active-pane');
-          if(tabId === 'users') renderUsersTable(currentUsers);
-          if(tabId === 'bookings') renderBookingsTable(currentBookings);
+        await fetch(`${API_BASE}/api/users/${userId}/verify`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isVerified })
         });
-      });
+        fetchUsers();
+        showToast('Verification updated', 'success');
+      } catch(e) {
+        const idx = currentUsers.findIndex(u => u.id == userId);
+        if (idx !== -1) currentUsers[idx].isVerified = isVerified;
+        renderUsersTable(currentUsers);
+        showToast('Updated locally', 'info');
+      }
+    };
+
+    window.updateBookingStatus = async (bookingId, newStatus) => {
+      try {
+        const token = localStorage.getItem('wineBubbles_token');
+        await fetch(`${API_BASE}/api/bookings/${bookingId}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        fetchBookings();
+        showToast(`Booking ${newStatus}`, 'success');
+      } catch(e) {
+        const idx = currentBookings.findIndex(b => b.id == bookingId);
+        if (idx !== -1) currentBookings[idx].status = newStatus;
+        renderBookingsTable(currentBookings);
+        showToast(`Status changed to ${newStatus}`, 'info');
+      }
+    };
+
+    function showToast(msg, type = 'info') {
+      const toast = document.createElement('div');
+      toast.textContent = msg;
+      toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#7A0026; color:#E6C79C; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px;`;
+      if (type === 'success') toast.style.background = '#2e7d32';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
     }
 
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+    // Search listeners
     document.getElementById('userSearch')?.addEventListener('input', (e) => renderUsersTable(currentUsers, e.target.value.toLowerCase()));
     document.getElementById('bookingSearch')?.addEventListener('input', (e) => renderBookingsTable(currentBookings, e.target.value.toLowerCase()));
 
-    // On load
-    window.addEventListener('DOMContentLoaded', async () => {
-      if (!checkAdminAndRedirect()) return;
-      initTabs();
-      await fetchUsers();
-      await fetchBookings();
-      if(window.CartUtils) window.CartUtils.updateCartBadge();
+    // Tab click handlers
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
+
+    // Initialize
+    if (checkAdminAuth()) {
+      renderQuickActions();
+      fetchUsers();
+      fetchBookings();
+      if (window.CartUtils) window.CartUtils.updateCartBadge();
+    }
   </script>
-  <script src="../cart/cart-utils.js"></script>
 </body>
 </html>
