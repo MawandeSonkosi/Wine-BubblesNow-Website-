@@ -1,8 +1,7 @@
-// User Edit JavaScript - Matches Flutter UserEditScreen functionality
+// User Edit JavaScript - Works with backend API
 
 const API_BASE = window.location.origin;
 let userId = null;
-let isLoading = false;
 
 // Get user ID from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -93,6 +92,7 @@ async function loadUserData() {
         const data = await response.json();
         console.log('📦 User data:', data);
         
+        // BACKEND RETURNS: { success: true, data: user }
         const user = data.data || data;
         
         fullNameInput.value = user.fullName || '';

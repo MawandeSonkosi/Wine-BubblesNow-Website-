@@ -1,4 +1,4 @@
-// User Management JavaScript - Matches Flutter app API response structure
+// User Management JavaScript - Properly handles backend API response
 
 const API_BASE = window.location.origin;
 let allUsers = [];
@@ -72,7 +72,7 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
-// ========== FETCH USERS - MATCHES FLUTTER APP ==========
+// ========== FETCH USERS - CORRECTLY HANDLES BACKEND RESPONSE ==========
 async function fetchUsers() {
     const container = document.getElementById('usersContainer');
     container.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Loading users...</p></div>';
@@ -104,16 +104,13 @@ async function fetchUsers() {
         const data = await response.json();
         console.log('📦 Response data:', data);
         
-        // MATCHES FLUTTER APP: expects { success: true, data: [...] }
+        // BACKEND RETURNS: { success: true, data: [...users], pagination: {...} }
         if (data.success === true && Array.isArray(data.data)) {
             allUsers = data.data;
             console.log(`✅ Loaded ${allUsers.length} users from data.data`);
         } else if (Array.isArray(data)) {
             allUsers = data;
             console.log(`✅ Loaded ${allUsers.length} users from direct array`);
-        } else if (data.users && Array.isArray(data.users)) {
-            allUsers = data.users;
-            console.log(`✅ Loaded ${allUsers.length} users from data.users`);
         } else {
             console.warn('Unexpected data format:', data);
             allUsers = [];
@@ -136,6 +133,12 @@ async function fetchUsers() {
 // ========== RENDER USERS ==========
 function renderUsers() {
     const container = document.getElementById('usersContainer');
+    
+    if (!allUsers || allUsers.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-users-slash" style="font-size:48px; margin-bottom:16px;"></i><p>No users found in database</p></div>`;
+        return;
+    }
+    
     let filtered = allUsers.filter(user => {
         if (!searchQuery) return true;
         const q = searchQuery.toLowerCase();
@@ -148,7 +151,7 @@ function renderUsers() {
     filtered.sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
     
     if (!filtered.length) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-users-slash" style="font-size:48px; margin-bottom:16px;"></i><p>No users found${searchQuery ? ' matching your search' : ''}</p></div>`;
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-search" style="font-size:48px; margin-bottom:16px;"></i><p>No users match "${searchQuery}"</p></div>`;
         return;
     }
     
@@ -229,7 +232,7 @@ async function viewUserDetails(userId) {
         });
         if (!response.ok) throw new Error('Failed to load user details');
         const data = await response.json();
-        // Handle both { success: true, data: user } and direct user object
+        // BACKEND RETURNS: { success: true, data: user }
         const user = data.data || data;
         
         showModal(`
@@ -242,6 +245,7 @@ async function viewUserDetails(userId) {
             <div class="detail-row"><div class="detail-label">User ID:</div><div class="detail-value"><code>${user.id}</code></div></div>
             <div class="detail-row"><div class="detail-label">Joined:</div><div class="detail-value">${formatDate(user.createdAt)}</div></div>
             <div class="detail-row"><div class="detail-label">Loyalty Points:</div><div class="detail-value">${user.loyaltyPoints || 0}</div></div>
+            <div class="detail-row"><div class="detail-label">Bookings:</div><div class="detail-value">${user.bookings?.length || 0}</div></div>
             <div style="display:flex; gap:12px; margin-top:24px;">
                 <button class="btn-primary" onclick="closeModal(); editUser('${userId}')" style="flex:1;"><i class="fas fa-edit"></i> Edit User</button>
                 <button onclick="closeModal()" style="background:#f0f0f0; border:none; padding:12px 20px; border-radius:40px; cursor:pointer;">Close</button>
