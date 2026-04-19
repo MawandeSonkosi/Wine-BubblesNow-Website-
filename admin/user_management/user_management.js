@@ -1,4 +1,4 @@
-// User Management JavaScript - Matches Flutter functionality
+// User Management JavaScript - Matches Flutter app API response structure
 
 const API_BASE = window.location.origin;
 let allUsers = [];
@@ -72,7 +72,7 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
-// ========== FETCH USERS ==========
+// ========== FETCH USERS - MATCHES FLUTTER APP ==========
 async function fetchUsers() {
     const container = document.getElementById('usersContainer');
     container.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Loading users...</p></div>';
@@ -104,18 +104,21 @@ async function fetchUsers() {
         const data = await response.json();
         console.log('📦 Response data:', data);
         
-        // Handle different API response structures
-        if (data.success === true) {
-            allUsers = data.data || [];
+        // MATCHES FLUTTER APP: expects { success: true, data: [...] }
+        if (data.success === true && Array.isArray(data.data)) {
+            allUsers = data.data;
+            console.log(`✅ Loaded ${allUsers.length} users from data.data`);
         } else if (Array.isArray(data)) {
             allUsers = data;
-        } else if (data.users) {
+            console.log(`✅ Loaded ${allUsers.length} users from direct array`);
+        } else if (data.users && Array.isArray(data.users)) {
             allUsers = data.users;
+            console.log(`✅ Loaded ${allUsers.length} users from data.users`);
         } else {
+            console.warn('Unexpected data format:', data);
             allUsers = [];
         }
         
-        console.log(`✅ Loaded ${allUsers.length} users`);
         renderUsers();
         
     } catch (error) {
@@ -226,6 +229,7 @@ async function viewUserDetails(userId) {
         });
         if (!response.ok) throw new Error('Failed to load user details');
         const data = await response.json();
+        // Handle both { success: true, data: user } and direct user object
         const user = data.data || data;
         
         showModal(`
@@ -249,7 +253,11 @@ async function viewUserDetails(userId) {
 }
 
 window.editUser = function(userId) {
-    window.location.href = `user_edit_screen.html?id=${userId}`;
+    if (userId) {
+        window.location.href = `user_edit_screen.html?id=${userId}`;
+    } else {
+        window.location.href = 'user_edit_screen.html';
+    }
 };
 
 window.toggleAdmin = async (userId, newStatus) => {
@@ -271,7 +279,7 @@ window.toggleAdmin = async (userId, newStatus) => {
         }
         
         showToast(`Admin status updated`, 'success');
-        fetchUsers();
+        fetchUsers(); // Refresh the list
     } catch (error) {
         console.error('Toggle admin error:', error);
         showToast(error.message || 'Failed to update admin status', 'error');
@@ -297,7 +305,7 @@ window.toggleVerify = async (userId, newStatus) => {
         }
         
         showToast(`User ${newStatus ? 'verified' : 'unverified'}`, 'success');
-        fetchUsers();
+        fetchUsers(); // Refresh the list
     } catch (error) {
         console.error('Toggle verify error:', error);
         showToast(error.message || 'Failed to update verification status', 'error');
@@ -324,7 +332,7 @@ async function deleteUser(userId) {
         }
         
         showToast('User deleted successfully', 'success');
-        fetchUsers();
+        fetchUsers(); // Refresh the list
     } catch (error) {
         console.error('Delete error:', error);
         showToast(error.message || 'Failed to delete user', 'error');
