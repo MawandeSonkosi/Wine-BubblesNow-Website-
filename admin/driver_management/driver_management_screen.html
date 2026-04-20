@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Driver Management | Wine & Bubbles Admin</title>
+  <link rel="icon" type="image/png" href="../../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #d4af37;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-warning: #ed6c02;
+      --admin-error: #d32f2f;
+      --admin-info: #0288d1;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 1400px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
+    .page-header h1 i { color: var(--admin-primary); margin-right: 12px; }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif; font-size: 14px; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(107,13,43,0.2); }
+    
+    .search-bar { background: white; border-radius: 50px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--admin-border); width: 300px; }
+    .search-bar i { color: var(--admin-primary); }
+    .search-bar input { border: none; flex: 1; outline: none; font-size: 14px; background: transparent; font-family: 'Montserrat', sans-serif; }
+    
+    .drivers-grid { display: flex; flex-direction: column; gap: 16px; }
+    .driver-card { background: var(--admin-card); border-radius: 20px; border: 1px solid var(--admin-border); padding: 20px 24px; transition: all 0.2s; }
+    .driver-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .driver-card-main { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .driver-avatar { width: 56px; height: 56px; background: var(--admin-primary); border-radius: 28px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px; font-family: 'Playfair Display', serif; flex-shrink: 0; }
+    .driver-info { flex: 1; }
+    .driver-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+    .driver-name { font-weight: 700; font-size: 18px; color: var(--admin-text); }
+    .driver-status { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .driver-status.active { background: rgba(46,125,50,0.1); color: var(--admin-success); }
+    .driver-status.inactive { background: rgba(109,109,109,0.1); color: var(--admin-muted); }
+    
+    .driver-details { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; color: var(--admin-muted); margin-top: 8px; }
+    .driver-details i { margin-right: 6px; width: 14px; color: var(--admin-primary); }
+    
+    .driver-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .icon-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 8px; border-radius: 40px; transition: 0.2s; color: var(--admin-muted); width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+    .icon-btn:hover { background: rgba(107,13,43,0.1); color: var(--admin-primary); }
+    .icon-btn.danger:hover { background: rgba(211,47,47,0.1); color: var(--admin-error); }
+    
+    .badge-deliveries { background: rgba(107,13,43,0.1); color: var(--admin-primary); padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; border-radius: 24px; max-width: 500px; width: 90%; padding: 28px; max-height: 80vh; overflow-y: auto; }
+    .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid var(--admin-border); }
+    .detail-label { width: 120px; font-weight: 600; color: var(--admin-text); }
+    .detail-value { flex: 1; color: var(--admin-muted); }
+    
+    .switch-group { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f8f7f5; border-radius: 12px; margin: 16px 0; border: 1px solid var(--admin-border); }
+    .switch-label { font-weight: 500; display: flex; align-items: center; gap: 10px; }
+    .switch { position: relative; display: inline-block; width: 52px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 26px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--admin-primary); }
+    input:checked + .slider:before { transform: translateX(26px); }
+    
+    @media (max-width: 768px) { 
+      .admin-container { padding: 0 16px; } 
+      .driver-card-main { flex-direction: column; align-items: flex-start; } 
+      .driver-actions { align-self: flex-end; } 
+      .page-header { flex-direction: column; align-items: stretch; }
+      .search-bar { width: 100%; }
+      .detail-row { flex-direction: column; gap: 4px; }
+      .detail-label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="../admin_dashboard.html"><img src="../../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="page-header">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <a href="../admin_dashboard.html" style="color: var(--admin-primary); text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
+        <h1><i class="fas fa-truck"></i> Driver Management</h1>
+      </div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search drivers..."></div>
+        <button class="btn-primary" id="addDriverBtn"><i class="fas fa-plus"></i> Add Driver</button>
+      </div>
+    </div>
+    
+    <div id="driversContainer" class="drivers-grid"><div class="loading-state"><div class="loading-spinner"></div><p>Loading drivers...</p></div></div>
+  </div>
+
+  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Driver Management</p></div></div></footer>
+
+  <script src="driver_management.js"></script>
+</body>
+</html>
