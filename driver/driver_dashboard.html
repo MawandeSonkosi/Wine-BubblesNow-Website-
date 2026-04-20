@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Driver Dashboard | Wine & Bubbles Now</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --driver-primary: #6b0d2b;
+      --driver-accent: #d4af37;
+      --driver-bg: #faf8f5;
+      --driver-card: #ffffff;
+      --driver-text: #1b1b1b;
+      --driver-muted: #6d6d6d;
+      --driver-border: #eae3da;
+      --driver-success: #2e7d32;
+      --driver-warning: #ed6c02;
+      --driver-error: #d32f2f;
+      --driver-info: #0288d1;
+      --driver-advert: #03a9f4;
+      --driver-food: #ff9800;
+    }
+    body { background: var(--driver-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .driver-container { max-width: 1200px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .driver-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .driver-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--driver-text); margin: 0; }
+    .driver-header h1 i { color: var(--driver-primary); margin-right: 12px; }
+    
+    .btn-icon { background: var(--driver-primary); color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif; font-size: 13px; }
+    .btn-icon:hover { background: #8a1e3d; transform: translateY(-2px); }
+    
+    /* Driver Info Card */
+    .driver-info-card { background: var(--driver-card); border-radius: 24px; border: 1px solid var(--driver-border); padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .driver-avatar { width: 70px; height: 70px; background: var(--driver-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 32px; font-family: 'Playfair Display', serif; }
+    .driver-details { flex: 1; }
+    .driver-name { font-weight: 700; font-size: 20px; color: var(--driver-text); margin-bottom: 4px; }
+    .driver-vehicle { font-size: 14px; color: var(--driver-muted); margin-bottom: 4px; }
+    .driver-phone { font-size: 14px; color: var(--driver-muted); }
+    .driver-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px; }
+    .driver-status.active { background: rgba(46,125,50,0.1); color: var(--driver-success); }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--driver-card); border-radius: 16px; padding: 16px; text-align: center; border: 1px solid var(--driver-border); }
+    .stat-card i { font-size: 28px; color: var(--driver-primary); margin-bottom: 8px; }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--driver-text); }
+    .stat-label { font-size: 12px; color: var(--driver-muted); margin-top: 4px; }
+    
+    /* Filter Tabs */
+    .filter-tabs { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-chip { padding: 8px 20px; border-radius: 40px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid var(--driver-border); color: var(--driver-muted); }
+    .filter-chip:hover { border-color: var(--driver-primary); color: var(--driver-primary); }
+    .filter-chip.active { background: var(--driver-primary); color: white; border-color: var(--driver-primary); }
+    
+    /* Deliveries List */
+    .delivery-card { background: var(--driver-card); border-radius: 20px; border: 1px solid var(--driver-border); margin-bottom: 16px; cursor: pointer; transition: all 0.2s; }
+    .delivery-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .delivery-card-content { padding: 20px; }
+    .delivery-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .delivery-id { font-weight: 700; font-size: 16px; color: var(--driver-text); }
+    .delivery-status { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .delivery-status.order-received { background: rgba(107,13,43,0.1); color: var(--driver-primary); }
+    .delivery-status.processing { background: rgba(237,108,2,0.1); color: var(--driver-warning); }
+    .delivery-status.out-for-delivery { background: rgba(2,136,209,0.1); color: var(--driver-info); }
+    .delivery-status.delivered { background: rgba(46,125,50,0.1); color: var(--driver-success); }
+    .delivery-status.cancelled { background: rgba(211,47,47,0.1); color: var(--driver-error); }
+    
+    .delivery-customer { font-size: 14px; color: var(--driver-muted); margin-bottom: 8px; }
+    .delivery-customer i { margin-right: 6px; width: 16px; color: var(--driver-primary); }
+    .delivery-details { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--driver-muted); margin-bottom: 12px; }
+    .delivery-details i { margin-right: 6px; width: 14px; }
+    
+    .badge-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+    .badge-case { background: rgba(212,175,55,0.1); color: var(--driver-accent); border: 1px solid var(--driver-accent); }
+    .badge-advert { background: rgba(3,169,244,0.1); color: var(--driver-advert); border: 1px solid var(--driver-advert); }
+    .badge-food { background: rgba(255,152,0,0.1); color: var(--driver-food); border: 1px solid var(--driver-food); }
+    
+    .delivery-amount { font-weight: 700; color: var(--driver-primary); margin-top: 8px; text-align: right; }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--driver-muted); background: white; border-radius: 24px; border: 1px solid var(--driver-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--driver-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .refresh-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--driver-primary); padding: 8px; border-radius: 50%; transition: 0.2s; }
+    .refresh-btn:hover { background: rgba(107,13,43,0.1); }
+    
+    @media (max-width: 768px) {
+      .driver-container { padding: 0 16px; }
+      .driver-info-card { flex-direction: column; text-align: center; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .delivery-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .delivery-amount { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="#" id="logoLink"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons">
+        <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i></button>
+        <a href="#" class="icon" id="profileIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="driver-container">
+    <div class="driver-header">
+      <h1><i class="fas fa-truck"></i> Driver Dashboard</h1>
+    </div>
+    
+    <div id="driverInfoCard" class="driver-info-card"><div class="loading-state" style="padding: 20px;"><div class="loading-spinner"></div>Loading driver info...</div></div>
+    
+    <div class="stats-grid" id="statsGrid"><div class="stat-card"><i class="fas fa-spinner fa-pulse"></i><div class="stat-value">—</div><div class="stat-label">Loading...</div></div></div>
+    
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-chip active" data-filter="active">Active Deliveries</button>
+      <button class="filter-chip" data-filter="completed">Completed</button>
+      <button class="filter-chip" data-filter="all">All Orders</button>
+    </div>
+    
+    <div id="deliveriesContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading deliveries...</p></div></div>
+  </div>
+
+  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Driver Dashboard — Deliver with Excellence</p></div></div></footer>
+
+  <script src="driver_dashboard.js"></script>
+</body>
+</html>

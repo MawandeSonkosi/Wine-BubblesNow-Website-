@@ -1,4 +1,4 @@
-// login/login.js - WITH ADMIN REDIRECT FIX
+// login/login.js - WITH DRIVER LOGIN SUPPORT
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
@@ -71,6 +71,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkAuth() {
         const token = localStorage.getItem('wineBubbles_token');
         const userData = localStorage.getItem('wineBubbles_user');
+        const driverToken = localStorage.getItem('driver_auth_token');
+        const driverData = localStorage.getItem('driver_data');
         
         if (token && userData) {
             const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
@@ -79,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const sevenDays = 7 * 24 * 60 * 60 * 1000;
                 
                 if (tokenAge < sevenDays) {
-                    // Already logged in - redirect based on role
                     try {
                         const user = JSON.parse(userData);
                         const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
@@ -96,19 +97,29 @@ document.addEventListener('DOMContentLoaded', function() {
                             window.location.href = '../index.html';
                         }
                         return;
-                    } catch(e) {
-                        console.error('Error parsing user data:', e);
-                    }
-                } else {
-                    // Token expired, clear it
-                    localStorage.removeItem('wineBubbles_token');
-                    localStorage.removeItem('wineBubbles_token_timestamp');
-                    localStorage.removeItem('wineBubbles_user');
-                    localStorage.removeItem('wineBubbles_isAdmin');
-                    localStorage.removeItem('wineBubbles_isDriver');
+                    } catch(e) {}
                 }
             }
         }
+        
+        // Check for driver session
+        if (driverToken && driverData) {
+            try {
+                const driver = JSON.parse(driverData);
+                if (driver.isDriver) {
+                    console.log('✅ Already logged in as Driver (driver session)');
+                    window.location.href = '../driver/driver_dashboard.html';
+                    return;
+                }
+            } catch(e) {}
+        }
+        
+        // Clear expired sessions
+        localStorage.removeItem('wineBubbles_token');
+        localStorage.removeItem('wineBubbles_token_timestamp');
+        localStorage.removeItem('wineBubbles_user');
+        localStorage.removeItem('wineBubbles_isAdmin');
+        localStorage.removeItem('wineBubbles_isDriver');
     }
     
     function validateForm() {
@@ -265,6 +276,101 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
     
+    // ========== DRIVER LOGIN FUNCTION ==========
+    async function driverLogin(email, password) {
+        console.log('🚗 Attempting driver login for:', email);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/drivers/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            console.log(`📡 Driver login response status: ${response.status}`);
+            
+            const data = await response.json();
+            console.log('📦 Driver login response:', data);
+            
+            if (response.ok && data.success === true) {
+                const driver = data.data;
+                const token = data.token;
+                
+                if (driver && token) {
+                    // Store driver session
+                    localStorage.setItem('driver_auth_token', token);
+                    localStorage.setItem('driver_data', JSON.stringify(driver));
+                    localStorage.setItem('driver_token_timestamp', Date.now().toString());
+                    
+                    console.log('✅ Driver login successful:', driver.fullName);
+                    return { success: true, driver: driver };
+                }
+            }
+            
+            return { success: false, error: data.message || 'Driver login failed' };
+            
+        } catch (error) {
+            console.error('Driver login error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+    
+    // ========== REGULAR USER LOGIN ==========
+    async function userLogin(email, password) {
+        console.log('👤 Attempting user login for:', email);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            console.log(`📡 User login response status: ${response.status}`);
+            
+            const data = await response.json();
+            console.log('📦 User login response:', data);
+            
+            if (response.ok) {
+                const user = data.user;
+                const token = data.token;
+                
+                if (user && token) {
+                    // Store user session
+                    localStorage.setItem('wineBubbles_token', token);
+                    localStorage.setItem('wineBubbles_token_timestamp', Date.now().toString());
+                    localStorage.setItem('wineBubbles_user', JSON.stringify(user));
+                    
+                    if (user.fullName) localStorage.setItem('wineBubbles_userFullName', user.fullName);
+                    if (user.email) localStorage.setItem('wineBubbles_userEmail', user.email);
+                    if (user.phoneNumber) localStorage.setItem('wineBubbles_userPhone', user.phoneNumber);
+                    
+                    if (user.isAdmin) localStorage.setItem('wineBubbles_isAdmin', 'true');
+                    if (user.isDriver) localStorage.setItem('wineBubbles_isDriver', 'true');
+                    
+                    console.log('✅ User login successful:', user.fullName);
+                    return { success: true, user: user, isAdmin: user.isAdmin === true, isDriver: user.isDriver === true };
+                }
+            }
+            
+            if (data.needsVerification === true) {
+                return { success: false, needsVerification: true, email: email };
+            }
+            
+            return { success: false, error: data.message || 'Login failed' };
+            
+        } catch (error) {
+            console.error('User login error:', error);
+            return { success: false, error: error.message };
+        }
+    }
+    
     async function login() {
         if (submitBtn) {
             submitBtn.disabled = true;
@@ -276,70 +382,55 @@ document.addEventListener('DOMContentLoaded', function() {
         const password = passwordInput.value.trim();
         
         try {
-            console.log('🔐 Attempting login for:', email);
+            console.log('🔐 Attempting login sequence for:', email);
             
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
+            // FIRST: Try driver login (matches Flutter order)
+            console.log('🚗 Trying driver login...');
+            const driverResult = await driverLogin(email, password);
             
-            console.log(`📡 Response status: ${response.status}`);
-            
-            let data;
-            try {
-                data = await response.json();
-                console.log('📦 Response data:', data);
-            } catch (parseError) {
-                console.error('Failed to parse JSON:', parseError);
-                throw new Error('Invalid server response');
-            }
-            
-            if (response.ok) {
-                console.log('✅ Login successful!');
+            if (driverResult.success && driverResult.driver) {
+                const driver = driverResult.driver;
+                const userName = driver.fullName || email.split('@')[0];
                 
-                // Store user data
-                storeUserData(data);
+                showWelcomeToast(userName, 'driver');
+                showSnackbar('Driver login successful!', 'success');
                 
                 if (rememberMe && rememberMe.checked && email) {
                     localStorage.setItem('wineBubbles_rememberedEmail', email);
                 }
                 
-                const user = data.user;
-                const userName = user ? (user.fullName || user.email.split('@')[0]) : null;
-                const isAdmin = user ? user.isAdmin === true : false;
-                const isDriver = user ? user.isDriver === true : false;
-                
-                // Show appropriate welcome toast
-                if (isAdmin) {
-                    showWelcomeToast(userName, 'admin');
-                } else if (isDriver) {
-                    showWelcomeToast(userName, 'driver');
-                } else {
-                    showWelcomeToast(userName, 'user');
+                setTimeout(() => {
+                    window.location.href = '../driver/driver_dashboard.html';
+                }, 1500);
+                return;
+            }
+            
+            // SECOND: Try regular user login (which includes admin check)
+            console.log('👤 Trying user login...');
+            const userResult = await userLogin(email, password);
+            
+            if (userResult.success) {
+                if (rememberMe && rememberMe.checked && email) {
+                    localStorage.setItem('wineBubbles_rememberedEmail', email);
                 }
                 
-                showSnackbar('Login successful!', 'success');
+                const userName = userResult.user?.fullName || email.split('@')[0];
                 
-                // ========== CRITICAL: REDIRECT BASED ON ROLE ==========
-                // This matches how the Flutter app handles admin login
-                if (isAdmin) {
-                    console.log('🎯 Admin user detected - redirecting to admin dashboard');
+                if (userResult.isAdmin) {
+                    showWelcomeToast(userName, 'admin');
+                    showSnackbar('Admin login successful!', 'success');
                     setTimeout(() => {
                         window.location.href = '../admin/admin_dashboard.html';
                     }, 1500);
-                } 
-                else if (isDriver) {
-                    console.log('🚗 Driver user detected - redirecting to driver dashboard');
+                } else if (userResult.isDriver) {
+                    showWelcomeToast(userName, 'driver');
+                    showSnackbar('Driver login successful!', 'success');
                     setTimeout(() => {
                         window.location.href = '../driver/driver_dashboard.html';
                     }, 1500);
-                } 
-                else {
-                    console.log('👤 Regular user detected - redirecting to home');
+                } else {
+                    showWelcomeToast(userName, 'user');
+                    showSnackbar('Login successful!', 'success');
                     setTimeout(() => {
                         window.location.href = '../index.html?login=success';
                     }, 1500);
@@ -347,11 +438,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            if (data.needsVerification === true) {
-                showVerificationPrompt(email);
-            } else {
-                throw new Error(data.message || 'Login failed');
+            // Handle verification requirement
+            if (userResult.needsVerification) {
+                showVerificationPrompt(userResult.email);
+                return;
             }
+            
+            // All logins failed
+            const errorMsg = driverResult.error || userResult.error || 'Login failed. Please check your credentials.';
+            throw new Error(errorMsg);
             
         } catch (error) {
             console.error('Login error:', error);
@@ -386,7 +481,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (user.email) localStorage.setItem('wineBubbles_userEmail', user.email);
             if (user.phoneNumber) localStorage.setItem('wineBubbles_userPhone', user.phoneNumber);
             
-            // Store role flags - CRITICAL for admin detection
             if (user.isAdmin) {
                 localStorage.setItem('wineBubbles_isAdmin', 'true');
                 console.log('👑 Admin flag saved');
@@ -531,12 +625,14 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => snackbar.classList.remove('show'), 3000);
     }
     
+    // Load remembered email
     const rememberedEmail = localStorage.getItem('wineBubbles_rememberedEmail');
     if (rememberedEmail && emailInput) {
         emailInput.value = rememberedEmail;
         if (rememberMe) rememberMe.checked = true;
     }
     
+    // Auto-focus email field
     if (emailInput && !emailInput.value) {
         setTimeout(() => emailInput.focus(), 300);
     }

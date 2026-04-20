@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Delivery Details | Wine & Bubbles Now</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --driver-primary: #6b0d2b;
+      --driver-accent: #d4af37;
+      --driver-bg: #faf8f5;
+      --driver-card: #ffffff;
+      --driver-text: #1b1b1b;
+      --driver-muted: #6d6d6d;
+      --driver-border: #eae3da;
+      --driver-success: #2e7d32;
+      --driver-warning: #ed6c02;
+      --driver-error: #d32f2f;
+      --driver-info: #0288d1;
+      --driver-advert: #03a9f4;
+      --driver-food: #ff9800;
+    }
+    body { background: var(--driver-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .driver-container { max-width: 800px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .detail-card { background: var(--driver-card); border-radius: 24px; border: 1px solid var(--driver-border); overflow: hidden; margin-bottom: 20px; }
+    .detail-header { background: linear-gradient(135deg, var(--driver-primary) 0%, #8a1e3d 100%); padding: 20px; color: white; }
+    .detail-header h2 { font-family: 'Playfair Display', serif; font-size: 20px; margin: 0; }
+    .detail-section { padding: 20px; border-bottom: 1px solid var(--driver-border); }
+    .detail-section h3 { font-size: 16px; color: var(--driver-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .info-row { display: flex; padding: 8px 0; }
+    .info-label { width: 130px; font-weight: 600; color: var(--driver-text); }
+    .info-value { flex: 1; color: var(--driver-muted); }
+    
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-badge.order-received { background: rgba(107,13,43,0.1); color: var(--driver-primary); }
+    .status-badge.processing { background: rgba(237,108,2,0.1); color: var(--driver-warning); }
+    .status-badge.out-for-delivery { background: rgba(2,136,209,0.1); color: var(--driver-info); }
+    .status-badge.delivered { background: rgba(46,125,50,0.1); color: var(--driver-success); }
+    
+    .item-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--driver-border); }
+    .item-name { flex: 1; font-weight: 500; }
+    .item-qty { width: 80px; text-align: center; }
+    .item-price { width: 100px; text-align: right; }
+    
+    .btn-update { background: var(--driver-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-size: 15px; transition: all 0.2s; }
+    .btn-update:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-update:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary { background: transparent; border: 1px solid var(--driver-border); padding: 12px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 12px; }
+    
+    .badge-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; margin-left: 8px; }
+    .badge-case { background: rgba(212,175,55,0.1); color: var(--driver-accent); border: 1px solid var(--driver-accent); }
+    
+    .loading-state { text-align: center; padding: 60px; }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--driver-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    
+    @media (max-width: 768px) { .info-row { flex-direction: column; gap: 4px; } .info-label { width: auto; } }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="driver_dashboard.html"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="driver_dashboard.html" class="icon"><i class="fas fa-tachometer-alt" style="font-size:22px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="driver-container">
+    <div id="detailContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading delivery details...</p></div></div>
+  </div>
+
+  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Delivery Details</p></div></div></footer>
+
+  <script src="delivery_detail.js"></script>
+</body>
+</html>
