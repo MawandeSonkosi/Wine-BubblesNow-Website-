@@ -50,6 +50,7 @@
 
     .logo {
       flex-shrink: 0;
+      cursor: pointer;
     }
 
     .top-icons {
@@ -480,6 +481,7 @@
       flex-wrap: wrap;
       gap: 12px;
       transition: background 0.2s;
+      cursor: pointer;
     }
 
     .recent-order-item:hover {
@@ -559,10 +561,8 @@
   </div>
   <div class="topbar-main">
     <div class="topbar-main-inner">
-      <div class="logo">
-        <a href="../index.html">
-          <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
-        </a>
+      <div class="logo" id="adminLogo" style="cursor: pointer;">
+        <img src="../assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
       </div>
       <div class="top-icons">
         <!-- Notification Icon -->
@@ -643,6 +643,7 @@
             <li><a href="user_management/user_management_screen.html">User Management</a></li>
             <li><a href="booking_management/booking_management_screen.html">Booking Management</a></li>
             <li><a href="delivery_management/delivery_management_screen.html">Delivery Hub</a></li>
+            <li><a href="driver_management/driver_management_screen.html">Driver Management</a></li>
           </ul>
         </div>
       </div>
@@ -662,7 +663,7 @@
       { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => window.location.href = 'user_management/user_management_screen.html' },
       { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => window.location.href = 'booking_management/booking_management_screen.html' },
       { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => window.location.href = 'delivery_management/delivery_management_screen.html' },
-      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => showComingSoon('Driver Management') },
+      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => window.location.href = 'driver_management/driver_management_screen.html' },
       { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#6b0d2b', action: () => window.location.href = '../wine/all_wines.html' },
       { title: 'Manage Add-Ons', icon: 'fa-gift', color: '#9c27b0', action: () => showComingSoon('Add-Ons Management') },
       { title: 'Manage Wine Farms', icon: 'fa-tree', color: '#8d6e63', action: () => showComingSoon('Wine Farms Management') },
@@ -823,16 +824,17 @@
         return 'Recently';
       }
     }
-  window.markNotificationRead = function(id, link) {
-    // Remove the notification from the array completely
-    const index = notifications.findIndex(n => n.id === id);
-    if (index !== -1) {
+    
+    window.markNotificationRead = function(id, link) {
+      // Remove the notification from the array completely
+      const index = notifications.findIndex(n => n.id === id);
+      if (index !== -1) {
         notifications.splice(index, 1);
-    }
-    updateNotificationBadge();
-    renderNotifications();
-    if (link) window.location.href = link;
-};
+      }
+      updateNotificationBadge();
+      renderNotifications();
+      if (link) window.location.href = link;
+    };
     
     function toggleNotificationDropdown() {
       const dropdown = document.getElementById('notificationDropdown');
@@ -1072,6 +1074,12 @@
       if (!str) return ''; 
       return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
     }
+
+    // Logo click handler - stays on admin dashboard, does NOT go to user homepage
+    document.getElementById('adminLogo')?.addEventListener('click', () => {
+      // Stay on admin dashboard - do nothing or refresh current page
+      window.location.reload();
+    });
 
     // Initialize
     if (checkAdminAuth()) {
