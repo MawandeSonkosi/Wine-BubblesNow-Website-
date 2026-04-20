@@ -1,4 +1,4 @@
-// Driver Dashboard JavaScript - Matches Flutter functionality
+// Driver Dashboard JavaScript - Fixed API endpoints
 
 const API_BASE = window.location.origin;
 let currentDriver = null;
@@ -11,6 +11,8 @@ function checkAuth() {
     const token = localStorage.getItem('driver_auth_token');
     const driverData = localStorage.getItem('driver_data');
     
+    console.log('🔐 Checking driver auth - Token exists:', !!token);
+    
     if (!token || !driverData) {
         alert('Please login as driver to access this page');
         window.location.href = '../login/login.html';
@@ -19,7 +21,7 @@ function checkAuth() {
     
     try {
         currentDriver = JSON.parse(driverData);
-        console.log('✅ Driver authenticated:', currentDriver.fullName);
+        console.log('✅ Driver authenticated:', currentDriver.fullName, 'ID:', currentDriver.id);
         return true;
     } catch(e) {
         console.error('Error parsing driver data:', e);
@@ -38,6 +40,7 @@ async function fetchUsers() {
         if (response.ok) {
             const data = await response.json();
             allUsers = data.data || (Array.isArray(data) ? data : []);
+            console.log('✅ Loaded users:', allUsers.length);
         }
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -49,7 +52,7 @@ function getUserName(userId) {
     return user ? user.fullName : 'Customer';
 }
 
-// ========== FETCH DRIVER DELIVERIES ==========
+// ========== FETCH DELIVERIES ASSIGNED TO DRIVER ==========
 async function fetchDeliveries() {
     if (!currentDriver) return;
     
@@ -58,16 +61,50 @@ async function fetchDeliveries() {
     
     try {
         const token = localStorage.getItem('driver_auth_token');
-        const response = await fetch(`${API_BASE}/api/deliveries/driver/${currentDriver.id}`, {
+        
+        // First, get all deliveries from admin endpoint
+        console.log('📡 Fetching all deliveries from admin endpoint...');
+        const response = await fetch(`${API_BASE}/api/deliveries/admin/all?limit=1000`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) throw new Error('Failed to fetch deliveries');
+        if (!response.ok) {
+            console.error('Failed to fetch deliveries, status:', response.status);
+            throw new Error(`HTTP ${response.status}`);
+        }
         
         const data = await response.json();
-        allDeliveries = data.data || (Array.isArray(data) ? data : []);
+        console.log('📦 Deliveries response:', data);
         
-        console.log(`✅ Loaded ${allDeliveries.length} deliveries for driver ${currentDriver.fullName}`);
+        // Get deliveries array from response
+        let allDeliveriesData = [];
+        if (data.success && Array.isArray(data.data)) {
+            allDeliveriesData = data.data;
+        } else if (Array.isArray(data)) {
+            allDeliveriesData = data;
+        } else if (data.deliveries && Array.isArray(data.deliveries)) {
+            allDeliveriesData = data.deliveries;
+        }
+        
+        console.log(`📦 Found ${allDeliveriesData.length} total deliveries`);
+        
+        // Filter deliveries assigned to this driver
+        // The driverId can be stored as driver.id (number) or as string
+        allDeliveries = allDeliveriesData.filter(delivery => {
+            // Check if delivery is assigned to this driver
+            const deliveryDriverId = delivery.driverId;
+            const currentDriverId = currentDriver.id;
+            
+            // Compare as numbers or strings
+            const isAssigned = deliveryDriverId == currentDriverId;
+            if (isAssigned) {
+                console.log(`✅ Delivery ${delivery._id} assigned to driver ${currentDriverId}`);
+            }
+            return isAssigned;
+        });
+        
+        console.log(`✅ Loaded ${allDeliveries.length} deliveries assigned to driver ${currentDriver.fullName}`);
+        
         renderDriverInfo();
         updateStats();
         renderDeliveries();
@@ -249,5 +286,6 @@ document.querySelectorAll('.filter-chip').forEach(chip => {
 });
 
 if (checkAuth()) {
+    console.log('🚗 Starting driver dashboard for:', currentDriver?.fullName, 'ID:', currentDriver?.id);
     fetchUsers().then(() => fetchDeliveries());
 }
