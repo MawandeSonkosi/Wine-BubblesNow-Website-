@@ -1,4 +1,4 @@
-// Delivery Edit JavaScript - Matches Flutter DeliveryEditScreen functionality
+// Delivery Edit JavaScript - Matches Flutter DeliveryEditScreen functionality with driver assignment
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -43,27 +43,33 @@ async function fetchUsers() {
 async function fetchDrivers() {
     try {
         const token = localStorage.getItem('wineBubbles_token');
-        // Fetch all users and filter for drivers
-        const response = await fetch(`${API_BASE}/api/users?limit=1000`, {
+        // Fetch drivers from the drivers API endpoint
+        const response = await fetch(`${API_BASE}/api/drivers?limit=1000`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        
         if (response.ok) {
             const data = await response.json();
-            const users = data.data || (Array.isArray(data) ? data : []);
-            // Filter users where isDriver is true
-            allDrivers = users.filter(user => user.isDriver === true);
-            console.log('✅ Loaded drivers:', allDrivers.length);
+            // Handle { success: true, data: [...] } format
+            const drivers = data.data || (Array.isArray(data) ? data : []);
+            // Filter only active drivers (isDriver === true)
+            allDrivers = drivers.filter(driver => driver.isDriver === true);
+            console.log('✅ Loaded drivers from /api/drivers:', allDrivers.length);
             
-            // Log driver details for debugging
             allDrivers.forEach(driver => {
-                console.log(`  Driver: ${driver.fullName} (ID: ${driver.id})`);
+                console.log(`  Driver: ${driver.fullName} (ID: ${driver.id}) - Active: ${driver.isDriver}`);
             });
             
+            populateDriverSelect();
+        } else {
+            console.error('Failed to fetch drivers, status:', response.status);
+            allDrivers = [];
             populateDriverSelect();
         }
     } catch (error) {
         console.error('Error fetching drivers:', error);
         allDrivers = [];
+        populateDriverSelect();
     }
 }
 
@@ -81,7 +87,7 @@ function populateDriverSelect() {
         const driverInfo = document.getElementById('driverInfo');
         if (driverInfo) {
             driverInfo.style.display = 'block';
-            driverInfo.innerHTML = '<i class="fas fa-info-circle"></i> No active drivers found. Please add drivers in the system.';
+            driverInfo.innerHTML = '<i class="fas fa-info-circle"></i> No active drivers found. Please add drivers in Driver Management.';
         }
         return;
     }
@@ -89,7 +95,7 @@ function populateDriverSelect() {
     allDrivers.forEach(driver => {
         const option = document.createElement('option');
         option.value = driver.id;
-        option.textContent = `${driver.fullName} ${driver.phoneNumber ? `- ${driver.phoneNumber}` : ''}`;
+        option.textContent = `${driver.fullName} ${driver.phoneNumber ? `- ${driver.phoneNumber}` : ''} ${driver.vehicleInfo ? `(${driver.vehicleInfo})` : ''}`;
         driverSelect.appendChild(option);
     });
     
@@ -101,7 +107,7 @@ function populateDriverSelect() {
             const driver = allDrivers.find(d => d.id == deliveryData.driverId);
             if (driver) {
                 driverInfo.style.display = 'block';
-                driverInfo.innerHTML = `<i class="fas fa-check-circle"></i> Currently assigned to: ${driver.fullName}`;
+                driverInfo.innerHTML = `<i class="fas fa-check-circle"></i> Currently assigned to: ${driver.fullName} ${driver.vehicleInfo ? `(${driver.vehicleInfo})` : ''}`;
             }
         }
     }
@@ -333,6 +339,33 @@ function getCaseCount(delivery) {
     return delivery.items.filter(item => item.isCase === true).length;
 }
 
+// ========== ASSIGN DRIVER USING DEDICATED ENDPOINT ==========
+async function assignDriver(deliveryId, driverId) {
+    if (!driverId) return false;
+    
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        console.log('📡 Assigning driver:', `${API_BASE}/api/drivers/${driverId}/assign-delivery/${deliveryId}`);
+        
+        const response = await fetch(`${API_BASE}/api/drivers/${driverId}/assign-delivery/${deliveryId}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to assign driver');
+        }
+        
+        console.log('✅ Driver assigned successfully');
+        return true;
+        
+    } catch (error) {
+        console.error('Error assigning driver:', error);
+        throw error;
+    }
+}
+
 // ========== UPDATE DELIVERY ==========
 async function updateDelivery() {
     const statusSelect = document.getElementById('statusSelect');
@@ -376,34 +409,41 @@ async function updateDelivery() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
-        const updateData = {
-            address: deliveryData.address  // Keep existing address
-        };
+        let statusUpdateSuccess = true;
+        let driverAssignSuccess = true;
         
-        // Only include fields that are being updated
-        if (newStatus && newStatus !== originalStatus) {
-            updateData.status = newStatus;
-        } else {
-            updateData.status = originalStatus;
-        }
-        
+        // Handle driver assignment separately using dedicated endpoint
         if (newDriverId !== deliveryData.driverId) {
-            updateData.driverId = newDriverId;
-        } else {
-            updateData.driverId = deliveryData.driverId || null;
+            if (newDriverId) {
+                // Assign new driver
+                await assignDriver(deliveryId, newDriverId);
+                console.log('✅ Driver assigned:', newDriverId);
+            } else if (deliveryData.driverId) {
+                // Driver was removed - need to unassign (optional, you can implement if needed)
+                console.log('⚠️ Driver removal - keeping existing driver assignment');
+            }
         }
         
-        console.log('📤 Updating delivery with:', updateData);
-        
-        const response = await fetch(`${API_BASE}/api/deliveries/${deliveryId}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(updateData)
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to update');
+        // Update status if changed
+        if (newStatus && newStatus !== originalStatus) {
+            const statusUpdateData = {
+                address: deliveryData.address,
+                status: newStatus,
+                driverId: newDriverId || deliveryData.driverId
+            };
+            
+            console.log('📤 Updating status with:', statusUpdateData);
+            
+            const response = await fetch(`${API_BASE}/api/deliveries/${deliveryId}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(statusUpdateData)
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to update status');
+            }
         }
         
         let successMsg = '';
@@ -418,8 +458,8 @@ async function updateDelivery() {
             } else if (newStatus === 'Cancelled') {
                 successMsg += ' - Order has been cancelled.';
             }
-        } else if (newDriverId !== deliveryData.driverId) {
-            successMsg = newDriverId ? 'Driver assigned successfully' : 'Driver unassigned successfully';
+        } else if (newDriverId !== deliveryData.driverId && newDriverId) {
+            successMsg = 'Driver assigned successfully';
         } else {
             successMsg = 'Delivery updated successfully';
         }
@@ -432,6 +472,7 @@ async function updateDelivery() {
         }, 1500);
         
     } catch (error) {
+        console.error('Update error:', error);
         showError('Failed to update: ' + error.message);
         showLoading(false);
     }
