@@ -1,17 +1,15 @@
-// Driver Dashboard JavaScript - Shows customer full names
+// Driver Dashboard JavaScript - Complete with user fetching and all features
 
 const API_BASE = window.location.origin;
 let currentDriver = null;
 let allDeliveries = [];
 let currentFilter = 'active';
-let userCache = {}; // Cache for user details
+let userCache = {};
 
 // ========== AUTHENTICATION ==========
 function checkAuth() {
     const token = localStorage.getItem('driver_auth_token');
     const driverData = localStorage.getItem('driver_data');
-    
-    console.log('🔐 Checking driver auth - Token exists:', !!token);
     
     if (!token || !driverData) {
         alert('Please login as driver to access this page');
@@ -24,7 +22,6 @@ function checkAuth() {
         console.log('✅ Driver authenticated:', currentDriver.fullName, 'ID:', currentDriver.id);
         return true;
     } catch(e) {
-        console.error('Error parsing driver data:', e);
         window.location.href = '../login/login.html';
         return false;
     }
@@ -32,15 +29,10 @@ function checkAuth() {
 
 // ========== FETCH USER BY ID ==========
 async function fetchUserById(userId) {
-    // Check cache first
-    if (userCache[userId]) {
-        return userCache[userId];
-    }
+    if (userCache[userId]) return userCache[userId];
     
     try {
         const token = localStorage.getItem('driver_auth_token');
-        console.log(`👤 Fetching user details for ID: ${userId}`);
-        
         const response = await fetch(`${API_BASE}/api/users/${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -50,7 +42,7 @@ async function fetchUserById(userId) {
             const user = data.data || data;
             if (user && user.fullName) {
                 userCache[userId] = user;
-                console.log(`✅ Found user: ${user.fullName} (${user.email})`);
+                console.log(`✅ Found user: ${user.fullName}`);
                 return user;
             }
         }
@@ -61,39 +53,7 @@ async function fetchUserById(userId) {
     }
 }
 
-// ========== GET USER NAME FROM CACHE OR FETCH ==========
-async function getUserName(userId) {
-    if (userCache[userId]) {
-        return userCache[userId].fullName;
-    }
-    
-    const user = await fetchUserById(userId);
-    return user ? user.fullName : 'Customer';
-}
-
-// ========== FETCH ALL USERS (fallback) ==========
-async function fetchAllUsers() {
-    try {
-        const token = localStorage.getItem('driver_auth_token');
-        const response = await fetch(`${API_BASE}/api/users?limit=1000`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-            const data = await response.json();
-            const users = data.data || (Array.isArray(data) ? data : []);
-            users.forEach(user => {
-                if (user.id && user.fullName) {
-                    userCache[user.id] = user;
-                }
-            });
-            console.log(`✅ Loaded ${users.length} users into cache`);
-        }
-    } catch (error) {
-        console.error('Error fetching users:', error);
-    }
-}
-
-// ========== FETCH DELIVERIES ASSIGNED TO DRIVER ==========
+// ========== FETCH ALL DELIVERIES ==========
 async function fetchDeliveries() {
     if (!currentDriver) return;
     
@@ -102,58 +62,37 @@ async function fetchDeliveries() {
     
     try {
         const token = localStorage.getItem('driver_auth_token');
-        
-        console.log('📡 Fetching all deliveries from admin endpoint...');
         const response = await fetch(`${API_BASE}/api/deliveries/admin/all?limit=1000`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) {
-            console.error('Failed to fetch deliveries, status:', response.status);
-            throw new Error(`HTTP ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
-        console.log('📦 Deliveries response:', data);
-        
-        // Get deliveries array from response
         let allDeliveriesData = [];
         if (data.success && Array.isArray(data.data)) {
             allDeliveriesData = data.data;
         } else if (Array.isArray(data)) {
             allDeliveriesData = data;
-        } else if (data.deliveries && Array.isArray(data.deliveries)) {
-            allDeliveriesData = data.deliveries;
         }
         
-        console.log(`📦 Found ${allDeliveriesData.length} total deliveries`);
-        
         // Filter deliveries assigned to this driver
-        allDeliveries = allDeliveriesData.filter(delivery => {
-            const deliveryDriverId = delivery.driverId;
-            const currentDriverId = currentDriver.id;
-            return deliveryDriverId == currentDriverId;
-        });
+        allDeliveries = allDeliveriesData.filter(delivery => delivery.driverId == currentDriver.id);
+        console.log(`✅ Loaded ${allDeliveries.length} deliveries`);
         
-        console.log(`✅ Loaded ${allDeliveries.length} deliveries assigned to driver ${currentDriver.fullName}`);
-        
-        // Fetch user details for each delivery's userId
+        // Fetch user details for each delivery
         const uniqueUserIds = [...new Set(allDeliveries.map(d => d.userId))];
-        console.log(`👥 Fetching details for ${uniqueUserIds.length} unique customers...`);
-        
         for (const userId of uniqueUserIds) {
-            if (!userCache[userId]) {
-                await fetchUserById(userId);
-            }
+            if (!userCache[userId]) await fetchUserById(userId);
         }
         
         renderDriverInfo();
         updateStats();
-        await renderDeliveries();
+        renderDeliveries();
         
     } catch (error) {
         console.error('Error fetching deliveries:', error);
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading deliveries: ${error.message}</p><button class="btn-icon" onclick="fetchDeliveries()" style="margin-top:16px;">Retry</button></div>`;
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading deliveries: ${error.message}</p><button onclick="fetchDeliveries()" style="margin-top:16px; background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px;">Retry</button></div>`;
     }
 }
 
@@ -169,7 +108,7 @@ function renderDriverInfo() {
             <div class="driver-phone"><i class="fas fa-phone"></i> ${escapeHtml(currentDriver.phoneNumber || '—')}</div>
             <div class="driver-status active"><i class="fas fa-check-circle"></i> Active Driver</div>
         </div>
-        <button class="btn-icon" onclick="window.location.href='driver_profile.html'"><i class="fas fa-user-edit"></i> Edit Profile</button>
+        <button onclick="window.location.href='driver_profile.html'" style="background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px; cursor:pointer;"><i class="fas fa-user-edit"></i> Edit Profile</button>
     `;
 }
 
@@ -214,13 +153,12 @@ async function renderDeliveries() {
         return;
     }
     
-    // Build HTML with customer names (using cached user data)
     const deliveriesHtml = [];
     for (const delivery of filtered) {
         const orderId = (delivery._id || delivery.id || '').substring(0, 8);
         const customerName = userCache[delivery.userId]?.fullName || 'Loading...';
         const statusClass = getStatusClass(delivery.status);
-        const caseCount = getCaseCount(delivery);
+        const caseCount = delivery.items?.filter(i => i.isCase === true).length || 0;
         const advertCount = delivery.adverts?.length || 0;
         const foodCount = delivery.foodItems?.length || 0;
         
@@ -250,11 +188,6 @@ async function renderDeliveries() {
     container.innerHTML = deliveriesHtml.join('');
 }
 
-function getCaseCount(delivery) {
-    if (!delivery.items) return 0;
-    return delivery.items.filter(item => item.isCase === true).length;
-}
-
 function getStatusClass(status) {
     switch(status) {
         case 'Order received': return 'order-received';
@@ -270,7 +203,7 @@ function formatDate(dateStr) {
     if (!dateStr) return '—';
     try {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', day: '2-digit' });
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
     } catch(e) { return '—'; }
 }
 
@@ -279,38 +212,28 @@ function escapeHtml(str) {
     return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
 
-// ========== NAVIGATION ==========
 window.viewDeliveryDetail = function(deliveryId) {
     window.location.href = `delivery_detail.html?id=${deliveryId}`;
 };
 
-// ========== REFRESH ==========
 async function refreshData() {
     const refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn) {
         refreshBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
         refreshBtn.disabled = true;
     }
-    
-    userCache = {}; // Clear cache to refresh user data
-    await fetchAllUsers();
+    userCache = {};
     await fetchDeliveries();
-    
     if (refreshBtn) {
         refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
         refreshBtn.disabled = false;
     }
 }
 
-// ========== INITIALIZE ==========
 document.getElementById('refreshBtn')?.addEventListener('click', refreshData);
 document.getElementById('profileIcon')?.addEventListener('click', (e) => {
     e.preventDefault();
     window.location.href = 'driver_profile.html';
-});
-document.getElementById('logoLink')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.reload();
 });
 
 document.querySelectorAll('.filter-chip').forEach(chip => {
@@ -323,6 +246,5 @@ document.querySelectorAll('.filter-chip').forEach(chip => {
 });
 
 if (checkAuth()) {
-    console.log('🚗 Starting driver dashboard for:', currentDriver?.fullName, 'ID:', currentDriver?.id);
-    fetchAllUsers().then(() => fetchDeliveries());
+    fetchDeliveries();
 }
