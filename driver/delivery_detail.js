@@ -1,4 +1,4 @@
-// Delivery Detail JavaScript - Matches Flutter DeliveryDetailScreen
+// Delivery Detail JavaScript - Shows customer full name
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -7,6 +7,8 @@ const deliveryId = urlParams.get('id');
 let deliveryData = null;
 let currentDriver = null;
 let isUpdating = false;
+let customerName = 'Customer';
+let customerEmail = '';
 
 function checkAuth() {
     const token = localStorage.getItem('driver_auth_token');
@@ -23,6 +25,41 @@ function checkAuth() {
         return true;
     } catch(e) {
         window.location.href = '../login/login.html';
+        return false;
+    }
+}
+
+// ========== FETCH USER BY ID ==========
+async function fetchUserById(userId) {
+    try {
+        const token = localStorage.getItem('driver_auth_token');
+        console.log(`👤 Fetching customer details for ID: ${userId}`);
+        
+        const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const user = data.data || data;
+            if (user && user.fullName) {
+                customerName = user.fullName;
+                customerEmail = user.email;
+                console.log(`✅ Found customer: ${customerName} (${customerEmail})`);
+                return true;
+            }
+        }
+        
+        // Fallback: parse from email
+        if (deliveryData?.userEmail) {
+            const email = deliveryData.userEmail;
+            customerEmail = email;
+            customerName = email.split('@')[0].replace(/[0-9]/g, '').replace(/[._]/g, ' ');
+            customerName = customerName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+        return false;
+    } catch (error) {
+        console.error(`Error fetching user ${userId}:`, error);
         return false;
     }
 }
@@ -46,6 +83,15 @@ async function fetchDelivery() {
         
         const data = await response.json();
         deliveryData = data.data || data;
+        
+        // Fetch customer details using userId
+        if (deliveryData.userId) {
+            await fetchUserById(deliveryData.userId);
+        } else if (deliveryData.userEmail) {
+            customerEmail = deliveryData.userEmail;
+            customerName = deliveryData.userEmail.split('@')[0].replace(/[0-9]/g, '').replace(/[._]/g, ' ');
+            customerName = customerName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
         
         renderDeliveryDetail();
         
@@ -124,8 +170,9 @@ function renderDeliveryDetail() {
             
             <div class="detail-section">
                 <h3><i class="fas fa-user"></i> Customer Information</h3>
-                <div class="info-row"><div class="info-label">Name:</div><div class="info-value">${escapeHtml(deliveryData.userEmail?.split('@')[0] || 'Customer')}</div></div>
-                <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(deliveryData.userEmail || '—')}</div></div>
+                <div class="info-row"><div class="info-label">Full Name:</div><div class="info-value"><strong>${escapeHtml(customerName)}</strong></div></div>
+                <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(customerEmail || deliveryData.userEmail || '—')}</div></div>
+                <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">${escapeHtml(deliveryData.userPhone || 'Not provided')}</div></div>
             </div>
             
             <div class="detail-section">
@@ -136,7 +183,7 @@ function renderDeliveryDetail() {
             </div>
             
             <div class="detail-section">
-                <h3><i class="fas fa-wine-bottle"></i> Order Items</h3>
+                <h3><i class="fas fa-wine-bottle"></i> Order Summary</h3>
                 <div class="info-row"><div class="info-label">Total Amount:</div><div class="info-value"><strong>R${(deliveryData.totalAmount || 0).toFixed(2)}</strong></div></div>
                 ${caseCount > 0 ? `<div class="info-row"><div class="info-label">Wine Cases:</div><div class="info-value">${caseCount} case${caseCount > 1 ? 's' : ''}</div></div>` : ''}
                 ${advertCount > 0 ? `<div class="info-row"><div class="info-label">Adverts:</div><div class="info-value">${advertCount} placement${advertCount > 1 ? 's' : ''}</div></div>` : ''}
