@@ -32,6 +32,7 @@ async function fetchUsers() {
         if (response.ok) {
             const data = await response.json();
             allUsers = data.data || (Array.isArray(data) ? data : []);
+            console.log('✅ Loaded users:', allUsers.length);
         }
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -42,27 +43,48 @@ async function fetchUsers() {
 async function fetchDrivers() {
     try {
         const token = localStorage.getItem('wineBubbles_token');
-        // Fetch users with isDriver = true
+        // Fetch all users and filter for drivers
         const response = await fetch(`${API_BASE}/api/users?limit=1000`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
             const data = await response.json();
             const users = data.data || (Array.isArray(data) ? data : []);
+            // Filter users where isDriver is true
             allDrivers = users.filter(user => user.isDriver === true);
-            console.log(`✅ Loaded ${allDrivers.length} active drivers`);
+            console.log('✅ Loaded drivers:', allDrivers.length);
+            
+            // Log driver details for debugging
+            allDrivers.forEach(driver => {
+                console.log(`  Driver: ${driver.fullName} (ID: ${driver.id})`);
+            });
+            
             populateDriverSelect();
         }
     } catch (error) {
         console.error('Error fetching drivers:', error);
+        allDrivers = [];
     }
 }
 
 function populateDriverSelect() {
     const driverSelect = document.getElementById('driverSelect');
-    if (!driverSelect) return;
+    if (!driverSelect) {
+        console.log('Driver select element not found');
+        return;
+    }
     
-    driverSelect.innerHTML = '<option value="">No driver assigned</option>';
+    driverSelect.innerHTML = '<option value="">-- No driver assigned --</option>';
+    
+    if (allDrivers.length === 0) {
+        driverSelect.innerHTML = '<option value="">-- No drivers available --</option>';
+        const driverInfo = document.getElementById('driverInfo');
+        if (driverInfo) {
+            driverInfo.style.display = 'block';
+            driverInfo.innerHTML = '<i class="fas fa-info-circle"></i> No active drivers found. Please add drivers in the system.';
+        }
+        return;
+    }
     
     allDrivers.forEach(driver => {
         const option = document.createElement('option');
@@ -71,6 +93,7 @@ function populateDriverSelect() {
         driverSelect.appendChild(option);
     });
     
+    // Set selected driver if delivery has one
     if (deliveryData && deliveryData.driverId) {
         driverSelect.value = deliveryData.driverId;
         const driverInfo = document.getElementById('driverInfo');
@@ -101,7 +124,8 @@ function getUserPhone(userId) {
 
 // ========== GET ALLOWED STATUSES BASED ON CURRENT STATUS (Matches Flutter) ==========
 function getAllowedStatuses(currentStatus) {
-    switch (currentStatus.toLowerCase()) {
+    const status = (currentStatus || '').toLowerCase();
+    switch (status) {
         case 'order received':
             return ['Processing', 'Cancelled'];
         case 'processing':
@@ -119,20 +143,27 @@ function getAllowedStatuses(currentStatus) {
 
 function populateStatusSelect() {
     const statusSelect = document.getElementById('statusSelect');
-    if (!statusSelect || !deliveryData) return;
+    if (!statusSelect || !deliveryData) {
+        console.log('Status select not ready');
+        return;
+    }
     
-    const allowedStatuses = getAllowedStatuses(deliveryData.status);
+    const currentStatus = deliveryData.status;
+    const allowedStatuses = getAllowedStatuses(currentStatus);
     const statusInfo = document.getElementById('statusInfo');
     
+    console.log('Current status:', currentStatus);
+    console.log('Allowed statuses:', allowedStatuses);
+    
     if (allowedStatuses.length === 0) {
-        statusSelect.innerHTML = '<option value="">No status changes available</option>';
+        statusSelect.innerHTML = '<option value="">-- No status changes available --</option>';
         statusSelect.disabled = true;
         if (statusInfo) {
             statusInfo.style.display = 'block';
-            statusInfo.innerHTML = `<i class="fas fa-lock"></i> This order is ${deliveryData.status.toLowerCase()} and cannot be modified.`;
+            statusInfo.innerHTML = `<i class="fas fa-lock"></i> This order is ${currentStatus.toLowerCase()} and cannot be modified.`;
         }
     } else {
-        statusSelect.innerHTML = '<option value="">Select new status...</option>';
+        statusSelect.innerHTML = '<option value="">-- Select new status --</option>';
         allowedStatuses.forEach(status => {
             const option = document.createElement('option');
             option.value = status;
@@ -147,13 +178,13 @@ function populateStatusSelect() {
         statusSelect.disabled = false;
         
         if (statusInfo) {
-            if (deliveryData.status === 'Order received') {
+            if (currentStatus === 'Order received') {
                 statusInfo.style.display = 'block';
                 statusInfo.innerHTML = `<i class="fas fa-info-circle"></i> You can process this order or cancel it. Processing will move it to the next stage.`;
-            } else if (deliveryData.status === 'Processing') {
+            } else if (currentStatus === 'Processing') {
                 statusInfo.style.display = 'block';
                 statusInfo.innerHTML = `<i class="fas fa-info-circle"></i> Order is being processed. You can mark it as "Out for delivery" or cancel it.`;
-            } else if (deliveryData.status === 'Out for delivery') {
+            } else if (currentStatus === 'Out for delivery') {
                 statusInfo.style.display = 'block';
                 statusInfo.innerHTML = `<i class="fas fa-info-circle"></i> Order is out for delivery. You can mark it as "Delivered" or cancel it.`;
             } else {
@@ -174,16 +205,21 @@ async function fetchDelivery() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
+        console.log('📡 Fetching delivery:', `${API_BASE}/api/deliveries/${deliveryId}`);
+        
         const response = await fetch(`${API_BASE}/api/deliveries/${deliveryId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
+        console.log('📡 Response status:', response.status);
+        
         if (!response.ok) throw new Error('Failed to load delivery');
         
         const data = await response.json();
+        console.log('📦 Delivery data:', data);
+        
         deliveryData = data.data || data;
         originalStatus = deliveryData.status;
-        console.log('📦 Delivery data:', deliveryData);
         
         renderDeliveryInfo();
         populateStatusSelect();
@@ -205,6 +241,7 @@ async function fetchDelivery() {
         }
         
     } catch (error) {
+        console.error('Error fetching delivery:', error);
         showError('Failed to load delivery: ' + error.message);
     } finally {
         showLoading(false);
@@ -305,7 +342,7 @@ async function updateDelivery() {
     
     if (!deliveryData || !deliveryId) return;
     
-    // Check if status was selected
+    // Check if anything was selected
     if (!newStatus && newDriverId === deliveryData.driverId) {
         showError('Please select a new status or assign a driver to update');
         return;
@@ -314,24 +351,19 @@ async function updateDelivery() {
     // Show confirmation dialog for status change
     if (newStatus && newStatus !== originalStatus) {
         let confirmMsg = '';
-        let warningHtml = '';
         
         switch (newStatus) {
             case 'Processing':
                 confirmMsg = `Process this order from "${originalStatus}" to "Processing"?\n\nThis will move the order to the processing stage.`;
-                warningHtml = 'Processing will move the order forward in the workflow.';
                 break;
             case 'Out for delivery':
                 confirmMsg = `Mark this order as "Out for delivery"?\n\nThis will notify the customer that their order is on the way.`;
-                warningHtml = 'Make sure a driver has been assigned before marking as out for delivery.';
                 break;
             case 'Delivered':
                 confirmMsg = `Mark this order as "Delivered"?\n\nThis will complete the order.`;
-                warningHtml = 'This action cannot be reversed.';
                 break;
             case 'Cancelled':
                 confirmMsg = `Cancel this order?\n\nThis will cancel the order and notify the customer.`;
-                warningHtml = 'Cancellation cannot be reversed.';
                 break;
             default:
                 confirmMsg = `Change status from "${originalStatus}" to "${newStatus}"?`;
@@ -344,19 +376,22 @@ async function updateDelivery() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
-        const updateData = {};
+        const updateData = {
+            address: deliveryData.address  // Keep existing address
+        };
         
         // Only include fields that are being updated
         if (newStatus && newStatus !== originalStatus) {
             updateData.status = newStatus;
+        } else {
+            updateData.status = originalStatus;
         }
         
         if (newDriverId !== deliveryData.driverId) {
             updateData.driverId = newDriverId;
+        } else {
+            updateData.driverId = deliveryData.driverId || null;
         }
-        
-        // Also always send address (keep existing if not changed)
-        updateData.address = deliveryData.address;
         
         console.log('📤 Updating delivery with:', updateData);
         
@@ -485,6 +520,7 @@ document.getElementById('updateBtn')?.addEventListener('click', updateDelivery);
 document.getElementById('deleteBtn')?.addEventListener('click', deleteDelivery);
 
 if (checkAuth()) {
+    // Fetch users first, then drivers, then delivery
     fetchUsers().then(() => {
         fetchDrivers().then(() => {
             fetchDelivery();

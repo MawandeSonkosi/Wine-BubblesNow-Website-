@@ -823,9 +823,8 @@
         return 'Recently';
       }
     }
-    
-    window.markNotificationRead = function(id, link) {
-    // Remove the notification from the array
+  window.markNotificationRead = function(id, link) {
+    // Remove the notification from the array completely
     const index = notifications.findIndex(n => n.id === id);
     if (index !== -1) {
         notifications.splice(index, 1);
