@@ -1,4 +1,4 @@
-// Delivery Detail JavaScript - With email notifications and full functionality
+// Delivery Detail JavaScript - Fetches users properly like admin panel
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -7,8 +7,9 @@ const deliveryId = urlParams.get('id');
 let deliveryData = null;
 let currentDriver = null;
 let isUpdating = false;
-let customerData = null;
+let allUsers = [];  // Store users like admin panel
 
+// ========== AUTHENTICATION ==========
 function checkAuth() {
     const token = localStorage.getItem('driver_auth_token');
     const driverData = localStorage.getItem('driver_data');
@@ -28,47 +29,40 @@ function checkAuth() {
     }
 }
 
-async function fetchCustomerDetails(userId, userEmail) {
+// ========== FETCH USERS - LIKE ADMIN PANEL ==========
+async function fetchUsers() {
     try {
         const token = localStorage.getItem('driver_auth_token');
-        const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+        const response = await fetch(`${API_BASE}/api/users?limit=1000`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        
         if (response.ok) {
             const data = await response.json();
-            const user = data.data || data;
-            if (user && user.fullName) {
-                customerData = {
-                    fullName: user.fullName,
-                    email: user.email,
-                    phoneNumber: user.phoneNumber || 'Not provided'
-                };
-                return;
-            }
-        }
-        
-        // Fallback: parse from email
-        if (userEmail) {
-            const name = userEmail.split('@')[0].replace(/[0-9]/g, '').replace(/[._]/g, ' ');
-            customerData = {
-                fullName: name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-                email: userEmail,
-                phoneNumber: 'Not provided'
-            };
+            allUsers = data.data || (Array.isArray(data) ? data : []);
+            console.log(`✅ Loaded ${allUsers.length} users`);
         }
     } catch (error) {
-        console.error('Error fetching customer:', error);
-        if (userEmail) {
-            customerData = {
-                fullName: userEmail.split('@')[0],
-                email: userEmail,
-                phoneNumber: 'Not provided'
-            };
-        }
+        console.error('Error fetching users:', error);
     }
 }
 
+// ========== GET USER DETAILS FROM CACHE ==========
+function getUserName(userId) {
+    const user = allUsers.find(u => u.id === userId || u._id === userId);
+    return user ? user.fullName : 'Customer';
+}
+
+function getUserEmail(userId) {
+    const user = allUsers.find(u => u.id === userId || u._id === userId);
+    return user ? user.email : 'No email';
+}
+
+function getUserPhone(userId) {
+    const user = allUsers.find(u => u.id === userId || u._id === userId);
+    return user ? (user.phoneNumber || 'Not provided') : 'Not provided';
+}
+
+// ========== FETCH DELIVERY ==========
 async function fetchDelivery() {
     if (!deliveryId) {
         showError('No delivery ID provided');
@@ -89,16 +83,16 @@ async function fetchDelivery() {
         const data = await response.json();
         deliveryData = data.data || data;
         
-        await fetchCustomerDetails(deliveryData.userId, deliveryData.userEmail);
+        console.log('📦 Delivery loaded:', deliveryData._id || deliveryData.id);
         renderDeliveryDetail();
         
     } catch (error) {
         console.error('Error:', error);
-        container.innerHTML = `<div class="loading-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${error.message}</p><button onclick="fetchDelivery()" style="margin-top:16px; background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px;">Retry</button></div>`;
+        container.innerHTML = `<div class="loading-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${error.message}</p><button onclick="location.reload()" style="margin-top:16px; background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px; cursor:pointer;">Retry</button></div>`;
     }
 }
 
-// Send email notification via backend
+// ========== SEND EMAIL NOTIFICATION ==========
 async function sendStatusUpdateEmail(newStatus) {
     try {
         const token = localStorage.getItem('driver_auth_token');
@@ -115,28 +109,42 @@ async function sendStatusUpdateEmail(newStatus) {
             return true;
         }
         
+        const customerName = getUserName(deliveryData.userId);
+        const customerEmail = getUserEmail(deliveryData.userId);
+        const customerPhone = getUserPhone(deliveryData.userId);
+        
+        const emailData = {
+            delivery: deliveryData,
+            userEmail: customerEmail || deliveryData.userEmail,
+            userFullName: customerName,
+            userPhoneNumber: customerPhone,
+            status: statusText,
+            message: message,
+            driverName: currentDriver?.fullName
+        };
+        
+        console.log('📧 Sending email notification:', emailData);
+        
         const response = await fetch(`${API_BASE}/api/email/send-delivery-status-update`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                delivery: deliveryData,
-                userEmail: customerData?.email || deliveryData.userEmail,
-                userFullName: customerData?.fullName || 'Customer',
-                userPhoneNumber: customerData?.phoneNumber || 'Not provided',
-                status: statusText,
-                message: message,
-                driverName: currentDriver?.fullName
-            })
+            body: JSON.stringify(emailData)
         });
         
-        console.log('📧 Email notification sent, status:', response.status);
-        return response.ok;
+        if (response.ok) {
+            console.log('✅ Email sent successfully');
+            return true;
+        } else {
+            console.log('⚠️ Email failed, but delivery status was updated');
+            return false;
+        }
     } catch (error) {
         console.error('Failed to send email:', error);
         return false;
     }
 }
 
+// ========== UPDATE DELIVERY STATUS ==========
 async function updateDeliveryStatus(newStatus) {
     if (!deliveryData || isUpdating) return;
     
@@ -156,7 +164,6 @@ async function updateDeliveryStatus(newStatus) {
     try {
         const token = localStorage.getItem('driver_auth_token');
         
-        // Update delivery status
         const response = await fetch(`${API_BASE}/api/deliveries/${deliveryId}/status`, {
             method: 'PATCH',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -165,14 +172,16 @@ async function updateDeliveryStatus(newStatus) {
         
         if (!response.ok) throw new Error('Failed to update status');
         
-        // Send email notification
         await sendStatusUpdateEmail(newStatus);
         
-        alert(`Order status updated to "${newStatus}" successfully!${newStatus === 'Delivered' ? ' A thank you email has been sent to the customer.' : ''}`);
-        window.location.reload();
+        showToast(`Order status updated to "${newStatus}" successfully!${newStatus === 'Delivered' ? ' A thank you email has been sent.' : ''}`, 'success');
+        
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
         
     } catch (error) {
-        alert('Failed to update status: ' + error.message);
+        showToast('Failed to update status: ' + error.message, 'error');
         if (btn) {
             btn.disabled = false;
             btn.innerHTML = deliveryData.status === 'Processing' ? 'Mark as Out for Delivery' : 'Mark as Delivered';
@@ -181,12 +190,25 @@ async function updateDeliveryStatus(newStatus) {
     }
 }
 
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:'Montserrat', sans-serif; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
+    toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// ========== RENDER DELIVERY DETAIL ==========
 function renderDeliveryDetail() {
     const container = document.getElementById('detailContent');
     if (!container || !deliveryData) return;
     
     const orderId = (deliveryData._id || deliveryData.id || '').substring(0, 8);
     const statusClass = getStatusClass(deliveryData.status);
+    const customerName = getUserName(deliveryData.userId);
+    const customerEmail = getUserEmail(deliveryData.userId);
+    const customerPhone = getUserPhone(deliveryData.userId);
     const caseCount = deliveryData.items?.filter(i => i.isCase === true).length || 0;
     const advertCount = deliveryData.adverts?.length || 0;
     const foodCount = deliveryData.foodItems?.length || 0;
@@ -209,7 +231,11 @@ function renderDeliveryDetail() {
                 <h3><i class="fas fa-wine-bottle"></i> Wine Items</h3>
                 ${deliveryData.items.map(item => `
                     <div class="item-row">
-                        <div class="item-name">${escapeHtml(item.name)} ${item.isCase ? '<span class="badge-case">Case of 6</span>' : ''}</div>
+                        <div class="item-name">
+                            <i class="fas ${item.isCase ? 'fa-cubes' : 'fa-wine-bottle'}"></i>
+                            ${escapeHtml(item.name)}
+                            ${item.isCase ? '<span class="badge-case">Case of 6</span>' : ''}
+                        </div>
                         <div class="item-qty">x${item.quantity}</div>
                         <div class="item-price">R${((item.price || 0) * (item.isCase ? 6 : 1) * (item.quantity || 1)).toFixed(2)}</div>
                     </div>
@@ -226,7 +252,7 @@ function renderDeliveryDetail() {
                 <h3><i class="fas fa-gift"></i> Add-ons</h3>
                 ${deliveryData.addOns.map(addon => `
                     <div class="item-row">
-                        <div class="item-name">${escapeHtml(addon.name)}</div>
+                        <div class="item-name"><i class="fas fa-gift"></i> ${escapeHtml(addon.name)}</div>
                         <div class="item-qty">x1</div>
                         <div class="item-price">R${(addon.price || 0).toFixed(2)}</div>
                     </div>
@@ -243,7 +269,7 @@ function renderDeliveryDetail() {
                 <h3><i class="fas fa-ad"></i> Advert Placements</h3>
                 ${deliveryData.adverts.map(advert => `
                     <div class="item-row">
-                        <div class="item-name">${escapeHtml(advert.title)}</div>
+                        <div class="item-name"><i class="fas fa-ad"></i> ${escapeHtml(advert.title)}</div>
                         <div class="item-qty">x${advert.quantity || 1}</div>
                         <div class="item-price">R${((advert.price || 0) * (advert.quantity || 1)).toFixed(2)}</div>
                     </div>
@@ -258,14 +284,16 @@ function renderDeliveryDetail() {
         const restaurantCount = [...new Set(deliveryData.foodItems.map(f => f.restaurantName))].length;
         foodItemsHtml = `
             <div class="detail-section">
-                <h3><i class="fas fa-utensils"></i> Food Items <span style="font-size:12px;">(${restaurantCount} restaurant${restaurantCount > 1 ? 's' : ''})</span></h3>
+                <h3><i class="fas fa-utensils"></i> Food Items <span style="font-size:12px; color:#ff9800;">(${restaurantCount} restaurant${restaurantCount > 1 ? 's' : ''})</span></h3>
                 ${deliveryData.foodItems.map(food => `
-                    <div class="item-row">
-                        <div class="item-name">${escapeHtml(food.name)} <span style="font-size:11px; color:#ff9800;">(${escapeHtml(food.restaurantName)})</span></div>
-                        <div class="item-qty">x${food.quantity}</div>
-                        <div class="item-price">R${((food.price || 0) * (food.quantity || 1)).toFixed(2)}</div>
+                    <div>
+                        <div class="item-row">
+                            <div class="item-name"><i class="fas fa-utensils"></i> ${escapeHtml(food.name)} <span class="badge-food">${escapeHtml(food.restaurantName)}</span></div>
+                            <div class="item-qty">x${food.quantity}</div>
+                            <div class="item-price">R${((food.price || 0) * (food.quantity || 1)).toFixed(2)}</div>
+                        </div>
+                        ${food.specialInstructions ? `<div class="special-instruction"><i class="fas fa-pen"></i> Special instructions: "${escapeHtml(food.specialInstructions)}"</div>` : ''}
                     </div>
-                    ${food.specialInstructions ? `<div style="font-size:11px; color:#888; margin-left:20px;">📝 Special: ${escapeHtml(food.specialInstructions)}</div>` : ''}
                 `).join('')}
             </div>
         `;
@@ -280,20 +308,20 @@ function renderDeliveryDetail() {
             
             <div class="detail-section">
                 <h3><i class="fas fa-user"></i> Customer Information</h3>
-                <div class="info-row"><div class="info-label">Full Name:</div><div class="info-value"><strong>${escapeHtml(customerData?.fullName || 'Customer')}</strong></div></div>
-                <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(customerData?.email || deliveryData.userEmail || '—')}</div></div>
-                <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">${escapeHtml(customerData?.phoneNumber || 'Not provided')}</div></div>
+                <div class="info-row"><div class="info-label">Full Name:</div><div class="info-value"><strong>${escapeHtml(customerName)}</strong></div></div>
+                <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(customerEmail)}</div></div>
+                <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">${escapeHtml(customerPhone)}</div></div>
             </div>
             
             <div class="detail-section">
                 <h3><i class="fas fa-map-marker-alt"></i> Delivery Information</h3>
-                <div class="info-row"><div class="info-label">Address:</div><div class="info-value">${escapeHtml(deliveryData.address || '—')}</div></div>
+                <div class="info-row"><div class="info-label">Delivery Address:</div><div class="info-value">${escapeHtml(deliveryData.address || '—')}</div></div>
                 <div class="info-row"><div class="info-label">Payment Method:</div><div class="info-value">${escapeHtml(deliveryData.paymentMethod || '—')}</div></div>
                 <div class="info-row"><div class="info-label">Order Date:</div><div class="info-value">${formatDateTime(deliveryData.createdAt)}</div></div>
-                ${caseCount > 0 ? `<div class="info-row"><div class="info-label">Wine Cases:</div><div class="info-value">${caseCount} case${caseCount > 1 ? 's' : ''}</div></div>` : ''}
+                <div class="info-row"><div class="info-label">Total Amount:</div><div class="info-value"><strong>R${(deliveryData.totalAmount || 0).toFixed(2)}</strong></div></div>
+                ${caseCount > 0 ? `<div class="info-row"><div class="info-label">Wine Cases:</div><div class="info-value">${caseCount} case${caseCount > 1 ? 's' : ''} (${caseCount * 6} bottles)</div></div>` : ''}
                 ${advertCount > 0 ? `<div class="info-row"><div class="info-label">Adverts:</div><div class="info-value">${advertCount} placement${advertCount > 1 ? 's' : ''}</div></div>` : ''}
                 ${foodCount > 0 ? `<div class="info-row"><div class="info-label">Food Items:</div><div class="info-value">${foodCount} item${foodCount > 1 ? 's' : ''}</div></div>` : ''}
-                <div class="info-row"><div class="info-label">Total Amount:</div><div class="info-value"><strong>R${(deliveryData.totalAmount || 0).toFixed(2)}</strong></div></div>
             </div>
             
             ${wineItemsHtml}
@@ -310,10 +338,13 @@ function renderDeliveryDetail() {
     `;
     
     if (canUpdate) {
-        document.getElementById('updateStatusBtn')?.addEventListener('click', () => {
-            const newStatus = deliveryData.status === 'Processing' ? 'Out for delivery' : 'Delivered';
-            updateDeliveryStatus(newStatus);
-        });
+        const btn = document.getElementById('updateStatusBtn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const newStatus = deliveryData.status === 'Processing' ? 'Out for delivery' : 'Delivered';
+                updateDeliveryStatus(newStatus);
+            });
+        }
     }
 }
 
@@ -343,10 +374,10 @@ function escapeHtml(str) {
 function showError(message) {
     const container = document.getElementById('detailContent');
     if (container) {
-        container.innerHTML = `<div class="loading-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${message}</p><button onclick="fetchDelivery()" style="margin-top:16px; background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px;">Retry</button></div>`;
+        container.innerHTML = `<div class="loading-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${message}</p><button onclick="location.reload()" style="margin-top:16px; background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px; cursor:pointer;">Retry</button></div>`;
     }
 }
 
 if (checkAuth()) {
-    fetchDelivery();
+    fetchUsers().then(() => fetchDelivery());
 }

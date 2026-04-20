@@ -93,7 +93,7 @@
   <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Delivery Details</p></div></div></footer>
 
   <script>
-    // Delivery Detail JavaScript - Complete with customer names, email notifications, and all features
+    // Delivery Detail JavaScript - Fixed to fetch users like admin panel
     const API_BASE = window.location.origin;
     const urlParams = new URLSearchParams(window.location.search);
     const deliveryId = urlParams.get('id');
@@ -101,7 +101,7 @@
     let deliveryData = null;
     let currentDriver = null;
     let isUpdating = false;
-    let customerData = null;
+    let allUsers = [];
 
     // ========== AUTHENTICATION ==========
     function checkAuth() {
@@ -124,52 +124,45 @@
         }
     }
 
-    // ========== FETCH CUSTOMER DETAILS ==========
-    async function fetchCustomerDetails(userId, userEmail) {
+    // ========== FETCH ALL USERS (like admin panel) ==========
+    async function fetchAllUsers() {
         try {
             const token = localStorage.getItem('driver_auth_token');
-            console.log('👤 Fetching customer details for user ID:', userId);
+            console.log('👥 Fetching all users...');
             
-            const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+            const response = await fetch(`${API_BASE}/api/users?limit=1000`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
             if (response.ok) {
                 const data = await response.json();
-                const user = data.data || data;
-                if (user && user.fullName) {
-                    customerData = {
-                        fullName: user.fullName,
-                        email: user.email,
-                        phoneNumber: user.phoneNumber || 'Not provided'
-                    };
-                    console.log('✅ Customer found:', customerData.fullName);
-                    return;
-                }
-            }
-            
-            // Fallback: parse name from email
-            if (userEmail) {
-                const namePart = userEmail.split('@')[0];
-                let cleanName = namePart.replace(/[0-9]/g, '').replace(/[._]/g, ' ');
-                cleanName = cleanName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-                customerData = {
-                    fullName: cleanName || 'Valued Customer',
-                    email: userEmail,
-                    phoneNumber: 'Not provided'
-                };
-                console.log('⚠️ Using fallback customer name:', customerData.fullName);
+                allUsers = data.data || (Array.isArray(data) ? data : []);
+                console.log(`✅ Loaded ${allUsers.length} users`);
+                return true;
+            } else {
+                console.log('⚠️ Failed to fetch users, status:', response.status);
+                return false;
             }
         } catch (error) {
-            console.error('Error fetching customer:', error);
-            if (userEmail) {
-                customerData = {
-                    fullName: userEmail.split('@')[0],
-                    email: userEmail,
-                    phoneNumber: 'Not provided'
-                };
-            }
+            console.error('Error fetching users:', error);
+            return false;
         }
+    }
+
+    // ========== GET USER DETAILS FROM CACHE ==========
+    function getUserName(userId) {
+        const user = allUsers.find(u => u.id === userId || u._id === userId);
+        return user ? user.fullName : 'Customer';
+    }
+
+    function getUserEmail(userId) {
+        const user = allUsers.find(u => u.id === userId || u._id === userId);
+        return user ? user.email : 'No email';
+    }
+
+    function getUserPhone(userId) {
+        const user = allUsers.find(u => u.id === userId || u._id === userId);
+        return user ? (user.phoneNumber || 'Not provided') : 'Not provided';
     }
 
     // ========== FETCH DELIVERY ==========
@@ -194,8 +187,8 @@
             deliveryData = data.data || data;
             
             console.log('📦 Delivery loaded:', deliveryData._id || deliveryData.id);
+            console.log('👤 User ID:', deliveryData.userId);
             
-            await fetchCustomerDetails(deliveryData.userId, deliveryData.userEmail);
             renderDeliveryDetail();
             
         } catch (error) {
@@ -221,17 +214,21 @@
                 return true;
             }
             
+            const customerName = getUserName(deliveryData.userId);
+            const customerEmail = getUserEmail(deliveryData.userId);
+            const customerPhone = getUserPhone(deliveryData.userId);
+            
             const emailData = {
                 delivery: deliveryData,
-                userEmail: customerData?.email || deliveryData.userEmail,
-                userFullName: customerData?.fullName || 'Valued Customer',
-                userPhoneNumber: customerData?.phoneNumber || 'Not provided',
+                userEmail: customerEmail || deliveryData.userEmail,
+                userFullName: customerName,
+                userPhoneNumber: customerPhone,
                 status: statusText,
                 message: message,
                 driverName: currentDriver?.fullName
             };
             
-            console.log('📧 Sending email notification:', emailData);
+            console.log('📧 Sending email notification to:', customerEmail);
             
             const response = await fetch(`${API_BASE}/api/email/send-delivery-status-update`, {
                 method: 'POST',
@@ -316,10 +313,15 @@
         
         const orderId = (deliveryData._id || deliveryData.id || '').substring(0, 8);
         const statusClass = getStatusClass(deliveryData.status);
+        const customerName = getUserName(deliveryData.userId);
+        const customerEmail = getUserEmail(deliveryData.userId);
+        const customerPhone = getUserPhone(deliveryData.userId);
         const caseCount = deliveryData.items?.filter(i => i.isCase === true).length || 0;
         const advertCount = deliveryData.adverts?.length || 0;
         const foodCount = deliveryData.foodItems?.length || 0;
         const canUpdate = deliveryData.status === 'Processing' || deliveryData.status === 'Out for delivery';
+        
+        console.log('Customer name from cache:', customerName);
         
         let updateButtonHtml = '';
         if (canUpdate) {
@@ -415,9 +417,9 @@
                 
                 <div class="detail-section">
                     <h3><i class="fas fa-user"></i> Customer Information</h3>
-                    <div class="info-row"><div class="info-label">Full Name:</div><div class="info-value"><strong>${escapeHtml(customerData?.fullName || 'Customer')}</strong></div></div>
-                    <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(customerData?.email || deliveryData.userEmail || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">${escapeHtml(customerData?.phoneNumber || 'Not provided')}</div></div>
+                    <div class="info-row"><div class="info-label">Full Name:</div><div class="info-value"><strong>${escapeHtml(customerName)}</strong></div></div>
+                    <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(customerEmail)}</div></div>
+                    <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">${escapeHtml(customerPhone)}</div></div>
                 </div>
                 
                 <div class="detail-section">
@@ -485,8 +487,12 @@
         }
     }
 
+    // ========== INITIALIZE ==========
     if (checkAuth()) {
-        fetchDelivery();
+        // First fetch all users (like admin panel), then fetch delivery
+        fetchAllUsers().then(() => {
+            fetchDelivery();
+        });
     }
   </script>
 </body>

@@ -1,9 +1,10 @@
-// Driver Dashboard JavaScript - Complete with customer name fetching
+// Driver Dashboard JavaScript - Fetches users properly like admin delivery management
+
 const API_BASE = window.location.origin;
 let currentDriver = null;
 let allDeliveries = [];
+let allUsers = [];  // Store all users like admin panel does
 let currentFilter = 'active';
-let userCache = {};
 
 // ========== AUTHENTICATION ==========
 function checkAuth() {
@@ -26,33 +27,40 @@ function checkAuth() {
     }
 }
 
-// ========== FETCH USER BY ID ==========
-async function fetchUserById(userId) {
-    if (userCache[userId]) return userCache[userId];
-    
+// ========== FETCH USERS - LIKE ADMIN PANEL ==========
+async function fetchUsers() {
     try {
         const token = localStorage.getItem('driver_auth_token');
-        const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+        const response = await fetch(`${API_BASE}/api/users?limit=1000`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        
         if (response.ok) {
             const data = await response.json();
-            const user = data.data || data;
-            if (user && user.fullName) {
-                userCache[userId] = user;
-                console.log(`✅ Found user: ${user.fullName}`);
-                return user;
-            }
+            allUsers = data.data || (Array.isArray(data) ? data : []);
+            console.log(`✅ Loaded ${allUsers.length} users`);
         }
-        return null;
     } catch (error) {
-        console.error(`Error fetching user ${userId}:`, error);
-        return null;
+        console.error('Error fetching users:', error);
     }
 }
 
-// ========== FETCH ALL DELIVERIES ==========
+// ========== GET USER DETAILS FROM CACHE ==========
+function getUserName(userId) {
+    const user = allUsers.find(u => u.id === userId || u._id === userId);
+    return user ? user.fullName : 'Loading...';
+}
+
+function getUserEmail(userId) {
+    const user = allUsers.find(u => u.id === userId || u._id === userId);
+    return user ? user.email : 'Loading...';
+}
+
+function getUserPhone(userId) {
+    const user = allUsers.find(u => u.id === userId || u._id === userId);
+    return user ? (user.phoneNumber || '—') : '—';
+}
+
+// ========== FETCH DELIVERIES ==========
 async function fetchDeliveries() {
     if (!currentDriver) return;
     
@@ -78,16 +86,6 @@ async function fetchDeliveries() {
         // Filter deliveries assigned to this driver
         allDeliveries = allDeliveriesData.filter(delivery => delivery.driverId == currentDriver.id);
         console.log(`✅ Loaded ${allDeliveries.length} deliveries assigned to driver`);
-        
-        // Fetch user details for each delivery's userId
-        const uniqueUserIds = [...new Set(allDeliveries.map(d => d.userId))];
-        console.log(`👥 Fetching details for ${uniqueUserIds.length} customers...`);
-        
-        for (const userId of uniqueUserIds) {
-            if (!userCache[userId]) {
-                await fetchUserById(userId);
-            }
-        }
         
         renderDriverInfo();
         updateStats();
@@ -135,7 +133,7 @@ function updateStats() {
     `;
 }
 
-async function renderDeliveries() {
+function renderDeliveries() {
     const container = document.getElementById('deliveriesContainer');
     
     let filtered = allDeliveries.filter(delivery => {
@@ -156,23 +154,26 @@ async function renderDeliveries() {
         return;
     }
     
-    const deliveriesHtml = [];
-    for (const delivery of filtered) {
+    container.innerHTML = filtered.map(delivery => {
         const orderId = (delivery._id || delivery.id || '').substring(0, 8);
-        const customerName = userCache[delivery.userId]?.fullName || 'Loading...';
+        const customerName = getUserName(delivery.userId);
+        const customerPhone = getUserPhone(delivery.userId);
         const statusClass = getStatusClass(delivery.status);
         const caseCount = delivery.items?.filter(i => i.isCase === true).length || 0;
         const advertCount = delivery.adverts?.length || 0;
         const foodCount = delivery.foodItems?.length || 0;
         
-        deliveriesHtml.push(`
+        return `
             <div class="delivery-card" onclick="viewDeliveryDetail('${delivery._id || delivery.id}')">
                 <div class="delivery-card-content">
                     <div class="delivery-header">
                         <span class="delivery-id">Order #${orderId}</span>
                         <span class="delivery-status ${statusClass}">${delivery.status}</span>
                     </div>
-                    <div class="delivery-customer"><i class="fas fa-user"></i> <strong>${escapeHtml(customerName)}</strong></div>
+                    <div class="delivery-customer">
+                        <i class="fas fa-user"></i> <strong>${escapeHtml(customerName)}</strong>
+                        ${customerPhone !== '—' ? `<span style="margin-left: 12px;"><i class="fas fa-phone"></i> ${escapeHtml(customerPhone)}</span>` : ''}
+                    </div>
                     <div class="delivery-details">
                         <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(delivery.address?.substring(0, 50) || '—')}</span>
                         <span><i class="fas fa-calendar"></i> ${formatDate(delivery.createdAt)}</span>
@@ -185,10 +186,8 @@ async function renderDeliveries() {
                     <div class="delivery-amount">R${(delivery.totalAmount || 0).toFixed(2)}</div>
                 </div>
             </div>
-        `);
-    }
-    
-    container.innerHTML = deliveriesHtml.join('');
+        `;
+    }).join('');
 }
 
 function getStatusClass(status) {
@@ -225,7 +224,7 @@ async function refreshData() {
         refreshBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
         refreshBtn.disabled = true;
     }
-    userCache = {};
+    await fetchUsers();
     await fetchDeliveries();
     if (refreshBtn) {
         refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
@@ -253,5 +252,5 @@ document.querySelectorAll('.filter-chip').forEach(chip => {
 });
 
 if (checkAuth()) {
-    fetchDeliveries();
+    fetchUsers().then(() => fetchDeliveries());
 }
