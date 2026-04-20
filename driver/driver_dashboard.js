@@ -1,5 +1,4 @@
-// Driver Dashboard JavaScript - Complete with user fetching and all features
-
+// Driver Dashboard JavaScript - Complete with customer name fetching
 const API_BASE = window.location.origin;
 let currentDriver = null;
 let allDeliveries = [];
@@ -78,12 +77,16 @@ async function fetchDeliveries() {
         
         // Filter deliveries assigned to this driver
         allDeliveries = allDeliveriesData.filter(delivery => delivery.driverId == currentDriver.id);
-        console.log(`✅ Loaded ${allDeliveries.length} deliveries`);
+        console.log(`✅ Loaded ${allDeliveries.length} deliveries assigned to driver`);
         
-        // Fetch user details for each delivery
+        // Fetch user details for each delivery's userId
         const uniqueUserIds = [...new Set(allDeliveries.map(d => d.userId))];
+        console.log(`👥 Fetching details for ${uniqueUserIds.length} customers...`);
+        
         for (const userId of uniqueUserIds) {
-            if (!userCache[userId]) await fetchUserById(userId);
+            if (!userCache[userId]) {
+                await fetchUserById(userId);
+            }
         }
         
         renderDriverInfo();
@@ -92,7 +95,7 @@ async function fetchDeliveries() {
         
     } catch (error) {
         console.error('Error fetching deliveries:', error);
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading deliveries: ${error.message}</p><button onclick="fetchDeliveries()" style="margin-top:16px; background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px;">Retry</button></div>`;
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading deliveries: ${error.message}</p><button onclick="location.reload()" style="margin-top:16px; background:#6b0d2b; color:white; border:none; padding:10px 20px; border-radius:40px; cursor:pointer;">Retry</button></div>`;
     }
 }
 
@@ -234,6 +237,10 @@ document.getElementById('refreshBtn')?.addEventListener('click', refreshData);
 document.getElementById('profileIcon')?.addEventListener('click', (e) => {
     e.preventDefault();
     window.location.href = 'driver_profile.html';
+});
+document.getElementById('logoLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.reload();
 });
 
 document.querySelectorAll('.filter-chip').forEach(chip => {
