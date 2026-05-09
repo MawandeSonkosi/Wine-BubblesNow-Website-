@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Add/Edit Wine Farm | Wine & Bubbles Admin</title>
+  <link rel="icon" type="image/png" href="../../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #d4af37;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-error: #d32f2f;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 900px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .form-card { background: var(--admin-card); border-radius: 24px; border: 1px solid var(--admin-border); padding: 32px; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin-bottom: 8px; }
+    .form-subtitle { color: var(--admin-muted); margin-bottom: 32px; font-size: 14px; }
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--admin-text); font-size: 14px; }
+    .form-label i { margin-right: 8px; color: var(--admin-primary); }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: 'Montserrat', sans-serif;
+      background: white;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--admin-primary);
+    }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    
+    .image-preview {
+      width: 100%;
+      height: 200px;
+      background: #f8f8f8;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      overflow: hidden;
+      border: 1px solid var(--admin-border);
+    }
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .image-placeholder {
+      text-align: center;
+      color: var(--admin-muted);
+    }
+    .image-placeholder i {
+      font-size: 48px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    
+    .switch-group {
+      background: #f8f7f5;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--admin-border);
+    }
+    .switch-label { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .switch-label i { font-size: 20px; color: var(--admin-primary); }
+    .switch { position: relative; display: inline-block; width: 52px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 26px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--admin-primary); }
+    input:checked + .slider:before { transform: translateX(26px); }
+    
+    .btn-primary {
+      background: var(--admin-primary);
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px;
+      transition: all 0.2s;
+      margin-top: 16px;
+    }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--admin-border);
+      padding: 12px 24px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 500;
+      width: 100%;
+      margin-top: 12px;
+    }
+    .btn-secondary:hover { background: #f5f5f5; }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    .error-message {
+      background: rgba(211,47,47,0.1);
+      border: 1px solid var(--admin-error);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 24px;
+      color: var(--admin-error);
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      .form-card { padding: 24px; }
+      .admin-container { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="../admin_dashboard.html"><img src="../../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="form-card">
+      <h1 class="form-title" id="formTitle">Add New Wine Farm</h1>
+      <p class="form-subtitle" id="formSubtitle">Fill in the wine farm details below</p>
+      
+      <div id="errorMessage" class="error-message"></div>
+      <div id="loadingContainer" style="display:none;"><div class="loading-overlay"><div class="loading-spinner"></div></div></div>
+      
+      <form id="wineFarmForm">
+        <div class="image-preview" id="imagePreview">
+          <div class="image-placeholder"><i class="fas fa-landscape"></i> Image Preview</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-image"></i> Image URL *</label>
+          <input type="text" id="imageUrl" class="form-input" placeholder="https://... or assets/images/...">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-wine-bottle"></i> Wine Farm Name *</label>
+          <input type="text" id="name" class="form-input" placeholder="Enter wine farm name">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-map-marker-alt"></i> Location *</label>
+          <select id="location" class="form-select">
+            <option value="Cape Town">Cape Town</option>
+            <option value="Johannesburg">Johannesburg</option>
+            <option value="Durban">Durban</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-align-left"></i> Description *</label>
+          <textarea id="description" class="form-textarea" placeholder="Enter wine farm description..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+          <input type="tel" id="phoneNumber" class="form-input" placeholder="+27 XX XXX XXXX">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="email" class="form-input" placeholder="info@winefarm.com">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-video"></i> Video URL (optional)</label>
+          <input type="text" id="videoUrl" class="form-input" placeholder="https://youtube.com/... or assets/videos/...">
+        </div>
+        
+        <div class="switch-group">
+          <div class="switch-label"><i class="fas fa-toggle-on"></i> Active Wine Farm</div>
+          <label class="switch"><input type="checkbox" id="isActive" checked><span class="slider"></span></label>
+        </div>
+        
+        <button type="submit" class="btn-primary" id="submitBtn">Save Wine Farm</button>
+        <button type="button" class="btn-secondary" onclick="window.location.href='wine_farm_management_screen.html'">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Add/Edit Wine Farm</p></div></div></footer>
+
+  <script src="wine_farm_add_edit.js"></script>
+</body>
+</html>

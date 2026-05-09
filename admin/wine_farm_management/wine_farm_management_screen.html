@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Wine Farm Management | Wine & Bubbles Admin</title>
+  <link rel="icon" type="image/png" href="../../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #d4af37;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-warning: #ed6c02;
+      --admin-error: #d32f2f;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 1400px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
+    .page-header h1 i { color: var(--admin-primary); margin-right: 12px; }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif; font-size: 14px; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(107,13,43,0.2); }
+    
+    .search-bar { background: white; border-radius: 50px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--admin-border); flex: 1; max-width: 400px; }
+    .search-bar i { color: var(--admin-primary); }
+    .search-bar input { border: none; flex: 1; outline: none; font-size: 14px; background: transparent; font-family: 'Montserrat', sans-serif; }
+    
+    .winefarms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+    }
+    
+    .winefarm-card {
+      background: var(--admin-card);
+      border-radius: 20px;
+      border: 1px solid var(--admin-border);
+      overflow: hidden;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .winefarm-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    .winefarm-image {
+      height: 180px;
+      background: #f8f8f8;
+      position: relative;
+      overflow: hidden;
+    }
+    .winefarm-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .video-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.6);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      color: white;
+    }
+    .status-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .status-active { background: #4caf50; color: white; }
+    .status-inactive { background: #f44336; color: white; }
+    
+    .winefarm-info {
+      padding: 16px;
+    }
+    .winefarm-name {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--admin-text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .winefarm-location {
+      font-size: 12px;
+      color: var(--admin-muted);
+      margin-bottom: 8px;
+    }
+    .winefarm-description {
+      font-size: 12px;
+      color: var(--admin-muted);
+      line-height: 1.4;
+      max-height: 36px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .winefarm-contact {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      color: var(--admin-muted);
+    }
+    .winefarm-contact i {
+      width: 14px;
+      color: var(--admin-primary);
+    }
+    .winefarm-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 40px;
+      transition: 0.2s;
+      color: var(--admin-muted);
+    }
+    .icon-btn:hover {
+      background: rgba(107,13,43,0.1);
+      color: var(--admin-primary);
+    }
+    
+    .loading-state, .empty-state {
+      text-align: center;
+      padding: 60px;
+      color: var(--admin-muted);
+      background: white;
+      border-radius: 24px;
+      border: 1px solid var(--admin-border);
+      grid-column: 1 / -1;
+    }
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(107,13,43,0.1);
+      border-top-color: var(--admin-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      max-width: 400px;
+      width: 90%;
+      padding: 24px;
+    }
+    .modal-content h3 {
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 16px;
+      color: var(--admin-text);
+    }
+    
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+      background: var(--admin-primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fab:hover {
+      background: #8a1e3d;
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 1100px) {
+      .winefarms-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; }
+      .winefarms-grid {
+        grid-template-columns: 1fr;
+      }
+      .page-header { flex-direction: column; align-items: stretch; }
+      .search-bar { max-width: 100%; }
+      .fab { bottom: 20px; right: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="../admin_dashboard.html"><img src="../../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="page-header">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <a href="../admin_dashboard.html" style="color: var(--admin-primary); text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
+        <h1><i class="fas fa-landmark"></i> Wine Farm Management</h1>
+      </div>
+      <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search wine farms..."></div>
+    </div>
+    
+    <div id="wineFarmsContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading wine farms...</p></div></div>
+  </div>
+
+  <button class="fab" id="addWineFarmBtn"><i class="fas fa-plus"></i></button>
+
+  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Wine Farm Management</p></div></div></footer>
+
+  <script src="wine_farm_management.js"></script>
+</body>
+</html>
