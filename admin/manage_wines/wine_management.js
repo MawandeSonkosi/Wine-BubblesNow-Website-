@@ -68,6 +68,23 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
+// Helper function to get correct image URL
+function getImageUrl(imageUrl) {
+    if (!imageUrl) {
+        return '../../assets/wines/default_wine.png';
+    }
+    // If it's already a full URL or starts with http, use as is
+    if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
+        return imageUrl;
+    }
+    // If it starts with 'assets/', remove the 'assets/' prefix and add '../../assets/'
+    if (imageUrl.startsWith('assets/')) {
+        return '../../' + imageUrl;
+    }
+    // Otherwise, assume it's in assets/wines/
+    return '../../assets/wines/' + imageUrl;
+}
+
 // ========== FETCH WINES ==========
 async function fetchWines() {
     const container = document.getElementById('winesContainer');
@@ -131,7 +148,7 @@ function renderWines() {
     container.innerHTML = filtered.map(wine => `
         <div class="wine-card" onclick="showWineActions(${wine.id})">
             <div class="wine-image">
-                <img src="${wine.imageUrl || '../../assets/wines/default_wine.png'}" alt="${escapeHtml(wine.name)}" onerror="this.src='../../assets/wines/default_wine.png'">
+                <img src="${getImageUrl(wine.imageUrl)}" alt="${escapeHtml(wine.name)}" onerror="this.src='../../assets/wines/default_wine.png'">
                 <div class="wine-badges">
                     ${wine.isFeatured ? '<span class="wine-badge badge-featured">FEATURED</span>' : ''}
                     ${wine.isGifting ? '<span class="wine-badge badge-gift">GIFT</span>' : ''}

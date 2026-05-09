@@ -26,6 +26,20 @@ function checkAuth() {
     return true;
 }
 
+// Helper function to get correct image URL for preview
+function getImageUrlForPreview(imageUrl) {
+    if (!imageUrl) {
+        return null;
+    }
+    if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
+        return imageUrl;
+    }
+    if (imageUrl.startsWith('assets/')) {
+        return '../../' + imageUrl;
+    }
+    return '../../assets/wines/' + imageUrl;
+}
+
 // ========== PROPERTY CHIPS ==========
 function initPropertyChips() {
     document.querySelectorAll('.property-chip').forEach(chip => {
@@ -54,7 +68,12 @@ function setupImagePreview() {
     function updatePreview() {
         const url = imageUrlInput.value.trim();
         if (url) {
-            previewContainer.innerHTML = `<img src="${url}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-wine-bottle\'></i> Image Preview</div>'">`;
+            const imgUrl = getImageUrlForPreview(url);
+            if (imgUrl) {
+                previewContainer.innerHTML = `<img src="${imgUrl}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-wine-bottle\'></i> Image Preview</div>'">`;
+            } else {
+                previewContainer.innerHTML = '<div class="image-placeholder"><i class="fas fa-wine-bottle"></i> Image Preview</div>';
+            }
         } else {
             previewContainer.innerHTML = '<div class="image-placeholder"><i class="fas fa-wine-bottle"></i> Image Preview</div>';
         }
@@ -121,7 +140,10 @@ async function loadWineData() {
         // Update image preview
         const previewContainer = document.getElementById('imagePreview');
         if (wineData.imageUrl) {
-            previewContainer.innerHTML = `<img src="${wineData.imageUrl}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-wine-bottle\'></i> Image Preview</div>'">`;
+            const imgUrl = getImageUrlForPreview(wineData.imageUrl);
+            if (imgUrl) {
+                previewContainer.innerHTML = `<img src="${imgUrl}" alt="Preview" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-wine-bottle\'></i> Image Preview</div>'">`;
+            }
         }
         
     } catch (error) {
