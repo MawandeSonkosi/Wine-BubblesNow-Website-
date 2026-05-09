@@ -18,6 +18,7 @@
       --admin-muted: #6d6d6d;
       --admin-border: #eae3da;
       --admin-error: #d32f2f;
+      --admin-success: #2e7d32;
     }
     body { background: var(--admin-bg); }
     .main-nav { display: none !important; }
@@ -59,10 +60,16 @@
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 12px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 12px; }
     .btn-secondary:hover { background: #f5f5f5; }
+    .btn-danger { background: transparent; border: 1px solid var(--admin-error); color: var(--admin-error); margin-top: 12px; width: 100%; }
+    .btn-danger:hover { background: rgba(211,47,47,0.1); }
+    
+    .form-actions { display: flex; flex-direction: column; gap: 12px; }
     
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
     .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-error); display: none; }
+    .success-message { background: rgba(46,125,50,0.1); border: 1px solid var(--admin-success); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-success); display: none; }
+    .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--admin-success); color: white; padding: 12px 24px; border-radius: 40px; z-index: 10002; font-family: 'Montserrat', sans-serif; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     
     @media (max-width: 768px) { .form-card { padding: 24px; } .admin-container { padding: 0 16px; } }
   </style>
@@ -111,11 +118,12 @@
         </div>
         
         <div id="passwordSection" class="form-group">
-          <label class="form-label"><i class="fas fa-lock"></i> Password *</label>
+          <label class="form-label"><i class="fas fa-lock"></i> Password <span id="passwordRequired">*</span></label>
           <div class="password-wrapper">
             <input type="password" id="password" class="form-input" placeholder="Enter password (min 6 characters)">
             <button type="button" class="password-toggle" id="togglePassword"><i class="fas fa-eye"></i></button>
           </div>
+          <div class="error-text" id="passwordError" style="display:none; color:#d32f2f; font-size:12px; margin-top:4px;">Password must be at least 6 characters</div>
         </div>
         
         <div class="switch-group">
@@ -123,14 +131,325 @@
           <label class="switch"><input type="checkbox" id="isActive" checked><span class="slider"></span></label>
         </div>
         
-        <button type="submit" class="btn-primary" id="submitBtn">Save Marketing Company</button>
-        <button type="button" class="btn-secondary" onclick="window.location.href='marketing_management_screen.html'">Cancel</button>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="submitBtn">Save Marketing Company</button>
+          <button type="button" class="btn-secondary" onclick="window.location.href='marketing_management_screen.html'">Cancel</button>
+        </div>
       </form>
     </div>
   </div>
 
   <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Add/Edit Marketing</p></div></div></footer>
 
-  <script src="marketing_management_add_edit.js"></script>
+  <script>
+    // Marketing Add/Edit JavaScript - Complete working version
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const marketingId = urlParams.get('id');
+
+    let marketingData = null;
+
+    // ========== AUTHENTICATION ==========
+    function checkAuth() {
+        const token = localStorage.getItem('wineBubbles_token');
+        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+        
+        if (!token || !isAdmin) {
+            alert('Admin access required');
+            window.location.href = '../../login/login.html';
+            return false;
+        }
+        return true;
+    }
+
+    // ========== LOAD MARKETING DATA (if editing) ==========
+    async function loadMarketingData() {
+        if (!marketingId) {
+            // Create mode
+            document.getElementById('formTitle').textContent = 'Add New Marketing Company';
+            document.getElementById('formSubtitle').textContent = 'Fill in the marketing company details below';
+            document.getElementById('submitBtn').textContent = 'Add Marketing Company';
+            document.getElementById('passwordSection').style.display = 'block';
+            document.getElementById('passwordRequired').textContent = '*';
+            return;
+        }
+        
+        // Edit mode
+        document.getElementById('formTitle').textContent = 'Edit Marketing Company';
+        document.getElementById('formSubtitle').textContent = 'Update marketing company information';
+        document.getElementById('submitBtn').textContent = 'Update Marketing Company';
+        document.getElementById('passwordSection').style.display = 'none';
+        
+        // Add delete button
+        addDeleteButton();
+        
+        showLoading(true);
+        
+        try {
+            const token = localStorage.getItem('wineBubbles_token');
+            const url = `${API_BASE}/api/marketing/${marketingId}`;
+            console.log('📡 Fetching marketing company from:', url);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            console.log('📡 Response status:', response.status);
+            
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('Marketing company not found');
+                }
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('📦 Response data:', data);
+            
+            // Handle different response formats
+            let company = null;
+            if (data.success === true && data.data) {
+                company = data.data;
+            } else if (data.data && typeof data.data === 'object') {
+                company = data.data;
+            } else if (data._id || data.id) {
+                company = data;
+            } else {
+                throw new Error('Invalid response format');
+            }
+            
+            if (!company) {
+                throw new Error('No company data received');
+            }
+            
+            marketingData = company;
+            
+            // Populate form fields
+            document.getElementById('companyName').value = marketingData.companyName || '';
+            document.getElementById('email').value = marketingData.email || '';
+            document.getElementById('phoneNumber').value = marketingData.phoneNumber || '';
+            document.getElementById('contactPerson').value = marketingData.contactPerson || '';
+            document.getElementById('address').value = marketingData.address || '';
+            document.getElementById('isActive').checked = marketingData.isActive === true;
+            
+            console.log('✅ Marketing company loaded:', marketingData.companyName);
+            
+        } catch (error) {
+            console.error('Error loading marketing company:', error);
+            showError('Failed to load marketing company data: ' + error.message);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ========== ADD DELETE BUTTON ==========
+    function addDeleteButton() {
+        if (!marketingId) return;
+        
+        const formActions = document.querySelector('.form-actions');
+        if (formActions && !document.querySelector('.btn-danger')) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn-danger';
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Company';
+            deleteBtn.onclick = deleteMarketing;
+            formActions.appendChild(deleteBtn);
+        }
+    }
+
+    // ========== DELETE MARKETING ==========
+    async function deleteMarketing() {
+        if (!marketingId) return;
+        
+        const companyName = document.getElementById('companyName').value || 'this company';
+        if (!confirm(`⚠️ Permanently delete "${companyName}"?\n\nThis action cannot be undone.`)) return;
+        
+        showLoading(true);
+        
+        try {
+            const token = localStorage.getItem('wineBubbles_token');
+            const response = await fetch(`${API_BASE}/api/marketing/${marketingId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Failed to delete');
+            }
+            
+            showToast('Marketing company deleted successfully', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'marketing_management_screen.html';
+            }, 1500);
+            
+        } catch (error) {
+            console.error('Delete error:', error);
+            showError('Failed to delete marketing company: ' + error.message);
+            showLoading(false);
+        }
+    }
+
+    // ========== VALIDATION ==========
+    function validateForm() {
+        const companyName = document.getElementById('companyName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password')?.value;
+        
+        if (!companyName) {
+            showError('Company name is required');
+            return false;
+        }
+        if (!email) {
+            showError('Email is required');
+            return false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError('Enter a valid email address');
+            return false;
+        }
+        if (!marketingId && (!password || password.length < 6)) {
+            showError('Password must be at least 6 characters');
+            return false;
+        }
+        
+        return true;
+    }
+
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        } else {
+            alert(message);
+        }
+    }
+
+    function showLoading(show) {
+        const loadingDiv = document.getElementById('loadingContainer');
+        const submitBtn = document.getElementById('submitBtn');
+        if (show) {
+            if (loadingDiv) loadingDiv.style.display = 'block';
+            if (submitBtn) submitBtn.disabled = true;
+        } else {
+            if (loadingDiv) loadingDiv.style.display = 'none';
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) existingToast.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        toast.style.background = type === 'success' ? '#2e7d32' : '#d32f2f';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            if (toast && toast.parentNode) toast.remove();
+        }, 3000);
+    }
+
+    // ========== SAVE MARKETING ==========
+    async function saveMarketing(event) {
+        event.preventDefault();
+        
+        if (!validateForm()) return;
+        
+        showLoading(true);
+        
+        const marketingDataToSave = {
+            companyName: document.getElementById('companyName').value.trim(),
+            email: document.getElementById('email').value.trim().toLowerCase(),
+            phoneNumber: document.getElementById('phoneNumber').value.trim() || null,
+            contactPerson: document.getElementById('contactPerson').value.trim() || null,
+            address: document.getElementById('address').value.trim() || null,
+            isActive: document.getElementById('isActive').checked,
+            advertIds: []
+        };
+        
+        if (!marketingId) {
+            marketingDataToSave.password = document.getElementById('password').value;
+        }
+        
+        console.log('📤 Saving marketing company:', marketingDataToSave);
+        
+        try {
+            const token = localStorage.getItem('wineBubbles_token');
+            const url = marketingId ? `${API_BASE}/api/marketing/${marketingId}` : `${API_BASE}/api/marketing`;
+            const method = marketingId ? 'PUT' : 'POST';
+            
+            console.log(`📡 ${method} request to:`, url);
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: { 
+                    'Authorization': `Bearer ${token}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(marketingDataToSave)
+            });
+            
+            console.log('📡 Response status:', response.status);
+            
+            if (!response.ok) {
+                let errorMsg = 'Failed to save marketing company';
+                try {
+                    const data = await response.json();
+                    errorMsg = data.message || data.error || errorMsg;
+                } catch(e) {}
+                throw new Error(errorMsg);
+            }
+            
+            const data = await response.json();
+            console.log('📦 Response data:', data);
+            
+            showToast(marketingId ? 'Marketing company updated successfully!' : 'Marketing company added successfully!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'marketing_management_screen.html';
+            }, 1500);
+            
+        } catch (error) {
+            console.error('Save error:', error);
+            showError('Failed to save marketing company: ' + error.message);
+            showLoading(false);
+        }
+    }
+
+    // ========== PASSWORD TOGGLE ==========
+    const toggleBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    if (toggleBtn && passwordInput) {
+        let showPassword = false;
+        toggleBtn.addEventListener('click', () => {
+            showPassword = !showPassword;
+            passwordInput.type = showPassword ? 'text' : 'password';
+            toggleBtn.innerHTML = showPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+        });
+    }
+
+    // ========== FORM SUBMIT ==========
+    const form = document.getElementById('marketingForm');
+    if (form) {
+        form.addEventListener('submit', saveMarketing);
+    }
+
+    // ========== INITIALIZE ==========
+    if (checkAuth()) {
+        loadMarketingData();
+    }
+  </script>
 </body>
 </html>
