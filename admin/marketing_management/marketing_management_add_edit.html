@@ -68,7 +68,6 @@
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
     .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-error); display: none; }
-    .success-message { background: rgba(46,125,50,0.1); border: 1px solid var(--admin-success); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-success); display: none; }
     .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--admin-success); color: white; padding: 12px 24px; border-radius: 40px; z-index: 10002; font-family: 'Montserrat', sans-serif; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     
     @media (max-width: 768px) { .form-card { padding: 24px; } .admin-container { padding: 0 16px; } }
@@ -142,7 +141,7 @@
   <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Add/Edit Marketing</p></div></div></footer>
 
   <script>
-    // Marketing Add/Edit JavaScript - Complete working version
+    // Marketing Add/Edit JavaScript - FIXED to use admin endpoint for loading
     const API_BASE = window.location.origin;
     const urlParams = new URLSearchParams(window.location.search);
     const marketingId = urlParams.get('id');
@@ -162,7 +161,7 @@
         return true;
     }
 
-    // ========== LOAD MARKETING DATA (if editing) ==========
+    // ========== LOAD MARKETING DATA (if editing) - USING ADMIN ENDPOINT ==========
     async function loadMarketingData() {
         if (!marketingId) {
             // Create mode
@@ -187,8 +186,11 @@
         
         try {
             const token = localStorage.getItem('wineBubbles_token');
-            const url = `${API_BASE}/api/marketing/${marketingId}`;
-            console.log('📡 Fetching marketing company from:', url);
+            
+            // FIXED: Use the admin endpoint to get all marketing companies (works with admin token)
+            // Then find the specific company by ID from the list
+            const url = `${API_BASE}/api/marketing?page=1&limit=100`;
+            console.log('📡 Fetching all marketing companies from:', url);
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -201,9 +203,6 @@
             console.log('📡 Response status:', response.status);
             
             if (!response.ok) {
-                if (response.status === 404) {
-                    throw new Error('Marketing company not found');
-                }
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
@@ -211,19 +210,28 @@
             console.log('📦 Response data:', data);
             
             // Handle different response formats
-            let company = null;
-            if (data.success === true && data.data) {
-                company = data.data;
-            } else if (data.data && typeof data.data === 'object') {
-                company = data.data;
-            } else if (data._id || data.id) {
-                company = data;
+            let companies = [];
+            if (data.success === true && Array.isArray(data.data)) {
+                companies = data.data;
+            } else if (Array.isArray(data)) {
+                companies = data;
+            } else if (data.companies && Array.isArray(data.companies)) {
+                companies = data.companies;
             } else {
                 throw new Error('Invalid response format');
             }
             
+            if (companies.length === 0) {
+                throw new Error('No marketing companies found');
+            }
+            
+            console.log(`📋 Found ${companies.length} marketing companies`);
+            
+            // Find the specific marketing company by ID (handle both id and _id)
+            const company = companies.find(c => c.id === marketingId || c._id === marketingId);
+            
             if (!company) {
-                throw new Error('No company data received');
+                throw new Error(`Marketing company with ID ${marketingId} not found`);
             }
             
             marketingData = company;
@@ -355,6 +363,7 @@
         toast.className = 'toast-notification';
         toast.textContent = message;
         toast.style.background = type === 'success' ? '#2e7d32' : '#d32f2f';
+        toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
         document.body.appendChild(toast);
         setTimeout(() => {
             if (toast && toast.parentNode) toast.remove();
