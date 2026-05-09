@@ -1,4 +1,4 @@
-// Marketing Management Detail JavaScript - FIXED for admin access
+// Marketing Management Detail JavaScript - FIXED for admin access using users approach
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -103,7 +103,7 @@ async function fetchAllAdverts() {
     }
 }
 
-// ========== FETCH MARKETING COMPANY - USING ADMIN ENDPOINT ==========
+// ========== FETCH MARKETING COMPANY - USING THE SAME PATTERN AS OTHER ADMIN SCREENS ==========
 async function fetchMarketingCompany() {
     if (!marketingId) {
         showError('No marketing ID provided');
@@ -118,9 +118,10 @@ async function fetchMarketingCompany() {
     try {
         const token = localStorage.getItem('wineBubbles_token');
         
-        // FIXED: Use admin endpoint to get all marketing companies, then find by ID
+        // Use the same endpoint that works in marketing_management.js
         const url = `${API_BASE}/api/marketing?page=1&limit=100`;
         console.log('📡 Fetching marketing companies from:', url);
+        console.log('🔐 Using token:', token ? 'Token present' : 'No token');
         
         const response = await fetch(url, {
             method: 'GET',
@@ -130,14 +131,19 @@ async function fetchMarketingCompany() {
             }
         });
         
+        console.log('📡 Response status:', response.status);
+        
         if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Authentication failed. Please refresh the page and login again.');
+            }
             throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
         console.log('📦 Response data:', data);
         
-        // Extract companies array
+        // Extract companies array - handle multiple response formats
         let companies = [];
         if (data.success === true && Array.isArray(data.data)) {
             companies = data.data;
@@ -157,10 +163,15 @@ async function fetchMarketingCompany() {
         console.log('Looking for ID:', marketingId);
         
         // Find the company by ID (handle both id and _id fields)
-        const company = companies.find(function(c) {
+        let company = null;
+        for (var i = 0; i < companies.length; i++) {
+            var c = companies[i];
             var companyId = c.id || c._id;
-            return companyId === marketingId || companyId === marketingId.toString();
-        });
+            if (companyId === marketingId || companyId === marketingId.toString()) {
+                company = c;
+                break;
+            }
+        }
         
         if (!company) {
             console.error('Available company IDs:', companies.map(function(c) { return c.id || c._id; }));
@@ -176,7 +187,7 @@ async function fetchMarketingCompany() {
     } catch (error) {
         console.error('Error fetching marketing company:', error);
         if (container) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ' + error.message + '</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button></div>';
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ' + error.message + '</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button><button class="btn-secondary" onclick="window.location.href=\'marketing_management_screen.html\'" style="margin-top:16px; margin-left:8px;">Back to List</button></div>';
         }
     }
 }
@@ -184,25 +195,51 @@ async function fetchMarketingCompany() {
 // ========== GET ASSIGNED ADVERTS ==========
 function getAssignedAdverts() {
     if (!allAdverts.length) return [];
-    return allAdverts.filter(function(advert) {
-        return assignedAdvertIds.includes(advert.id || advert._id);
-    });
+    var result = [];
+    for (var i = 0; i < allAdverts.length; i++) {
+        var advert = allAdverts[i];
+        var advertId = advert.id || advert._id;
+        for (var j = 0; j < assignedAdvertIds.length; j++) {
+            if (assignedAdvertIds[j] === advertId) {
+                result.push(advert);
+                break;
+            }
+        }
+    }
+    return result;
 }
 
 // ========== GET AVAILABLE ADVERTS ==========
 function getAvailableAdverts() {
     if (!allAdverts.length) return [];
     
-    var available = allAdverts.filter(function(advert) {
-        return !assignedAdvertIds.includes(advert.id || advert._id);
-    });
+    var available = [];
+    for (var i = 0; i < allAdverts.length; i++) {
+        var advert = allAdverts[i];
+        var advertId = advert.id || advert._id;
+        var isAssigned = false;
+        for (var j = 0; j < assignedAdvertIds.length; j++) {
+            if (assignedAdvertIds[j] === advertId) {
+                isAssigned = true;
+                break;
+            }
+        }
+        if (!isAssigned) {
+            available.push(advert);
+        }
+    }
     
     if (searchQuery) {
         var q = searchQuery.toLowerCase();
-        available = available.filter(function(advert) {
-            return (advert.title && advert.title.toLowerCase().indexOf(q) !== -1) || 
-                   (advert.subtitle && advert.subtitle.toLowerCase().indexOf(q) !== -1);
-        });
+        var filtered = [];
+        for (var i = 0; i < available.length; i++) {
+            var advert = available[i];
+            if ((advert.title && advert.title.toLowerCase().indexOf(q) !== -1) || 
+                (advert.subtitle && advert.subtitle.toLowerCase().indexOf(q) !== -1)) {
+                filtered.push(advert);
+            }
+        }
+        available = filtered;
     }
     
     return available;
@@ -381,7 +418,14 @@ window.addAdvert = async function(advertId) {
         }
         
         // Update local data
-        if (assignedAdvertIds.indexOf(advertId) === -1) {
+        var alreadyExists = false;
+        for (var i = 0; i < assignedAdvertIds.length; i++) {
+            if (assignedAdvertIds[i] === advertId) {
+                alreadyExists = true;
+                break;
+            }
+        }
+        if (!alreadyExists) {
             assignedAdvertIds.push(advertId);
         }
         
@@ -470,7 +514,6 @@ function escapeHtml(str) {
 
 function showToast(message, type) {
     type = type || 'success';
-    // Remove existing toast
     var existingToast = document.querySelector('.toast-notification');
     if (existingToast) existingToast.remove();
     
@@ -490,10 +533,9 @@ function showError(message) {
 
 // ========== INITIALIZE ==========
 if (checkAuth()) {
-    fetchAllAdverts().then(function() {
+    // Create wrapper for async init
+    (function init() {
+        fetchAllAdverts();
         fetchMarketingCompany();
-    }).catch(function(error) {
-        console.error('Initialization error:', error);
-        fetchMarketingCompany();
-    });
+    })();
 }

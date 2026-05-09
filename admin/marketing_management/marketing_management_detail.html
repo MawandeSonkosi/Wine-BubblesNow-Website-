@@ -21,10 +21,36 @@
       --admin-error: #d32f2f;
       --admin-info: #0288d1;
     }
-    body { background: var(--admin-bg); }
+    
+    /* Full height layout to push footer to bottom */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      background: var(--admin-bg);
+      display: flex;
+      flex-direction: column;
+    }
+    
     .main-nav { display: none !important; }
     .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
-    .admin-container { max-width: 1200px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    /* Main content wrapper - pushes footer down */
+    .admin-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .admin-container { 
+      max-width: 1200px; 
+      margin: 30px auto 0; 
+      padding: 0 24px;
+      flex: 1;
+    }
     
     .detail-card { background: var(--admin-card); border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
     .detail-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
@@ -82,8 +108,14 @@
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; border-radius: 24px; max-width: 400px; width: 90%; padding: 24px; }
     
+    /* Footer stays at bottom */
+    .footer { 
+      margin-top: auto;
+      background: var(--admin-primary);
+    }
+    
     @media (max-width: 768px) {
-      .admin-container { padding: 0 16px; }
+      .admin-container { padding: 0 16px; margin-top: 20px; }
       .info-grid { grid-template-columns: 1fr; }
       .info-row { flex-direction: column; gap: 4px; }
       .info-label { width: auto; }
@@ -102,12 +134,21 @@
     </div>
   </div>
 
-  <div class="admin-container">
-    <div id="detailContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading marketing company details...</p></div></div>
+  <div class="admin-wrapper">
+    <div class="admin-container">
+      <div id="detailContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading marketing company details...</p></div></div>
+    </div>
   </div>
 
-  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Marketing Company Details</p></div></div></footer>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Admin Panel — Marketing Company Details</p>
+      </div>
+    </div>
+  </footer>
 
-  <script src="marketing_management_detail.js"></script>
+  <script src="marketing_management_detail.js?v=3"></script>
 </body>
 </html>
