@@ -171,26 +171,28 @@ function renderMarketingCompanies() {
 }
 
 // ========== MARKETING ACTIONS ==========
-function showMarketingActions(companyId) {
-    const company = allCompanies.find(c => c.id === companyId);
-    if (!company) return;
+function showMarketingActions(marketingId) {
+    const marketing = allMarketing.find(m => m.id === marketingId || m._id === marketingId);
+    if (!marketing) return;
+    
+    // Get the correct ID
+    const companyId = marketing.id || marketing._id;
     
     const modalHtml = `
         <div class="modal-overlay" id="marketingActionsModal">
             <div class="modal-content">
-                <h3><i class="fas fa-chart-line"></i> ${escapeHtml(company.companyName)}</h3>
+                <h3><i class="fas fa-chart-line"></i> ${escapeHtml(marketing.companyName)}</h3>
                 <div style="margin-bottom: 20px;">
-                    <p><strong>Email:</strong> ${escapeHtml(company.email)}</p>
-                    ${company.phoneNumber ? `<p><strong>Phone:</strong> ${escapeHtml(company.phoneNumber)}</p>` : ''}
-                    ${company.contactPerson ? `<p><strong>Contact:</strong> ${escapeHtml(company.contactPerson)}</p>` : ''}
-                    ${company.address ? `<p><strong>Address:</strong> ${escapeHtml(company.address)}</p>` : ''}
-                    <p><strong>Status:</strong> ${company.isActive ? 'Active' : 'Inactive'}</p>
-                    <p><strong>Adverts:</strong> ${company.advertIds?.length || 0} assigned</p>
+                    <p><strong>Email:</strong> ${escapeHtml(marketing.email)}</p>
+                    ${marketing.phoneNumber ? `<p><strong>Phone:</strong> ${escapeHtml(marketing.phoneNumber)}</p>` : ''}
+                    ${marketing.contactPerson ? `<p><strong>Contact:</strong> ${escapeHtml(marketing.contactPerson)}</p>` : ''}
+                    <p><strong>Status:</strong> ${marketing.isActive ? 'Active' : 'Inactive'}</p>
+                    <p><strong>Adverts:</strong> ${marketing.advertIds?.length || 0} assigned</p>
                 </div>
                 <div style="display: flex; gap: 12px; flex-direction: column;">
                     <button class="btn-primary" onclick="editMarketing('${companyId}')" style="width:100%;"><i class="fas fa-edit"></i> Edit Company</button>
                     <button class="btn-primary" onclick="viewMarketingDetails('${companyId}')" style="width:100%;"><i class="fas fa-eye"></i> View Details</button>
-                    <button class="btn-primary" onclick="deleteMarketingPrompt('${companyId}', '${escapeHtml(company.companyName)}')" style="width:100%; background:#d32f2f;"><i class="fas fa-trash-alt"></i> Delete Company</button>
+                    <button class="btn-primary" onclick="deleteMarketingPrompt('${companyId}', '${escapeHtml(marketing.companyName)}')" style="width:100%; background:#d32f2f;"><i class="fas fa-trash-alt"></i> Delete Company</button>
                     <button onclick="closeModal()" style="background:#f0f0f0; border:none; padding:12px; border-radius:40px; cursor:pointer; width:100%;">Cancel</button>
                 </div>
             </div>
@@ -206,7 +208,13 @@ function closeModal() {
 
 window.editMarketing = function(companyId) {
     closeModal();
-    window.location.href = `marketing_management_add_edit.html?id=${companyId}`;
+    // Make sure we're passing a valid ID
+    if (companyId && companyId !== 'undefined' && companyId !== 'null') {
+        window.location.href = `marketing_management_add_edit.html?id=${companyId}`;
+    } else {
+        console.error('Invalid company ID:', companyId);
+        showToast('Invalid company ID', 'error');
+    }
 };
 
 window.viewMarketingDetails = function(companyId) {

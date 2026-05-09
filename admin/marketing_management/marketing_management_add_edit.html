@@ -141,7 +141,7 @@
   <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Add/Edit Marketing</p></div></div></footer>
 
   <script>
-    // Marketing Add/Edit JavaScript - FIXED to use admin endpoint for loading
+    // Marketing Add/Edit JavaScript - FIXED ID handling
     const API_BASE = window.location.origin;
     const urlParams = new URLSearchParams(window.location.search);
     const marketingId = urlParams.get('id');
@@ -161,10 +161,13 @@
         return true;
     }
 
-    // ========== LOAD MARKETING DATA (if editing) - USING ADMIN ENDPOINT ==========
+    // ========== LOAD MARKETING DATA (if editing) ==========
     async function loadMarketingData() {
-        if (!marketingId) {
-            // Create mode
+        // Debug log to see what ID we received
+        console.log('🔍 Marketing ID from URL:', marketingId);
+        
+        if (!marketingId || marketingId === 'null' || marketingId === 'undefined') {
+            // Create mode - no ID provided
             document.getElementById('formTitle').textContent = 'Add New Marketing Company';
             document.getElementById('formSubtitle').textContent = 'Fill in the marketing company details below';
             document.getElementById('submitBtn').textContent = 'Add Marketing Company';
@@ -179,7 +182,7 @@
         document.getElementById('submitBtn').textContent = 'Update Marketing Company';
         document.getElementById('passwordSection').style.display = 'none';
         
-        // Add delete button
+        // Add delete button (only for edit mode)
         addDeleteButton();
         
         showLoading(true);
@@ -187,8 +190,7 @@
         try {
             const token = localStorage.getItem('wineBubbles_token');
             
-            // FIXED: Use the admin endpoint to get all marketing companies (works with admin token)
-            // Then find the specific company by ID from the list
+            // Use the admin endpoint to get all marketing companies
             const url = `${API_BASE}/api/marketing?page=1&limit=100`;
             console.log('📡 Fetching all marketing companies from:', url);
             
@@ -209,7 +211,7 @@
             const data = await response.json();
             console.log('📦 Response data:', data);
             
-            // Handle different response formats
+            // Extract companies array
             let companies = [];
             if (data.success === true && Array.isArray(data.data)) {
                 companies = data.data;
@@ -218,7 +220,7 @@
             } else if (data.companies && Array.isArray(data.companies)) {
                 companies = data.companies;
             } else {
-                throw new Error('Invalid response format');
+                throw new Error('Invalid response format - no companies array found');
             }
             
             if (companies.length === 0) {
@@ -226,11 +228,16 @@
             }
             
             console.log(`📋 Found ${companies.length} marketing companies`);
+            console.log('Looking for ID:', marketingId);
             
-            // Find the specific marketing company by ID (handle both id and _id)
-            const company = companies.find(c => c.id === marketingId || c._id === marketingId);
+            // Find the company by ID (handle both id and _id fields)
+            const company = companies.find(c => {
+                const companyId = c.id || c._id;
+                return companyId === marketingId || companyId === marketingId.toString();
+            });
             
             if (!company) {
+                console.error('Available company IDs:', companies.map(c => c.id || c._id));
                 throw new Error(`Marketing company with ID ${marketingId} not found`);
             }
             
@@ -256,7 +263,7 @@
 
     // ========== ADD DELETE BUTTON ==========
     function addDeleteButton() {
-        if (!marketingId) return;
+        if (!marketingId || marketingId === 'null' || marketingId === 'undefined') return;
         
         const formActions = document.querySelector('.form-actions');
         if (formActions && !document.querySelector('.btn-danger')) {
@@ -388,7 +395,7 @@
             advertIds: []
         };
         
-        if (!marketingId) {
+        if (!marketingId || marketingId === 'null' || marketingId === 'undefined') {
             marketingDataToSave.password = document.getElementById('password').value;
         }
         
@@ -396,8 +403,11 @@
         
         try {
             const token = localStorage.getItem('wineBubbles_token');
-            const url = marketingId ? `${API_BASE}/api/marketing/${marketingId}` : `${API_BASE}/api/marketing`;
-            const method = marketingId ? 'PUT' : 'POST';
+            // Use the ID from the URL for update, or no ID for create
+            const url = (marketingId && marketingId !== 'null' && marketingId !== 'undefined') 
+                ? `${API_BASE}/api/marketing/${marketingId}` 
+                : `${API_BASE}/api/marketing`;
+            const method = (marketingId && marketingId !== 'null' && marketingId !== 'undefined') ? 'PUT' : 'POST';
             
             console.log(`📡 ${method} request to:`, url);
             
