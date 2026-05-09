@@ -659,20 +659,20 @@
     let lastCheckTime = new Date();
     
     // Complete Quick Actions - All navigate to separate screens
-    const quickActions = [
-      { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => window.location.href = 'user_management/user_management_screen.html' },
-      { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => window.location.href = 'booking_management/booking_management_screen.html' },
-      { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => window.location.href = 'delivery_management/delivery_management_screen.html' },
-      { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => window.location.href = 'driver_management/driver_management_screen.html' },
-      { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#6b0d2b', action: () => window.location.href = 'manage_wines/wine_management_screen.html' },
-      { title: 'Manage Add-Ons', icon: 'fa-gift', color: '#9c27b0', action: () => showComingSoon('Add-Ons Management') },
-      { title: 'Manage Wine Farms', icon: 'fa-tree', color: '#8d6e63', action: () => showComingSoon('Wine Farms Management') },
-      { title: 'Manage Suppliers', icon: 'fa-truck', color: '#0288d1', action: () => showComingSoon('Supplier Management') },
-      { title: 'Manage Adverts', icon: 'fa-bullhorn', color: '#7b1fa2', action: () => showComingSoon('Adverts Management') },
-      { title: 'Marketing Management', icon: 'fa-chart-line', color: '#00897b', action: () => showComingSoon('Marketing Management') },
-      { title: 'Warehouse', icon: 'fa-warehouse', color: '#bf360c', action: () => showComingSoon('Warehouse Management') },
-      { title: 'Manage Restaurants', icon: 'fa-utensils', color: '#d84315', action: () => showComingSoon('Restaurant Management') }
-    ];
+   const quickActions = [
+  { title: 'Manage Users', icon: 'fa-users', color: '#6b0d2b', action: () => window.location.href = 'user_management/user_management_screen.html' },
+  { title: 'Manage Bookings', icon: 'fa-calendar-alt', color: '#2e7d32', action: () => window.location.href = 'booking_management/booking_management_screen.html' },
+  { title: 'Manage Deliveries', icon: 'fa-truck', color: '#e65100', action: () => window.location.href = 'delivery_management/delivery_management_screen.html' },
+  { title: 'Manage Drivers', icon: 'fa-id-card', color: '#1565c0', action: () => window.location.href = 'driver_management/driver_management_screen.html' },
+  { title: 'Manage Wines', icon: 'fa-wine-bottle', color: '#6b0d2b', action: () => window.location.href = 'manage_wines/wine_management_screen.html' },
+  { title: 'Manage Add-Ons', icon: 'fa-gift', color: '#9c27b0', action: () => window.location.href = 'addon_management/addon_management_screen.html' },
+  { title: 'Manage Wine Farms', icon: 'fa-tree', color: '#8d6e63', action: () => showComingSoon('Wine Farms Management') },
+  { title: 'Manage Suppliers', icon: 'fa-truck', color: '#0288d1', action: () => showComingSoon('Supplier Management') },
+  { title: 'Manage Adverts', icon: 'fa-bullhorn', color: '#7b1fa2', action: () => showComingSoon('Adverts Management') },
+  { title: 'Marketing Management', icon: 'fa-chart-line', color: '#00897b', action: () => showComingSoon('Marketing Management') },
+  { title: 'Warehouse', icon: 'fa-warehouse', color: '#bf360c', action: () => showComingSoon('Warehouse Management') },
+  { title: 'Manage Restaurants', icon: 'fa-utensils', color: '#d84315', action: () => showComingSoon('Restaurant Management') }
+];
 
     function renderQuickActions() {
       const container = document.getElementById('quickActionsGrid');
