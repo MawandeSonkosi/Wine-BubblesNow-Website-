@@ -198,9 +198,8 @@ function renderSuppliers() {
                                 ${supplier.isVerified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>' : ''}
                             </div>
                             <div class="supplier-actions" onclick="event.stopPropagation()">
-                                <button class="icon-btn" onclick="editSupplier('${supplier.id}')" title="Edit"><i class="fas fa-edit"></i></button>
-                                <button class="icon-btn" onclick="viewSupplierDetails('${supplier.id}')" title="View Details"><i class="fas fa-eye"></i></button>
-                                <button class="icon-btn" onclick="deleteSupplierPrompt('${supplier.id}', '${escapeHtml(supplier.name)}')" title="Delete" style="color:#d32f2f;"><i class="fas fa-trash-alt"></i></button>
+                                <button class="icon-btn" onclick="editSupplier('${supplier.id}')" title="Edit Supplier"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="icon-btn danger" onclick="deleteSupplierPrompt('${supplier.id}', '${escapeHtml(supplier.name)}')" title="Delete Supplier"><i class="fas fa-trash-alt"></i> Delete</button>
                             </div>
                         </div>
                     </div>
@@ -229,7 +228,6 @@ function showSupplierActions(supplierId) {
                 </div>
                 <div style="display: flex; gap: 12px; flex-direction: column;">
                     <button class="btn-primary" onclick="editSupplier('${supplierId}')" style="width:100%;"><i class="fas fa-edit"></i> Edit Supplier</button>
-                    <button class="btn-primary" onclick="viewSupplierDetails('${supplierId}')" style="width:100%;"><i class="fas fa-eye"></i> View Details</button>
                     <button class="btn-primary" onclick="deleteSupplierPrompt('${supplierId}', '${escapeHtml(supplier.name)}')" style="width:100%; background:#d32f2f;"><i class="fas fa-trash-alt"></i> Delete Supplier</button>
                     <button onclick="closeModal()" style="background:#f0f0f0; border:none; padding:12px; border-radius:40px; cursor:pointer; width:100%;">Cancel</button>
                 </div>
@@ -247,11 +245,6 @@ function closeModal() {
 window.editSupplier = function(supplierId) {
     closeModal();
     window.location.href = `supplier_management_add_edit.html?id=${supplierId}`;
-};
-
-window.viewSupplierDetails = function(supplierId) {
-    closeModal();
-    window.location.href = `supplier_detail.html?id=${supplierId}`;
 };
 
 window.deleteSupplierPrompt = function(supplierId, supplierName) {

@@ -21,10 +21,28 @@
       --admin-warning: #ed6c02;
       --admin-error: #d32f2f;
     }
-    body { background: var(--admin-bg); }
+    body { 
+      background: var(--admin-bg); 
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
     .main-nav { display: none !important; }
     .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
-    .admin-container { max-width: 1400px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    /* Main content wrapper - ensures footer stays at bottom */
+    .admin-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .admin-container { 
+      max-width: 1400px; 
+      margin: 30px auto 0; 
+      padding: 0 24px;
+      flex: 1;
+    }
     
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
     .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
@@ -44,9 +62,24 @@
     .stat-box-value { font-size: 24px; font-weight: 700; color: var(--admin-text); }
     .stat-box-label { font-size: 12px; color: var(--admin-muted); }
     
-    .suppliers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 24px; }
+    .suppliers-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 24px; 
+      margin-bottom: 30px;
+    }
     
-    .supplier-card { background: var(--admin-card); border-radius: 20px; border: 1px solid var(--admin-border); overflow: hidden; transition: all 0.2s; cursor: pointer; }
+    .supplier-card { 
+      background: var(--admin-card); 
+      border-radius: 20px; 
+      border: 1px solid var(--admin-border); 
+      overflow: hidden; 
+      transition: all 0.2s; 
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
     .supplier-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
     .supplier-header { padding: 16px; background: #f8f7f5; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; }
     .supplier-name { font-weight: 700; font-size: 16px; color: var(--admin-text); }
@@ -55,18 +88,41 @@
     .status-badge.inactive { background: rgba(211,47,47,0.1); color: #d32f2f; }
     .status-badge.pending { background: rgba(237,108,2,0.1); color: #ed6c02; }
     
-    .supplier-body { padding: 16px; }
+    .supplier-body { padding: 16px; flex: 1; }
     .supplier-contact { margin-bottom: 12px; }
     .supplier-contact p { font-size: 13px; color: var(--admin-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     .supplier-contact i { width: 16px; color: var(--admin-primary); }
     .wine-count { display: inline-flex; align-items: center; gap: 6px; background: rgba(107,13,43,0.08); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--admin-primary); margin-top: 8px; }
     .verified-badge { color: #2196f3; font-size: 11px; margin-left: 8px; }
     
-    .supplier-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid var(--admin-border); padding-top: 12px; }
-    .icon-btn { background: none; border: none; font-size: 16px; cursor: pointer; padding: 6px; border-radius: 40px; transition: 0.2s; color: var(--admin-muted); }
+    .supplier-actions { 
+      margin-top: 16px; 
+      display: flex; 
+      gap: 12px; 
+      justify-content: flex-end; 
+      border-top: 1px solid var(--admin-border); 
+      padding-top: 12px;
+    }
+    .icon-btn { 
+      background: none; 
+      border: none; 
+      font-size: 16px; 
+      cursor: pointer; 
+      padding: 6px 12px; 
+      border-radius: 40px; 
+      transition: 0.2s; 
+      color: var(--admin-muted); 
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+    }
+    .icon-btn i { font-size: 14px; }
     .icon-btn:hover { background: rgba(107,13,43,0.1); color: var(--admin-primary); }
+    .icon-btn.danger:hover { background: rgba(211,47,47,0.1); color: var(--admin-error); }
     
-    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); grid-column: 1 / -1; }
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
     .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
@@ -74,17 +130,39 @@
     .modal-content { background: white; border-radius: 24px; max-width: 400px; width: 90%; padding: 24px; }
     .modal-content h3 { font-family: 'Playfair Display', serif; margin-bottom: 16px; color: var(--admin-text); }
     
-    .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; background: var(--admin-primary); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.2s; z-index: 100; display: flex; align-items: center; justify-content: center; }
+    .fab { 
+      position: fixed; 
+      bottom: 30px; 
+      right: 30px; 
+      width: 56px; 
+      height: 56px; 
+      background: var(--admin-primary); 
+      color: white; 
+      border: none; 
+      border-radius: 50%; 
+      font-size: 24px; 
+      cursor: pointer; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+      transition: all 0.2s; 
+      z-index: 100; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+    }
     .fab:hover { background: #8a1e3d; transform: scale(1.05); }
+    
+    /* Footer stays at bottom */
+    .footer { margin-top: auto; }
     
     @media (max-width: 1100px) { .suppliers-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) {
-      .admin-container { padding: 0 16px; }
+      .admin-container { padding: 0 16px; margin-top: 20px; }
       .suppliers-grid { grid-template-columns: 1fr; }
       .page-header { flex-direction: column; align-items: stretch; }
       .search-bar { width: 100%; }
       .fab { bottom: 20px; right: 20px; }
       .stats-row { flex-direction: column; }
+      .supplier-actions { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -97,22 +175,31 @@
     </div>
   </div>
 
-  <div class="admin-container">
-    <div class="page-header">
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <a href="../admin_dashboard.html" style="color: var(--admin-primary); text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
-        <h1><i class="fas fa-truck"></i> Supplier Management</h1>
+  <div class="admin-wrapper">
+    <div class="admin-container">
+      <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <a href="../admin_dashboard.html" style="color: var(--admin-primary); text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
+          <h1><i class="fas fa-truck"></i> Supplier Management</h1>
+        </div>
+        <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search suppliers..."></div>
       </div>
-      <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search suppliers..."></div>
+      
+      <div id="statsContainer" class="stats-row"></div>
+      <div id="suppliersContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading suppliers...</p></div></div>
     </div>
-    
-    <div id="statsContainer" class="stats-row"></div>
-    <div id="suppliersContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading suppliers...</p></div></div>
   </div>
 
   <button class="fab" id="addSupplierBtn"><i class="fas fa-plus"></i></button>
 
-  <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Supplier Management</p></div></div></footer>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Admin Panel — Supplier Management</p>
+      </div>
+    </div>
+  </footer>
 
   <script src="supplier_management.js"></script>
 </body>
