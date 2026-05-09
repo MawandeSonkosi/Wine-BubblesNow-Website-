@@ -1,4 +1,4 @@
-// Marketing Management Detail JavaScript - FIXED for admin access using users approach
+// Marketing Management Detail JavaScript - Fetches assigned adverts properly
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -92,7 +92,7 @@ async function fetchAllAdverts() {
             } else {
                 allAdverts = [];
             }
-            console.log(`✅ Loaded ${allAdverts.length} adverts`);
+            console.log(`✅ Loaded ${allAdverts.length} total adverts`);
         } else {
             console.error('Failed to fetch adverts:', response.status);
             allAdverts = [];
@@ -103,7 +103,7 @@ async function fetchAllAdverts() {
     }
 }
 
-// ========== FETCH MARKETING COMPANY - USING THE SAME PATTERN AS OTHER ADMIN SCREENS ==========
+// ========== FETCH MARKETING COMPANY ==========
 async function fetchMarketingCompany() {
     if (!marketingId) {
         showError('No marketing ID provided');
@@ -118,10 +118,9 @@ async function fetchMarketingCompany() {
     try {
         const token = localStorage.getItem('wineBubbles_token');
         
-        // Use the same endpoint that works in marketing_management.js
+        // Fetch all marketing companies (admin endpoint)
         const url = `${API_BASE}/api/marketing?page=1&limit=100`;
         console.log('📡 Fetching marketing companies from:', url);
-        console.log('🔐 Using token:', token ? 'Token present' : 'No token');
         
         const response = await fetch(url, {
             method: 'GET',
@@ -131,76 +130,109 @@ async function fetchMarketingCompany() {
             }
         });
         
-        console.log('📡 Response status:', response.status);
-        
         if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('Authentication failed. Please refresh the page and login again.');
-            }
             throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('📦 Response data:', data);
+        console.log('📦 Marketing response:', data);
         
-        // Extract companies array - handle multiple response formats
+        // Extract companies array
         let companies = [];
         if (data.success === true && Array.isArray(data.data)) {
             companies = data.data;
         } else if (Array.isArray(data)) {
             companies = data;
-        } else if (data.companies && Array.isArray(data.companies)) {
-            companies = data.companies;
         } else {
-            throw new Error('Invalid response format - no companies array found');
+            throw new Error('Invalid response format');
         }
         
-        if (companies.length === 0) {
-            throw new Error('No marketing companies found');
-        }
-        
-        console.log(`📋 Found ${companies.length} marketing companies`);
-        console.log('Looking for ID:', marketingId);
-        
-        // Find the company by ID (handle both id and _id fields)
-        let company = null;
+        // Find the specific marketing company
+        let foundCompany = null;
         for (var i = 0; i < companies.length; i++) {
-            var c = companies[i];
-            var companyId = c.id || c._id;
-            if (companyId === marketingId || companyId === marketingId.toString()) {
-                company = c;
+            var company = companies[i];
+            var companyId = company.id || company._id;
+            if (companyId == marketingId) {
+                foundCompany = company;
                 break;
             }
         }
         
-        if (!company) {
-            console.error('Available company IDs:', companies.map(function(c) { return c.id || c._id; }));
-            throw new Error('Marketing company with ID ' + marketingId + ' not found');
+        if (!foundCompany) {
+            throw new Error('Marketing company not found');
         }
         
-        marketingData = company;
+        marketingData = foundCompany;
         assignedAdvertIds = marketingData.advertIds || [];
         
         console.log('✅ Marketing company loaded:', marketingData.companyName);
+        console.log('📋 Assigned advert IDs:', assignedAdvertIds);
+        
+        // Now fetch the actual advert details for assigned adverts
+        await fetchAssignedAdvertDetails();
+        
         renderDetail();
         
     } catch (error) {
         console.error('Error fetching marketing company:', error);
         if (container) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ' + error.message + '</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button><button class="btn-secondary" onclick="window.location.href=\'marketing_management_screen.html\'" style="margin-top:16px; margin-left:8px;">Back to List</button></div>';
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ' + error.message + '</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button></div>';
         }
+    }
+}
+
+// ========== FETCH ASSIGNED ADVERT DETAILS ==========
+async function fetchAssignedAdvertDetails() {
+    if (!assignedAdvertIds || assignedAdvertIds.length === 0) {
+        console.log('No assigned adverts to fetch');
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        
+        // Fetch each assigned advert by ID
+        for (var i = 0; i < assignedAdvertIds.length; i++) {
+            var advertId = assignedAdvertIds[i];
+            try {
+                const response = await fetch(`${API_BASE}/api/adverts/${advertId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const advertData = await response.json();
+                    // Check if already in allAdverts
+                    var exists = false;
+                    for (var j = 0; j < allAdverts.length; j++) {
+                        if (allAdverts[j].id == advertId || allAdverts[j]._id == advertId) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) {
+                        allAdverts.push(advertData.data || advertData);
+                    }
+                }
+            } catch (err) {
+                console.error(`Failed to fetch advert ${advertId}:`, err);
+            }
+        }
+        console.log(`✅ Fetched ${assignedAdvertIds.length} assigned adverts`);
+    } catch (error) {
+        console.error('Error fetching assigned adverts:', error);
     }
 }
 
 // ========== GET ASSIGNED ADVERTS ==========
 function getAssignedAdverts() {
     if (!allAdverts.length) return [];
+    
     var result = [];
     for (var i = 0; i < allAdverts.length; i++) {
         var advert = allAdverts[i];
         var advertId = advert.id || advert._id;
         for (var j = 0; j < assignedAdvertIds.length; j++) {
-            if (assignedAdvertIds[j] === advertId) {
+            if (assignedAdvertIds[j] == advertId) {
                 result.push(advert);
                 break;
             }
@@ -219,7 +251,7 @@ function getAvailableAdverts() {
         var advertId = advert.id || advert._id;
         var isAssigned = false;
         for (var j = 0; j < assignedAdvertIds.length; j++) {
-            if (assignedAdvertIds[j] === advertId) {
+            if (assignedAdvertIds[j] == advertId) {
                 isAssigned = true;
                 break;
             }
@@ -420,13 +452,23 @@ window.addAdvert = async function(advertId) {
         // Update local data
         var alreadyExists = false;
         for (var i = 0; i < assignedAdvertIds.length; i++) {
-            if (assignedAdvertIds[i] === advertId) {
+            if (assignedAdvertIds[i] == advertId) {
                 alreadyExists = true;
                 break;
             }
         }
         if (!alreadyExists) {
             assignedAdvertIds.push(advertId);
+            
+            // Fetch the advert details
+            var advertResponse = await fetch(API_BASE + '/api/adverts/' + advertId, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (advertResponse.ok) {
+                var advertData = await advertResponse.json();
+                var newAdvert = advertData.data || advertData;
+                allAdverts.push(newAdvert);
+            }
         }
         
         // Update UI
@@ -466,7 +508,7 @@ window.removeAdvert = async function(advertId) {
         // Update local data
         var newAssignedIds = [];
         for (var i = 0; i < assignedAdvertIds.length; i++) {
-            if (assignedAdvertIds[i] !== advertId) {
+            if (assignedAdvertIds[i] != advertId) {
                 newAssignedIds.push(assignedAdvertIds[i]);
             }
         }
@@ -527,15 +569,8 @@ function showToast(message, type) {
     }, 3000);
 }
 
-function showError(message) {
-    showToast(message, 'error');
-}
-
 // ========== INITIALIZE ==========
 if (checkAuth()) {
-    // Create wrapper for async init
-    (function init() {
-        fetchAllAdverts();
-        fetchMarketingCompany();
-    })();
+    fetchAllAdverts();
+    fetchMarketingCompany();
 }
