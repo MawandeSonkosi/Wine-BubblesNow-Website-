@@ -1,4 +1,4 @@
-// Marketing Management Detail JavaScript
+// Marketing Management Detail JavaScript - FIXED for admin access
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -103,7 +103,7 @@ async function fetchAllAdverts() {
     }
 }
 
-// ========== FETCH MARKETING COMPANY ==========
+// ========== FETCH MARKETING COMPANY - USING ADMIN ENDPOINT ==========
 async function fetchMarketingCompany() {
     if (!marketingId) {
         showError('No marketing ID provided');
@@ -117,8 +117,17 @@ async function fetchMarketingCompany() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
-        const response = await fetch(`${API_BASE}/api/marketing/${marketingId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+        
+        // FIXED: Use admin endpoint to get all marketing companies, then find by ID
+        const url = `${API_BASE}/api/marketing?page=1&limit=100`;
+        console.log('📡 Fetching marketing companies from:', url);
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
         
         if (!response.ok) {
@@ -126,7 +135,39 @@ async function fetchMarketingCompany() {
         }
         
         const data = await response.json();
-        marketingData = data.data || data;
+        console.log('📦 Response data:', data);
+        
+        // Extract companies array
+        let companies = [];
+        if (data.success === true && Array.isArray(data.data)) {
+            companies = data.data;
+        } else if (Array.isArray(data)) {
+            companies = data;
+        } else if (data.companies && Array.isArray(data.companies)) {
+            companies = data.companies;
+        } else {
+            throw new Error('Invalid response format - no companies array found');
+        }
+        
+        if (companies.length === 0) {
+            throw new Error('No marketing companies found');
+        }
+        
+        console.log(`📋 Found ${companies.length} marketing companies`);
+        console.log('Looking for ID:', marketingId);
+        
+        // Find the company by ID (handle both id and _id fields)
+        const company = companies.find(function(c) {
+            var companyId = c.id || c._id;
+            return companyId === marketingId || companyId === marketingId.toString();
+        });
+        
+        if (!company) {
+            console.error('Available company IDs:', companies.map(function(c) { return c.id || c._id; }));
+            throw new Error('Marketing company with ID ' + marketingId + ' not found');
+        }
+        
+        marketingData = company;
         assignedAdvertIds = marketingData.advertIds || [];
         
         console.log('✅ Marketing company loaded:', marketingData.companyName);
@@ -135,7 +176,7 @@ async function fetchMarketingCompany() {
     } catch (error) {
         console.error('Error fetching marketing company:', error);
         if (container) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ${error.message}</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button></div>`;
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ' + error.message + '</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button></div>';
         }
     }
 }
@@ -143,21 +184,25 @@ async function fetchMarketingCompany() {
 // ========== GET ASSIGNED ADVERTS ==========
 function getAssignedAdverts() {
     if (!allAdverts.length) return [];
-    return allAdverts.filter(advert => assignedAdvertIds.includes(advert.id));
+    return allAdverts.filter(function(advert) {
+        return assignedAdvertIds.includes(advert.id || advert._id);
+    });
 }
 
 // ========== GET AVAILABLE ADVERTS ==========
 function getAvailableAdverts() {
     if (!allAdverts.length) return [];
     
-    let available = allAdverts.filter(advert => !assignedAdvertIds.includes(advert.id));
+    var available = allAdverts.filter(function(advert) {
+        return !assignedAdvertIds.includes(advert.id || advert._id);
+    });
     
     if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        available = available.filter(advert => 
-            (advert.title && advert.title.toLowerCase().includes(q)) || 
-            (advert.subtitle && advert.subtitle.toLowerCase().includes(q))
-        );
+        var q = searchQuery.toLowerCase();
+        available = available.filter(function(advert) {
+            return (advert.title && advert.title.toLowerCase().indexOf(q) !== -1) || 
+                   (advert.subtitle && advert.subtitle.toLowerCase().indexOf(q) !== -1);
+        });
     }
     
     return available;
@@ -165,12 +210,12 @@ function getAvailableAdverts() {
 
 // ========== RENDER DETAIL ==========
 function renderDetail() {
-    const container = document.getElementById('detailContent');
+    var container = document.getElementById('detailContent');
     if (!container || !marketingData) return;
     
-    const statusClass = marketingData.isActive ? 'active' : 'inactive';
-    const assignedAdverts = getAssignedAdverts();
-    const availableAdverts = getAvailableAdverts();
+    var statusClass = marketingData.isActive ? 'active' : 'inactive';
+    var assignedAdverts = getAssignedAdverts();
+    var availableAdverts = getAvailableAdverts();
     
     container.innerHTML = `
         <div class="detail-card">
@@ -222,9 +267,9 @@ function renderDetail() {
     `;
     
     // Setup search listener
-    const searchInput = document.getElementById('advertSearch');
+    var searchInput = document.getElementById('advertSearch');
     if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', function(e) {
             searchQuery = e.target.value;
             updateAvailableAdverts();
         });
@@ -236,22 +281,28 @@ function renderAssignedAdverts(adverts) {
         return '<div class="empty-state" style="grid-column:1/-1; padding:40px;"><i class="fas fa-ad" style="font-size:48px; margin-bottom:16px; opacity:0.5;"></i><p>No adverts assigned to this company</p></div>';
     }
     
-    return adverts.map(advert => `
-        <div class="advert-card">
-            <div class="advert-image">
-                ${getAdvertImageHtml(advert)}
-            </div>
-            <div class="advert-title">${escapeHtml(advert.title)}</div>
-            <div class="advert-subtitle">${escapeHtml(advert.subtitle || 'No description')}</div>
-            <div class="advert-details">
-                <div>
-                    <span class="advert-price">R${(advert.price || 0).toFixed(2)}</span>
-                    <span class="advert-type"> • ${escapeHtml(advert.type || 'Advert')}</span>
+    var html = '';
+    for (var i = 0; i < adverts.length; i++) {
+        var advert = adverts[i];
+        var advertId = advert.id || advert._id;
+        html += `
+            <div class="advert-card">
+                <div class="advert-image">
+                    ${getAdvertImageHtml(advert)}
                 </div>
-                <button class="remove-btn" onclick="removeAdvert('${advert.id}')" title="Remove from company"><i class="fas fa-trash-alt"></i></button>
+                <div class="advert-title">${escapeHtml(advert.title)}</div>
+                <div class="advert-subtitle">${escapeHtml(advert.subtitle || 'No description')}</div>
+                <div class="advert-details">
+                    <div>
+                        <span class="advert-price">R${(advert.price || 0).toFixed(2)}</span>
+                        <span class="advert-type"> • ${escapeHtml(advert.type || 'Advert')}</span>
+                    </div>
+                    <button class="remove-btn" onclick="removeAdvert('${advertId}')" title="Remove from company"><i class="fas fa-trash-alt"></i></button>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }
+    return html;
 }
 
 function renderAvailableAdverts(adverts) {
@@ -259,47 +310,54 @@ function renderAvailableAdverts(adverts) {
         return '<div class="empty-state" style="padding:40px;"><i class="fas fa-check-circle" style="font-size:48px; margin-bottom:16px; color:#2e7d32;"></i><p>No adverts available' + (searchQuery ? ' matching your search' : '') + '</p></div>';
     }
     
-    return adverts.map(advert => `
-        <div class="available-advert-item" onclick="addAdvert('${advert.id}')">
-            <div class="available-advert-image">
-                ${getAdvertImageHtml(advert, 'small')}
+    var html = '';
+    for (var i = 0; i < adverts.length; i++) {
+        var advert = adverts[i];
+        var advertId = advert.id || advert._id;
+        html += `
+            <div class="available-advert-item" onclick="addAdvert('${advertId}')">
+                <div class="available-advert-image">
+                    ${getAdvertImageHtml(advert, 'small')}
+                </div>
+                <div class="available-advert-info">
+                    <div class="available-advert-name">${escapeHtml(advert.title)}</div>
+                    <div class="available-advert-meta">R${(advert.price || 0).toFixed(2)} • ${escapeHtml(advert.type || 'Advert')}</div>
+                </div>
+                <button class="add-advert-btn" onclick="event.stopPropagation(); addAdvert('${advertId}')">+ Add</button>
             </div>
-            <div class="available-advert-info">
-                <div class="available-advert-name">${escapeHtml(advert.title)}</div>
-                <div class="available-advert-meta">R${(advert.price || 0).toFixed(2)} • ${escapeHtml(advert.type || 'Advert')}</div>
-            </div>
-            <button class="add-advert-btn" onclick="event.stopPropagation(); addAdvert('${advert.id}')">+ Add</button>
-        </div>
-    `).join('');
+        `;
+    }
+    return html;
 }
 
-function getAdvertImageHtml(advert, size = 'normal') {
+function getAdvertImageHtml(advert, size) {
+    size = size || 'normal';
     if (advert.imageUrl && advert.imageUrl.trim() !== '') {
-        const imgUrl = getImageUrl(advert.imageUrl);
-        return `<img src="${imgUrl}" alt="${escapeHtml(advert.title)}" onerror="this.parentElement.innerHTML='<div class=\\'advert-image-placeholder\\'><i class=\\'fas fa-ad\\'></i></div>'">`;
+        var imgUrl = getImageUrl(advert.imageUrl);
+        return '<img src="' + imgUrl + '" alt="' + escapeHtml(advert.title) + '" onerror="this.parentElement.innerHTML=\'<div class=\\\'advert-image-placeholder\\\'><i class=\\\'fas fa-ad\\\'></i></div>\'">';
     }
     return '<div class="advert-image-placeholder"><i class="fas fa-ad"></i></div>';
 }
 
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
-    if (imageUrl.startsWith('http')) return imageUrl;
-    if (imageUrl.startsWith('assets/')) return '../../' + imageUrl;
+    if (imageUrl.indexOf('http') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '../../' + imageUrl;
     return '../../assets/images/' + imageUrl;
 }
 
 function updateAvailableAdverts() {
-    const container = document.getElementById('availableAdvertsContainer');
+    var container = document.getElementById('availableAdvertsContainer');
     if (container) {
-        const availableAdverts = getAvailableAdverts();
+        var availableAdverts = getAvailableAdverts();
         container.innerHTML = renderAvailableAdverts(availableAdverts);
     }
 }
 
 function updateAssignedAdverts() {
-    const container = document.getElementById('assignedAdvertsContainer');
+    var container = document.getElementById('assignedAdvertsContainer');
     if (container) {
-        const assignedAdverts = getAssignedAdverts();
+        var assignedAdverts = getAssignedAdverts();
         container.innerHTML = renderAssignedAdverts(assignedAdverts);
     }
 }
@@ -311,19 +369,19 @@ window.addAdvert = async function(advertId) {
     isLoading = true;
     
     try {
-        const token = localStorage.getItem('wineBubbles_token');
-        const response = await fetch(`${API_BASE}/api/marketing/${marketingId}/adverts/${advertId}`, {
+        var token = localStorage.getItem('wineBubbles_token');
+        var response = await fetch(API_BASE + '/api/marketing/' + marketingId + '/adverts/' + advertId, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
         });
         
         if (!response.ok) {
-            const errorData = await response.json();
+            var errorData = await response.json();
             throw new Error(errorData.message || 'Failed to add advert');
         }
         
         // Update local data
-        if (!assignedAdvertIds.includes(advertId)) {
+        if (assignedAdvertIds.indexOf(advertId) === -1) {
             assignedAdvertIds.push(advertId);
         }
         
@@ -350,19 +408,25 @@ window.removeAdvert = async function(advertId) {
     isLoading = true;
     
     try {
-        const token = localStorage.getItem('wineBubbles_token');
-        const response = await fetch(`${API_BASE}/api/marketing/${marketingId}/adverts/${advertId}`, {
+        var token = localStorage.getItem('wineBubbles_token');
+        var response = await fetch(API_BASE + '/api/marketing/' + marketingId + '/adverts/' + advertId, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 'Authorization': 'Bearer ' + token }
         });
         
         if (!response.ok) {
-            const errorData = await response.json();
+            var errorData = await response.json();
             throw new Error(errorData.message || 'Failed to remove advert');
         }
         
         // Update local data
-        assignedAdvertIds = assignedAdvertIds.filter(id => id !== advertId);
+        var newAssignedIds = [];
+        for (var i = 0; i < assignedAdvertIds.length; i++) {
+            if (assignedAdvertIds[i] !== advertId) {
+                newAssignedIds.push(assignedAdvertIds[i]);
+            }
+        }
+        assignedAdvertIds = newAssignedIds;
         
         // Update UI
         updateAssignedAdverts();
@@ -380,14 +444,14 @@ window.removeAdvert = async function(advertId) {
 
 // ========== EDIT MARKETING ==========
 window.editMarketing = function() {
-    window.location.href = `marketing_management_add_edit.html?id=${marketingId}`;
+    window.location.href = 'marketing_management_add_edit.html?id=' + marketingId;
 };
 
 // ========== HELPER FUNCTIONS ==========
 function formatDate(dateStr) {
     if (!dateStr) return '—';
     try {
-        const d = new Date(dateStr);
+        var d = new Date(dateStr);
         return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     } catch(e) { 
         return '—';
@@ -404,15 +468,16 @@ function escapeHtml(str) {
     });
 }
 
-function showToast(message, type = 'success') {
+function showToast(message, type) {
+    type = type || 'success';
     // Remove existing toast
-    const existingToast = document.querySelector('.toast-notification');
+    var existingToast = document.querySelector('.toast-notification');
     if (existingToast) existingToast.remove();
     
-    const toast = document.createElement('div');
+    var toast = document.createElement('div');
     toast.className = 'toast-notification';
     toast.textContent = message;
-    toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
+    toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:' + (type === 'success' ? '#2e7d32' : '#d32f2f') + '; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);';
     document.body.appendChild(toast);
     setTimeout(function() { 
         if (toast && toast.parentNode) toast.remove(); 
