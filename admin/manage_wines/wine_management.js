@@ -73,15 +73,12 @@ function getImageUrl(imageUrl) {
     if (!imageUrl) {
         return '../../assets/wines/default_wine.png';
     }
-    // If it's already a full URL or starts with http, use as is
     if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
         return imageUrl;
     }
-    // If it starts with 'assets/', remove the 'assets/' prefix and add '../../assets/'
     if (imageUrl.startsWith('assets/')) {
         return '../../' + imageUrl;
     }
-    // Otherwise, assume it's in assets/wines/
     return '../../assets/wines/' + imageUrl;
 }
 
@@ -119,7 +116,7 @@ async function fetchWines() {
     }
 }
 
-// ========== RENDER WINES ==========
+// ========== RENDER WINES - Using grid container ==========
 function renderWines() {
     const container = document.getElementById('winesContainer');
     
@@ -145,30 +142,37 @@ function renderWines() {
         return;
     }
     
-    container.innerHTML = filtered.map(wine => `
-        <div class="wine-card" onclick="showWineActions(${wine.id})">
-            <div class="wine-image">
-                <img src="${getImageUrl(wine.imageUrl)}" alt="${escapeHtml(wine.name)}" onerror="this.src='../../assets/wines/default_wine.png'">
-                <div class="wine-badges">
-                    ${wine.isFeatured ? '<span class="wine-badge badge-featured">FEATURED</span>' : ''}
-                    ${wine.isGifting ? '<span class="wine-badge badge-gift">GIFT</span>' : ''}
-                    ${wine.isEvent ? '<span class="wine-badge badge-event">EVENT</span>' : ''}
-                    ${wine.isCase ? '<span class="wine-badge badge-case">CASE</span>' : ''}
+    // Create grid container with wines-grid class
+    const gridHtml = `
+        <div class="wines-grid">
+            ${filtered.map(wine => `
+                <div class="wine-card" onclick="showWineActions(${wine.id})">
+                    <div class="wine-image">
+                        <img src="${getImageUrl(wine.imageUrl)}" alt="${escapeHtml(wine.name)}" onerror="this.src='../../assets/wines/default_wine.png'">
+                        <div class="wine-badges">
+                            ${wine.isFeatured ? '<span class="wine-badge badge-featured">FEATURED</span>' : ''}
+                            ${wine.isGifting ? '<span class="wine-badge badge-gift">GIFT</span>' : ''}
+                            ${wine.isEvent ? '<span class="wine-badge badge-event">EVENT</span>' : ''}
+                            ${wine.isCase ? '<span class="wine-badge badge-case">CASE</span>' : ''}
+                        </div>
+                        <div class="${getStockClass(wine.stockCount)}">${getStockText(wine.stockCount)}</div>
+                    </div>
+                    <div class="wine-info">
+                        <div class="wine-name">${escapeHtml(wine.name)}</div>
+                        <div class="wine-type">${escapeHtml(wine.type)}</div>
+                        <div class="wine-description">${escapeHtml(wine.description?.substring(0, 80) || '')}${wine.description?.length > 80 ? '...' : ''}</div>
+                        <div class="wine-price">R${(wine.price || 0).toFixed(2)}</div>
+                        <div class="wine-actions" onclick="event.stopPropagation()">
+                            <button class="icon-btn" onclick="editWine(${wine.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="icon-btn" onclick="deleteWinePrompt(${wine.id}, '${escapeHtml(wine.name)}')" title="Delete" style="color:#d32f2f;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
                 </div>
-                <div class="${getStockClass(wine.stockCount)}">${getStockText(wine.stockCount)}</div>
-            </div>
-            <div class="wine-info">
-                <div class="wine-name">${escapeHtml(wine.name)}</div>
-                <div class="wine-type">${escapeHtml(wine.type)}</div>
-                <div class="wine-description">${escapeHtml(wine.description?.substring(0, 80) || '')}${wine.description?.length > 80 ? '...' : ''}</div>
-                <div class="wine-price">R${(wine.price || 0).toFixed(2)}</div>
-                <div class="wine-actions" onclick="event.stopPropagation()">
-                    <button class="icon-btn" onclick="editWine(${wine.id})" title="Edit"><i class="fas fa-edit"></i></button>
-                    <button class="icon-btn" onclick="deleteWinePrompt(${wine.id}, '${escapeHtml(wine.name)}')" title="Delete" style="color:#d32f2f;"><i class="fas fa-trash-alt"></i></button>
-                </div>
-            </div>
+            `).join('')}
         </div>
-    `).join('');
+    `;
+    
+    container.innerHTML = gridHtml;
 }
 
 function getStockClass(stockCount) {
