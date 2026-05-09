@@ -74,7 +74,7 @@ async function fetchMarketingCompanies() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
-        const response = await fetch(`${API_BASE}/api/marketing?limit=100`, {
+        const response = await fetch(`${API_BASE}/api/marketing?page=1&limit=100`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -120,6 +120,11 @@ function getStatusClass(isActive) {
     return isActive ? 'active' : 'inactive';
 }
 
+// Get company ID consistently
+function getCompanyId(company) {
+    return company.id || company._id;
+}
+
 function renderMarketingCompanies() {
     const container = document.getElementById('marketingContainer');
     
@@ -142,8 +147,9 @@ function renderMarketingCompanies() {
         <div class="marketing-grid">
             ${filtered.map(company => {
                 const statusClass = getStatusClass(company.isActive);
+                const companyId = getCompanyId(company);
                 return `
-                    <div class="marketing-card" onclick="showMarketingActions('${company.id}')">
+                    <div class="marketing-card" onclick="viewMarketingDetails('${companyId}')">
                         <div class="marketing-header">
                             <span class="company-name">${escapeHtml(company.companyName)}</span>
                             <span class="status-badge ${statusClass}">${company.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
@@ -158,8 +164,9 @@ function renderMarketingCompanies() {
                                 <span class="advert-count"><i class="fas fa-ad"></i> ${company.advertIds?.length || 0} Adverts</span>
                             </div>
                             <div class="marketing-actions" onclick="event.stopPropagation()">
-                                <button class="icon-btn" onclick="editMarketing('${company.id}')" title="Edit"><i class="fas fa-edit"></i> Edit</button>
-                                <button class="icon-btn danger" onclick="deleteMarketingPrompt('${company.id}', '${escapeHtml(company.companyName)}')" title="Delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                                <button class="icon-btn" onclick="editMarketing('${companyId}')" title="Edit"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="icon-btn" onclick="viewMarketingDetails('${companyId}')" title="View Details"><i class="fas fa-eye"></i> View</button>
+                                <button class="icon-btn danger" onclick="deleteMarketingPrompt('${companyId}', '${escapeHtml(company.companyName)}')" title="Delete"><i class="fas fa-trash-alt"></i> Delete</button>
                             </div>
                         </div>
                     </div>
@@ -171,28 +178,26 @@ function renderMarketingCompanies() {
 }
 
 // ========== MARKETING ACTIONS ==========
-function showMarketingActions(marketingId) {
-    const marketing = allMarketing.find(m => m.id === marketingId || m._id === marketingId);
-    if (!marketing) return;
-    
-    // Get the correct ID
-    const companyId = marketing.id || marketing._id;
+function showMarketingActions(companyId) {
+    const company = allCompanies.find(c => (c.id === companyId || c._id === companyId));
+    if (!company) return;
     
     const modalHtml = `
         <div class="modal-overlay" id="marketingActionsModal">
             <div class="modal-content">
-                <h3><i class="fas fa-chart-line"></i> ${escapeHtml(marketing.companyName)}</h3>
+                <h3><i class="fas fa-chart-line"></i> ${escapeHtml(company.companyName)}</h3>
                 <div style="margin-bottom: 20px;">
-                    <p><strong>Email:</strong> ${escapeHtml(marketing.email)}</p>
-                    ${marketing.phoneNumber ? `<p><strong>Phone:</strong> ${escapeHtml(marketing.phoneNumber)}</p>` : ''}
-                    ${marketing.contactPerson ? `<p><strong>Contact:</strong> ${escapeHtml(marketing.contactPerson)}</p>` : ''}
-                    <p><strong>Status:</strong> ${marketing.isActive ? 'Active' : 'Inactive'}</p>
-                    <p><strong>Adverts:</strong> ${marketing.advertIds?.length || 0} assigned</p>
+                    <p><strong>Email:</strong> ${escapeHtml(company.email)}</p>
+                    ${company.phoneNumber ? `<p><strong>Phone:</strong> ${escapeHtml(company.phoneNumber)}</p>` : ''}
+                    ${company.contactPerson ? `<p><strong>Contact:</strong> ${escapeHtml(company.contactPerson)}</p>` : ''}
+                    ${company.address ? `<p><strong>Address:</strong> ${escapeHtml(company.address)}</p>` : ''}
+                    <p><strong>Status:</strong> ${company.isActive ? 'Active' : 'Inactive'}</p>
+                    <p><strong>Adverts:</strong> ${company.advertIds?.length || 0} assigned</p>
                 </div>
                 <div style="display: flex; gap: 12px; flex-direction: column;">
                     <button class="btn-primary" onclick="editMarketing('${companyId}')" style="width:100%;"><i class="fas fa-edit"></i> Edit Company</button>
                     <button class="btn-primary" onclick="viewMarketingDetails('${companyId}')" style="width:100%;"><i class="fas fa-eye"></i> View Details</button>
-                    <button class="btn-primary" onclick="deleteMarketingPrompt('${companyId}', '${escapeHtml(marketing.companyName)}')" style="width:100%; background:#d32f2f;"><i class="fas fa-trash-alt"></i> Delete Company</button>
+                    <button class="btn-primary" onclick="deleteMarketingPrompt('${companyId}', '${escapeHtml(company.companyName)}')" style="width:100%; background:#d32f2f;"><i class="fas fa-trash-alt"></i> Delete Company</button>
                     <button onclick="closeModal()" style="background:#f0f0f0; border:none; padding:12px; border-radius:40px; cursor:pointer; width:100%;">Cancel</button>
                 </div>
             </div>
@@ -206,26 +211,35 @@ function closeModal() {
     if (modal) modal.remove();
 }
 
-window.editMarketing = function(companyId) {
-    closeModal();
-    // Make sure we're passing a valid ID
+// ========== NAVIGATION FUNCTIONS ==========
+window.viewMarketingDetails = function(companyId) {
+    console.log('👁️ Viewing marketing company details for ID:', companyId);
     if (companyId && companyId !== 'undefined' && companyId !== 'null') {
-        window.location.href = `marketing_management_add_edit.html?id=${companyId}`;
+        window.location.href = `marketing_management_detail.html?id=${companyId}`;
     } else {
-        console.error('Invalid company ID:', companyId);
-        showToast('Invalid company ID', 'error');
+        console.error('Invalid company ID for view details:', companyId);
+        showToast('Unable to view details: Invalid company ID', 'error');
     }
 };
 
-window.viewMarketingDetails = function(companyId) {
-    closeModal();
-    window.location.href = `marketing_management_detail.html?id=${companyId}`;
+window.editMarketing = function(companyId) {
+    console.log('✏️ Editing marketing company with ID:', companyId);
+    if (companyId && companyId !== 'undefined' && companyId !== 'null') {
+        window.location.href = `marketing_management_add_edit.html?id=${companyId}`;
+    } else {
+        console.error('Invalid company ID for edit:', companyId);
+        showToast('Unable to edit: Invalid company ID', 'error');
+    }
 };
 
 window.deleteMarketingPrompt = function(companyId, companyName) {
     closeModal();
-    if (confirm(`⚠️ Permanently delete "${companyName}"?\n\nThis action cannot be undone.`)) {
-        deleteMarketing(companyId);
+    if (companyId && companyId !== 'undefined' && companyId !== 'null') {
+        if (confirm(`⚠️ Permanently delete "${companyName}"?\n\nThis action cannot be undone.`)) {
+            deleteMarketing(companyId);
+        }
+    } else {
+        showToast('Unable to delete: Invalid company ID', 'error');
     }
 };
 
@@ -260,7 +274,7 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 3000);
 }
 
-// ========== INITIALIZE ==========
+// ========== SEARCH & INITIALIZATION ==========
 document.getElementById('searchInput')?.addEventListener('input', (e) => {
     searchQuery = e.target.value;
     renderMarketingCompanies();
