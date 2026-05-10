@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Add/Edit Restaurant | Wine & Bubbles Admin</title>
+  <link rel="icon" type="image/png" href="/assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #d4af37;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-error: #d32f2f;
+      --admin-success: #2e7d32;
+    }
+    
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    
+    .admin-container { max-width: 1000px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .form-card { background: var(--admin-card); border-radius: 24px; border: 1px solid var(--admin-border); padding: 32px; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin-bottom: 8px; }
+    .form-subtitle { color: var(--admin-muted); margin-bottom: 32px; font-size: 14px; }
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--admin-text); font-size: 14px; }
+    .form-label i { margin-right: 8px; color: var(--admin-primary); }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: 'Montserrat', sans-serif;
+      background: white;
+      transition: all 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--admin-primary); box-shadow: 0 0 0 2px rgba(107,13,43,0.1); }
+    
+    .image-preview-area { margin-top: 8px; border: 2px dashed var(--admin-border); border-radius: 12px; padding: 16px; text-align: center; }
+    .image-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-bottom: 12px; }
+    .image-placeholder { width: 100%; height: 100px; background: rgba(107,13,43,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--admin-muted); }
+    
+    .switch-group { background: #f8f7f5; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--admin-border); }
+    .switch-label { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .switch-label i { font-size: 20px; color: var(--admin-primary); }
+    .switch { position: relative; display: inline-block; width: 52px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 26px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--admin-primary); }
+    input:checked + .slider:before { transform: translateX(26px); }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-size: 15px; transition: all 0.2s; margin-top: 16px; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 12px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 12px; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    .btn-danger { background: transparent; border: 1px solid var(--admin-error); color: var(--admin-error); margin-top: 12px; width: 100%; }
+    .btn-danger:hover { background: rgba(211,47,47,0.1); }
+    
+    .form-actions { display: flex; flex-direction: column; gap: 12px; }
+    
+    .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; }
+    .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-error); display: none; }
+    .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--admin-success); color: white; padding: 12px 24px; border-radius: 40px; z-index: 10002; font-family: 'Montserrat', sans-serif; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 768px) { .row { grid-template-columns: 1fr; } .form-card { padding: 24px; } .admin-container { padding: 0 16px; } }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="/admin/admin_dashboard.html"><img src="/assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="form-card">
+      <h1 class="form-title" id="formTitle">Add New Restaurant</h1>
+      <p class="form-subtitle" id="formSubtitle">Create a new restaurant for the Dine With Me feature.</p>
+      
+      <div id="errorMessage" class="error-message"></div>
+      <div id="loadingContainer" style="display:none;"><div class="loading-overlay"><div class="loading-spinner"></div></div></div>
+      
+      <form id="restaurantForm">
+        <!-- Basic Information -->
+        <h3 style="color: var(--admin-primary); margin-bottom: 16px;">Basic Information</h3>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-utensils"></i> Restaurant Name *</label>
+          <input type="text" id="name" class="form-input" placeholder="e.g., The Gourmet Kitchen">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-align-left"></i> Description *</label>
+          <textarea id="description" class="form-textarea" placeholder="Restaurant description" rows="3"></textarea>
+        </div>
+        
+        <!-- Images -->
+        <h3 style="color: var(--admin-primary); margin-bottom: 16px; margin-top: 24px;">Images</h3>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-image"></i> Restaurant Image URL</label>
+          <input type="text" id="imageUrl" class="form-input" placeholder="/assets/dine_with_me/restaurant_name.png">
+          <div id="imagePreviewArea" class="image-preview-area" style="display: none;">
+            <img id="imagePreview" class="image-preview" alt="Preview">
+            <div id="imagePlaceholder" class="image-placeholder"><i class="fas fa-image"></i><p style="margin-top:8px;">Enter an image URL above</p></div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-image"></i> Banner Image URL</label>
+          <input type="text" id="bannerImageUrl" class="form-input" placeholder="/assets/dine_with_me/banner_name.png">
+        </div>
+        
+        <!-- Contact Information -->
+        <h3 style="color: var(--admin-primary); margin-bottom: 16px; margin-top: 24px;">Contact Information</h3>
+        
+        <div class="row">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-map-marker-alt"></i> Address *</label>
+            <input type="text" id="address" class="form-input" placeholder="Full restaurant address">
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-phone"></i> Phone *</label>
+            <input type="tel" id="phone" class="form-input" placeholder="+27 XX XXX XXXX">
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-envelope"></i> Email *</label>
+            <input type="email" id="email" class="form-input" placeholder="restaurant@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-utensil-spoon"></i> Cuisine Type *</label>
+            <input type="text" id="cuisineType" class="form-input" placeholder="e.g., Italian, Chinese, Fusion">
+          </div>
+        </div>
+        
+        <!-- Hours -->
+        <h3 style="color: var(--admin-primary); margin-bottom: 16px; margin-top: 24px;">Business Hours</h3>
+        
+        <div class="row">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-clock"></i> Opening Hours</label>
+            <input type="time" id="openingHours" class="form-input" value="09:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-clock"></i> Closing Hours</label>
+            <input type="time" id="closingHours" class="form-input" value="22:00">
+          </div>
+        </div>
+        
+        <!-- Access -->
+        <h3 style="color: var(--admin-primary); margin-bottom: 16px; margin-top: 24px;">Access</h3>
+        
+        <div id="passwordSection" class="form-group">
+          <label class="form-label"><i class="fas fa-lock"></i> Password <span id="passwordRequired">*</span></label>
+          <div class="password-wrapper" style="position: relative;">
+            <input type="password" id="password" class="form-input" placeholder="Enter password (min 6 characters)">
+            <button type="button" class="password-toggle" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        
+        <!-- Settings -->
+        <div class="switch-group">
+          <div class="switch-label"><i class="fas fa-toggle-on"></i> Active Restaurant</div>
+          <label class="switch"><input type="checkbox" id="isActive" checked><span class="slider"></span></label>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="submitBtn">Create Restaurant</button>
+          <button type="button" class="btn-secondary" onclick="window.location.href='restaurant_management_screen.html'">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="/assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Admin Panel — Add/Edit Restaurant</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/admin/restaurant_management/restaurant_management_add_edit.js?v=1"></script>
+</body>
+</html>
