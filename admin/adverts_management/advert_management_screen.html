@@ -7,10 +7,9 @@
   <link rel="icon" type="image/png" href="/assets/categories/Icons.png" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- FIXED: Use absolute path from root -->
+  <!-- FIXED: Absolute path from root -->
   <link rel="stylesheet" href="/style.css" />
   <style>
-    /* All your styles from before - keep them */
     :root {
       --admin-primary: #6b0d2b;
       --admin-accent: #d4af37;
@@ -24,13 +23,33 @@
       --admin-error: #d32f2f;
     }
     
-    html, body { height: 100%; margin: 0; padding: 0; }
-    body { background: var(--admin-bg); display: flex; flex-direction: column; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      background: var(--admin-bg);
+      display: flex;
+      flex-direction: column;
+    }
+    
     .main-nav { display: none !important; }
     .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
     
-    .admin-wrapper { flex: 1; display: flex; flex-direction: column; }
-    .admin-container { max-width: 1400px; margin: 30px auto 0; padding: 0 24px; flex: 1; }
+    .admin-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .admin-container { 
+      max-width: 1400px; 
+      margin: 30px auto 0; 
+      padding: 0 24px;
+      flex: 1;
+    }
     
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
     .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
@@ -45,10 +64,39 @@
     .search-bar i { color: var(--admin-primary); }
     .search-bar input { border: none; flex: 1; outline: none; font-size: 14px; background: transparent; font-family: 'Montserrat', sans-serif; }
     
-    .filter-bar { background: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid var(--admin-border); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
-    .filter-group { display: flex; align-items: center; gap: 12px; }
-    .filter-group label { font-size: 13px; font-weight: 600; color: var(--admin-text); }
-    .filter-select { padding: 8px 16px; border-radius: 40px; border: 1px solid var(--admin-border); background: white; font-family: 'Montserrat', sans-serif; font-size: 13px; cursor: pointer; }
+    .filter-bar {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      border: 1px solid var(--admin-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .filter-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--admin-text);
+    }
+    
+    .filter-select {
+      padding: 8px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--admin-border);
+      background: white;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+    }
     
     .stats-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
     .stat-box { background: var(--admin-card); border-radius: 16px; padding: 16px 20px; flex: 1; min-width: 150px; border: 1px solid var(--admin-border); display: flex; align-items: center; gap: 12px; }
@@ -57,11 +105,35 @@
     .stat-box-value { font-size: 24px; font-weight: 700; color: var(--admin-text); }
     .stat-box-label { font-size: 12px; color: var(--admin-muted); }
     
-    .advert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 30px; }
-    .advert-card { background: var(--admin-card); border-radius: 20px; border: 1px solid var(--admin-border); overflow: hidden; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column; height: 100%; }
+    .advert-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 24px; 
+      margin-bottom: 30px;
+    }
+    
+    .advert-card { 
+      background: var(--admin-card); 
+      border-radius: 20px; 
+      border: 1px solid var(--admin-border); 
+      overflow: hidden; 
+      transition: all 0.2s; 
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
     .advert-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
     
-    .advert-image { width: 100%; height: 180px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .advert-image { 
+      width: 100%; 
+      height: 180px; 
+      background: #f0f0f0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      overflow: hidden;
+    }
     .advert-image img { width: 100%; height: 100%; object-fit: cover; }
     .advert-image-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: rgba(107,13,43,0.08); color: var(--admin-primary); font-size: 48px; }
     
@@ -79,7 +151,13 @@
     .stat-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(107,13,43,0.06); padding: 4px 8px; border-radius: 20px; font-size: 11px; color: var(--admin-primary); }
     .advert-price { font-weight: 700; color: var(--admin-primary); font-size: 14px; margin-top: 8px; }
     
-    .advert-actions { padding: 12px 16px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid var(--admin-border); }
+    .advert-actions { 
+      padding: 12px 16px; 
+      display: flex; 
+      gap: 12px; 
+      justify-content: flex-end; 
+      border-top: 1px solid var(--admin-border); 
+    }
     .icon-btn { background: none; border: none; font-size: 13px; cursor: pointer; padding: 6px 12px; border-radius: 40px; transition: 0.2s; color: var(--admin-muted); display: inline-flex; align-items: center; gap: 6px; font-family: 'Montserrat', sans-serif; }
     .icon-btn i { font-size: 13px; }
     .icon-btn:hover { background: rgba(107,13,43,0.1); color: var(--admin-primary); }
@@ -89,7 +167,25 @@
     .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    .fab { position: fixed; bottom: 30px; right: 30px; width: 56px; height: 56px; background: var(--admin-primary); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.2s; z-index: 100; display: flex; align-items: center; justify-content: center; }
+    .fab { 
+      position: fixed; 
+      bottom: 30px; 
+      right: 30px; 
+      width: 56px; 
+      height: 56px; 
+      background: var(--admin-primary); 
+      color: white; 
+      border: none; 
+      border-radius: 50%; 
+      font-size: 24px; 
+      cursor: pointer; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+      transition: all 0.2s; 
+      z-index: 100; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+    }
     .fab:hover { background: #8a1e3d; transform: scale(1.05); }
     
     .footer { margin-top: auto; background: var(--admin-primary); }
@@ -173,7 +269,7 @@
     </div>
   </footer>
 
-  <!-- FIXED: Use absolute path for JS -->
+  <!-- FIXED: Absolute path from root -->
   <script src="/admin/advert_management/advert_management.js?v=2"></script>
 </body>
 </html>
