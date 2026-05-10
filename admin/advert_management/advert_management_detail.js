@@ -14,7 +14,7 @@ function checkAuth() {
     
     if (!token || !isAdmin) {
         alert('Admin access required');
-        window.location.href = '../../login/login.html';
+        window.location.href = '/login/login.html';
         return false;
     }
     
@@ -46,7 +46,7 @@ function toggleUserDropdown(user) {
             <div style="font-weight:bold; margin-bottom:4px;">${escapeHtml(user.fullName || user.email)} <span class="badge-admin" style="background:#6b0d2b; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ADMIN</span></div>
             <div style="font-size:13px; color:#6d6d6d;">${escapeHtml(user.email)}</div>
         </div>
-        <a href="../../user/profile.html" style="display:flex; align-items:center; gap:10px; padding:10px 0; color:#1b1b1b; text-decoration:none;"><i class="fas fa-user"></i> My Profile</a>
+        <a href="/user/profile.html" style="display:flex; align-items:center; gap:10px; padding:10px 0; color:#1b1b1b; text-decoration:none;"><i class="fas fa-user"></i> My Profile</a>
         <button id="logoutBtn" style="margin-top:12px; padding:10px; background:#6b0d2b; color:white; border:none; border-radius:8px; width:100%; cursor:pointer; font-weight:600;">Logout</button>
     `;
     document.body.appendChild(dropdown);
@@ -57,7 +57,7 @@ function toggleUserDropdown(user) {
         localStorage.removeItem('wineBubbles_user');
         localStorage.removeItem('wineBubbles_isAdmin');
         localStorage.removeItem('wineBubbles_isDriver');
-        window.location.href = '../../login/login.html';
+        window.location.href = '/login/login.html';
     });
     
     setTimeout(() => {
@@ -109,7 +109,7 @@ async function fetchAdvertDetails() {
     } catch (error) {
         console.error('Error fetching advert:', error);
         if (container) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading advert: ${error.message}</p><button class="btn-primary" onclick="fetchAdvertDetails()" style="margin-top:16px;">Retry</button><button class="btn-secondary" onclick="window.location.href='advert_management_screen.html'" style="margin-top:16px; margin-left:8px;">Back to List</button></div>`;
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading advert: ${error.message}</p><button class="btn-primary" onclick="fetchAdvertDetails()" style="margin-top:16px;">Retry</button><button class="btn-secondary" onclick="window.location.href='/admin/advert_management/advert_management_screen.html'" style="margin-top:16px; margin-left:8px;">Back to List</button></div>`;
         }
     }
 }
@@ -124,15 +124,23 @@ function renderDetail() {
     const conversionRate = (advertData.conversionRate || 0).toFixed(1);
     const imageUrl = getImageUrl(advertData.imageUrl);
     
+    // Determine icon based on advert type
+    let icon = 'fa-ad';
+    const type = advertData.productType || advertData.type || 'advert';
+    if (type === 'marketing_banner' || type === 'marketing') icon = 'fa-bullhorn';
+    if (type === 'wine' || type === 'wine_banner') icon = 'fa-wine-bottle';
+    if (type === 'sponsored_content') icon = 'fa-star';
+    if (type === 'featured_ad') icon = 'fa-crown';
+    
     container.innerHTML = `
         <div class="detail-card">
             <div class="detail-header">
                 <div class="detail-title">
-                    <i class="fas fa-ad"></i>
+                    <i class="fas ${icon}"></i>
                     ${escapeHtml(advertData.title)}
                 </div>
                 <div class="header-actions">
-                    <button class="btn-icon" onclick="window.location.href='advert_management_screen.html'">
+                    <button class="btn-icon" onclick="window.location.href='/admin/advert_management/advert_management_screen.html'">
                         <i class="fas fa-arrow-left"></i> Back
                     </button>
                     <button class="btn-icon" onclick="editAdvert()">
@@ -144,8 +152,8 @@ function renderDetail() {
             <div class="detail-section">
                 <div class="image-container">
                     ${advertData.imageUrl ? 
-                        `<img src="${imageUrl}" alt="${escapeHtml(advertData.title)}" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-ad\'></i><p>Failed to load image</p></div>'">` : 
-                        `<div class="image-placeholder"><i class="fas fa-ad"></i><p>No image</p></div>`
+                        `<img src="${imageUrl}" alt="${escapeHtml(advertData.title)}" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas ${icon}\'></i><p>Failed to load image</p><p style=\'font-size:12px; margin-top:5px;\'>${escapeHtml(advertData.title)}</p></div>'">` : 
+                        `<div class="image-placeholder"><i class="fas ${icon}"></i><p>${escapeHtml(advertData.title)}</p><p style="font-size:12px; opacity:0.7;">No image available</p></div>`
                     }
                 </div>
             </div>
@@ -155,13 +163,13 @@ function renderDetail() {
                 <div class="info-grid">
                     <div class="info-row"><div class="info-label">Title:</div><div class="info-value">${escapeHtml(advertData.title)}</div></div>
                     <div class="info-row"><div class="info-label">Subtitle:</div><div class="info-value">${escapeHtml(advertData.subtitle || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value">${escapeHtml(advertData.type || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Category:</div><div class="info-value">${escapeHtml(advertData.category || '—')}</div></div>
+                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.type || '—')}</span></div></div>
+                    <div class="info-row"><div class="info-label">Category:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.category || '—')}</span></div></div>
                     <div class="info-row"><div class="info-label">Product Type:</div><div class="info-value">${escapeHtml((advertData.productType || 'advert').replace(/_/g, ' '))}</div></div>
-                    <div class="info-row"><div class="info-label">Target URL:</div><div class="info-value">${advertData.targetUrl ? `<a href="${escapeHtml(advertData.targetUrl)}" target="_blank" style="color:var(--admin-primary);">${escapeHtml(advertData.targetUrl)}</a>` : '—'}</div></div>
-                    <div class="info-row"><div class="info-label">Position:</div><div class="info-value">${advertData.position || 0}</div></div>
-                    <div class="info-row"><div class="info-label">Price:</div><div class="info-value">R${(advertData.price || 0).toFixed(2)}</div></div>
-                    <div class="info-row"><div class="info-label">Stock:</div><div class="info-value">${advertData.stockCount || 0} placements</div></div>
+                    <div class="info-row"><div class="info-label">Target URL:</div><div class="info-value">${advertData.targetUrl ? `<a href="${escapeHtml(advertData.targetUrl)}" target="_blank" style="color:var(--admin-primary); text-decoration:none;"><i class="fas fa-external-link-alt"></i> ${escapeHtml(advertData.targetUrl)}</a>` : '—'}</div></div>
+                    <div class="info-row"><div class="info-label">Display Position:</div><div class="info-value">${advertData.position || 0}</div></div>
+                    <div class="info-row"><div class="info-label">Price:</div><div class="info-value"><strong style="color:var(--admin-primary); font-size:18px;">R${(advertData.price || 0).toFixed(2)}</strong></div></div>
+                    <div class="info-row"><div class="info-label">Stock:</div><div class="info-value">${advertData.stockCount || 0} placement${(advertData.stockCount || 0) !== 1 ? 's' : ''}</div></div>
                     <div class="info-row"><div class="info-label">Status:</div><div class="info-value">
                         <span class="badge ${advertData.isActive ? 'badge-active' : 'badge-inactive'}">${advertData.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
                         <span class="badge ${advertData.isAvailableForPurchase && advertData.stockCount > 0 ? 'badge-purchasable' : 'badge-display'}" style="margin-left:8px;">${advertData.isAvailableForPurchase && advertData.stockCount > 0 ? 'PURCHASABLE' : 'DISPLAY ONLY'}</span>
@@ -174,17 +182,35 @@ function renderDetail() {
             <div class="detail-section">
                 <h3 class="section-title"><i class="fas fa-chart-line"></i> Performance Analytics</h3>
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value">${formatNumber(advertData.impressions || 0)}</div><div class="stat-label">Impressions</div></div>
-                    <div class="stat-card"><div class="stat-value">${formatNumber(advertData.clicks || 0)}</div><div class="stat-label">Clicks</div></div>
-                    <div class="stat-card"><div class="stat-value">${formatNumber(advertData.purchases || 0)}</div><div class="stat-label">Purchases</div></div>
-                    <div class="stat-card"><div class="stat-value">${ctr}%</div><div class="stat-label">CTR</div></div>
-                    <div class="stat-card"><div class="stat-value">${conversionRate}%</div><div class="stat-label">Conversion Rate</div></div>
-                    <div class="stat-card"><div class="stat-value">R${revenue.toFixed(2)}</div><div class="stat-label">Revenue Generated</div></div>
+                    <div class="stat-card">
+                        <div class="stat-value">${formatNumber(advertData.impressions || 0)}</div>
+                        <div class="stat-label"><i class="fas fa-eye"></i> Impressions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${formatNumber(advertData.clicks || 0)}</div>
+                        <div class="stat-label"><i class="fas fa-mouse-pointer"></i> Clicks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${formatNumber(advertData.purchases || 0)}</div>
+                        <div class="stat-label"><i class="fas fa-shopping-cart"></i> Purchases</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${ctr}%</div>
+                        <div class="stat-label"><i class="fas fa-chart-line"></i> CTR</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${conversionRate}%</div>
+                        <div class="stat-label"><i class="fas fa-percent"></i> Conversion Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">R${revenue.toFixed(2)}</div>
+                        <div class="stat-label"><i class="fas fa-rand"></i> Total Revenue</div>
+                    </div>
                 </div>
             </div>
             
             <div class="detail-section" style="display: flex; gap: 16px; justify-content: flex-end; border-bottom: none;">
-                <button class="btn-secondary" onclick="window.location.href='advert_management_screen.html'"><i class="fas fa-arrow-left"></i> Back to List</button>
+                <button class="btn-secondary" onclick="window.location.href='/admin/advert_management/advert_management_screen.html'"><i class="fas fa-arrow-left"></i> Back to List</button>
                 <button class="btn-primary" onclick="editAdvert()"><i class="fas fa-edit"></i> Edit Advert</button>
                 <button class="btn-secondary" style="background: ${advertData.isActive ? '#d32f2f' : '#2e7d32'}; color:white; border:none;" onclick="toggleStatus()">
                     <i class="fas ${advertData.isActive ? 'fa-toggle-off' : 'fa-toggle-on'}"></i> ${advertData.isActive ? 'Deactivate' : 'Activate'}
@@ -198,8 +224,9 @@ function renderDetail() {
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
     if (imageUrl.indexOf('http') === 0) return imageUrl;
-    if (imageUrl.indexOf('assets/') === 0) return '../../' + imageUrl;
-    return '../../assets/images/' + imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+    return '/assets/images/' + imageUrl;
 }
 
 function formatNumber(num) {
@@ -212,7 +239,7 @@ function formatDate(dateStr) {
     if (!dateStr) return '—';
     try {
         const d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     } catch(e) { 
         return '—';
     }
@@ -226,7 +253,7 @@ function escapeHtml(str) {
 function showError(message) {
     const container = document.getElementById('detailContent');
     if (container) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${escapeHtml(message)}</p><button class="btn-primary" onclick="fetchAdvertDetails()" style="margin-top:16px;">Retry</button><button class="btn-secondary" onclick="window.location.href='advert_management_screen.html'" style="margin-top:16px; margin-left:8px;">Back to List</button></div>`;
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${escapeHtml(message)}</p><button class="btn-primary" onclick="fetchAdvertDetails()" style="margin-top:16px;">Retry</button><button class="btn-secondary" onclick="window.location.href='/admin/advert_management/advert_management_screen.html'" style="margin-top:16px; margin-left:8px;">Back to List</button></div>`;
     } else {
         alert(message);
     }
@@ -247,7 +274,7 @@ function showToast(message, type = 'success') {
 // ========== ACTIONS ==========
 function editAdvert() {
     if (advertId && advertId !== 'undefined' && advertId !== 'null') {
-        window.location.href = `advert_management_add_edit.html?id=${advertId}`;
+        window.location.href = `/admin/advert_management/advert_management_add_edit.html?id=${advertId}`;
     } else {
         showError('Unable to edit: Invalid advert ID');
     }
