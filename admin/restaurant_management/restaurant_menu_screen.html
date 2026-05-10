@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Restaurant Menu | Wine & Bubbles Admin</title>
+  <link rel="icon" type="image/png" href="/assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #d4af37;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-warning: #ed6c02;
+      --admin-error: #d32f2f;
+      --admin-info: #0288d1;
+    }
+    
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { background: var(--admin-bg); display: flex; flex-direction: column; }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    
+    .admin-wrapper { flex: 1; display: flex; flex-direction: column; }
+    .admin-container { max-width: 1200px; margin: 30px auto 0; padding: 0 24px; flex: 1; }
+    
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--admin-text); margin: 0; }
+    .page-header h1 i { color: var(--admin-primary); margin-right: 12px; }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif; font-size: 14px; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 500; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    .btn-danger { background: var(--admin-error); color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-size: 12px; }
+    .btn-danger:hover { background: #b71c1c; }
+    
+    .restaurant-info-card {
+      background: var(--admin-card);
+      border-radius: 20px;
+      border: 1px solid var(--admin-border);
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .restaurant-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 16px;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .restaurant-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .restaurant-info h2 { margin: 0 0 5px 0; color: var(--admin-text); }
+    .restaurant-info p { margin: 0; color: var(--admin-muted); font-size: 13px; }
+    
+    .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 16px; }
+    .menu-card {
+      background: var(--admin-card);
+      border-radius: 16px;
+      border: 1px solid var(--admin-border);
+      overflow: hidden;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    
+    .menu-image {
+      width: 100%;
+      height: 160px;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .menu-image img { width: 100%; height: 100%; object-fit: cover; }
+    .menu-image-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--admin-muted);
+    }
+    .menu-image-placeholder i { font-size: 40px; }
+    
+    .menu-body { padding: 16px; flex: 1; }
+    .menu-name { font-weight: 700; font-size: 16px; color: var(--admin-text); margin-bottom: 6px; }
+    .menu-description { font-size: 13px; color: var(--admin-muted); margin-bottom: 12px; line-height: 1.4; }
+    .menu-price { font-weight: 800; color: var(--admin-primary); font-size: 18px; margin-bottom: 12px; }
+    
+    .menu-actions {
+      padding: 12px 16px;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      border-top: 1px solid var(--admin-border);
+      background: #faf8f5;
+    }
+    
+    .icon-btn {
+      background: none;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 30px;
+      transition: 0.2s;
+      color: var(--admin-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .icon-btn:hover { background: rgba(107,13,43,0.1); color: var(--admin-primary); }
+    .icon-btn.danger:hover { background: rgba(211,47,47,0.1); color: var(--admin-error); }
+    
+    .status-badge { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+    .status-available { background: rgba(46,125,50,0.1); color: #2e7d32; }
+    .status-unavailable { background: rgba(211,47,47,0.1); color: #d32f2f; }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      max-width: 500px;
+      width: 90%;
+      padding: 24px;
+    }
+    .modal-content h3 { font-family: 'Playfair Display', serif; margin-bottom: 16px; color: var(--admin-text); }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--admin-text); font-size: 13px; }
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--admin-border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Montserrat', sans-serif;
+      background: white;
+    }
+    .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--admin-primary); }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .footer { margin-top: auto; background: var(--admin-primary); }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .menu-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="/admin/admin_dashboard.html"><img src="/assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-wrapper">
+    <div class="admin-container">
+      <div id="menuContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading menu...</p></div></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="/assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Admin Panel — Restaurant Menu Management</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/admin/restaurant_management/restaurant_menu_screen.js?v=1"></script>
+</body>
+</html>
