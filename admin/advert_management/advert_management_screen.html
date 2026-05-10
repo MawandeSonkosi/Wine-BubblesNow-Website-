@@ -104,7 +104,7 @@
     .stat-box-value { font-size: 24px; font-weight: 700; color: var(--admin-text); }
     .stat-box-label { font-size: 12px; color: var(--admin-muted); }
     
-    /* Improved Advert Grid and Cards */
+    /* Improved Advert Grid and Cards - Wine Card Style */
     .advert-grid { 
       display: grid; 
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
@@ -122,7 +122,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      min-height: 420px;
+      min-height: 450px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     
@@ -132,31 +132,36 @@
       border-color: var(--admin-primary);
     }
     
-    /* Improved Image Container */
+    /* FIXED: Wine Card Image Container - Shows full image like All Wines page */
     .advert-image { 
       width: 100%; 
-      height: 220px; 
-      background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+      height: 260px; 
+      background: linear-gradient(135deg, #faf8f5, #f5f0eb);
       display: flex; 
       align-items: center; 
       justify-content: center; 
       overflow: hidden;
       position: relative;
+      padding: 16px;
     }
     
     .advert-image img { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover;
+      width: auto; 
+      max-width: 100%;
+      height: auto;
+      max-height: 100%;
+      object-fit: contain;
       object-position: center;
       transition: transform 0.4s ease;
+      display: block;
+      margin: 0 auto;
     }
     
     .advert-card:hover .advert-image img {
-      transform: scale(1.08);
+      transform: scale(1.05);
     }
     
-    /* Improved Placeholder */
+    /* Placeholder for missing images */
     .advert-image-placeholder { 
       display: flex;
       flex-direction: column;
@@ -171,9 +176,9 @@
     }
     
     .advert-image-placeholder i {
-      font-size: 56px;
+      font-size: 64px;
       margin-bottom: 12px;
-      opacity: 0.7;
+      opacity: 0.6;
     }
     
     .advert-image-placeholder span {
@@ -267,7 +272,7 @@
     .advert-price { 
       font-weight: 800; 
       color: var(--admin-primary); 
-      font-size: 18px; 
+      font-size: 20px; 
       margin: 8px 0 6px;
     }
     
@@ -402,8 +407,8 @@
       .filter-group { justify-content: space-between; }
       .fab { bottom: 20px; right: 20px; width: 52px; height: 52px; font-size: 22px; }
       .stats-row { flex-direction: column; }
-      .advert-image { height: 200px; }
-      .advert-card { min-height: 400px; }
+      .advert-image { height: 220px; }
+      .advert-card { min-height: 420px; }
     }
   </style>
 </head>
@@ -473,6 +478,6 @@
     </div>
   </footer>
 
-  <script src="/admin/advert_management/advert_management.js?v=4"></script>
+  <script src="/admin/advert_management/advert_management.js?v=5"></script>
 </body>
 </html>
