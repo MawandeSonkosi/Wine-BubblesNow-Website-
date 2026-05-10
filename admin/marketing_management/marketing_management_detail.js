@@ -461,18 +461,29 @@ function renderAvailableAdverts(adverts) {
 
 function getAdvertImageHtml(advert, size) {
     size = size || 'normal';
+    var title = escapeHtml(advert.title || 'Advert');
+    var type = advert.productType || advert.type || 'advert';
+    
+    // Determine appropriate icon
+    var icon = 'fa-ad';
+    if (type === 'marketing_banner' || type === 'marketing') icon = 'fa-bullhorn';
+    if (type === 'wine' || type === 'wine_banner') icon = 'fa-wine-bottle';
+    if (type === 'sponsored_content') icon = 'fa-star';
+    if (type === 'featured_ad') icon = 'fa-crown';
+    
     if (advert.imageUrl && advert.imageUrl.trim() !== '') {
         var imgUrl = getImageUrl(advert.imageUrl);
-        return '<img src="' + imgUrl + '" alt="' + escapeHtml(advert.title) + '" onerror="this.parentElement.innerHTML=\'<div class=\\\'advert-image-placeholder\\\'><i class=\\\'fas fa-ad\\\'></i></div>\'">';
+        return '<img src="' + imgUrl + '" alt="' + title + '" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML=\'<div class=\\\'advert-image-placeholder\\\'><i class=\\\'fas ' + icon + '\\\'></i><span>' + title + '</span></div>\'">';
     }
-    return '<div class="advert-image-placeholder"><i class="fas fa-ad"></i></div>';
+    return '<div class="advert-image-placeholder"><i class="fas ' + icon + '"></i><span>' + title + '</span></div>';
 }
 
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
     if (imageUrl.indexOf('http') === 0) return imageUrl;
-    if (imageUrl.indexOf('assets/') === 0) return '../../' + imageUrl;
-    return '../../assets/images/' + imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+    return '/assets/images/' + imageUrl;
 }
 
 function updateAvailableAdverts() {
