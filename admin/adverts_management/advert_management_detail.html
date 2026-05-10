@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Advert Details | Wine & Bubbles Admin</title>
+  <link rel="icon" type="image/png" href="../../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #d4af37;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-error: #d32f2f;
+      --admin-info: #0288d1;
+    }
+    
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { background: var(--admin-bg); display: flex; flex-direction: column; }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    
+    .admin-wrapper { flex: 1; display: flex; flex-direction: column; }
+    .admin-container { max-width: 1200px; margin: 30px auto 0; padding: 0 24px; flex: 1; }
+    
+    .detail-card { background: var(--admin-card); border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
+    .detail-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .detail-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--admin-text); margin: 0; display: flex; align-items: center; gap: 12px; }
+    .detail-title i { color: var(--admin-primary); }
+    
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-active { background: rgba(46,125,50,0.1); color: #2e7d32; }
+    .badge-inactive { background: rgba(211,47,47,0.1); color: #d32f2f; }
+    .badge-purchasable { background: rgba(33,150,243,0.1); color: #1976d2; }
+    .badge-display { background: rgba(255,152,0,0.1); color: #ed6c02; }
+    
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .btn-icon { background: transparent; border: 1px solid var(--admin-border); padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: 500; font-family: 'Montserrat', sans-serif; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; color: var(--admin-text); }
+    .btn-icon:hover { background: #f5f5f5; border-color: var(--admin-primary); color: var(--admin-primary); }
+    
+    .detail-section { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--admin-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .info-row { display: flex; padding: 8px 0; }
+    .info-label { width: 140px; font-weight: 600; color: var(--admin-text); }
+    .info-value { flex: 1; color: var(--admin-muted); }
+    
+    .image-container { width: 100%; max-height: 300px; overflow: hidden; border-radius: 16px; margin-bottom: 20px; }
+    .image-container img { width: 100%; height: auto; object-fit: cover; }
+    .image-placeholder { width: 100%; height: 200px; background: rgba(107,13,43,0.05); display: flex; align-items: center; justify-content: center; border-radius: 16px; color: var(--admin-muted); }
+    .image-placeholder i { font-size: 48px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
+    .stat-card { background: #f8f7f5; border-radius: 16px; padding: 16px; text-align: center; border: 1px solid var(--admin-border); }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--admin-primary); }
+    .stat-label { font-size: 12px; color: var(--admin-muted); margin-top: 4px; }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif; font-size: 14px; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 12px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .footer { margin-top: auto; background: var(--admin-primary); }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .info-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .info-row { flex-direction: column; gap: 4px; }
+      .info-label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="../admin_dashboard.html"><img src="../../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-wrapper">
+    <div class="admin-container">
+      <div id="detailContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading advert details...</p></div></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Admin Panel — Advert Details</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="advert_management_detail.js"></script>
+</body>
+</html>

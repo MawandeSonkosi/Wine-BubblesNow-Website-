@@ -43,7 +43,7 @@ function toggleUserDropdown(user) {
     dropdown.style.cssText = 'position:absolute; top:100px; right:20px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12); padding:16px; min-width:220px; z-index:1000; border:1px solid #eae3da;';
     dropdown.innerHTML = `
         <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #eee;">
-            <div style="font-weight:bold; margin-bottom:4px;">${escapeHtml(user.fullName || user.email)} <span class="badge-admin" style="background:#6b0d2b; color:white; padding:2px 8px; border-radius:12px; font-size:10px; margin-left:8px;">ADMIN</span></div>
+            <div style="font-weight:bold; margin-bottom:4px;">${escapeHtml(user.fullName || user.email)} <span class="badge badge-admin">ADMIN</span></div>
             <div style="font-size:13px; color:#6d6d6d;">${escapeHtml(user.email)}</div>
         </div>
         <a href="../../user/profile.html" style="display:flex; align-items:center; gap:10px; padding:10px 0; color:#1b1b1b; text-decoration:none;"><i class="fas fa-user"></i> My Profile</a>
@@ -81,7 +81,7 @@ async function fetchAdverts() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
         console.log('📦 Adverts response:', data);
@@ -104,7 +104,6 @@ async function fetchAdverts() {
     }
 }
 
-// ========== RENDER STATS ==========
 function renderStats() {
     const container = document.getElementById('statsContainer');
     if (!container) return;
@@ -124,16 +123,13 @@ function renderStats() {
     `;
 }
 
-// ========== GET ADVERT ID ==========
 function getAdvertId(advert) {
     return advert.id || advert._id;
 }
 
-// ========== FILTER ADVERTS ==========
 function filterAdverts() {
     let filtered = [...allAdverts];
     
-    // Search filter
     if (searchQuery) {
         const q = searchQuery.toLowerCase();
         filtered = filtered.filter(a => 
@@ -142,19 +138,16 @@ function filterAdverts() {
         );
     }
     
-    // Status filter
     if (statusFilter === 'active') {
         filtered = filtered.filter(a => a.isActive === true);
     } else if (statusFilter === 'inactive') {
         filtered = filtered.filter(a => a.isActive === false);
     }
     
-    // Type filter
     if (typeFilter !== 'all') {
         filtered = filtered.filter(a => a.type === typeFilter);
     }
     
-    // Purchase filter
     if (purchaseFilter === 'purchasable') {
         filtered = filtered.filter(a => a.isAvailableForPurchase === true && a.stockCount > 0);
     } else if (purchaseFilter === 'display') {
@@ -164,7 +157,6 @@ function filterAdverts() {
     return filtered;
 }
 
-// ========== RENDER ADVERTS ==========
 function renderAdverts() {
     const container = document.getElementById('advertContainer');
     if (!container) return;
@@ -181,14 +173,13 @@ function renderAdverts() {
             ${filtered.map(advert => {
                 const advertId = getAdvertId(advert);
                 const ctr = (advert.ctr || 0).toFixed(1);
-                const conversion = (advert.conversionRate || 0).toFixed(1);
                 const imageUrl = getImageUrl(advert.imageUrl);
                 
                 return `
                     <div class="advert-card" onclick="viewAdvertDetail('${advertId}')">
                         <div class="advert-image">
                             ${advert.imageUrl ? 
-                                `<img src="${imageUrl}" alt="${escapeHtml(advert.title)}" onerror="this.parentElement.innerHTML='<div class=\'advert-image-placeholder\'><i class=\'fas fa-ad\'></i></div>'">` : 
+                                `<img src="${imageUrl}" alt="${escapeHtml(advert.title)}" onerror="this.parentElement.innerHTML='<div class=\\'advert-image-placeholder\\'><i class=\\'fas fa-ad\\'></i></div>'">` : 
                                 `<div class="advert-image-placeholder"><i class="fas fa-ad"></i></div>`
                             }
                         </div>
@@ -221,7 +212,6 @@ function renderAdverts() {
     container.innerHTML = gridHtml;
 }
 
-// ========== HELPER FUNCTIONS ==========
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
     if (imageUrl.indexOf('http') === 0) return imageUrl;
@@ -241,11 +231,7 @@ function escapeHtml(str) {
 }
 
 function showToast(message, type = 'success') {
-    const existingToast = document.querySelector('.toast-notification');
-    if (existingToast) existingToast.remove();
-    
     const toast = document.createElement('div');
-    toast.className = 'toast-notification';
     toast.textContent = message;
     toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
     document.body.appendChild(toast);
@@ -253,95 +239,46 @@ function showToast(message, type = 'success') {
 }
 
 // ========== ADVERT ACTIONS ==========
-function viewAdvertDetail(advertId) {
+window.viewAdvertDetail = function(advertId) {
+    console.log('👁️ Viewing advert details for ID:', advertId);
     if (advertId && advertId !== 'undefined' && advertId !== 'null') {
         window.location.href = `advert_management_detail.html?id=${advertId}`;
     } else {
         showToast('Unable to view details: Invalid advert ID', 'error');
     }
-}
+};
 
-function editAdvert(advertId) {
+window.editAdvert = function(advertId) {
+    console.log('✏️ Editing advert with ID:', advertId);
     if (advertId && advertId !== 'undefined' && advertId !== 'null') {
         window.location.href = `advert_management_add_edit.html?id=${advertId}`;
     } else {
         showToast('Unable to edit: Invalid advert ID', 'error');
     }
-}
+};
 
-function deleteAdvertPrompt(advertId, advertTitle) {
+window.deleteAdvertPrompt = function(advertId, advertTitle) {
     if (confirm(`⚠️ Permanently delete "${advertTitle}"?\n\nThis action cannot be undone.\nThis will also remove this advert from all marketing companies.`)) {
         deleteAdvert(advertId);
     }
-}
+};
 
 async function deleteAdvert(advertId) {
     try {
         const token = localStorage.getItem('wineBubbles_token');
-        
-        // Show loading indicator
-        const deleteBtn = document.activeElement;
-        if (deleteBtn) {
-            deleteBtn.disabled = true;
-            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        }
-        
         const response = await fetch(`${API_BASE}/api/adverts/${advertId}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to delete');
-        }
+        if (!response.ok) throw new Error('Failed to delete');
         
         showToast('Advert deleted successfully', 'success');
-        
-        // Refresh the list
-        await fetchAdverts();
+        fetchAdverts();
         
     } catch (error) {
         console.error('Delete error:', error);
         showToast('Failed to delete advert: ' + error.message, 'error');
-    }
-}
-
-async function toggleAdvertStatus(advertId, currentStatus) {
-    try {
-        const token = localStorage.getItem('wineBubbles_token');
-        const advert = allAdverts.find(a => getAdvertId(a) === advertId);
-        
-        if (!advert) return;
-        
-        const updatedAdvert = {
-            ...advert,
-            isActive: !currentStatus
-        };
-        
-        // Remove internal fields
-        delete updatedAdvert.id;
-        delete updatedAdvert._id;
-        delete updatedAdvert.createdAt;
-        delete updatedAdvert.updatedAt;
-        
-        const response = await fetch(`${API_BASE}/api/adverts/${advertId}`, {
-            method: 'PUT',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedAdvert)
-        });
-        
-        if (!response.ok) throw new Error('Failed to update status');
-        
-        showToast(`Advert ${!currentStatus ? 'activated' : 'deactivated'}`, 'success');
-        await fetchAdverts();
-        
-    } catch (error) {
-        console.error('Toggle status error:', error);
-        showToast('Failed to update advert status', 'error');
     }
 }
 
