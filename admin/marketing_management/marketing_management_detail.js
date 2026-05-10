@@ -103,6 +103,37 @@ async function fetchAllAdverts() {
     }
 }
 
+// ========== EXTRACT ADVERT IDS FROM MARKETING DATA ==========
+function extractAdvertIds(marketing) {
+    var ids = [];
+    
+    // Check different possible locations for advert IDs
+    if (marketing.advertIds && Array.isArray(marketing.advertIds)) {
+        for (var i = 0; i < marketing.advertIds.length; i++) {
+            var item = marketing.advertIds[i];
+            if (typeof item === 'string') {
+                ids.push(item);
+            } else if (typeof item === 'object' && item !== null) {
+                // Handle object with _id or id field
+                if (item._id) ids.push(item._id);
+                else if (item.id) ids.push(item.id);
+            }
+        }
+    }
+    
+    // Also check for populated adverts array
+    if (marketing.adverts && Array.isArray(marketing.adverts)) {
+        for (var i = 0; i < marketing.adverts.length; i++) {
+            var advert = marketing.adverts[i];
+            if (advert._id) ids.push(advert._id);
+            else if (advert.id) ids.push(advert.id);
+        }
+    }
+    
+    console.log('📋 Extracted advert IDs:', ids);
+    return ids;
+}
+
 // ========== FETCH MARKETING COMPANY ==========
 async function fetchMarketingCompany() {
     if (!marketingId) {
@@ -118,17 +149,30 @@ async function fetchMarketingCompany() {
     try {
         const token = localStorage.getItem('wineBubbles_token');
         
-        // Fetch all marketing companies (admin endpoint)
-        const url = `${API_BASE}/api/marketing?page=1&limit=100`;
+        // Fetch all marketing companies (admin endpoint) - try both possible endpoints
+        let url = `${API_BASE}/api/marketing?page=1&limit=100`;
         console.log('📡 Fetching marketing companies from:', url);
         
-        const response = await fetch(url, {
+        let response = await fetch(url, {
             method: 'GET',
             headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
+        
+        // If first endpoint fails, try the alternative
+        if (!response.ok) {
+            console.log('Trying alternative endpoint...');
+            url = `${API_BASE}/api/marketing`;
+            response = await fetch(url, {
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -163,9 +207,12 @@ async function fetchMarketingCompany() {
         }
         
         marketingData = foundCompany;
-        assignedAdvertIds = marketingData.advertIds || [];
+        
+        // Extract assigned advert IDs using the helper function
+        assignedAdvertIds = extractAdvertIds(marketingData);
         
         console.log('✅ Marketing company loaded:', marketingData.companyName);
+        console.log('📋 Assigned advert IDs count:', assignedAdvertIds.length);
         console.log('📋 Assigned advert IDs:', assignedAdvertIds);
         
         // Now fetch the actual advert details for assigned adverts
@@ -176,7 +223,7 @@ async function fetchMarketingCompany() {
     } catch (error) {
         console.error('Error fetching marketing company:', error);
         if (container) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ' + error.message + '</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button></div>';
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading marketing company: ' + error.message + '</p><button class="btn-primary" onclick="fetchMarketingCompany()" style="margin-top:16px;">Retry</button><button class="btn-secondary" onclick="window.location.href=\'marketing_management_screen.html\'" style="margin-top:16px; margin-left:8px;">Back to List</button></div>';
         }
     }
 }
@@ -201,23 +248,25 @@ async function fetchAssignedAdvertDetails() {
                 
                 if (response.ok) {
                     const advertData = await response.json();
+                    const advert = advertData.data || advertData;
+                    
                     // Check if already in allAdverts
                     var exists = false;
                     for (var j = 0; j < allAdverts.length; j++) {
-                        if (allAdverts[j].id == advertId || allAdverts[j]._id == advertId) {
+                        if (allAdverts[j]._id == advertId || allAdverts[j].id == advertId) {
                             exists = true;
                             break;
                         }
                     }
                     if (!exists) {
-                        allAdverts.push(advertData.data || advertData);
+                        allAdverts.push(advert);
                     }
                 }
             } catch (err) {
                 console.error(`Failed to fetch advert ${advertId}:`, err);
             }
         }
-        console.log(`✅ Fetched ${assignedAdvertIds.length} assigned adverts`);
+        console.log(`✅ Fetched details for ${assignedAdvertIds.length} assigned adverts`);
     } catch (error) {
         console.error('Error fetching assigned adverts:', error);
     }
@@ -228,11 +277,12 @@ function getAssignedAdverts() {
     if (!allAdverts.length) return [];
     
     var result = [];
-    for (var i = 0; i < allAdverts.length; i++) {
-        var advert = allAdverts[i];
-        var advertId = advert.id || advert._id;
-        for (var j = 0; j < assignedAdvertIds.length; j++) {
-            if (assignedAdvertIds[j] == advertId) {
+    for (var i = 0; i < assignedAdvertIds.length; i++) {
+        var targetId = assignedAdvertIds[i];
+        for (var j = 0; j < allAdverts.length; j++) {
+            var advert = allAdverts[j];
+            var advertId = advert._id || advert.id;
+            if (advertId == targetId) {
                 result.push(advert);
                 break;
             }
@@ -248,7 +298,7 @@ function getAvailableAdverts() {
     var available = [];
     for (var i = 0; i < allAdverts.length; i++) {
         var advert = allAdverts[i];
-        var advertId = advert.id || advert._id;
+        var advertId = advert._id || advert.id;
         var isAssigned = false;
         for (var j = 0; j < assignedAdvertIds.length; j++) {
             if (assignedAdvertIds[j] == advertId) {
@@ -285,6 +335,9 @@ function renderDetail() {
     var statusClass = marketingData.isActive ? 'active' : 'inactive';
     var assignedAdverts = getAssignedAdverts();
     var availableAdverts = getAvailableAdverts();
+    
+    console.log('🎨 Rendering - Assigned adverts count:', assignedAdverts.length);
+    console.log('🎨 Rendering - Available adverts count:', availableAdverts.length);
     
     container.innerHTML = `
         <div class="detail-card">
@@ -353,7 +406,7 @@ function renderAssignedAdverts(adverts) {
     var html = '';
     for (var i = 0; i < adverts.length; i++) {
         var advert = adverts[i];
-        var advertId = advert.id || advert._id;
+        var advertId = advert._id || advert.id;
         html += `
             <div class="advert-card">
                 <div class="advert-image">
@@ -382,7 +435,7 @@ function renderAvailableAdverts(adverts) {
     var html = '';
     for (var i = 0; i < adverts.length; i++) {
         var advert = adverts[i];
-        var advertId = advert.id || advert._id;
+        var advertId = advert._id || advert.id;
         html += `
             <div class="available-advert-item" onclick="addAdvert('${advertId}')">
                 <div class="available-advert-image">
