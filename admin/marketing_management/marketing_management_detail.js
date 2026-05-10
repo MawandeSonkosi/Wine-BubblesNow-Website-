@@ -340,14 +340,21 @@ function renderDetail() {
     console.log('🎨 Rendering - Available adverts count:', availableAdverts.length);
     
     container.innerHTML = `
-        <div class="detail-card">
-            <div class="detail-header">
-                <div class="detail-title">
-                    <i class="fas fa-chart-line"></i>
-                    ${escapeHtml(marketingData.companyName)}
-                </div>
-                <div class="status-badge ${statusClass}">${marketingData.isActive ? 'ACTIVE' : 'INACTIVE'}</div>
+    <div class="detail-card">
+        <div class="detail-header">
+            <div class="detail-title">
+                <i class="fas fa-chart-line"></i>
+                ${escapeHtml(marketingData.companyName)}
             </div>
+            <div class="header-actions">
+                <button class="btn-icon" onclick="window.location.href='marketing_management_screen.html'">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn-icon" onclick="editMarketing()">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+        </div>
             
             <div class="detail-section">
                 <h3 class="section-title"><i class="fas fa-info-circle"></i> Company Information</h3>
