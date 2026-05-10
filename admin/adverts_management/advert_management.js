@@ -1,4 +1,5 @@
 // Advert Management JavaScript
+// MATCHES MARKETING MANAGEMENT PATTERN EXACTLY
 
 const API_BASE = window.location.origin;
 let allAdverts = [];
