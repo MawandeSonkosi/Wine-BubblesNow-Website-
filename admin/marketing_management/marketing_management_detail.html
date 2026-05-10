@@ -53,12 +53,63 @@
     }
     
     .detail-card { background: var(--admin-card); border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
-    .detail-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-    .detail-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--admin-text); margin: 0; display: flex; align-items: center; gap: 12px; }
+    .detail-header { 
+      padding: 20px 24px; 
+      border-bottom: 1px solid var(--admin-border); 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      flex-wrap: wrap; 
+      gap: 16px; 
+    }
+    .detail-title { 
+      font-family: 'Playfair Display', serif; 
+      font-size: 24px; 
+      color: var(--admin-text); 
+      margin: 0; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+    }
     .detail-title i { color: var(--admin-primary); }
-    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-badge { 
+      padding: 4px 12px; 
+      border-radius: 20px; 
+      font-size: 12px; 
+      font-weight: 600; 
+    }
     .status-badge.active { background: rgba(46,125,50,0.1); color: #2e7d32; }
     .status-badge.inactive { background: rgba(211,47,47,0.1); color: #d32f2f; }
+    
+    /* Top action buttons */
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--admin-border);
+      padding: 8px 16px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 500;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--admin-text);
+    }
+    .btn-icon:hover {
+      background: #f5f5f5;
+      border-color: var(--admin-primary);
+      color: var(--admin-primary);
+    }
+    .btn-icon i {
+      font-size: 14px;
+    }
     
     .detail-section { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); }
     .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--admin-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
@@ -265,6 +316,7 @@
       .add-advert-btn { margin-top: 8px; width: 100%; text-align: center; }
       /* Adjust image height for mobile */
       .advert-image { height: 180px; }
+      .header-actions { width: 100%; justify-content: flex-start; }
     }
   </style>
 </head>
