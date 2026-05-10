@@ -68,6 +68,15 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
+// Fixed: Proper image URL handling
+function getImageUrl(imageUrl) {
+    if (!imageUrl) return '';
+    if (imageUrl.indexOf('http') === 0) return imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+    return '/assets/images/' + imageUrl;
+}
+
 async function fetchRestaurantDetails() {
     if (!restaurantId) {
         showError('No restaurant ID provided');
@@ -110,8 +119,16 @@ function renderDetail() {
     const container = document.getElementById('detailContent');
     if (!container || !restaurantData) return;
     
-    const imageUrl = getImageUrl(restaurantData.imageUrl);
-    const bannerUrl = getImageUrl(restaurantData.bannerImageUrl);
+    let imageUrl = '';
+    if (restaurantData.imageUrl && restaurantData.imageUrl !== 'assets/dine_with_me/placeholder.png') {
+        imageUrl = getImageUrl(restaurantData.imageUrl);
+    }
+    
+    let bannerUrl = '';
+    if (restaurantData.bannerImageUrl && restaurantData.bannerImageUrl !== 'assets/dine_with_me/banner_placeholder.png') {
+        bannerUrl = getImageUrl(restaurantData.bannerImageUrl);
+    }
+    
     const statusClass = restaurantData.isActive ? 'badge-active' : 'badge-inactive';
     
     container.innerHTML = `
@@ -136,11 +153,25 @@ function renderDetail() {
             </div>
             
             <div class="detail-section">
-                <div class="image-container">
-                    ${restaurantData.imageUrl ? 
-                        `<img src="${imageUrl}" alt="${escapeHtml(restaurantData.name)}" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-utensils\'></i><p>Failed to load image</p></div>'">` : 
-                        `<div class="image-placeholder"><i class="fas fa-utensils"></i><p>No image</p></div>`
-                    }
+                <div class="image-container" style="display: flex; gap: 16px; flex-wrap: wrap;">
+                    <div style="flex: 1;">
+                        <h4 style="color: var(--admin-text); margin-bottom: 8px;">Restaurant Image</h4>
+                        ${imageUrl ? 
+                            `<img src="${imageUrl}" alt="${escapeHtml(restaurantData.name)}" style="width:100%; height:200px; object-fit:cover; border-radius:12px;" onerror="this.onerror=null; this.src='/assets/dine_with_me/placeholder.png'">` : 
+                            `<div class="image-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:200px; background:#f0f0f0; border-radius:12px;">
+                                <i class="fas fa-utensils" style="font-size:48px; color:#999;"></i>
+                            </div>`
+                        }
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="color: var(--admin-text); margin-bottom: 8px;">Banner Image</h4>
+                        ${bannerUrl ? 
+                            `<img src="${bannerUrl}" alt="${escapeHtml(restaurantData.name)} Banner" style="width:100%; height:200px; object-fit:cover; border-radius:12px;" onerror="this.onerror=null; this.src='/assets/dine_with_me/banner_placeholder.png'">` : 
+                            `<div class="image-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:200px; background:#f0f0f0; border-radius:12px;">
+                                <i class="fas fa-image" style="font-size:48px; color:#999;"></i>
+                            </div>`
+                        }
+                    </div>
                 </div>
             </div>
             
@@ -182,41 +213,39 @@ function renderMenuItems() {
     }
     
     return `
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="border-bottom: 1px solid var(--admin-border);">
-                    <th style="text-align: left; padding: 8px; color: var(--admin-muted);">Item</th>
-                    <th style="text-align: left; padding: 8px; color: var(--admin-muted);">Description</th>
-                    <th style="text-align: right; padding: 8px; color: var(--admin-muted);">Price</th>
-                    <th style="text-align: center; padding: 8px; color: var(--admin-muted);">Status</th>
-                </table>
-            </thead>
-            <tbody>
-                ${menuItems.map(item => `
-                    <tr style="border-bottom: 1px solid var(--admin-border);">
-                        <td style="padding: 12px 8px;"><strong>${escapeHtml(item.name)}</strong></td>
-                        <td style="padding: 12px 8px;">${escapeHtml(item.description?.substring(0, 50) || '')}${item.description?.length > 50 ? '...' : ''}</td>
-                        <td style="text-align: right; padding: 12px 8px;">R${(item.price || 0).toFixed(2)}</td>
-                        <td style="text-align: center; padding: 12px 8px;">
-                            <span class="badge ${item.isAvailable ? 'badge-active' : 'badge-inactive'}" style="font-size: 10px;">
-                                ${item.isAvailable ? 'Available' : 'Unavailable'}
-                            </span>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+            ${menuItems.map(item => {
+                let itemImageUrl = '';
+                if (item.imageUrl && item.imageUrl !== 'assets/dine_with_me/food_placeholder.png') {
+                    itemImageUrl = getImageUrl(item.imageUrl);
+                }
+                const statusClass = item.isAvailable ? 'status-available' : 'status-unavailable';
+                const statusText = item.isAvailable ? 'AVAILABLE' : 'UNAVAILABLE';
+                
+                return `
+                    <div style="background: var(--admin-card); border-radius: 12px; border: 1px solid var(--admin-border); overflow: hidden;">
+                        <div style="height: 120px; overflow: hidden;">
+                            ${itemImageUrl ? 
+                                `<img src="${itemImageUrl}" alt="${escapeHtml(item.name)}" style="width:100%; height:100%; object-fit:cover;">` : 
+                                `<div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; background:#f0f0f0;">
+                                    <i class="fas fa-utensils" style="font-size:32px; color:#999;"></i>
+                                </div>`
+                            }
+                        </div>
+                        <div style="padding: 12px;">
+                            <div style="font-weight:700; color:var(--admin-text);">${escapeHtml(item.name)}</div>
+                            <div style="font-size:12px; color:var(--admin-muted); margin:4px 0;">${escapeHtml((item.description || '').substring(0, 60))}${(item.description || '').length > 60 ? '...' : ''}</div>
+                            <div style="font-weight:800; color:var(--admin-primary); margin:8px 0;">R${(item.price || 0).toFixed(2)}</div>
+                            <div><span class="badge ${statusClass}" style="font-size:10px;">${statusText}</span></div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
         <div style="margin-top: 16px; text-align: center;">
-            <button class="btn-primary" onclick="viewMenuItems()" style="width: auto; padding: 10px 20px;"><i class="fas fa-edit"></i> Edit Menu</button>
+            <button class="btn-primary" onclick="viewMenuItems()" style="width: auto; padding: 10px 20px;"><i class="fas fa-edit"></i> Edit Full Menu</button>
         </div>
     `;
-}
-
-function getImageUrl(imageUrl) {
-    if (!imageUrl) return '';
-    if (imageUrl.indexOf('http') === 0) return imageUrl;
-    if (imageUrl.indexOf('/') === 0) return imageUrl;
-    return '/assets/dine_with_me/' + imageUrl;
 }
 
 function formatDate(dateStr) {
@@ -241,18 +270,6 @@ function showError(message) {
     } else {
         alert(message);
     }
-}
-
-function showToast(message, type = 'success') {
-    const existingToast = document.querySelector('.toast-notification');
-    if (existingToast) existingToast.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.textContent = message;
-    toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
 }
 
 function editRestaurant() {

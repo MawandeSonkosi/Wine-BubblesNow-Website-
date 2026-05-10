@@ -71,6 +71,15 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
+// Fixed: Proper image URL handling
+function getImageUrl(imageUrl) {
+    if (!imageUrl) return '';
+    if (imageUrl.indexOf('http') === 0) return imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+    return '/assets/images/' + imageUrl;
+}
+
 // ========== FETCH RESTAURANT AND MENU ==========
 async function fetchRestaurantAndMenu() {
     if (!restaurantId) {
@@ -116,7 +125,10 @@ function renderMenuScreen() {
     const container = document.getElementById('menuContent');
     if (!container || !restaurantData) return;
     
-    const imageUrl = getImageUrl(restaurantData.imageUrl);
+    let imageUrl = '';
+    if (restaurantData.imageUrl && restaurantData.imageUrl !== 'assets/dine_with_me/placeholder.png') {
+        imageUrl = getImageUrl(restaurantData.imageUrl);
+    }
     
     container.innerHTML = `
         <div class="page-header">
@@ -129,21 +141,21 @@ function renderMenuScreen() {
             </button>
         </div>
         
-        <div class="restaurant-info-card">
-            <div class="restaurant-avatar">
-                ${restaurantData.imageUrl ? 
-                    `<img src="${imageUrl}" alt="${escapeHtml(restaurantData.name)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\' style=\\'font-size: 30px; color: #999;\\'></i>'">` : 
+        <div class="restaurant-info-card" style="background: var(--admin-card); border-radius: 20px; border: 1px solid var(--admin-border); padding: 20px; margin-bottom: 24px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+            <div class="restaurant-avatar" style="width: 70px; height: 70px; border-radius: 16px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                ${imageUrl ? 
+                    `<img src="${imageUrl}" alt="${escapeHtml(restaurantData.name)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\' style=\\'font-size: 30px; color: #999;\\'></i>'">` : 
                     `<i class="fas fa-utensils" style="font-size: 30px; color: #999;"></i>`
                 }
             </div>
             <div class="restaurant-info">
-                <h2>${escapeHtml(restaurantData.name)}</h2>
-                <p><i class="fas fa-cutlery"></i> ${escapeHtml(restaurantData.cuisineType)}</p>
-                <p><i class="fas fa-clock"></i> ${escapeHtml(restaurantData.openingHours)} - ${escapeHtml(restaurantData.closingHours)}</p>
+                <h2 style="margin: 0 0 5px 0; color: var(--admin-text);">${escapeHtml(restaurantData.name)}</h2>
+                <p style="margin: 0; color: var(--admin-muted); font-size: 13px;"><i class="fas fa-cutlery"></i> ${escapeHtml(restaurantData.cuisineType)}</p>
+                <p style="margin: 0; color: var(--admin-muted); font-size: 13px;"><i class="fas fa-clock"></i> ${escapeHtml(restaurantData.openingHours)} - ${escapeHtml(restaurantData.closingHours)}</p>
             </div>
         </div>
         
-        <div id="menuGrid" class="menu-grid">
+        <div id="menuGrid" class="menu-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
             ${renderMenuItems()}
         </div>
     `;
@@ -151,55 +163,54 @@ function renderMenuScreen() {
 
 function renderMenuItems() {
     if (menuItems.length === 0) {
-        return '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-utensils" style="font-size:48px; margin-bottom:16px; opacity:0.5;"></i><p>No menu items yet</p><button class="btn-primary" onclick="showAddMenuItemModal()" style="margin-top:16px;"><i class="fas fa-plus"></i> Add First Menu Item</button></div>';
+        return '<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 60px;"><i class="fas fa-utensils" style="font-size:48px; margin-bottom:16px; opacity:0.5;"></i><p>No menu items yet</p><button class="btn-primary" onclick="showAddMenuItemModal()" style="margin-top:16px;"><i class="fas fa-plus"></i> Add First Menu Item</button></div>';
     }
     
     return menuItems.map(item => {
-        const itemImageUrl = getImageUrl(item.imageUrl);
+        let itemImageUrl = '';
+        if (item.imageUrl && item.imageUrl !== 'assets/dine_with_me/food_placeholder.png') {
+            itemImageUrl = getImageUrl(item.imageUrl);
+        }
         const statusClass = item.isAvailable ? 'status-available' : 'status-unavailable';
         const statusText = item.isAvailable ? 'AVAILABLE' : 'UNAVAILABLE';
         
         return `
-            <div class="menu-card">
-                <div class="menu-image">
-                    ${item.imageUrl && item.imageUrl !== 'assets/dine_with_me/food_placeholder.png' ? 
-                        `<img src="${itemImageUrl}" alt="${escapeHtml(item.name)}" onerror="this.parentElement.innerHTML='<div class=\\'menu-image-placeholder\\'><i class=\\'fas fa-utensils\\'></i><span>${escapeHtml(item.name)}</span></div>'">` : 
-                        `<div class="menu-image-placeholder"><i class="fas fa-utensils"></i><span>${escapeHtml(item.name)}</span></div>`
+            <div class="menu-card" style="background: var(--admin-card); border-radius: 16px; border: 1px solid var(--admin-border); overflow: hidden; transition: all 0.2s;">
+                <div class="menu-image" style="width: 100%; height: 160px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    ${itemImageUrl ? 
+                        `<img src="${itemImageUrl}" alt="${escapeHtml(item.name)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null; this.src='/assets/dine_with_me/food_placeholder.png'">` : 
+                        `<div class="menu-image-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #999;">
+                            <i class="fas fa-utensils" style="font-size: 40px;"></i>
+                            <span>${escapeHtml(item.name)}</span>
+                        </div>`
                     }
                 </div>
-                <div class="menu-body">
-                    <div class="menu-name">${escapeHtml(item.name)}</div>
-                    <div class="menu-description">${escapeHtml(item.description || 'No description')}</div>
-                    <div class="menu-price">R${(item.price || 0).toFixed(2)}</div>
+                <div class="menu-body" style="padding: 16px; flex: 1;">
+                    <div class="menu-name" style="font-weight: 700; font-size: 16px; color: var(--admin-text); margin-bottom: 6px;">${escapeHtml(item.name)}</div>
+                    <div class="menu-description" style="font-size: 13px; color: var(--admin-muted); margin-bottom: 12px; line-height: 1.4;">${escapeHtml((item.description || '').substring(0, 80))}${(item.description || '').length > 80 ? '...' : ''}</div>
+                    <div class="menu-price" style="font-weight: 800; color: var(--admin-primary); font-size: 18px; margin-bottom: 12px;">R${(item.price || 0).toFixed(2)}</div>
                     <div>
-                        <span class="status-badge ${statusClass}">
+                        <span class="status-badge ${statusClass}" style="padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; background: ${item.isAvailable ? 'rgba(46,125,50,0.1)' : 'rgba(211,47,47,0.1)'}; color: ${item.isAvailable ? '#2e7d32' : '#d32f2f'};">
                             <i class="fas ${item.isAvailable ? 'fa-check-circle' : 'fa-times-circle'}"></i>
                             ${statusText}
                         </span>
                     </div>
                 </div>
-                <div class="menu-actions">
-                    <button class="icon-btn" onclick="toggleMenuItemStatus(${item.id}, ${!item.isAvailable})">
+                <div class="menu-actions" style="padding: 12px 16px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid var(--admin-border); background: #faf8f5;">
+                    <button class="icon-btn" onclick="toggleMenuItemStatus(${item.id}, ${!item.isAvailable})" style="background: none; border: none; font-size: 13px; cursor: pointer; padding: 6px 12px; border-radius: 30px; transition: 0.2s; color: #6d6d6d; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas ${item.isAvailable ? 'fa-toggle-off' : 'fa-toggle-on'}"></i>
                         ${item.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
                     </button>
-                    <button class="icon-btn" onclick="showEditMenuItemModal(${item.id})">
+                    <button class="icon-btn" onclick="showEditMenuItemModal(${item.id})" style="background: none; border: none; font-size: 13px; cursor: pointer; padding: 6px 12px; border-radius: 30px; transition: 0.2s; color: #6d6d6d; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas fa-edit"></i> Edit
                     </button>
-                    <button class="icon-btn danger" onclick="deleteMenuItem(${item.id}, '${escapeHtml(item.name)}')">
+                    <button class="icon-btn danger" onclick="deleteMenuItem(${item.id}, '${escapeHtml(item.name)}')" style="background: none; border: none; font-size: 13px; cursor: pointer; padding: 6px 12px; border-radius: 30px; transition: 0.2s; color: #6d6d6d; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fas fa-trash-alt"></i> Delete
                     </button>
                 </div>
             </div>
         `;
     }).join('');
-}
-
-function getImageUrl(imageUrl) {
-    if (!imageUrl) return '';
-    if (imageUrl.indexOf('http') === 0) return imageUrl;
-    if (imageUrl.indexOf('/') === 0) return imageUrl;
-    return '/assets/dine_with_me/' + imageUrl;
 }
 
 function escapeHtml(str) {
@@ -238,36 +249,36 @@ function showEditMenuItemModal(itemId) {
 function showMenuItemModal(menuItem) {
     const isEditing = menuItem !== null;
     const modalHtml = `
-        <div class="modal-overlay" id="menuItemModal">
-            <div class="modal-content">
-                <h3><i class="fas fa-utensils"></i> ${isEditing ? 'Edit Menu Item' : 'Add Menu Item'}</h3>
+        <div class="modal-overlay" id="menuItemModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+            <div class="modal-content" style="background: white; border-radius: 24px; max-width: 500px; width: 90%; padding: 24px;">
+                <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 16px; color: var(--admin-text);"><i class="fas fa-utensils"></i> ${isEditing ? 'Edit Menu Item' : 'Add Menu Item'}</h3>
                 <form id="menuItemForm">
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-tag"></i> Item Name *</label>
-                        <input type="text" id="itemName" class="form-input" value="${isEditing ? escapeHtml(menuItem.name) : ''}" placeholder="e.g., Margherita Pizza">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; font-weight: 600; margin-bottom: 6px; color: var(--admin-text); font-size: 13px;"><i class="fas fa-tag"></i> Item Name *</label>
+                        <input type="text" id="itemName" class="form-input" style="width: 100%; padding: 12px 14px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 14px;" value="${isEditing ? escapeHtml(menuItem.name) : ''}" placeholder="e.g., Margherita Pizza">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
-                        <textarea id="itemDescription" class="form-textarea" rows="3" placeholder="Item description">${isEditing ? escapeHtml(menuItem.description || '') : ''}</textarea>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; font-weight: 600; margin-bottom: 6px; color: var(--admin-text); font-size: 13px;"><i class="fas fa-align-left"></i> Description</label>
+                        <textarea id="itemDescription" class="form-textarea" style="width: 100%; padding: 12px 14px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 14px; font-family: 'Montserrat', sans-serif;" rows="3" placeholder="Item description">${isEditing ? escapeHtml(menuItem.description || '') : ''}</textarea>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-tag"></i> Price (R) *</label>
-                        <input type="number" id="itemPrice" class="form-input" step="0.01" value="${isEditing ? menuItem.price : ''}" placeholder="0.00">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; font-weight: 600; margin-bottom: 6px; color: var(--admin-text); font-size: 13px;"><i class="fas fa-tag"></i> Price (R) *</label>
+                        <input type="number" id="itemPrice" class="form-input" style="width: 100%; padding: 12px 14px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 14px;" step="0.01" value="${isEditing ? menuItem.price : ''}" placeholder="0.00">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-image"></i> Image URL</label>
-                        <input type="text" id="itemImageUrl" class="form-input" value="${isEditing ? escapeHtml(menuItem.imageUrl || '') : ''}" placeholder="assets/dine_with_me/food_image.png">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; font-weight: 600; margin-bottom: 6px; color: var(--admin-text); font-size: 13px;"><i class="fas fa-image"></i> Image URL</label>
+                        <input type="text" id="itemImageUrl" class="form-input" style="width: 100%; padding: 12px 14px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 14px;" value="${isEditing ? escapeHtml(menuItem.imageUrl || '') : ''}" placeholder="assets/dine_with_me/food_image.png">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="fas fa-check-circle"></i> Status</label>
-                        <select id="itemIsAvailable" class="form-input">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; font-weight: 600; margin-bottom: 6px; color: var(--admin-text); font-size: 13px;"><i class="fas fa-check-circle"></i> Status</label>
+                        <select id="itemIsAvailable" class="form-input" style="width: 100%; padding: 12px 14px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 14px;">
                             <option value="true" ${isEditing && menuItem.isAvailable ? 'selected' : ''}>Available</option>
                             <option value="false" ${isEditing && !menuItem.isAvailable ? 'selected' : ''}>Unavailable</option>
                         </select>
                     </div>
                     <div style="display: flex; gap: 12px; margin-top: 20px;">
-                        <button type="button" class="btn-secondary" onclick="closeModal()" style="flex: 1;">Cancel</button>
-                        <button type="submit" class="btn-primary" style="flex: 1;">${isEditing ? 'Update' : 'Add'} Item</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal()" style="flex: 1; background: transparent; border: 1px solid var(--admin-border); padding: 12px 24px; border-radius: 40px; cursor: pointer;">Cancel</button>
+                        <button type="submit" class="btn-primary" style="flex: 1; background: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; cursor: pointer;">${isEditing ? 'Update' : 'Add'} Item</button>
                     </div>
                 </form>
             </div>
@@ -331,7 +342,6 @@ async function addMenuItem(name, description, price, imageUrl, isAvailable) {
         
         const updatedMenuItems = [...menuItems, newItem];
         
-        // Update restaurant with new menu
         const updatedRestaurant = {
             ...restaurantData,
             menuItems: updatedMenuItems

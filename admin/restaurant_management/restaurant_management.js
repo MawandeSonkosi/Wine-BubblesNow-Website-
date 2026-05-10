@@ -156,6 +156,15 @@ function filterRestaurants() {
     return filtered;
 }
 
+// Fixed: Proper image URL handling
+function getImageUrl(imageUrl) {
+    if (!imageUrl) return '';
+    if (imageUrl.indexOf('http') === 0) return imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+    return '/assets/images/' + imageUrl;
+}
+
 function renderRestaurants() {
     const container = document.getElementById('restaurantContainer');
     if (!container) return;
@@ -171,13 +180,16 @@ function renderRestaurants() {
         <div class="restaurant-grid">
             ${filtered.map(restaurant => {
                 const restaurantId = getRestaurantId(restaurant);
-                const imageUrl = getImageUrl(restaurant.imageUrl);
+                let imageUrl = '';
+                if (restaurant.imageUrl && restaurant.imageUrl !== 'assets/dine_with_me/placeholder.png') {
+                    imageUrl = getImageUrl(restaurant.imageUrl);
+                }
                 
                 return `
                     <div class="restaurant-card" onclick="viewRestaurantDetail('${restaurantId}')">
                         <div class="restaurant-image">
-                            ${restaurant.imageUrl ? 
-                                `<img src="${imageUrl}" alt="${escapeHtml(restaurant.name)}" onerror="this.parentElement.innerHTML='<div class=\\'restaurant-image-placeholder\\'><i class=\\'fas fa-utensils\\'></i></div>'">` : 
+                            ${imageUrl ? 
+                                `<img src="${imageUrl}" alt="${escapeHtml(restaurant.name)}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'restaurant-image-placeholder\\'><i class=\\'fas fa-utensils\\'></i></div>'">` : 
                                 `<div class="restaurant-image-placeholder"><i class="fas fa-utensils"></i></div>`
                             }
                         </div>
@@ -186,7 +198,7 @@ function renderRestaurants() {
                             <span class="badge ${restaurant.isActive ? 'badge-active' : 'badge-inactive'}">${restaurant.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
                         </div>
                         <div class="restaurant-body">
-                            <div class="restaurant-cuisine">${escapeHtml(restaurant.cuisineType || 'Various')}</div>
+                            <div class="restaurant-cuisine"><i class="fas fa-utensil-spoon"></i> ${escapeHtml(restaurant.cuisineType || 'Various')}</div>
                             <div class="restaurant-address">
                                 <i class="fas fa-map-marker-alt"></i> ${escapeHtml(restaurant.address || 'No address')}
                             </div>
@@ -206,14 +218,6 @@ function renderRestaurants() {
         </div>
     `;
     container.innerHTML = gridHtml;
-}
-
-function getImageUrl(imageUrl) {
-    if (!imageUrl) return '';
-    if (imageUrl.indexOf('http') === 0) return imageUrl;
-    if (imageUrl.indexOf('/') === 0) return imageUrl;
-    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
-    return '/assets/images/' + imageUrl;
 }
 
 function escapeHtml(str) {
