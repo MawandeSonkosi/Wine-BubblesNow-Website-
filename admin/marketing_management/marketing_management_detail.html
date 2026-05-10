@@ -87,10 +87,10 @@
     }
     .advert-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     
-    /* Fixed image container size */
+    /* Fixed image container size - INCREASED HEIGHT */
     .advert-image { 
       width: 100%; 
-      height: 160px; 
+      height: 220px; 
       background: #e0e0e0; 
       border-radius: 12px; 
       display: flex; 
@@ -263,6 +263,8 @@
       .search-box { max-width: 100%; }
       .available-advert-item { flex-wrap: wrap; }
       .add-advert-btn { margin-top: 8px; width: 100%; text-align: center; }
+      /* Adjust image height for mobile */
+      .advert-image { height: 180px; }
     }
   </style>
 </head>
