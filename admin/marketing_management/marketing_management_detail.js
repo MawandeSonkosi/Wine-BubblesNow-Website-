@@ -340,21 +340,14 @@ function renderDetail() {
     console.log('🎨 Rendering - Available adverts count:', availableAdverts.length);
     
     container.innerHTML = `
-    <div class="detail-card">
-        <div class="detail-header">
-            <div class="detail-title">
-                <i class="fas fa-chart-line"></i>
-                ${escapeHtml(marketingData.companyName)}
+        <div class="detail-card">
+            <div class="detail-header">
+                <div class="detail-title">
+                    <i class="fas fa-chart-line"></i>
+                    ${escapeHtml(marketingData.companyName)}
+                </div>
+                <div class="status-badge ${statusClass}">${marketingData.isActive ? 'ACTIVE' : 'INACTIVE'}</div>
             </div>
-            <div class="header-actions">
-                <button class="btn-icon" onclick="window.location.href='marketing_management_screen.html'">
-                    <i class="fas fa-arrow-left"></i> Back
-                </button>
-                <button class="btn-icon" onclick="editMarketing()">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-            </div>
-        </div>
             
             <div class="detail-section">
                 <h3 class="section-title"><i class="fas fa-info-circle"></i> Company Information</h3>
@@ -461,29 +454,18 @@ function renderAvailableAdverts(adverts) {
 
 function getAdvertImageHtml(advert, size) {
     size = size || 'normal';
-    var title = escapeHtml(advert.title || 'Advert');
-    var type = advert.productType || advert.type || 'advert';
-    
-    // Determine appropriate icon
-    var icon = 'fa-ad';
-    if (type === 'marketing_banner' || type === 'marketing') icon = 'fa-bullhorn';
-    if (type === 'wine' || type === 'wine_banner') icon = 'fa-wine-bottle';
-    if (type === 'sponsored_content') icon = 'fa-star';
-    if (type === 'featured_ad') icon = 'fa-crown';
-    
     if (advert.imageUrl && advert.imageUrl.trim() !== '') {
         var imgUrl = getImageUrl(advert.imageUrl);
-        return '<img src="' + imgUrl + '" alt="' + title + '" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML=\'<div class=\\\'advert-image-placeholder\\\'><i class=\\\'fas ' + icon + '\\\'></i><span>' + title + '</span></div>\'">';
+        return '<img src="' + imgUrl + '" alt="' + escapeHtml(advert.title) + '" onerror="this.parentElement.innerHTML=\'<div class=\\\'advert-image-placeholder\\\'><i class=\\\'fas fa-ad\\\'></i></div>\'">';
     }
-    return '<div class="advert-image-placeholder"><i class="fas ' + icon + '"></i><span>' + title + '</span></div>';
+    return '<div class="advert-image-placeholder"><i class="fas fa-ad"></i></div>';
 }
 
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
     if (imageUrl.indexOf('http') === 0) return imageUrl;
-    if (imageUrl.indexOf('/') === 0) return imageUrl;
-    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
-    return '/assets/images/' + imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '../../' + imageUrl;
+    return '../../assets/images/' + imageUrl;
 }
 
 function updateAvailableAdverts() {
