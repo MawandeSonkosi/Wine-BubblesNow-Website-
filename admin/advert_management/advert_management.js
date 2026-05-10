@@ -158,66 +158,33 @@ function filterAdverts() {
     return filtered;
 }
 
-function renderAdverts() {
-    const container = document.getElementById('advertContainer');
-    if (!container) return;
-    
-    const filtered = filterAdverts();
-    
-    if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-ad" style="font-size:48px; margin-bottom:16px;"></i><p>No adverts found${searchQuery ? ' matching your search' : ''}</p><button class="btn-primary" onclick="window.location.href='/admin/advert_management/advert_management_add_edit.html'"><i class="fas fa-plus"></i> Create First Advert</button></div>`;
-        return;
-    }
-    
-    const gridHtml = `
-        <div class="advert-grid">
-            ${filtered.map(advert => {
-                const advertId = getAdvertId(advert);
-                const ctr = (advert.ctr || 0).toFixed(1);
-                const imageUrl = getImageUrl(advert.imageUrl);
-                
-                return `
-                    <div class="advert-card" onclick="viewAdvertDetail('${advertId}')">
-                        <div class="advert-image">
-                            ${advert.imageUrl ? 
-                                `<img src="${imageUrl}" alt="${escapeHtml(advert.title)}" onerror="this.parentElement.innerHTML='<div class=\\'advert-image-placeholder\\'><i class=\\'fas fa-ad\\'></i></div>'">` : 
-                                `<div class="advert-image-placeholder"><i class="fas fa-ad"></i></div>`
-                            }
-                        </div>
-                        <div class="advert-header">
-                            <span class="advert-title">${escapeHtml(advert.title)}</span>
-                            <div style="display: flex; gap: 4px;">
-                                <span class="badge ${advert.isActive ? 'badge-active' : 'badge-inactive'}">${advert.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
-                                <span class="badge ${advert.isAvailableForPurchase && advert.stockCount > 0 ? 'badge-purchasable' : 'badge-display'}">${advert.isAvailableForPurchase && advert.stockCount > 0 ? 'PURCHASABLE' : 'DISPLAY'}</span>
-                            </div>
-                        </div>
-                        <div class="advert-body">
-                            <div class="advert-subtitle">${escapeHtml(advert.subtitle || 'No description')}</div>
-                            <div class="advert-stats">
-                                <span class="stat-chip"><i class="fas fa-eye"></i> ${formatNumber(advert.impressions || 0)}</span>
-                                <span class="stat-chip"><i class="fas fa-mouse-pointer"></i> ${formatNumber(advert.clicks || 0)}</span>
-                                <span class="stat-chip"><i class="fas fa-chart-line"></i> ${ctr}% CTR</span>
-                            </div>
-                            <div class="advert-price">R${(advert.price || 0).toFixed(2)}</div>
-                        </div>
-                        <div class="advert-actions" onclick="event.stopPropagation()">
-                            <button class="icon-btn" onclick="editAdvert('${advertId}')" title="Edit"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="icon-btn" onclick="viewAdvertDetail('${advertId}')" title="View Details"><i class="fas fa-chart-simple"></i> Analytics</button>
-                            <button class="icon-btn danger" onclick="deleteAdvertPrompt('${advertId}', '${escapeHtml(advert.title)}')" title="Delete"><i class="fas fa-trash-alt"></i> Delete</button>
-                        </div>
-                    </div>
-                `;
-            }).join('')}
-        </div>
-    `;
-    container.innerHTML = gridHtml;
-}
-
+// Improved image URL helper
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
     if (imageUrl.indexOf('http') === 0) return imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
     if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
     return '/assets/images/' + imageUrl;
+}
+
+// Improved image HTML generator with better placeholders
+function getAdvertImageHtml(advert) {
+    const imageUrl = getImageUrl(advert.imageUrl);
+    const title = escapeHtml(advert.title || 'Advert');
+    const type = advert.productType || advert.type || 'advert';
+    
+    // Determine appropriate icon based on advert type
+    let icon = 'fa-ad';
+    if (type === 'marketing_banner' || type === 'marketing') icon = 'fa-bullhorn';
+    if (type === 'wine' || type === 'wine_banner') icon = 'fa-wine-bottle';
+    if (type === 'sponsored_content') icon = 'fa-star';
+    if (type === 'featured_ad') icon = 'fa-crown';
+    
+    if (imageUrl) {
+        return `<img src="${imageUrl}" alt="${title}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'advert-image-placeholder\\'><i class=\\'fas ${icon}\\'></i><span>${title}</span></div>'">`;
+    }
+    
+    return `<div class="advert-image-placeholder"><i class="fas ${icon}"></i><span>${title}</span></div>`;
 }
 
 function formatNumber(num) {
@@ -232,11 +199,74 @@ function escapeHtml(str) {
 }
 
 function showToast(message, type = 'success') {
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) existingToast.remove();
+    
     const toast = document.createElement('div');
+    toast.className = 'toast-notification';
     toast.textContent = message;
     toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
+}
+
+// ========== RENDER ADVERTS WITH IMPROVED LAYOUT ==========
+function renderAdverts() {
+    const container = document.getElementById('advertContainer');
+    if (!container) return;
+    
+    const filtered = filterAdverts();
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-ad" style="font-size:56px; margin-bottom:20px; opacity:0.5;"></i><p style="font-size:16px; margin-bottom:8px;">No adverts found${searchQuery ? ' matching your search' : ''}</p><p style="font-size:13px; color:var(--admin-muted); margin-bottom:20px;">Create your first advert to get started</p><button class="btn-primary" onclick="window.location.href='/admin/advert_management/advert_management_add_edit.html'"><i class="fas fa-plus"></i> Create First Advert</button></div>`;
+        return;
+    }
+    
+    const gridHtml = `
+        <div class="advert-grid">
+            ${filtered.map(advert => {
+                const advertId = getAdvertId(advert);
+                const ctr = (advert.ctr || 0).toFixed(1);
+                const conversion = (advert.conversionRate || 0).toFixed(1);
+                const stockStatus = (advert.stockCount || 0) > 0;
+                
+                return `
+                    <div class="advert-card" onclick="viewAdvertDetail('${advertId}')">
+                        <div class="advert-image">
+                            ${getAdvertImageHtml(advert)}
+                        </div>
+                        <div class="advert-header">
+                            <span class="advert-title" title="${escapeHtml(advert.title)}">${escapeHtml(advert.title)}</span>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <span class="badge ${advert.isActive ? 'badge-active' : 'badge-inactive'}">${advert.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
+                                <span class="badge ${advert.isAvailableForPurchase && stockStatus ? 'badge-purchasable' : 'badge-display'}">${advert.isAvailableForPurchase && stockStatus ? 'PURCHASABLE' : 'DISPLAY'}</span>
+                            </div>
+                        </div>
+                        <div class="advert-body">
+                            <div class="advert-subtitle">${escapeHtml(advert.subtitle || 'No description available')}</div>
+                            <div class="advert-stats">
+                                <span class="stat-chip"><i class="fas fa-eye"></i> ${formatNumber(advert.impressions || 0)}</span>
+                                <span class="stat-chip"><i class="fas fa-mouse-pointer"></i> ${formatNumber(advert.clicks || 0)}</span>
+                                <span class="stat-chip"><i class="fas fa-chart-line"></i> ${ctr}% CTR</span>
+                                <span class="stat-chip"><i class="fas fa-percent"></i> ${conversion}% Conv</span>
+                            </div>
+                            <div class="advert-price">R${(advert.price || 0).toFixed(2)}</div>
+                            <div class="stock-info ${!stockStatus ? 'out-of-stock' : ''}">
+                                <i class="fas ${stockStatus ? 'fa-boxes' : 'fa-exclamation-triangle'}"></i>
+                                ${stockStatus ? `${advert.stockCount} placement${advert.stockCount !== 1 ? 's' : ''} available` : 'Out of stock'}
+                            </div>
+                        </div>
+                        <div class="advert-actions" onclick="event.stopPropagation()">
+                            <button class="icon-btn" onclick="editAdvert('${advertId}')" title="Edit Advert"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="icon-btn" onclick="viewAdvertDetail('${advertId}')" title="View Analytics"><i class="fas fa-chart-simple"></i> Analytics</button>
+                            <button class="icon-btn danger" onclick="deleteAdvertPrompt('${advertId}', '${escapeHtml(advert.title)}')" title="Delete Advert"><i class="fas fa-trash-alt"></i> Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    container.innerHTML = gridHtml;
 }
 
 // ========== ADVERT ACTIONS ==========
