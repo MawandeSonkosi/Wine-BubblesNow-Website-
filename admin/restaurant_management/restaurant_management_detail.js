@@ -119,11 +119,7 @@ function renderDetail() {
     const container = document.getElementById('detailContent');
     if (!container || !restaurantData) return;
     
-    let imageUrl = '';
-    if (restaurantData.imageUrl && restaurantData.imageUrl !== 'assets/dine_with_me/placeholder.png') {
-        imageUrl = getImageUrl(restaurantData.imageUrl);
-    }
-    
+    // Only banner image - removed restaurant image
     let bannerUrl = '';
     if (restaurantData.bannerImageUrl && restaurantData.bannerImageUrl !== 'assets/dine_with_me/banner_placeholder.png') {
         bannerUrl = getImageUrl(restaurantData.bannerImageUrl);
@@ -153,25 +149,15 @@ function renderDetail() {
             </div>
             
             <div class="detail-section">
-                <div class="image-container" style="display: flex; gap: 16px; flex-wrap: wrap;">
-                    <div style="flex: 1;">
-                        <h4 style="color: var(--admin-text); margin-bottom: 8px;">Restaurant Image</h4>
-                        ${imageUrl ? 
-                            `<img src="${imageUrl}" alt="${escapeHtml(restaurantData.name)}" style="width:100%; height:200px; object-fit:cover; border-radius:12px;" onerror="this.onerror=null; this.src='/assets/dine_with_me/placeholder.png'">` : 
-                            `<div class="image-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:200px; background:#f0f0f0; border-radius:12px;">
-                                <i class="fas fa-utensils" style="font-size:48px; color:#999;"></i>
-                            </div>`
-                        }
-                    </div>
-                    <div style="flex: 1;">
-                        <h4 style="color: var(--admin-text); margin-bottom: 8px;">Banner Image</h4>
-                        ${bannerUrl ? 
-                            `<img src="${bannerUrl}" alt="${escapeHtml(restaurantData.name)} Banner" style="width:100%; height:200px; object-fit:cover; border-radius:12px;" onerror="this.onerror=null; this.src='/assets/dine_with_me/banner_placeholder.png'">` : 
-                            `<div class="image-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:200px; background:#f0f0f0; border-radius:12px;">
-                                <i class="fas fa-image" style="font-size:48px; color:#999;"></i>
-                            </div>`
-                        }
-                    </div>
+                <div class="image-container">
+                    <h4 style="color: var(--admin-text); margin-bottom: 8px;">Banner Image</h4>
+                    ${bannerUrl ? 
+                        `<img src="${bannerUrl}" alt="${escapeHtml(restaurantData.name)} Banner" style="width:100%; max-height:300px; object-fit:cover; border-radius:12px;" onerror="this.onerror=null; this.src='/assets/dine_with_me/banner_placeholder.png'">` : 
+                        `<div class="image-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:200px; background:#f0f0f0; border-radius:12px;">
+                            <i class="fas fa-image" style="font-size:48px; color:#999;"></i>
+                            <p style="margin-top:8px; color:#999;">No banner image available</p>
+                        </div>`
+                    }
                 </div>
             </div>
             
