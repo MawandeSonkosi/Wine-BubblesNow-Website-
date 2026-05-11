@@ -114,7 +114,7 @@ async function fetchAdvertDetails() {
     }
 }
 
-// ========== RENDER DETAIL - BANNER ONLY, NO RESTAURANT IMAGES ==========
+// ========== RENDER DETAIL ==========
 function renderDetail() {
     const container = document.getElementById('detailContent');
     if (!container || !advertData) return;
@@ -124,8 +124,13 @@ function renderDetail() {
     const conversionRate = (advertData.conversionRate || 0).toFixed(1);
     const imageUrl = getImageUrl(advertData.imageUrl);
     
-    // Determine icon based on advert type - BANNER ONLY
-    let icon = 'fa-bullhorn';
+    // Determine icon based on advert type
+    let icon = 'fa-ad';
+    const type = advertData.productType || advertData.type || 'advert';
+    if (type === 'marketing_banner' || type === 'marketing') icon = 'fa-bullhorn';
+    if (type === 'wine' || type === 'wine_banner') icon = 'fa-wine-bottle';
+    if (type === 'sponsored_content') icon = 'fa-star';
+    if (type === 'featured_ad') icon = 'fa-crown';
     
     container.innerHTML = `
         <div class="detail-card">
@@ -148,19 +153,19 @@ function renderDetail() {
                 <div class="image-container">
                     ${advertData.imageUrl ? 
                         `<img src="${imageUrl}" alt="${escapeHtml(advertData.title)}" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas ${icon}\'></i><p>Failed to load image</p><p style=\'font-size:12px; margin-top:5px;\'>${escapeHtml(advertData.title)}</p></div>'">` : 
-                        `<div class="image-placeholder"><i class="fas ${icon}"></i><p>${escapeHtml(advertData.title)}</p><p style="font-size:12px; opacity:0.7;">No banner image available</p></div>`
+                        `<div class="image-placeholder"><i class="fas ${icon}"></i><p>${escapeHtml(advertData.title)}</p><p style="font-size:12px; opacity:0.7;">No image available</p></div>`
                     }
                 </div>
             </div>
             
             <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-info-circle"></i> Banner Information</h3>
+                <h3 class="section-title"><i class="fas fa-info-circle"></i> Advert Information</h3>
                 <div class="info-grid">
                     <div class="info-row"><div class="info-label">Title:</div><div class="info-value">${escapeHtml(advertData.title)}</div></div>
                     <div class="info-row"><div class="info-label">Subtitle:</div><div class="info-value">${escapeHtml(advertData.subtitle || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.type || 'banner')}</span></div></div>
-                    <div class="info-row"><div class="info-label">Category:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.category || 'banner')}</span></div></div>
-                    <div class="info-row"><div class="info-label">Product Type:</div><div class="info-value">${escapeHtml((advertData.productType || 'banner').replace(/_/g, ' '))}</div></div>
+                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.type || '—')}</span></div></div>
+                    <div class="info-row"><div class="info-label">Category:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.category || '—')}</span></div></div>
+                    <div class="info-row"><div class="info-label">Product Type:</div><div class="info-value">${escapeHtml((advertData.productType || 'advert').replace(/_/g, ' '))}</div></div>
                     <div class="info-row"><div class="info-label">Target URL:</div><div class="info-value">${advertData.targetUrl ? `<a href="${escapeHtml(advertData.targetUrl)}" target="_blank" style="color:var(--admin-primary); text-decoration:none;"><i class="fas fa-external-link-alt"></i> ${escapeHtml(advertData.targetUrl)}</a>` : '—'}</div></div>
                     <div class="info-row"><div class="info-label">Display Position:</div><div class="info-value">${advertData.position || 0}</div></div>
                     <div class="info-row"><div class="info-label">Price:</div><div class="info-value"><strong style="color:var(--admin-primary); font-size:18px;">R${(advertData.price || 0).toFixed(2)}</strong></div></div>
@@ -199,14 +204,14 @@ function renderDetail() {
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">R${revenue.toFixed(2)}</div>
-                        <div class="stat-label"><i class="fas fa-chart-line"></i> Total Revenue</div>
+                        <div class="stat-label"><i class="fas fa-rand"></i> Total Revenue</div>
                     </div>
                 </div>
             </div>
             
             <div class="detail-section" style="display: flex; gap: 16px; justify-content: flex-end; border-bottom: none;">
                 <button class="btn-secondary" onclick="window.location.href='/admin/advert_management/advert_management_screen.html'"><i class="fas fa-arrow-left"></i> Back to List</button>
-                <button class="btn-primary" onclick="editAdvert()"><i class="fas fa-edit"></i> Edit Banner</button>
+                <button class="btn-primary" onclick="editAdvert()"><i class="fas fa-edit"></i> Edit Advert</button>
                 <button class="btn-secondary" style="background: ${advertData.isActive ? '#d32f2f' : '#2e7d32'}; color:white; border:none;" onclick="toggleStatus()">
                     <i class="fas ${advertData.isActive ? 'fa-toggle-off' : 'fa-toggle-on'}"></i> ${advertData.isActive ? 'Deactivate' : 'Activate'}
                 </button>
@@ -309,11 +314,11 @@ async function toggleStatus() {
         advertData.isActive = !advertData.isActive;
         renderDetail();
         
-        showToast(`Banner ${advertData.isActive ? 'activated' : 'deactivated'}`, 'success');
+        showToast(`Advert ${advertData.isActive ? 'activated' : 'deactivated'}`, 'success');
         
     } catch (error) {
         console.error('Toggle status error:', error);
-        showToast('Failed to update banner status', 'error');
+        showToast('Failed to update advert status', 'error');
     } finally {
         isLoading = false;
     }
