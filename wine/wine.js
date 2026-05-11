@@ -75,8 +75,11 @@ function extractWineTypes(wines) {
   return ['All', ...allTypes];
 }
 
-// Check if item is a wine (not a banner or advert)
+// Check if item is a wine (not a banner or advert) AND is active
 function isWine(item) {
+  // Check if item is active
+  const isActive = item.isActive === true;
+  
   // Check if it has a valid wine type - only Red Wine, White Wine, Champagne
   const validWineTypes = ['Red Wine', 'White Wine', 'Champagne'];
   
@@ -98,8 +101,8 @@ function isWine(item) {
                              item.description.toLowerCase().includes('vintage') ||
                              item.description.toLowerCase().includes('bottle'));
   
-  // Return true if it meets wine criteria AND has valid type
-  return hasPrice && hasValidType && (hasWineName || hasWineDescription);
+  // Return true if it meets wine criteria AND has valid type AND is active
+  return hasPrice && hasValidType && (hasWineName || hasWineDescription) && isActive;
 }
 
 // Populate filter dropdown
@@ -163,22 +166,22 @@ async function fetchWines() {
     const items = await response.json();
     console.log(`✅ Received ${items.length} items from API`);
     
-    // Filter to only Red Wine, White Wine, and Champagne
+    // Filter to only active wines that are Red Wine, White Wine, and Champagne
     const wines = items.filter(item => isWine(item));
     
-    console.log(`🍷 Filtered to ${wines.length} wines (Red Wine, White Wine, Champagne only)`);
+    console.log(`🍷 Filtered to ${wines.length} active wines (Red Wine, White Wine, Champagne only)`);
     
     // Log what was filtered out for debugging
     const filteredOut = items.length - wines.length;
     if (filteredOut > 0) {
-      console.log(`🚫 Filtered out ${filteredOut} non-wine items and other categories`);
+      console.log(`🚫 Filtered out ${filteredOut} non-wine items, inactive wines, and other categories`);
     }
     
     allWines = wines;
     filteredWines = wines;
     
     if (wines.length === 0) {
-      showEmptyState('No wines found');
+      showEmptyState('No active wines found');
     } else {
       populateFilterDropdown(wines);
       renderWines();
@@ -212,7 +215,7 @@ function renderWines() {
   console.log('🎨 Rendering wines...');
   
   if (filteredWines.length === 0) {
-    showEmptyState('No wines match your criteria');
+    showEmptyState('No active wines match your criteria');
     return;
   }
   
@@ -342,7 +345,7 @@ function showEmptyState(message) {
         <p>Available types: ${allTypes.join(', ')}</p>
       </div>
       <button onclick="resetFilters()" class="btn-fill" style="margin-top: 20px;">
-        Show All Wines
+        Show All Active Wines
       </button>
     </div>
   `;
