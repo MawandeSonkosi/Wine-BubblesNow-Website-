@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wine & Bubbles — All Wines</title>
+  <title>Wine & Bubbles — All Beverages</title>
   <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
   <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/categories/Icons.png">
@@ -181,7 +181,7 @@
 
       <nav class="main-nav">
         <ul>
-          <li><a href="all_wines.html" class="active">All Wines</a></li>
+          <li><a href="all_wines.html" class="active">All Beverages</a></li>
           <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
           <li><a href="../wine_farm/wine_farm.html">Wine Bars Near Me</a></li>
           <li><a href="../pairings/pairings.html">Pairings</a></li>
@@ -204,14 +204,14 @@
   <!-- Main Content -->
   <section class="section all-wines-section">
     <div class="container">
-      <h2 class="section-title">All Wines</h2>
-      <p class="muted">Browse our curated collection of premium wines</p>
+      <h2 class="section-title">All Beverages</h2>
+      <p class="muted">Browse our curated collection of premium beverages</p>
       
       <!-- Search and Filter Bar -->
       <div class="search-filter-bar">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Search all wines..." class="search-input">
+          <input type="text" id="searchInput" placeholder="Search all beverages..." class="search-input">
         </div>
         <div class="filter-dropdown">
           <button class="filter-btn" id="filterBtn">
@@ -230,7 +230,7 @@
         <!-- Loading state -->
         <div class="loading-state">
           <div class="loading-spinner"></div>
-          <p>Loading wines...</p>
+          <p>Loading beverages...</p>
         </div>
       </div>
     </div>
@@ -255,7 +255,7 @@
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
-            <li><a href="all_wines.html">All Wines</a></li>
+            <li><a href="all_wines.html">All Beverages</a></li>
             <li><a href="../index.html#bookings">Bookings</a></li>
             <li><a href="../index.html#tastings">Tastings</a></li>
             <li><a href="../index.html#blog">Blog</a></li>
@@ -277,9 +277,9 @@
     <!-- JavaScript with cache busting -->
   <script src="wine.js?v=4"></script>
   <script>
-    // Authentication logic for All Wines page - PROFILE ONLY, cart stays as is
+    // Authentication logic for All Beverages page - PROFILE ONLY, cart stays as is
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🍷 All Wines page loaded - checking authentication');
+        console.log('🍷 All Beverages page loaded - checking authentication');
         
         // Configuration
         const API_BASE_URL = 'http://localhost:3000/api';
@@ -324,7 +324,7 @@
         const userIconElement = document.getElementById('userIconElement');
         
         if (isValidToken && userData) {
-            console.log('✅ User is logged in on All Wines page');
+            console.log('✅ User is logged in on All Beverages page');
             
             try {
                 const user = JSON.parse(userData);
@@ -354,7 +354,7 @@
             }
             
         } else {
-            console.log('❌ User is not logged in or token expired on All Wines page');
+            console.log('❌ User is not logged in or token expired on All Beverages page');
             clearUserSession();
             resetUserIcon();
         }
@@ -513,7 +513,8 @@
             }
         }
         
-        console.log('✅ All Wines page authentication initialized');
+        console.log('✅ All Beverages page authentication initialized');
     });
   </script>
+</body>
 </html>
