@@ -68,7 +68,6 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
-// Fixed: Proper image URL handling
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
     if (imageUrl.indexOf('http') === 0) return imageUrl;
@@ -119,7 +118,6 @@ function renderDetail() {
     const container = document.getElementById('detailContent');
     if (!container || !restaurantData) return;
     
-    // Only banner image - removed restaurant image
     let bannerUrl = '';
     if (restaurantData.bannerImageUrl && restaurantData.bannerImageUrl !== 'assets/dine_with_me/banner_placeholder.png') {
         bannerUrl = getImageUrl(restaurantData.bannerImageUrl);
@@ -148,16 +146,14 @@ function renderDetail() {
                 </div>
             </div>
             
-            <div class="detail-section" style="padding: 0;">
-                <div class="image-container" style="margin: 0;">
-                    ${bannerUrl ? 
-                        `<img src="${bannerUrl}" alt="${escapeHtml(restaurantData.name)}" style="width:100%; height:auto; max-height:400px; object-fit:cover; display:block;" onerror="this.onerror=null; this.src='/assets/dine_with_me/banner_placeholder.png'">` : 
-                        `<div class="image-placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:250px; background:#f0f0f0;">
-                            <i class="fas fa-image" style="font-size:48px; color:#999;"></i>
-                            <p style="margin-top:8px; color:#999;">No banner image available</p>
-                        </div>`
-                    }
-                </div>
+            <div class="banner-container">
+                ${bannerUrl ? 
+                    `<img src="${bannerUrl}" alt="${escapeHtml(restaurantData.name)}" class="banner-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'banner-placeholder\'><i class=\'fas fa-image\'></i><p>No banner image available</p></div>'">` : 
+                    `<div class="banner-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>No banner image available</p>
+                    </div>`
+                }
             </div>
             
             <div class="detail-section">
