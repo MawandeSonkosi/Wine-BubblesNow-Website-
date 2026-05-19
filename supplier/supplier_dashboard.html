@@ -54,7 +54,7 @@
     .stat-value { font-size: 32px; font-weight: 700; color: var(--admin-text); margin-bottom: 4px; }
     .stat-label { font-size: 14px; color: var(--admin-muted); }
     
-    /* Main Section Card - Everything in one card */
+    /* Main Section Card */
     .main-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 32px; }
     
     /* Tabs inside card */
@@ -66,20 +66,66 @@
     /* Tab Content */
     .tab-content { padding: 24px; }
     
-    /* Wine Grid */
-    .wines-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-    .wine-item { background: var(--card-bg); border-radius: 16px; overflow: hidden; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(107,13,43,0.2); }
+    /* Wine Grid - Vertical card layout */
+    .wines-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+    .wine-item { 
+      background: var(--card-bg); 
+      border-radius: 16px; 
+      overflow: hidden; 
+      transition: all 0.2s; 
+      cursor: pointer; 
+      border: 1px solid rgba(107,13,43,0.2);
+      display: flex;
+      flex-direction: column;
+    }
     .wine-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--admin-primary); }
+    
+    /* Wine Image - Top of card */
     .wine-image-container { width: 100%; height: 200px; overflow: hidden; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
     .wine-image { width: 100%; height: 100%; object-fit: contain; background: #2a2a2a; }
-    .wine-info { padding: 16px; }
-    .wine-name { font-weight: 700; font-size: 16px; color: var(--admin-accent); margin-bottom: 4px; }
-    .wine-type { font-size: 12px; color: #888; margin-bottom: 8px; }
-    .wine-stats { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; }
-    .wine-price { font-weight: 700; color: var(--admin-primary); }
-    .wine-sold { font-size: 12px; color: var(--admin-success); }
-    .no-sales-badge { background: rgba(255,152,0,0.1); color: #ff9800; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
-    .restock-btn { background: transparent; border: 1px solid var(--admin-primary); color: var(--admin-primary); padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 12px; }
+    .wine-image-placeholder { width: 100%; height: 200px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
+    .wine-image-placeholder i { font-size: 48px; color: #555; }
+    
+    /* Wine Info - Below image */
+    .wine-info { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* Wine Name and Type */
+    .wine-name { font-weight: 700; font-size: 18px; color: var(--admin-accent); margin-bottom: 4px; }
+    .wine-type { font-size: 13px; color: #888; }
+    
+    /* Wine Stats - Stacked vertically */
+    .wine-stats { 
+      display: flex; 
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .wine-price { font-weight: 700; color: var(--admin-primary); font-size: 16px; }
+    .wine-sold { font-size: 13px; color: var(--admin-success); }
+    .wine-revenue { font-weight: 700; color: var(--admin-success); font-size: 16px; }
+    .no-sales-badge { background: rgba(255,152,0,0.1); color: #ff9800; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-align: center; }
+    
+    /* Restock Button - Full width at bottom */
+    .restock-btn { 
+      background: transparent; 
+      border: 1px solid var(--admin-primary); 
+      color: var(--admin-primary); 
+      padding: 10px 16px; 
+      border-radius: 8px; 
+      font-size: 13px; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      width: 100%; 
+      margin-top: 8px;
+      font-weight: 600;
+    }
     .restock-btn:hover { background: var(--admin-primary); color: white; }
     
     /* Delivery Item */
@@ -123,8 +169,6 @@
     .timeframe-btn.active { background: var(--admin-primary); color: white; border-color: var(--admin-primary); }
     
     /* Chart Styles */
-    .wine-image-placeholder { width: 100%; height: 200px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
-    .wine-image-placeholder i { font-size: 48px; color: #555; }
     .chart-container { padding: 0; }
     .chart-bars { display: flex; align-items: flex-end; justify-content: space-around; gap: 16px; min-height: 250px; margin: 20px 0; flex-wrap: wrap; }
     .chart-bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 60px; }
@@ -485,24 +529,37 @@
         var revenue = wineRevenue[wine.id] || 0;
         var hasSales = bottlesSold > 0;
         
+        // Build wine card with stacked information
         winesHtml += 
           '<div class="wine-item" onclick="viewWineAnalytics(' + wine.id + ')">' +
             buildWineImageHtml(wine.imageUrl, wine.name) +
             '<div class="wine-info">' +
               '<div class="wine-name">' + escapeHtml(wine.name) + '</div>' +
-              '<div class="wine-type">' + escapeHtml(wine.type) + ' • ' + escapeHtml(wine.category) + '</div>' +
-              '<div class="wine-stats">';
+              '<div class="wine-type">' + escapeHtml(wine.type) + ' • ' + escapeHtml(wine.category) + '</div>';
+        
         if (hasSales) {
           winesHtml += 
-                '<div><span class="wine-price">R' + wine.price.toFixed(2) + '</span> <span class="wine-sold">' + bottlesSold + ' bottles sold</span></div>' +
-                '<div><strong>R' + revenue.toFixed(2) + '</strong></div>';
+              '<div class="wine-stats">' +
+                '<div class="stat-row">' +
+                  '<span class="wine-price">R' + wine.price.toFixed(2) + '</span>' +
+                  '<span class="wine-sold"><i class="fas fa-wine-bottle"></i> ' + bottlesSold + ' bottles sold</span>' +
+                '</div>' +
+                '<div class="stat-row">' +
+                  '<span>Total Revenue:</span>' +
+                  '<span class="wine-revenue">R' + revenue.toFixed(2) + '</span>' +
+                '</div>' +
+              '</div>';
         } else {
           winesHtml += 
-                '<div><span class="wine-price">R' + wine.price.toFixed(2) + '</span></div>' +
-                '<div class="no-sales-badge">No sales yet</div>';
+              '<div class="wine-stats">' +
+                '<div class="stat-row">' +
+                  '<span class="wine-price">R' + wine.price.toFixed(2) + '</span>' +
+                  '<span class="no-sales-badge">No sales yet</span>' +
+                '</div>' +
+              '</div>';
         }
+        
         winesHtml += 
-              '</div>' +
               '<button class="restock-btn" onclick="event.stopPropagation(); requestRestock(' + wine.id + ')"><i class="fas fa-truck"></i> Request Restock</button>' +
             '</div>' +
           '</div>';
