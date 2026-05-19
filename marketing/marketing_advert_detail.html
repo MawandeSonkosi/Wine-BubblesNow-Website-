@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Advert Analytics | Marketing Portal</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #E6C79C;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-warning: #ed6c02;
+      --admin-error: #d32f2f;
+      --admin-info: #0288d1;
+      --card-bg: #1A1A1A;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 1000px; margin: 30px auto 50px; padding: 0 24px; }
+    .logo { cursor: pointer; }
+    
+    .detail-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
+    .detail-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; background: linear-gradient(135deg, var(--admin-primary) 0%, #8a1e3d 100%); color: white; }
+    .detail-header h2 { margin: 0; font-family: 'Playfair Display', serif; }
+    .detail-section { padding: 24px; border-bottom: 1px solid var(--admin-border); }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--admin-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .info-row { display: flex; padding: 8px 0; }
+    .info-label { width: 140px; font-weight: 600; color: var(--admin-text); }
+    .info-value { flex: 1; color: var(--admin-muted); }
+    
+    .image-container { width: 100%; max-height: 250px; overflow: hidden; border-radius: 16px; margin-bottom: 20px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; }
+    .detail-image { width: 100%; height: auto; max-height: 250px; object-fit: contain; }
+    .image-placeholder { width: 100%; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: var(--admin-muted); flex-direction: column; gap: 12px; }
+    .image-placeholder i { font-size: 64px; opacity: 0.5; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+    .stat-card { background: #f8f7f5; border-radius: 16px; padding: 20px; text-align: center; border: 1px solid var(--admin-border); }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--admin-primary); }
+    .stat-label { font-size: 12px; color: var(--admin-muted); margin-top: 8px; }
+    
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 12px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 16px; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-active { background: rgba(46,125,50,0.1); color: #2e7d32; border: 1px solid #2e7d32; }
+    .status-inactive { background: rgba(211,47,47,0.1); color: #d32f2f; border: 1px solid #d32f2f; }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .stats-grid { grid-template-columns: 1fr; gap: 12px; }
+      .info-row { flex-direction: column; gap: 4px; }
+      .info-label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo" id="dashboardLogo" style="cursor: pointer;">
+        <img src="../assets/categories/Logo_Top.png" alt="Logo">
+      </div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div id="detailContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading advert details...</p></div></div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Marketing Portal — Advert Analytics</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    var API_BASE = window.location.origin;
+    var urlParams = new URLSearchParams(window.location.search);
+    var advertId = urlParams.get('id');
+    var advertData = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        var d = new Date(dateStr);
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch(e) { return '—'; }
+    }
+
+    function getImageUrl(imageUrl) {
+      if (!imageUrl) return null;
+      if (imageUrl.indexOf('http') === 0) return imageUrl;
+      if (imageUrl.indexOf('/') === 0) return imageUrl;
+      if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+      return '/assets/' + imageUrl;
+    }
+
+    function setupLogo() {
+      var logo = document.getElementById('dashboardLogo');
+      if (logo) {
+        logo.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'marketing_dashboard.html';
+        });
+      }
+    }
+
+    function goToProfile() {
+      window.location.href = 'marketing_profile.html';
+    }
+
+    function setupUserIcon() {
+      var userIcon = document.getElementById('userIcon');
+      if (userIcon) {
+        userIcon.addEventListener('click', function(e) {
+          e.preventDefault();
+          goToProfile();
+        });
+      }
+    }
+
+    async function checkAuth() {
+      var token = localStorage.getItem('marketing_token');
+      if (!token) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+      setupUserIcon();
+      setupLogo();
+      return true;
+    }
+
+    async function fetchAdvertDetails() {
+      if (!advertId) {
+        showError('No advert ID provided');
+        return;
+      }
+      
+      var container = document.getElementById('detailContent');
+      container.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Loading advert details...</p></div>';
+      
+      try {
+        var token = localStorage.getItem('marketing_token');
+        var response = await fetch(API_BASE + '/api/adverts/' + advertId, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load advert');
+        
+        var data = await response.json();
+        advertData = data.data || data;
+        renderDetail();
+        
+      } catch (error) {
+        console.error('Error fetching advert:', error);
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading advert</p><button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#6b0d2b; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button></div>';
+      }
+    }
+
+    function renderDetail() {
+      var container = document.getElementById('detailContent');
+      if (!advertData) return;
+      
+      var revenue = (advertData.price || 0) * (advertData.purchases || 0);
+      var ctr = advertData.impressions > 0 ? ((advertData.clicks / advertData.impressions) * 100).toFixed(1) : 0;
+      var conversionRate = advertData.clicks > 0 ? ((advertData.purchases / advertData.clicks) * 100).toFixed(1) : 0;
+      var avgPurchaseValue = advertData.purchases > 0 ? revenue / advertData.purchases : 0;
+      var clickToPurchaseRate = advertData.clicks > 0 ? ((advertData.purchases / advertData.clicks) * 100).toFixed(1) : 0;
+      var pricePerClick = advertData.clicks > 0 ? revenue / advertData.clicks : 0;
+      var isActive = advertData.isActive === true;
+      var statusClass = isActive ? 'status-active' : 'status-inactive';
+      var statusText = isActive ? 'Active' : 'Inactive';
+      var imageUrl = getImageUrl(advertData.imageUrl);
+      
+      container.innerHTML = `
+        <div class="detail-card">
+          <div class="detail-header">
+            <h2><i class="fas fa-campaign"></i> Advert Analytics</h2>
+            <button class="btn-refresh" onclick="location.reload()" style="background: rgba(255,255,255,0.2); border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; color: white;"><i class="fas fa-sync-alt"></i> Refresh</button>
+          </div>
+          
+          <div class="detail-section">
+            <div class="image-container">
+              ${imageUrl ? 
+                '<img src="' + imageUrl + '" alt="' + escapeHtml(advertData.title) + '" class="detail-image" onerror="this.parentElement.innerHTML=\'<div class=\'image-placeholder\'><i class=\'fas fa-campaign\'></i><p>Failed to load image</p></div>\'">' : 
+                '<div class="image-placeholder"><i class="fas fa-campaign"></i><p>No image available</p></div>'
+              }
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-info-circle"></i> Advert Information</h3>
+            <div class="info-row"><div class="info-label">Title:</div><div class="info-value">${escapeHtml(advertData.title)}</div></div>
+            <div class="info-row"><div class="info-label">Subtitle:</div><div class="info-value">${escapeHtml(advertData.subtitle || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Type:</div><div class="info-value">${escapeHtml(advertData.type || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Category:</div><div class="info-value">${escapeHtml(advertData.category || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Price:</div><div class="info-value"><strong style="color: var(--admin-primary); font-size: 18px;">R${(advertData.price || 0).toFixed(2)}</strong></div></div>
+            <div class="info-row"><div class="info-label">Status:</div><div class="info-value"><span class="status-badge ${statusClass}">${statusText}</span></div></div>
+            ${advertData.createdAt ? '<div class="info-row"><div class="info-label">Created:</div><div class="info-value">' + formatDate(advertData.createdAt) + '</div></div>' : ''}
+            ${advertData.updatedAt ? '<div class="info-row"><div class="info-label">Last Updated:</div><div class="info-value">' + formatDate(advertData.updatedAt) + '</div></div>' : ''}
+          </div>
+          
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-chart-line"></i> Performance Metrics</h3>
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-value">${advertData.impressions || 0}</div><div class="stat-label">Impressions</div></div>
+              <div class="stat-card"><div class="stat-value">${advertData.clicks || 0}</div><div class="stat-label">Clicks</div></div>
+              <div class="stat-card"><div class="stat-value">${advertData.purchases || 0}</div><div class="stat-label">Purchases</div></div>
+              <div class="stat-card"><div class="stat-value">R${revenue.toFixed(2)}</div><div class="stat-label">Revenue</div></div>
+              <div class="stat-card"><div class="stat-value">${ctr}%</div><div class="stat-label">CTR</div></div>
+              <div class="stat-card"><div class="stat-value">${conversionRate}%</div><div class="stat-label">Conversion Rate</div></div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-chart-simple"></i> Detailed Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-value">R${avgPurchaseValue.toFixed(2)}</div><div class="stat-label">Avg Purchase Value</div></div>
+              <div class="stat-card"><div class="stat-value">${clickToPurchaseRate}%</div><div class="stat-label">Click to Purchase</div></div>
+              <div class="stat-card"><div class="stat-value">R${pricePerClick.toFixed(2)}</div><div class="stat-label">Price per Click</div></div>
+            </div>
+          </div>
+          
+          ${advertData.stockCount !== undefined ? `
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-box"></i> Stock Information</h3>
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-value">${advertData.stockCount || 0}</div><div class="stat-label">Available Stock</div></div>
+              <div class="stat-card"><div class="stat-value">${advertData.stockCount > 0 ? 'In Stock' : 'Out of Stock'}</div><div class="stat-label">Status</div></div>
+            </div>
+          </div>
+          ` : ''}
+          
+          <div class="detail-section" style="border-bottom: none;">
+            <button class="btn-secondary" onclick="window.location.href='marketing_dashboard.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      var container = document.getElementById('detailContent');
+      container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>' + escapeHtml(message) + '</p><button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#6b0d2b; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button></div>';
+    }
+
+    async function init() {
+      var authenticated = await checkAuth();
+      if (authenticated) {
+        await fetchAdvertDetails();
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

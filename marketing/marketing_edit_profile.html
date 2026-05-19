@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Edit Profile | Marketing Portal</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #E6C79C;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-error: #d32f2f;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 600px; margin: 30px auto 50px; padding: 0 24px; }
+    .logo { cursor: pointer; }
+    
+    .form-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); padding: 32px; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin-bottom: 8px; }
+    .form-subtitle { color: var(--admin-muted); margin-bottom: 32px; font-size: 14px; }
+    
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--admin-text); font-size: 14px; }
+    .form-label i { margin-right: 8px; color: var(--admin-primary); }
+    .form-input { width: 100%; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px; font-family: 'Montserrat', sans-serif; background: white; }
+    .form-input:focus { outline: none; border-color: var(--admin-primary); }
+    .form-input:disabled { background: #f5f5f5; color: var(--admin-muted); }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-size: 15px; transition: all 0.2s; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 14px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 12px; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    
+    .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 12px; margin-bottom: 24px; color: var(--admin-error); font-size: 14px; }
+    .success-message { background: rgba(46,125,50,0.1); border: 1px solid var(--admin-success); border-radius: 12px; padding: 12px; margin-bottom: 24px; color: var(--admin-success); font-size: 14px; }
+    
+    .avatar-section { text-align: center; margin-bottom: 32px; }
+    .avatar { width: 80px; height: 80px; background: var(--admin-primary); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+    .avatar i { font-size: 40px; color: white; }
+    .avatar-name { font-size: 18px; font-weight: bold; color: var(--admin-text); }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .form-card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo" id="dashboardLogo" style="cursor: pointer;">
+        <img src="../assets/categories/Logo_Top.png" alt="Logo">
+      </div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="form-card">
+      <div class="avatar-section">
+        <div class="avatar"><i class="fas fa-chart-line"></i></div>
+        <div class="avatar-name" id="companyName">Loading...</div>
+      </div>
+      
+      <h1 class="form-title">Edit Profile</h1>
+      <p class="form-subtitle">Update your company information</p>
+      
+      <div id="errorMessage" class="error-message" style="display:none;"></div>
+      <div id="successMessage" class="success-message" style="display:none;"></div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-building"></i> Company Name</label>
+        <input type="text" id="companyNameInput" class="form-input" placeholder="Your company name" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+        <input type="email" id="emailInput" class="form-input" placeholder="Your email address" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-user"></i> Contact Person</label>
+        <input type="text" id="contactPersonInput" class="form-input" placeholder="Full name of contact person">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+        <input type="tel" id="phoneInput" class="form-input" placeholder="+27 12 345 6789">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-map-marker-alt"></i> Address</label>
+        <textarea id="addressInput" class="form-input" rows="3" placeholder="Company address"></textarea>
+      </div>
+      
+      <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> Save Changes</button>
+      <button class="btn-secondary" onclick="window.location.href='marketing_profile.html'"><i class="fas fa-arrow-left"></i> Cancel</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Marketing Portal — Edit Profile</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    var API_BASE = window.location.origin;
+    var marketingData = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+
+    function showError(message) {
+      var errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(function() { errorDiv.style.display = 'none'; }, 5000);
+    }
+
+    function showSuccess(message) {
+      var successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      setTimeout(function() { successDiv.style.display = 'none'; }, 3000);
+    }
+
+    function setupLogo() {
+      var logo = document.getElementById('dashboardLogo');
+      if (logo) {
+        logo.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'marketing_dashboard.html';
+        });
+      }
+    }
+
+    function setupUserIcon() {
+      var userIcon = document.getElementById('userIcon');
+      if (userIcon) {
+        userIcon.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'marketing_profile.html';
+        });
+      }
+    }
+
+    async function checkAuth() {
+      var token = localStorage.getItem('marketing_token');
+      var marketingStr = localStorage.getItem('marketing_data');
+      
+      if (!token || !marketingStr) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+      
+      try {
+        marketingData = JSON.parse(marketingStr);
+        document.getElementById('companyName').textContent = marketingData.companyName;
+        document.getElementById('companyNameInput').value = marketingData.companyName;
+        document.getElementById('emailInput').value = marketingData.email;
+        document.getElementById('contactPersonInput').value = marketingData.contactPerson || '';
+        document.getElementById('phoneInput').value = marketingData.phoneNumber || '';
+        document.getElementById('addressInput').value = marketingData.address || '';
+        setupUserIcon();
+        setupLogo();
+        return true;
+      } catch (e) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+    }
+
+    async function saveProfile() {
+      var contactPerson = document.getElementById('contactPersonInput').value.trim();
+      var phone = document.getElementById('phoneInput').value.trim();
+      var address = document.getElementById('addressInput').value.trim();
+      
+      var saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Saving...';
+      
+      try {
+        var token = localStorage.getItem('marketing_token');
+        var marketingId = marketingData._id || marketingData.id;
+        
+        var response = await fetch(API_BASE + '/api/marketing/' + marketingId + '/profile', {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            contactPerson: contactPerson,
+            phoneNumber: phone,
+            address: address
+          })
+        });
+        
+        if (response.ok) {
+          var result = await response.json();
+          if (result.success && result.data) {
+            // Update local data
+            marketingData.contactPerson = contactPerson;
+            marketingData.phoneNumber = phone;
+            marketingData.address = address;
+            localStorage.setItem('marketing_data', JSON.stringify(marketingData));
+            
+            showSuccess('Profile updated successfully!');
+            setTimeout(function() {
+              window.location.href = 'marketing_profile.html';
+            }, 1500);
+          } else {
+            throw new Error(result.message || 'Failed to update profile');
+          }
+        } else {
+          var error = await response.json();
+          throw new Error(error.message || 'Failed to update profile');
+        }
+      } catch (error) {
+        showError(error.message);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+      }
+    }
+
+    document.getElementById('saveBtn')?.addEventListener('click', saveProfile);
+    
+    checkAuth();
+  </script>
+</body>
+</html>

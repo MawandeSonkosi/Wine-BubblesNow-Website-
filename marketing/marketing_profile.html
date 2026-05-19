@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Marketing Profile | Marketing Portal</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #E6C79C;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-error: #d32f2f;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 800px; margin: 30px auto 50px; padding: 0 24px; }
+    .logo { cursor: pointer; }
+    
+    .profile-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
+    .profile-header { background: linear-gradient(135deg, var(--admin-primary) 0%, #8a1e3d 100%); padding: 40px 24px; text-align: center; color: white; }
+    .profile-avatar { width: 100px; height: 100px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border: 3px solid white; }
+    .profile-avatar i { font-size: 50px; color: white; }
+    .profile-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: bold; margin-bottom: 8px; }
+    .profile-email { font-size: 14px; opacity: 0.9; }
+    .profile-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-top: 12px; background: rgba(46,125,50,0.2); color: #2e7d32; border: 1px solid #2e7d32; }
+    
+    .profile-section { padding: 24px; border-bottom: 1px solid var(--admin-border); }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--admin-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .section-title i { width: 24px; }
+    
+    .info-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--admin-border); }
+    .info-label { width: 140px; font-weight: 600; color: var(--admin-text); }
+    .info-value { flex: 1; color: var(--admin-muted); }
+    
+    .action-item { display: flex; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--admin-border); cursor: pointer; transition: background 0.2s; }
+    .action-item:hover { background: #f8f7f5; margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+    .action-icon { width: 40px; height: 40px; background: rgba(107,13,43,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 16px; }
+    .action-icon i { font-size: 18px; color: var(--admin-primary); }
+    .action-content { flex: 1; }
+    .action-title { font-weight: 600; color: var(--admin-text); margin-bottom: 2px; }
+    .action-subtitle { font-size: 12px; color: var(--admin-muted); }
+    .action-arrow { color: var(--admin-muted); font-size: 14px; }
+    
+    .stat-item { text-align: center; flex: 1; }
+    .stat-value { font-size: 24px; font-weight: bold; color: var(--admin-primary); }
+    .stat-label { font-size: 11px; color: var(--admin-muted); margin-top: 4px; }
+    
+    .btn-danger { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--admin-error); color: var(--admin-error); border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 16px; }
+    .btn-danger:hover { background: rgba(211,47,47,0.1); }
+    
+    .version-text { text-align: center; padding: 24px; color: var(--admin-muted); font-size: 12px; }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .modal-content { background: white; border-radius: 24px; max-width: 400px; width: 90%; padding: 24px; text-align: center; }
+    .modal-content h3 { color: var(--admin-text); margin-bottom: 12px; }
+    .modal-content p { color: var(--admin-muted); margin-bottom: 24px; }
+    .modal-buttons { display: flex; gap: 12px; justify-content: center; }
+    .modal-btn { padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
+    .modal-btn-cancel { background: #f0f0f0; color: var(--admin-text); }
+    .modal-btn-confirm { background: var(--admin-error); color: white; }
+    
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 40px; color: white; font-size: 14px; z-index: 10002; animation: fadeInUp 0.3s ease; }
+    .toast-success { background: #2e7d32; }
+    .toast-error { background: #d32f2f; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .info-row { flex-direction: column; gap: 4px; }
+      .info-label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo" id="dashboardLogo" style="cursor: pointer;">
+        <img src="../assets/categories/Logo_Top.png" alt="Logo">
+      </div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div id="profileContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading profile...</p></div></div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Marketing Portal — My Profile</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    var API_BASE = window.location.origin;
+    var marketingData = null;
+    var isDeleting = false;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        var d = new Date(dateStr);
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+      } catch(e) { return '—'; }
+    }
+
+    function setupLogo() {
+      var logo = document.getElementById('dashboardLogo');
+      if (logo) {
+        logo.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'marketing_dashboard.html';
+        });
+      }
+    }
+
+    function goToDashboard() {
+      window.location.href = 'marketing_dashboard.html';
+    }
+
+    function setupUserIcon() {
+      var userIcon = document.getElementById('userIcon');
+      if (userIcon) {
+        userIcon.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = 'marketing_profile.html';
+        });
+      }
+    }
+
+    function showToast(message, type) {
+      var existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+      
+      var toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(function() { toast.remove(); }, 3000);
+    }
+
+    function closeModal() {
+      var modal = document.querySelector('.modal-overlay');
+      if (modal) modal.remove();
+    }
+
+    function showLogoutConfirmation() {
+      var modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3><i class="fas fa-sign-out-alt"></i> Logout</h3>
+          <p>Are you sure you want to logout?</p>
+          <div class="modal-buttons">
+            <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" onclick="confirmLogout()">Logout</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function confirmLogout() {
+      localStorage.removeItem('marketing_token');
+      localStorage.removeItem('marketing_data');
+      localStorage.removeItem('marketing_token_timestamp');
+      localStorage.removeItem('marketing_id');
+      window.location.href = '../login/login.html';
+    }
+
+    window.closeModal = closeModal;
+    window.confirmLogout = confirmLogout;
+
+    async function checkAuth() {
+      var token = localStorage.getItem('marketing_token');
+      var marketingStr = localStorage.getItem('marketing_data');
+      
+      if (!token || !marketingStr) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+      
+      try {
+        marketingData = JSON.parse(marketingStr);
+        setupUserIcon();
+        setupLogo();
+        return true;
+      } catch (e) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+    }
+
+    function renderProfile() {
+      var container = document.getElementById('profileContent');
+      if (!marketingData) return;
+      
+      var isActive = marketingData.isActive === true;
+      var statusText = isActive ? 'ACTIVE' : 'INACTIVE';
+      var createdAt = formatDate(marketingData.createdAt);
+      var updatedAt = formatDate(marketingData.updatedAt);
+      var advertCount = (marketingData.advertIds || []).length;
+      
+      container.innerHTML = `
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="profile-name">${escapeHtml(marketingData.companyName)}</div>
+            <div class="profile-email">${escapeHtml(marketingData.email)}</div>
+            <div><span class="profile-status">${statusText}</span></div>
+          </div>
+          
+          <div class="profile-section">
+            <h3 class="section-title"><i class="fas fa-info-circle"></i> Company Information</h3>
+            <div class="info-row"><div class="info-label">Company Name:</div><div class="info-value">${escapeHtml(marketingData.companyName)}</div></div>
+            <div class="info-row"><div class="info-label">Email Address:</div><div class="info-value">${escapeHtml(marketingData.email)}</div></div>
+            <div class="info-row"><div class="info-label">Contact Person:</div><div class="info-value">${escapeHtml(marketingData.contactPerson || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Phone Number:</div><div class="info-value">${escapeHtml(marketingData.phoneNumber || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Address:</div><div class="info-value">${escapeHtml(marketingData.address || '—')}</div></div>
+          </div>
+          
+          <div class="profile-section">
+            <h3 class="section-title"><i class="fas fa-chart-simple"></i> Account Statistics</h3>
+            <div style="display: flex; justify-content: space-around; gap: 16px;">
+              <div class="stat-item"><div class="stat-value">${advertCount}</div><div class="stat-label">Adverts</div></div>
+              <div class="stat-item"><div class="stat-value">${marketingData.isActive ? 'Active' : 'Inactive'}</div><div class="stat-label">Status</div></div>
+              <div class="stat-item"><div class="stat-value">${marketingData.createdAt ? formatDate(marketingData.createdAt).split(' ')[0] : '—'}</div><div class="stat-label">Member Since</div></div>
+            </div>
+          </div>
+          
+          <div class="profile-section">
+            <h3 class="section-title"><i class="fas fa-cog"></i> Account Settings</h3>
+            
+            <div class="action-item" onclick="editProfile()">
+              <div class="action-icon"><i class="fas fa-edit"></i></div>
+              <div class="action-content">
+                <div class="action-title">Edit Profile</div>
+                <div class="action-subtitle">Update your company information</div>
+              </div>
+              <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            
+            <div class="action-item" onclick="changePassword()">
+              <div class="action-icon"><i class="fas fa-lock"></i></div>
+              <div class="action-content">
+                <div class="action-title">Change Password</div>
+                <div class="action-subtitle">Update your password</div>
+              </div>
+              <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            
+            <div class="action-item" onclick="showLogoutConfirmation()">
+              <div class="action-icon"><i class="fas fa-sign-out-alt"></i></div>
+              <div class="action-content">
+                <div class="action-title">Logout</div>
+                <div class="action-subtitle">Sign out of your account</div>
+              </div>
+              <div class="action-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+          </div>
+          
+          <div class="profile-section">
+            <button class="btn-danger" onclick="deleteAccount()" ${isDeleting ? 'disabled' : ''}>
+              <i class="fas fa-trash-alt"></i> ${isDeleting ? 'Deleting...' : 'Delete Account'}
+            </button>
+          </div>
+          
+          <div class="version-text">
+            <i class="fas fa-chart-line"></i> Wine & Bubbles Marketing Portal v1.0.0
+          </div>
+        </div>
+      `;
+    }
+
+    function editProfile() {
+      window.location.href = 'marketing_edit_profile.html';
+    }
+
+    function changePassword() {
+      window.location.href = 'marketing_change_password.html';
+    }
+
+    function deleteAccount() {
+      var modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3 style="color: #d32f2f;"><i class="fas fa-exclamation-triangle"></i> Delete Account</h3>
+          <p>Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.</p>
+          <div class="modal-buttons">
+            <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+            <button id="confirmDeleteBtn" class="modal-btn modal-btn-confirm" style="background:#d32f2f;">Delete Account</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      document.getElementById('confirmDeleteBtn')?.addEventListener('click', async function() {
+        closeModal();
+        isDeleting = true;
+        
+        try {
+          var token = localStorage.getItem('marketing_token');
+          var marketingId = marketingData._id || marketingData.id;
+          
+          var response = await fetch(API_BASE + '/api/marketing/' + marketingId, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          
+          if (response.ok) {
+            localStorage.removeItem('marketing_token');
+            localStorage.removeItem('marketing_data');
+            localStorage.removeItem('marketing_token_timestamp');
+            localStorage.removeItem('marketing_id');
+            showToast('Account deleted successfully', 'success');
+            setTimeout(function() {
+              window.location.href = '../index.html';
+            }, 2000);
+          } else {
+            throw new Error('Delete failed');
+          }
+        } catch (error) {
+          showToast('Failed to delete account', 'error');
+          isDeleting = false;
+        }
+      });
+    }
+
+    window.editProfile = editProfile;
+    window.changePassword = changePassword;
+    window.deleteAccount = deleteAccount;
+    window.showLogoutConfirmation = showLogoutConfirmation;
+
+    async function init() {
+      var authenticated = await checkAuth();
+      if (authenticated) {
+        renderProfile();
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>
