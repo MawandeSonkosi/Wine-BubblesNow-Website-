@@ -35,6 +35,9 @@
     .dashboard-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
     .dashboard-title i { color: var(--admin-primary); margin-right: 12px; }
     
+    /* Logo cursor pointer */
+    .logo { cursor: pointer; }
+    
     /* Welcome Card */
     .welcome-card { background: linear-gradient(135deg, var(--admin-primary) 0%, #8a1e3d 100%); border-radius: 24px; padding: 24px; margin-bottom: 32px; color: white; }
     .welcome-card h2 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 8px; }
@@ -155,7 +158,9 @@
   <div class="topbar-top"><div class="topbar-top-inner"></div></div>
   <div class="topbar-main">
     <div class="topbar-main-inner">
-      <div class="logo"><a href="../index.html"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="logo" id="dashboardLogo" style="cursor: pointer;">
+        <img src="../assets/categories/Logo_Top.png" alt="Logo">
+      </div>
       <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
     </div>
   </div>
@@ -293,6 +298,23 @@
       return false;
     }
 
+    // Setup logo click handler - stays on dashboard
+    function setupLogo() {
+      const logo = document.getElementById('dashboardLogo');
+      if (logo) {
+        logo.addEventListener('click', function(e) {
+          e.preventDefault();
+          // Stay on supplier dashboard - just refresh the page
+          window.location.reload();
+        });
+      }
+    }
+
+    // Go to profile page
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+
     // Check authentication and load supplier data
     async function checkAuth() {
       const token = localStorage.getItem('supplier_auth_token');
@@ -314,6 +336,9 @@
         // Setup user dropdown
         setupUserDropdown(supplierData);
         
+        // Setup logo
+        setupLogo();
+        
         return true;
       } catch (e) {
         console.error('Error parsing supplier data:', e);
@@ -328,7 +353,7 @@
       
       userIcon.addEventListener('click', (e) => {
         e.preventDefault();
-        toggleSupplierDropdown(supplier);
+        goToProfile();
       });
     }
 
