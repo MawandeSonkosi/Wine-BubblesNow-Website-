@@ -1,4 +1,4 @@
-// login/login.js - WITH DRIVER AND SUPPLIER LOGIN SUPPORT
+// login/login.js - WITH DRIVER, SUPPLIER, AND MARKETING LOGIN SUPPORT
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
@@ -75,8 +75,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const driverData = localStorage.getItem('driver_data');
         const supplierToken = localStorage.getItem('supplier_auth_token');
         const supplierData = localStorage.getItem('supplier_data');
+        const marketingToken = localStorage.getItem('marketing_token');
+        const marketingData = localStorage.getItem('marketing_data');
         
-        // Check supplier session first
+        // Check marketing session first
+        if (marketingToken && marketingData) {
+            try {
+                const marketing = JSON.parse(marketingData);
+                console.log('✅ Already logged in as Marketing:', marketing.companyName);
+                window.location.href = '../marketing/marketing_dashboard.html';
+                return;
+            } catch(e) {}
+        }
+        
+        // Check supplier session
         if (supplierToken && supplierData) {
             try {
                 const supplier = JSON.parse(supplierData);
@@ -193,6 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (role === 'supplier') {
             iconHtml = '<i class="fas fa-boxes"></i>';
             titleText = 'Welcome Supplier!';
+        } else if (role === 'marketing') {
+            iconHtml = '<i class="fas fa-chart-line"></i>';
+            titleText = 'Welcome Marketing Partner!';
         }
         
         toast.style.cssText = `
@@ -289,6 +304,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => toast.remove(), 500);
             }
         }, 5000);
+    }
+    
+    // ========== MARKETING LOGIN FUNCTION ==========
+    async function marketingLogin(email, password) {
+        console.log('📊 Attempting marketing login for:', email);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/marketing/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            console.log(`📡 Marketing login response status: ${response.status}`);
+            
+            const data = await response.json();
+            console.log('📦 Marketing login response:', data);
+            
+            if (response.ok && data.success === true && data.token) {
+                const marketing = data.data;
+                const token = data.token;
+                
+                if (marketing && token) {
+                    // Store marketing session
+                    localStorage.setItem('marketing_token', token);
+                    localStorage.setItem('marketing_data', JSON.stringify(marketing));
+                    localStorage.setItem('marketing_token_timestamp', Date.now().toString());
+                    
+                    console.log('✅ Marketing login successful:', marketing.companyName);
+                    return { success: true, marketing: marketing };
+                }
+            }
+            
+            return { success: false, error: data.message || 'Marketing login failed' };
+            
+        } catch (error) {
+            console.error('Marketing login error:', error);
+            return { success: false, error: error.message };
+        }
     }
     
     // ========== SUPPLIER LOGIN FUNCTION ==========
@@ -451,7 +508,28 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log('🔐 Attempting login sequence for:', email);
             
-            // FIRST: Try supplier login
+            // FIRST: Try marketing login
+            console.log('📊 Trying marketing login...');
+            const marketingResult = await marketingLogin(email, password);
+            
+            if (marketingResult.success && marketingResult.marketing) {
+                const marketing = marketingResult.marketing;
+                const userName = marketing.companyName || email.split('@')[0];
+                
+                showWelcomeToast(userName, 'marketing');
+                showSnackbar('Marketing login successful!', 'success');
+                
+                if (rememberMe && rememberMe.checked && email) {
+                    localStorage.setItem('wineBubbles_rememberedEmail', email);
+                }
+                
+                setTimeout(() => {
+                    window.location.href = '../marketing/marketing_dashboard.html';
+                }, 1500);
+                return;
+            }
+            
+            // SECOND: Try supplier login
             console.log('📦 Trying supplier login...');
             const supplierResult = await supplierLogin(email, password);
             
@@ -472,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // SECOND: Try driver login
+            // THIRD: Try driver login
             console.log('🚗 Trying driver login...');
             const driverResult = await driverLogin(email, password);
             
@@ -493,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // THIRD: Try regular user login (which includes admin check)
+            // FOURTH: Try regular user login (which includes admin check)
             console.log('👤 Trying user login...');
             const userResult = await userLogin(email, password);
             
@@ -533,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // All logins failed
-            const errorMsg = supplierResult.error || driverResult.error || userResult.error || 'Login failed. Please check your credentials.';
+            const errorMsg = marketingResult.error || supplierResult.error || driverResult.error || userResult.error || 'Login failed. Please check your credentials.';
             throw new Error(errorMsg);
             
         } catch (error) {
