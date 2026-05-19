@@ -11,7 +11,7 @@
   <style>
     :root {
       --admin-primary: #6b0d2b;
-      --admin-accent: #D8C09D;
+      --admin-accent: #E6C79C;
       --admin-bg: #faf8f5;
       --admin-card: #ffffff;
       --admin-text: #1b1b1b;
@@ -30,8 +30,8 @@
     .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
     .admin-container { max-width: 1400px; margin: 30px auto 50px; padding: 0 24px; }
     
-    /* Dashboard Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    /* Dashboard Header - Removed Back Button */
+    .dashboard-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
     .dashboard-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
     .dashboard-title i { color: var(--admin-primary); margin-right: 12px; }
     
@@ -59,11 +59,12 @@
     .section-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--admin-text); margin: 0; }
     .section-header h3 i { color: var(--admin-primary); margin-right: 10px; }
     
-    /* Wine Grid */
+    /* Wine Grid - Improved Images */
     .wines-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; padding: 24px; }
     .wine-item { background: var(--card-bg); border-radius: 16px; overflow: hidden; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(107,13,43,0.2); }
     .wine-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--admin-primary); }
-    .wine-image { width: 100%; height: 160px; object-fit: cover; background: #2a2a2a; }
+    .wine-image-container { width: 100%; height: 200px; overflow: hidden; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
+    .wine-image { width: 100%; height: 100%; object-fit: contain; background: #2a2a2a; }
     .wine-info { padding: 16px; }
     .wine-name { font-weight: 700; font-size: 16px; color: var(--admin-accent); margin-bottom: 4px; }
     .wine-type { font-size: 12px; color: #888; margin-bottom: 8px; }
@@ -119,8 +120,7 @@
     .timeframe-selector { display: flex; gap: 8px; }
     .timeframe-btn { background: transparent; border: 1px solid var(--admin-border); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
     .timeframe-btn.active { background: var(--admin-primary); color: white; border-color: var(--admin-primary); }
-    .btn-refresh:hover { background: #8a1e3d !important; transform: translateY(-2px); }
-    .wine-image-placeholder { width: 100%; height: 160px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
+    .wine-image-placeholder { width: 100%; height: 200px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
     .wine-image-placeholder i { font-size: 48px; color: #555; }
     .restock-btn { background: transparent; border: 1px solid var(--admin-primary); color: var(--admin-primary); padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
     .restock-btn:hover { background: var(--admin-primary); color: white; }
@@ -162,13 +162,7 @@
 
   <div class="admin-container">
     <div class="dashboard-header">
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <a href="../index.html" style="color: var(--admin-primary); text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
-        <h1 class="dashboard-title"><i class="fas fa-boxes"></i> Supplier Dashboard</h1>
-      </div>
-      <div style="display: flex; gap: 12px;">
-        <button class="btn-refresh" id="refreshBtn" style="background: var(--admin-primary); color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer;"><i class="fas fa-sync-alt"></i> Refresh</button>
-      </div>
+      <h1 class="dashboard-title"><i class="fas fa-boxes"></i> Supplier Dashboard</h1>
     </div>
 
     <!-- Welcome Card -->
@@ -239,7 +233,7 @@
   </footer>
 
   <script>
-    // Supplier Dashboard JavaScript
+    // Supplier Dashboard JavaScript - Full Flutter-like Functionality
     const API_BASE = window.location.origin;
     let supplierData = null;
     let supplierWines = [];
@@ -288,9 +282,15 @@
     function buildWineImageHtml(imageUrl, wineName) {
       const url = getImageUrl(imageUrl);
       if (url) {
-        return `<img src="${url}" alt="${escapeHtml(wineName)}" class="wine-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'wine-image-placeholder\'><i class=\'fas fa-wine-bottle\'></i></div>'">`;
+        return `<div class="wine-image-container"><img src="${url}" alt="${escapeHtml(wineName)}" class="wine-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'wine-image-placeholder\'><i class=\'fas fa-wine-bottle\'></i></div>'"></div>`;
       }
       return '<div class="wine-image-placeholder"><i class="fas fa-wine-bottle"></i></div>';
+    }
+
+    // Check if wine item is a case
+    function isWineCase(item) {
+      if (item && item.isCase === true) return true;
+      return false;
     }
 
     // Check authentication and load supplier data
@@ -343,6 +343,7 @@
           <div style="font-weight:bold; margin-bottom:4px;">${escapeHtml(supplier.name)} <span class="badge-supplier">SUPPLIER</span></div>
           <div style="font-size:13px; color:#6d6d6d;">${escapeHtml(supplier.email)}</div>
         </div>
+        <a href="profile.html" style="display:flex; align-items:center; gap:10px; padding:10px 0; color:#1b1b1b; text-decoration:none;"><i class="fas fa-user"></i> My Profile</a>
         <button id="logoutBtn" style="margin-top:12px; padding:10px; background:#6b0d2b; color:white; border:none; border-radius:8px; width:100%; cursor:pointer; font-weight:600;">Logout</button>
       `;
       document.body.appendChild(dropdown);
@@ -375,7 +376,7 @@
         const token = localStorage.getItem('supplier_auth_token');
         
         // Fetch all wines to get details
-        const winesResponse = await fetch(`${API_BASE}/api/wines?all=true`, {
+        const winesResponse = await fetch(`${API_BASE}/api/wines?all=true&_=${Date.now()}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (winesResponse.ok) {
@@ -762,11 +763,6 @@
         });
       });
     }
-
-    // Refresh button
-    document.getElementById('refreshBtn')?.addEventListener('click', async () => {
-      await loadSupplierData();
-    });
 
     // Initialize
     async function init() {
