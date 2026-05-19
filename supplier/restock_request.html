@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Request Restock | Supplier Portal</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #E6C79C;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-error: #d32f2f;
+      --admin-info: #0288d1;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 600px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .form-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); padding: 32px; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin-bottom: 8px; }
+    .form-subtitle { color: var(--admin-muted); margin-bottom: 32px; font-size: 14px; }
+    
+    .wine-card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; }
+    .wine-image { width: 60px; height: 60px; border-radius: 12px; object-fit: contain; background: #2a2a2a; }
+    .wine-image-placeholder { width: 60px; height: 60px; background: #2a2a2a; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .wine-image-placeholder i { font-size: 24px; color: #555; }
+    .wine-details { flex: 1; }
+    .wine-name { font-weight: bold; color: var(--admin-accent); margin-bottom: 4px; }
+    .wine-type { font-size: 11px; color: #888; }
+    .stock-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; margin-top: 4px; }
+    .stock-green { background: rgba(46,125,50,0.1); color: #2e7d32; }
+    .stock-orange { background: rgba(237,108,2,0.1); color: #ed6c02; }
+    .stock-red { background: rgba(211,47,47,0.1); color: #d32f2f; }
+    
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--admin-text); font-size: 14px; }
+    .form-label i { margin-right: 8px; color: var(--admin-primary); }
+    .form-input { width: 100%; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px; font-family: 'Montserrat', sans-serif; background: white; }
+    .form-input:focus { outline: none; border-color: var(--admin-primary); }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-size: 15px; transition: all 0.2s; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 14px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 12px; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    
+    .summary-card { background: #f8f7f5; border-radius: 16px; padding: 16px; margin: 24px 0; }
+    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--admin-border); }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label { color: var(--admin-muted); }
+    .summary-value { font-weight: 600; color: var(--admin-text); }
+    .total-value { font-size: 20px; color: var(--admin-success); }
+    
+    .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 12px; margin-bottom: 24px; color: var(--admin-error); font-size: 14px; }
+    .info-message { background: rgba(2,136,209,0.1); border: 1px solid var(--admin-info); border-radius: 12px; padding: 12px; margin-bottom: 24px; color: var(--admin-info); font-size: 14px; }
+    .success-screen { text-align: center; padding: 40px; }
+    .success-icon { font-size: 80px; color: var(--admin-success); margin-bottom: 24px; }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .form-card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="supplier_dashboard.html"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container" id="mainContainer">
+    <!-- Content will be loaded here -->
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Supplier Portal — Restock Request</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const wineId = parseInt(urlParams.get('wineId'));
+    const supplierId = urlParams.get('supplierId');
+    
+    let wineData = null;
+    let quantity = 0;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+
+    function getImageUrl(imageUrl) {
+      if (!imageUrl) return null;
+      if (imageUrl.startsWith('http')) return imageUrl;
+      if (imageUrl.startsWith('/')) return imageUrl;
+      if (imageUrl.startsWith('assets/')) return '/' + imageUrl;
+      return '/assets/' + imageUrl;
+    }
+
+    function getStockClass(stock) {
+      if (stock > 50) return 'stock-green';
+      if (stock > 0) return 'stock-orange';
+      return 'stock-red';
+    }
+
+    async function checkAuth() {
+      const token = localStorage.getItem('supplier_auth_token');
+      const supplierStr = localStorage.getItem('supplier_data');
+      
+      if (!token || !supplierStr) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+      
+      setupUserIcon();
+      return true;
+    }
+
+    function setupUserIcon() {
+      const userIcon = document.getElementById('userIcon');
+      if (userIcon) {
+        userIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = 'profile.html';
+        });
+      }
+    }
+
+    async function loadWineData() {
+      if (!wineId) {
+        showError('No wine ID provided');
+        return;
+      }
+      
+      try {
+        const token = localStorage.getItem('supplier_auth_token');
+        const response = await fetch(`${API_BASE}/api/wines/${wineId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          wineData = await response.json();
+          renderForm();
+        } else {
+          throw new Error('Failed to load wine details');
+        }
+      } catch (error) {
+        showError('Failed to load wine information');
+      }
+    }
+
+    function renderForm() {
+      const container = document.getElementById('mainContainer');
+      if (!wineData) return;
+      
+      const imageUrl = getImageUrl(wineData.imageUrl);
+      const stockClass = getStockClass(wineData.stockCount);
+      const stockText = wineData.stockCount > 0 ? `${wineData.stockCount} units` : 'Out of stock';
+      
+      container.innerHTML = `
+        <div class="form-card">
+          <h1 class="form-title">Request Restock</h1>
+          <p class="form-subtitle">Request additional stock for your wine</p>
+          
+          <div class="wine-card">
+            ${imageUrl ? 
+              `<img src="${imageUrl}" alt="${escapeHtml(wineData.name)}" class="wine-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'wine-image-placeholder\'><i class=\'fas fa-wine-bottle\'></i></div>'">` :
+              `<div class="wine-image-placeholder"><i class="fas fa-wine-bottle"></i></div>`
+            }
+            <div class="wine-details">
+              <div class="wine-name">${escapeHtml(wineData.name)}</div>
+              <div class="wine-type">${escapeHtml(wineData.type)} • ${escapeHtml(wineData.category)}</div>
+              <div class="stock-badge ${stockClass}">${stockText}</div>
+            </div>
+          </div>
+          
+          <div id="errorMessage" class="error-message" style="display:none;"></div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-boxes"></i> Quantity to Restock</label>
+            <input type="number" id="quantityInput" class="form-input" placeholder="Enter number of bottles" min="1" max="1000">
+          </div>
+          
+          <div class="summary-card" id="summaryCard" style="display:none;">
+            <div class="summary-row"><span class="summary-label">Wine:</span><span class="summary-value" id="summaryWine">—</span></div>
+            <div class="summary-row"><span class="summary-label">Current Stock:</span><span class="summary-value" id="summaryCurrentStock">—</span></div>
+            <div class="summary-row"><span class="summary-label">Requested:</span><span class="summary-value" id="summaryRequested">—</span></div>
+            <div class="summary-row"><span class="summary-label">New Total:</span><span class="summary-value total-value" id="summaryNewTotal">—</span></div>
+          </div>
+          
+          <div class="info-message">
+            <i class="fas fa-info-circle"></i> This request will be emailed to our team. We will contact you to arrange delivery.
+          </div>
+          
+          <button class="btn-primary" id="submitBtn"><i class="fas fa-paper-plane"></i> Send Restock Request</button>
+          <button class="btn-secondary" onclick="window.location.href='supplier_dashboard.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+        </div>
+      `;
+      
+      const quantityInput = document.getElementById('quantityInput');
+      const summaryCard = document.getElementById('summaryCard');
+      const summaryWine = document.getElementById('summaryWine');
+      const summaryCurrentStock = document.getElementById('summaryCurrentStock');
+      const summaryRequested = document.getElementById('summaryRequested');
+      const summaryNewTotal = document.getElementById('summaryNewTotal');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      summaryWine.textContent = wineData.name;
+      summaryCurrentStock.textContent = `${wineData.stockCount} units`;
+      
+      quantityInput.addEventListener('input', (e) => {
+        quantity = parseInt(e.target.value) || 0;
+        
+        if (quantity > 0 && quantity <= 1000) {
+          summaryCard.style.display = 'block';
+          summaryRequested.textContent = `${quantity} units`;
+          summaryNewTotal.textContent = `${wineData.stockCount + quantity} units`;
+        } else {
+          summaryCard.style.display = 'none';
+        }
+      });
+      
+      submitBtn.addEventListener('click', submitRestockRequest);
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => errorDiv.style.display = 'none', 5000);
+      } else {
+        alert(message);
+      }
+    }
+
+    async function submitRestockRequest() {
+      if (!quantity || quantity < 1) {
+        showError('Please enter a valid quantity');
+        return;
+      }
+      
+      if (quantity > 1000) {
+        showError('Maximum 1000 bottles per request');
+        return;
+      }
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Sending Request...';
+      
+      try {
+        const supplierStr = localStorage.getItem('supplier_data');
+        const supplier = JSON.parse(supplierStr);
+        
+        const response = await fetch(`${API_BASE}/api/email/restock`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            wineId: wineData.id,
+            wineName: wineData.name,
+            supplierId: supplier.id,
+            quantity: quantity,
+            currentStock: wineData.stockCount,
+            supplierName: supplier.name,
+            supplierEmail: supplier.email,
+            timestamp: new Date().toISOString()
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          const container = document.getElementById('mainContainer');
+          container.innerHTML = `
+            <div class="form-card success-screen">
+              <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+              <h2>Restock Request Sent!</h2>
+              <p>Your request to restock ${escapeHtml(wineData.name)} has been sent to our team.</p>
+              <p style="margin-top: 8px; color: #6d6d6d;">We'll contact you shortly to arrange delivery.</p>
+              <button class="btn-primary" onclick="window.location.href='supplier_dashboard.html'" style="margin-top: 24px;"><i class="fas fa-home"></i> Return to Dashboard</button>
+            </div>
+          `;
+        } else {
+          showError(data.message || 'Failed to send restock request');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Restock Request';
+        }
+      } catch (error) {
+        showError('Network error. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Restock Request';
+      }
+    }
+
+    async function init() {
+      const authenticated = await checkAuth();
+      if (authenticated) {
+        await loadWineData();
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

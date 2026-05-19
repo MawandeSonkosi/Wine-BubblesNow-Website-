@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Wine Analytics | Supplier Portal</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #E6C79C;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-warning: #ed6c02;
+      --admin-error: #d32f2f;
+      --admin-info: #0288d1;
+      --card-bg: #1A1A1A;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 1200px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .wine-header { display: flex; gap: 24px; background: white; border-radius: 24px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--admin-border); }
+    .wine-image { width: 120px; height: 120px; border-radius: 16px; object-fit: contain; background: #1a1a1a; }
+    .wine-image-placeholder { width: 120px; height: 120px; background: #2a2a2a; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+    .wine-image-placeholder i { font-size: 48px; color: #555; }
+    .wine-details { flex: 1; }
+    .wine-name { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin-bottom: 8px; }
+    .wine-type { font-size: 14px; color: var(--admin-muted); margin-bottom: 12px; }
+    .wine-price { display: inline-block; padding: 4px 12px; background: rgba(107,13,43,0.1); border-radius: 20px; color: var(--admin-primary); font-weight: bold; margin-right: 12px; }
+    .wine-stock { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; }
+    .stock-green { background: rgba(46,125,50,0.1); color: #2e7d32; border: 1px solid #2e7d32; }
+    .stock-red { background: rgba(211,47,47,0.1); color: #d32f2f; border: 1px solid #d32f2f; }
+    .stock-orange { background: rgba(237,108,2,0.1); color: #ed6c02; border: 1px solid #ed6c02; }
+    
+    .stat-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid var(--admin-border); margin-bottom: 24px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+    .stat-item { text-align: center; padding: 16px; background: #f8f7f5; border-radius: 16px; }
+    .stat-value { font-size: 28px; font-weight: bold; color: var(--admin-primary); }
+    .stat-label { font-size: 12px; color: var(--admin-muted); margin-top: 4px; }
+    
+    .section-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
+    .section-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .section-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--admin-text); margin: 0; }
+    .section-header h3 i { color: var(--admin-primary); margin-right: 10px; }
+    
+    .timeframe-selector { display: flex; gap: 8px; }
+    .timeframe-btn { background: transparent; border: 1px solid var(--admin-border); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+    .timeframe-btn.active { background: var(--admin-primary); color: white; border-color: var(--admin-primary); }
+    
+    .chart-container { padding: 24px; }
+    .chart-bars { display: flex; align-items: flex-end; justify-content: space-around; gap: 16px; min-height: 250px; margin: 20px 0; flex-wrap: wrap; }
+    .chart-bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 60px; }
+    .chart-bar { width: 100%; max-width: 60px; background: var(--admin-primary); border-radius: 8px 8px 0 0; transition: height 0.3s; min-width: 40px; }
+    .chart-label { font-size: 11px; color: var(--admin-muted); text-align: center; }
+    .chart-value { font-size: 10px; font-weight: bold; color: var(--admin-success); }
+    
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 24px; }
+    .metric-item { text-align: center; }
+    .metric-icon { width: 48px; height: 48px; margin: 0 auto 12px; background: rgba(107,13,43,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .metric-icon i { font-size: 24px; color: var(--admin-primary); }
+    .metric-value { font-size: 20px; font-weight: bold; color: var(--admin-text); }
+    .metric-label { font-size: 11px; color: var(--admin-muted); margin-top: 4px; }
+    
+    .delivery-item { padding: 16px 24px; border-bottom: 1px solid var(--admin-border); }
+    .delivery-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+    .delivery-id { font-weight: 700; color: var(--admin-text); font-size: 14px; }
+    .delivery-date { font-size: 12px; color: var(--admin-muted); }
+    .delivery-customer { font-size: 14px; color: var(--admin-muted); margin-bottom: 8px; }
+    .delivery-address { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .delivery-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    
+    .restock-btn { background: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 16px; }
+    .restock-btn:hover { background: #8a1e3d; }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .wine-header { flex-direction: column; align-items: center; text-align: center; }
+      .metrics-grid { grid-template-columns: 1fr; gap: 12px; }
+      .chart-bars { flex-direction: column; align-items: center; }
+      .chart-bar-wrapper { width: 100%; }
+      .chart-bar { width: 100%; max-width: none; height: 40px !important; border-radius: 0 8px 8px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="supplier_dashboard.html"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div id="analyticsContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading wine analytics...</p></div></div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Supplier Portal — Wine Analytics</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const wineId = parseInt(urlParams.get('id'));
+    const supplierId = urlParams.get('supplierId');
+    
+    let wineData = null;
+    let supplierDeliveries = [];
+    let currentTimeframe = 'weekly';
+    let currentStock = 0;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      } catch(e) { return '—'; }
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleString();
+      } catch(e) { return '—'; }
+    }
+
+    function parsePrice(price) {
+      if (typeof price === 'number') return price;
+      if (typeof price === 'string') return parseFloat(price) || 0;
+      return 0;
+    }
+
+    function getImageUrl(imageUrl) {
+      if (!imageUrl) return null;
+      if (imageUrl.startsWith('http')) return imageUrl;
+      if (imageUrl.startsWith('/')) return imageUrl;
+      if (imageUrl.startsWith('assets/')) return '/' + imageUrl;
+      return '/assets/' + imageUrl;
+    }
+
+    function isWineCase(item) {
+      return item && item.isCase === true;
+    }
+
+    function getStockClass(stock) {
+      if (stock > 50) return 'stock-green';
+      if (stock > 0) return 'stock-orange';
+      return 'stock-red';
+    }
+
+    function getStockText(stock) {
+      if (stock > 0) return `${stock} in stock`;
+      return 'Out of stock';
+    }
+
+    async function checkAuth() {
+      const token = localStorage.getItem('supplier_auth_token');
+      const supplierStr = localStorage.getItem('supplier_data');
+      
+      if (!token || !supplierStr) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+      
+      setupUserIcon();
+      return true;
+    }
+
+    function setupUserIcon() {
+      const userIcon = document.getElementById('userIcon');
+      if (userIcon) {
+        userIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = 'profile.html';
+        });
+      }
+    }
+
+    async function loadWineData() {
+      if (!wineId) {
+        showError('No wine ID provided');
+        return;
+      }
+      
+      try {
+        const token = localStorage.getItem('supplier_auth_token');
+        
+        // Fetch wine details
+        const wineResponse = await fetch(`${API_BASE}/api/wines/${wineId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (wineResponse.ok) {
+          wineData = await wineResponse.json();
+          currentStock = wineData.stockCount || 0;
+        } else {
+          throw new Error('Failed to load wine details');
+        }
+        
+        // Fetch deliveries containing supplier's wines
+        const supplierStr = localStorage.getItem('supplier_data');
+        const supplierData = JSON.parse(supplierStr);
+        const wineIds = supplierData.wineIds || [];
+        
+        if (wineIds.length > 0) {
+          const deliveriesResponse = await fetch(`${API_BASE}/api/deliveries/supplier`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ wineIds: wineIds, page: 0, limit: 1000 })
+          });
+          
+          if (deliveriesResponse.ok) {
+            const deliveriesData = await deliveriesResponse.json();
+            supplierDeliveries = deliveriesData.data || [];
+          }
+        }
+        
+        renderAnalytics();
+        
+      } catch (error) {
+        console.error('Error loading wine data:', error);
+        showError('Failed to load wine analytics');
+      }
+    }
+
+    function getWineDeliveries() {
+      return supplierDeliveries.filter(delivery => {
+        if (delivery.status?.toLowerCase() !== 'delivered') return false;
+        for (const item of delivery.items || []) {
+          if (item.id === wineId) return true;
+        }
+        return false;
+      });
+    }
+
+    function getWineSalesData(timeframe) {
+      const now = new Date();
+      let filteredDeliveries = getWineDeliveries();
+      
+      switch (timeframe) {
+        case 'weekly':
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          filteredDeliveries = filteredDeliveries.filter(d => new Date(d.createdAt) >= weekAgo);
+          break;
+        case 'monthly':
+          const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+          filteredDeliveries = filteredDeliveries.filter(d => new Date(d.createdAt) >= monthAgo);
+          break;
+      }
+      
+      let totalRevenue = 0;
+      let totalBottlesSold = 0;
+      let totalOrders = filteredDeliveries.length;
+      
+      for (const delivery of filteredDeliveries) {
+        for (const item of delivery.items || []) {
+          if (item.id === wineId) {
+            const quantity = item.quantity || 1;
+            const price = parsePrice(item.price);
+            const isCase = isWineCase(item);
+            const bottlesInItem = isCase ? quantity * 6 : quantity;
+            const itemPrice = isCase ? price * 6 : price;
+            
+            totalBottlesSold += bottlesInItem;
+            totalRevenue += itemPrice * quantity;
+          }
+        }
+      }
+      
+      return {
+        totalRevenue,
+        totalBottlesSold,
+        totalOrders,
+        averageOrderValue: totalOrders > 0 ? totalRevenue / totalOrders : 0
+      };
+    }
+
+    function getChartData(timeframe) {
+      const deliveries = getWineDeliveries();
+      const now = new Date();
+      const data = [];
+      
+      if (timeframe === 'weekly') {
+        for (let i = 6; i >= 0; i--) {
+          const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+          const dayDeliveries = deliveries.filter(d => {
+            const dDate = new Date(d.createdAt);
+            return dDate.toDateString() === date.toDateString();
+          });
+          
+          let dayRevenue = 0;
+          let dayBottles = 0;
+          
+          for (const delivery of dayDeliveries) {
+            for (const item of delivery.items || []) {
+              if (item.id === wineId) {
+                const quantity = item.quantity || 1;
+                const price = parsePrice(item.price);
+                const isCase = isWineCase(item);
+                const bottlesInItem = isCase ? quantity * 6 : quantity;
+                const itemPrice = isCase ? price * 6 : price;
+                dayBottles += bottlesInItem;
+                dayRevenue += itemPrice * quantity;
+              }
+            }
+          }
+          
+          data.push({
+            label: date.toLocaleDateString('en-GB', { weekday: 'short' }),
+            revenue: dayRevenue,
+            bottles: dayBottles
+          });
+        }
+      } else {
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        for (let i = 5; i >= 0; i--) {
+          let targetMonth = now.getMonth() - i;
+          let targetYear = now.getFullYear();
+          if (targetMonth < 0) {
+            targetMonth += 12;
+            targetYear--;
+          }
+          
+          const monthDeliveries = deliveries.filter(d => {
+            const dDate = new Date(d.createdAt);
+            return dDate.getMonth() === targetMonth && dDate.getFullYear() === targetYear;
+          });
+          
+          let monthRevenue = 0;
+          let monthBottles = 0;
+          
+          for (const delivery of monthDeliveries) {
+            for (const item of delivery.items || []) {
+              if (item.id === wineId) {
+                const quantity = item.quantity || 1;
+                const price = parsePrice(item.price);
+                const isCase = isWineCase(item);
+                const bottlesInItem = isCase ? quantity * 6 : quantity;
+                const itemPrice = isCase ? price * 6 : price;
+                monthBottles += bottlesInItem;
+                monthRevenue += itemPrice * quantity;
+              }
+            }
+          }
+          
+          data.push({
+            label: `${monthNames[targetMonth]} ${targetYear}`,
+            revenue: monthRevenue,
+            bottles: monthBottles
+          });
+        }
+      }
+      
+      return data;
+    }
+
+    function renderAnalytics() {
+      const container = document.getElementById('analyticsContent');
+      if (!wineData) return;
+      
+      const salesData = getWineSalesData(currentTimeframe);
+      const chartData = getChartData(currentTimeframe);
+      const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
+      const allTimeSales = getWineSalesData('all');
+      const totalBottlesAllTime = allTimeSales.totalBottlesSold;
+      const initialStock = wineData.stockCount + totalBottlesAllTime;
+      const stockPercentage = initialStock > 0 ? (currentStock / initialStock * 100).toFixed(1) : 0;
+      const stockClass = getStockClass(currentStock);
+      const stockText = getStockText(currentStock);
+      const imageUrl = getImageUrl(wineData.imageUrl);
+      
+      const recentDeliveries = getWineDeliveries().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+      
+      container.innerHTML = `
+        <div class="wine-header">
+          ${imageUrl ? 
+            `<img src="${imageUrl}" alt="${escapeHtml(wineData.name)}" class="wine-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'wine-image-placeholder\'><i class=\'fas fa-wine-bottle\'></i></div>'">` :
+            `<div class="wine-image-placeholder"><i class="fas fa-wine-bottle"></i></div>`
+          }
+          <div class="wine-details">
+            <div class="wine-name">${escapeHtml(wineData.name)}</div>
+            <div class="wine-type">${escapeHtml(wineData.type)} • ${escapeHtml(wineData.category)}</div>
+            <div>
+              <span class="wine-price">R${wineData.price.toFixed(2)}</span>
+              <span class="wine-stock ${stockClass}">${stockText}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <h3 style="margin-bottom: 8px;">Sales Summary</h3>
+          <div class="stat-grid">
+            <div class="stat-item"><div class="stat-value">R${salesData.totalRevenue.toFixed(2)}</div><div class="stat-label">Total Revenue</div></div>
+            <div class="stat-item"><div class="stat-value">${salesData.totalBottlesSold}</div><div class="stat-label">Bottles Sold</div></div>
+            <div class="stat-item"><div class="stat-value">${salesData.totalOrders}</div><div class="stat-label">Total Orders</div></div>
+            <div class="stat-item"><div class="stat-value">R${salesData.averageOrderValue.toFixed(2)}</div><div class="stat-label">Avg per Order</div></div>
+          </div>
+        </div>
+        
+        <div class="section-card">
+          <div class="section-header">
+            <h3><i class="fas fa-chart-line"></i> Revenue Trend</h3>
+            <div class="timeframe-selector">
+              <button class="timeframe-btn ${currentTimeframe === 'weekly' ? 'active' : ''}" data-timeframe="weekly">Weekly</button>
+              <button class="timeframe-btn ${currentTimeframe === 'monthly' ? 'active' : ''}" data-timeframe="monthly">Monthly</button>
+              <button class="timeframe-btn ${currentTimeframe === 'all' ? 'active' : ''}" data-timeframe="all">All Time</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-bars">
+              ${chartData.map(data => {
+                const heightPercent = (data.revenue / maxRevenue) * 200;
+                return `
+                  <div class="chart-bar-wrapper">
+                    <div class="chart-value">R${data.revenue.toFixed(0)}</div>
+                    <div class="chart-bar" style="height: ${Math.max(heightPercent, 4)}px;"></div>
+                    <div class="chart-label">${data.label}</div>
+                    <div style="font-size: 10px; color: #888;">${data.bottles} bottles</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+        
+        <div class="section-card">
+          <div class="section-header">
+            <h3><i class="fas fa-chart-simple"></i> Performance Metrics</h3>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-item"><div class="metric-icon"><i class="fas fa-chart-line"></i></div><div class="metric-value">${stockPercentage}%</div><div class="metric-label">Stock Remaining</div></div>
+            <div class="metric-item"><div class="metric-icon"><i class="fas fa-trending-up"></i></div><div class="metric-value">${totalBottlesAllTime}</div><div class="metric-label">Total Bottles Sold</div></div>
+            <div class="metric-item"><div class="metric-icon"><i class="fas fa-coins"></i></div><div class="metric-value">R${(salesData.totalRevenue / Math.max(salesData.totalBottlesSold, 1)).toFixed(2)}</div><div class="metric-label">Revenue per Bottle</div></div>
+          </div>
+        </div>
+        
+        <div class="section-card">
+          <div class="section-header">
+            <h3><i class="fas fa-truck"></i> Recent Deliveries</h3>
+          </div>
+          ${recentDeliveries.length === 0 ? 
+            '<div class="empty-state" style="padding: 40px;"><i class="fas fa-truck"></i><p>No deliveries for this wine yet</p></div>' :
+            recentDeliveries.map(delivery => {
+              let itemQuantity = 0;
+              let itemRevenue = 0;
+              let isCase = false;
+              
+              for (const item of delivery.items || []) {
+                if (item.id === wineId) {
+                  const quantity = item.quantity || 1;
+                  const price = parsePrice(item.price);
+                  isCase = isWineCase(item);
+                  const bottlesInItem = isCase ? quantity * 6 : quantity;
+                  const itemPrice = isCase ? price * 6 : price;
+                  itemQuantity = bottlesInItem;
+                  itemRevenue = itemPrice * quantity;
+                  break;
+                }
+              }
+              
+              const customerName = delivery.userFullName || (delivery.userEmail ? delivery.userEmail.split('@')[0] : 'Customer');
+              const orderId = (delivery._id || delivery.id || '').substring(0, 8);
+              
+              return `
+                <div class="delivery-item">
+                  <div class="delivery-header">
+                    <span class="delivery-id">Order #${orderId}</span>
+                    <span class="delivery-date">${formatDateTime(delivery.createdAt)}</span>
+                  </div>
+                  <div class="delivery-customer"><i class="fas fa-user"></i> ${escapeHtml(customerName)}</div>
+                  <div class="delivery-address"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(delivery.address?.substring(0, 80) || '—')}</div>
+                  <div class="delivery-footer">
+                    <span><i class="fas fa-wine-bottle"></i> ${itemQuantity} bottles</span>
+                    <span><strong>R${itemRevenue.toFixed(2)}</strong></span>
+                  </div>
+                </div>
+              `;
+            }).join('')
+          }
+        </div>
+        
+        <button class="restock-btn" onclick="requestRestock()"><i class="fas fa-truck"></i> Request Restock</button>
+      `;
+      
+      // Setup timeframe buttons
+      document.querySelectorAll('.timeframe-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentTimeframe = btn.dataset.timeframe;
+          renderAnalytics();
+        });
+      });
+    }
+
+    function requestRestock() {
+      window.location.href = `restock_request.html?wineId=${wineId}&supplierId=${supplierId}`;
+    }
+
+    window.requestRestock = requestRestock;
+
+    function showError(message) {
+      const container = document.getElementById('analyticsContent');
+      if (container) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${escapeHtml(message)}</p><button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#6b0d2b; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button></div>`;
+      }
+    }
+
+    async function init() {
+      const authenticated = await checkAuth();
+      if (authenticated) {
+        await loadWineData();
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Edit Profile | Supplier Portal</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #E6C79C;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+      --admin-error: #d32f2f;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 600px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .form-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); padding: 32px; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin-bottom: 8px; }
+    .form-subtitle { color: var(--admin-muted); margin-bottom: 32px; font-size: 14px; }
+    
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--admin-text); font-size: 14px; }
+    .form-label i { margin-right: 8px; color: var(--admin-primary); }
+    .form-input { width: 100%; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px; font-family: 'Montserrat', sans-serif; background: white; }
+    .form-input:focus { outline: none; border-color: var(--admin-primary); }
+    .form-input:disabled { background: #f5f5f5; color: var(--admin-muted); }
+    
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; font-size: 15px; transition: all 0.2s; }
+    .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 14px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 12px; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    
+    .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 12px; margin-bottom: 24px; color: var(--admin-error); font-size: 14px; }
+    .success-message { background: rgba(46,125,50,0.1); border: 1px solid var(--admin-success); border-radius: 12px; padding: 12px; margin-bottom: 24px; color: var(--admin-success); font-size: 14px; }
+    
+    .avatar-section { text-align: center; margin-bottom: 32px; }
+    .avatar { width: 80px; height: 80px; background: var(--admin-primary); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+    .avatar i { font-size: 40px; color: white; }
+    .avatar-name { font-size: 18px; font-weight: bold; color: var(--admin-text); }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .form-card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="supplier_dashboard.html"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div class="form-card">
+      <div class="avatar-section">
+        <div class="avatar"><i class="fas fa-building"></i></div>
+        <div class="avatar-name" id="supplierName">Loading...</div>
+      </div>
+      
+      <h1 class="form-title">Edit Profile</h1>
+      <p class="form-subtitle">Update your business information</p>
+      
+      <div id="errorMessage" class="error-message" style="display:none;"></div>
+      <div id="successMessage" class="success-message" style="display:none;"></div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-building"></i> Business Name</label>
+        <input type="text" id="nameInput" class="form-input" placeholder="Your business name">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+        <input type="email" id="emailInput" class="form-input" placeholder="Your email address" disabled>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+        <input type="tel" id="phoneInput" class="form-input" placeholder="+27 12 345 6789">
+      </div>
+      
+      <button class="btn-primary" id="saveBtn"><i class="fas fa-save"></i> Save Changes</button>
+      <button class="btn-secondary" onclick="window.location.href='profile.html'"><i class="fas fa-arrow-left"></i> Cancel</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Supplier Portal — Edit Profile</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin;
+    let supplierData = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => errorDiv.style.display = 'none', 5000);
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      setTimeout(() => successDiv.style.display = 'none', 3000);
+    }
+
+    async function checkAuth() {
+      const token = localStorage.getItem('supplier_auth_token');
+      const supplierStr = localStorage.getItem('supplier_data');
+      
+      if (!token || !supplierStr) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+      
+      try {
+        supplierData = JSON.parse(supplierStr);
+        document.getElementById('supplierName').textContent = supplierData.name;
+        document.getElementById('nameInput').value = supplierData.name;
+        document.getElementById('emailInput').value = supplierData.email;
+        document.getElementById('phoneInput').value = supplierData.phone || '';
+        
+        setupUserIcon();
+        return true;
+      } catch (e) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+    }
+
+    function setupUserIcon() {
+      const userIcon = document.getElementById('userIcon');
+      if (userIcon) {
+        userIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = 'profile.html';
+        });
+      }
+    }
+
+    async function saveProfile() {
+      const name = document.getElementById('nameInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim();
+      
+      if (!name) {
+        showError('Business name is required');
+        return;
+      }
+      
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Saving...';
+      
+      try {
+        const token = localStorage.getItem('supplier_auth_token');
+        const updatedSupplier = {
+          ...supplierData,
+          name: name,
+          phone: phone
+        };
+        
+        const response = await fetch(`${API_BASE}/api/suppliers/${supplierData.id}`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updatedSupplier)
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          const updatedData = {
+            id: result.id || supplierData.id,
+            name: result.name || name,
+            email: result.email || supplierData.email,
+            phone: result.phone || phone,
+            status: result.status || supplierData.status,
+            isVerified: result.isVerified || supplierData.isVerified,
+            wineIds: result.wineIds || supplierData.wineIds,
+            createdAt: result.createdAt || supplierData.createdAt,
+            updatedAt: result.updatedAt || new Date().toISOString()
+          };
+          
+          localStorage.setItem('supplier_data', JSON.stringify(updatedData));
+          supplierData = updatedData;
+          
+          showSuccess('Profile updated successfully!');
+          setTimeout(() => {
+            window.location.href = 'profile.html';
+          }, 1500);
+        } else {
+          const error = await response.json();
+          showError(error.message || 'Failed to update profile');
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
+      } catch (error) {
+        showError('Network error. Please try again.');
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+      }
+    }
+
+    document.getElementById('saveBtn')?.addEventListener('click', saveProfile);
+    
+    checkAuth();
+  </script>
+</body>
+</html>

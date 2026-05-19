@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Delivery Details | Supplier Portal</title>
+  <link rel="icon" type="image/png" href="../assets/categories/Icons.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    :root {
+      --admin-primary: #6b0d2b;
+      --admin-accent: #E6C79C;
+      --admin-bg: #faf8f5;
+      --admin-card: #ffffff;
+      --admin-text: #1b1b1b;
+      --admin-muted: #6d6d6d;
+      --admin-border: #eae3da;
+      --admin-success: #2e7d32;
+    }
+    body { background: var(--admin-bg); }
+    .main-nav { display: none !important; }
+    .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    .admin-container { max-width: 800px; margin: 30px auto 50px; padding: 0 24px; }
+    
+    .detail-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
+    .detail-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; background: linear-gradient(135deg, var(--admin-primary) 0%, #8a1e3d 100%); color: white; }
+    .detail-header h2 { margin: 0; font-family: 'Playfair Display', serif; }
+    .detail-section { padding: 24px; border-bottom: 1px solid var(--admin-border); }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--admin-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .info-row { display: flex; padding: 8px 0; border-bottom: 1px solid var(--admin-border); }
+    .info-label { width: 140px; font-weight: 600; color: var(--admin-text); }
+    .info-value { flex: 1; color: var(--admin-muted); }
+    .item-row { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--admin-border); }
+    .item-image { width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: #2a2a2a; }
+    .item-details { flex: 1; }
+    .item-name { font-weight: 600; color: var(--admin-text); }
+    .item-quantity { font-size: 12px; color: var(--admin-muted); }
+    .item-price { font-weight: bold; color: var(--admin-primary); }
+    
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 12px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 16px; }
+    .btn-secondary:hover { background: #f5f5f5; }
+    
+    @media (max-width: 768px) {
+      .admin-container { padding: 0 16px; margin-top: 20px; }
+      .info-row { flex-direction: column; gap: 4px; }
+      .info-label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar-top"><div class="topbar-top-inner"></div></div>
+  <div class="topbar-main">
+    <div class="topbar-main-inner">
+      <div class="logo"><a href="supplier_dashboard.html"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <div id="detailContent"><div class="loading-state"><div class="loading-spinner"></div><p>Loading delivery details...</p></div></div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="../assets/categories/Logo_Botttom.png" class="footer-logo">
+        <p class="brand-tagline">Supplier Portal — Delivery Details</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+    const deliveryId = urlParams.get('id');
+    
+    let deliveryData = null;
+    let supplierWineIds = [];
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        const d = new Date(dateStr);
+        return d.toLocaleString();
+      } catch(e) { return '—'; }
+    }
+
+    function getImageUrl(imageUrl) {
+      if (!imageUrl) return null;
+      if (imageUrl.startsWith('http')) return imageUrl;
+      if (imageUrl.startsWith('/')) return imageUrl;
+      if (imageUrl.startsWith('assets/')) return '/' + imageUrl;
+      return '/assets/' + imageUrl;
+    }
+
+    async function checkAuth() {
+      const token = localStorage.getItem('supplier_auth_token');
+      const supplierStr = localStorage.getItem('supplier_data');
+      
+      if (!token || !supplierStr) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+      
+      try {
+        const supplier = JSON.parse(supplierStr);
+        supplierWineIds = supplier.wineIds || [];
+        setupUserIcon();
+        return true;
+      } catch (e) {
+        window.location.href = '../login/login.html';
+        return false;
+      }
+    }
+
+    function setupUserIcon() {
+      const userIcon = document.getElementById('userIcon');
+      if (userIcon) {
+        userIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.location.href = 'profile.html';
+        });
+      }
+    }
+
+    async function fetchDeliveryDetails() {
+      if (!deliveryId) {
+        showError('No delivery ID provided');
+        return;
+      }
+      
+      try {
+        const token = localStorage.getItem('supplier_auth_token');
+        const response = await fetch(`${API_BASE}/api/deliveries/${deliveryId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load delivery');
+        
+        const data = await response.json();
+        deliveryData = data.data || data;
+        renderDetail();
+        
+      } catch (error) {
+        console.error('Error fetching delivery:', error);
+        showError('Failed to load delivery details');
+      }
+    }
+
+    function renderDetail() {
+      const container = document.getElementById('detailContent');
+      if (!deliveryData) return;
+      
+      const orderId = (deliveryData._id || deliveryData.id || '').substring(0, 8);
+      const customerName = deliveryData.userFullName || (deliveryData.userEmail ? deliveryData.userEmail.split('@')[0] : 'Customer');
+      
+      // Filter items that belong to this supplier
+      const supplierItems = (deliveryData.items || []).filter(item => supplierWineIds.includes(item.id));
+      
+      let supplierTotal = 0;
+      let supplierBottles = 0;
+      
+      for (const item of supplierItems) {
+        const quantity = item.quantity || 1;
+        const price = parseFloat(item.price) || 0;
+        const isCase = item.isCase === true;
+        const bottlesInItem = isCase ? quantity * 6 : quantity;
+        const itemPrice = isCase ? price * 6 : price;
+        supplierBottles += bottlesInItem;
+        supplierTotal += itemPrice * quantity;
+      }
+      
+      container.innerHTML = `
+        <div class="detail-card">
+          <div class="detail-header">
+            <h2><i class="fas fa-truck"></i> Order #${orderId}</h2>
+            <span class="status-badge" style="background: rgba(46,125,32,0.2); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">DELIVERED</span>
+          </div>
+          
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-user"></i> Customer Information</h3>
+            <div class="info-row"><div class="info-label">Name:</div><div class="info-value">${escapeHtml(customerName)}</div></div>
+            <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(deliveryData.userEmail || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">${escapeHtml(deliveryData.userPhoneNumber || '—')}</div></div>
+          </div>
+          
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Delivery Information</h3>
+            <div class="info-row"><div class="info-label">Address:</div><div class="info-value">${escapeHtml(deliveryData.address || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Payment Method:</div><div class="info-value">${escapeHtml(deliveryData.paymentMethod || '—')}</div></div>
+            <div class="info-row"><div class="info-label">Order Date:</div><div class="info-value">${formatDateTime(deliveryData.createdAt)}</div></div>
+            <div class="info-row"><div class="info-label">Total Amount:</div><div class="info-value">R${(deliveryData.totalAmount || 0).toFixed(2)}</div></div>
+          </div>
+          
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-wine-bottle"></i> Your Wines in this Order</h3>
+            ${supplierItems.length === 0 ? 
+              '<div class="empty-state" style="padding: 20px;"><p>No wines from your portfolio in this order</p></div>' :
+              supplierItems.map(item => {
+                const quantity = item.quantity || 1;
+                const price = parseFloat(item.price) || 0;
+                const isCase = item.isCase === true;
+                const bottlesInItem = isCase ? quantity * 6 : quantity;
+                const itemPrice = isCase ? price * 6 : price;
+                const total = itemPrice * quantity;
+                const displayName = isCase ? `${item.name} (Case of 6)` : item.name;
+                const imageUrl = getImageUrl(item.imageUrl);
+                
+                return `
+                  <div class="item-row">
+                    ${imageUrl ? 
+                      `<img src="${imageUrl}" alt="${escapeHtml(item.name)}" class="item-image" onerror="this.onerror=null; this.style.display='none'">` :
+                      `<div class="item-image" style="display: flex; align-items: center; justify-content: center; background: #f0f0f0;"><i class="fas fa-wine-bottle"></i></div>`
+                    }
+                    <div class="item-details">
+                      <div class="item-name">${escapeHtml(displayName)}</div>
+                      <div class="item-quantity">Quantity: ${quantity} ${isCase ? 'case(s)' : 'bottle(s)'} (${bottlesInItem} bottles)</div>
+                      <div>${isCase ? `R${price.toFixed(2)} per bottle (6 bottles/case)` : `R${price.toFixed(2)} per bottle`}</div>
+                    </div>
+                    <div class="item-price">R${total.toFixed(2)}</div>
+                  </div>
+                `;
+              }).join('')
+            }
+          </div>
+          
+          <div class="detail-section">
+            <h3 class="section-title"><i class="fas fa-chart-line"></i> Summary for Your Wines</h3>
+            <div class="info-row"><div class="info-label">Total Bottles:</div><div class="info-value">${supplierBottles} bottles</div></div>
+            <div class="info-row"><div class="info-label">Total Revenue:</div><div class="info-value"><strong style="color: var(--admin-success);">R${supplierTotal.toFixed(2)}</strong></div></div>
+          </div>
+          
+          <div class="detail-section" style="border-bottom: none;">
+            <button class="btn-secondary" onclick="window.location.href='supplier_dashboard.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function showError(message) {
+      const container = document.getElementById('detailContent');
+      if (container) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${escapeHtml(message)}</p><button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#6b0d2b; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button></div>`;
+      }
+    }
+
+    async function init() {
+      const authenticated = await checkAuth();
+      if (authenticated) {
+        await fetchDeliveryDetails();
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>
