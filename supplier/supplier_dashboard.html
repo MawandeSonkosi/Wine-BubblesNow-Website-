@@ -11,7 +11,7 @@
   <style>
     :root {
       --admin-primary: #6b0d2b;
-      --admin-accent: #D8C09D;
+      --admin-accent: #E6C79C;
       --admin-bg: #faf8f5;
       --admin-card: #ffffff;
       --admin-text: #1b1b1b;
@@ -30,10 +30,13 @@
     .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
     .admin-container { max-width: 1400px; margin: 30px auto 50px; padding: 0 24px; }
     
-    /* Dashboard Header */
-    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    /* Dashboard Header - Removed Back Button */
+    .dashboard-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
     .dashboard-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
     .dashboard-title i { color: var(--admin-primary); margin-right: 12px; }
+    
+    /* Logo clickable but stays on dashboard */
+    .logo { cursor: pointer; }
     
     /* Welcome Card */
     .welcome-card { background: linear-gradient(135deg, var(--admin-primary) 0%, #8a1e3d 100%); border-radius: 24px; padding: 24px; margin-bottom: 32px; color: white; }
@@ -59,11 +62,12 @@
     .section-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--admin-text); margin: 0; }
     .section-header h3 i { color: var(--admin-primary); margin-right: 10px; }
     
-    /* Wine Grid */
+    /* Wine Grid - Improved Images */
     .wines-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; padding: 24px; }
     .wine-item { background: var(--card-bg); border-radius: 16px; overflow: hidden; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(107,13,43,0.2); }
     .wine-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--admin-primary); }
-    .wine-image { width: 100%; height: 160px; object-fit: cover; background: #2a2a2a; }
+    .wine-image-container { width: 100%; height: 200px; overflow: hidden; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
+    .wine-image { width: 100%; height: 100%; object-fit: contain; background: #2a2a2a; }
     .wine-info { padding: 16px; }
     .wine-name { font-weight: 700; font-size: 16px; color: var(--admin-accent); margin-bottom: 4px; }
     .wine-type { font-size: 12px; color: #888; margin-bottom: 8px; }
@@ -119,8 +123,7 @@
     .timeframe-selector { display: flex; gap: 8px; }
     .timeframe-btn { background: transparent; border: 1px solid var(--admin-border); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
     .timeframe-btn.active { background: var(--admin-primary); color: white; border-color: var(--admin-primary); }
-    .btn-refresh:hover { background: #8a1e3d !important; transform: translateY(-2px); }
-    .wine-image-placeholder { width: 100%; height: 160px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
+    .wine-image-placeholder { width: 100%; height: 200px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
     .wine-image-placeholder i { font-size: 48px; color: #555; }
     .restock-btn { background: transparent; border: 1px solid var(--admin-primary); color: var(--admin-primary); padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
     .restock-btn:hover { background: var(--admin-primary); color: white; }
@@ -155,20 +158,16 @@
   <div class="topbar-top"><div class="topbar-top-inner"></div></div>
   <div class="topbar-main">
     <div class="topbar-main-inner">
-      <div class="logo"><a href="../index.html"><img src="../assets/categories/Logo_Top.png" alt="Logo"></a></div>
+      <div class="logo" id="dashboardLogo" style="cursor: pointer;">
+        <img src="../assets/categories/Logo_Top.png" alt="Logo">
+      </div>
       <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
     </div>
   </div>
 
   <div class="admin-container">
     <div class="dashboard-header">
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <a href="../index.html" style="color: var(--admin-primary); text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
-        <h1 class="dashboard-title"><i class="fas fa-boxes"></i> Supplier Dashboard</h1>
-      </div>
-      <div style="display: flex; gap: 12px;">
-        <button class="btn-refresh" id="refreshBtn" style="background: var(--admin-primary); color: white; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer;"><i class="fas fa-sync-alt"></i> Refresh</button>
-      </div>
+      <h1 class="dashboard-title"><i class="fas fa-boxes"></i> Supplier Dashboard</h1>
     </div>
 
     <!-- Welcome Card -->
@@ -187,7 +186,7 @@
       <div class="stat-card"><div class="stat-icon" style="background: rgba(107,13,43,0.1);"><i class="fas fa-wine-bottle" style="color: var(--admin-primary);"></i></div><div class="stat-value" id="statTotalWines">—</div><div class="stat-label">Total Wines Supplied</div></div>
       <div class="stat-card"><div class="stat-icon" style="background: rgba(46,125,50,0.1);"><i class="fas fa-chart-line" style="color: var(--admin-success);"></i></div><div class="stat-value" id="statWinesSelling">—</div><div class="stat-label">Wines Selling</div></div>
       <div class="stat-card"><div class="stat-icon" style="background: rgba(2,136,209,0.1);"><i class="fas fa-shopping-cart" style="color: var(--admin-info);"></i></div><div class="stat-value" id="statTotalOrders">—</div><div class="stat-label">Delivered Orders</div></div>
-      <div class="stat-card"><div class="stat-icon" style="background: rgba(107,13,43,0.1);"><i class="fas fa-rand" style="color: var(--admin-primary);"></i></div><div class="stat-value" id="statAverageOrder">R0</div><div class="stat-label">Average Order Value</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background: rgba(107,13,43,0.1);"><i class="fas fa-chart-simple" style="color: var(--admin-primary);"></i></div><div class="stat-value" id="statAverageOrder">R0</div><div class="stat-label">Average Order Value</div></div>
     </div>
 
     <!-- Tabs -->
@@ -239,26 +238,31 @@
   </footer>
 
   <script>
-    // Supplier Dashboard JavaScript
-    const API_BASE = window.location.origin;
-    let supplierData = null;
-    let supplierWines = [];
-    let supplierDeliveries = [];
-    let allWines = [];
-    let currentTab = 'wines';
-    let currentTimeframe = 'all';
-    let isLoading = false;
+    // Supplier Dashboard JavaScript - Full Flutter-like Functionality
+    var API_BASE = window.location.origin;
+    var supplierData = null;
+    var supplierWines = [];
+    var supplierDeliveries = [];
+    var allWines = [];
+    var currentTab = 'wines';
+    var currentTimeframe = 'all';
+    var isLoading = false;
 
     // Helper functions
     function escapeHtml(str) {
       if (!str) return '';
-      return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
     }
 
     function formatDate(dateStr) {
       if (!dateStr) return '—';
       try {
-        const d = new Date(dateStr);
+        var d = new Date(dateStr);
         return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
       } catch(e) { return '—'; }
     }
@@ -266,7 +270,7 @@
     function formatDateTime(dateStr) {
       if (!dateStr) return '—';
       try {
-        const d = new Date(dateStr);
+        var d = new Date(dateStr);
         return d.toLocaleString();
       } catch(e) { return '—'; }
     }
@@ -279,24 +283,42 @@
 
     function getImageUrl(imageUrl) {
       if (!imageUrl) return null;
-      if (imageUrl.startsWith('http')) return imageUrl;
-      if (imageUrl.startsWith('/')) return imageUrl;
-      if (imageUrl.startsWith('assets/')) return '/' + imageUrl;
+      if (imageUrl.indexOf('http') === 0) return imageUrl;
+      if (imageUrl.indexOf('/') === 0) return imageUrl;
+      if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
       return '/assets/' + imageUrl;
     }
 
     function buildWineImageHtml(imageUrl, wineName) {
-      const url = getImageUrl(imageUrl);
+      var url = getImageUrl(imageUrl);
       if (url) {
-        return `<img src="${url}" alt="${escapeHtml(wineName)}" class="wine-image" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'wine-image-placeholder\'><i class=\'fas fa-wine-bottle\'></i></div>'">`;
+        return '<div class="wine-image-container"><img src="' + url + '" alt="' + escapeHtml(wineName) + '" class="wine-image" onerror="this.onerror=null; this.parentElement.innerHTML=\'<div class=\"wine-image-placeholder\"><i class=\"fas fa-wine-bottle\"></i></div>\'"></div>';
       }
       return '<div class="wine-image-placeholder"><i class="fas fa-wine-bottle"></i></div>';
     }
 
+    // Check if wine item is a case
+    function isWineCase(item) {
+      if (item && item.isCase === true) return true;
+      return false;
+    }
+
+    // Setup logo click handler - stays on dashboard
+    function setupLogo() {
+      var logo = document.getElementById('dashboardLogo');
+      if (logo) {
+        logo.addEventListener('click', function(e) {
+          e.preventDefault();
+          // Stay on supplier dashboard - just refresh the page
+          window.location.reload();
+        });
+      }
+    }
+
     // Check authentication and load supplier data
     async function checkAuth() {
-      const token = localStorage.getItem('supplier_auth_token');
-      const supplierStr = localStorage.getItem('supplier_data');
+      var token = localStorage.getItem('supplier_auth_token');
+      var supplierStr = localStorage.getItem('supplier_data');
       
       if (!token || !supplierStr) {
         console.log('❌ No supplier session found, redirecting to login');
@@ -309,10 +331,13 @@
         console.log('✅ Supplier authenticated:', supplierData.name);
         
         // Update welcome card
-        document.getElementById('welcomeTitle').innerHTML = `Welcome, ${escapeHtml(supplierData.name)}!`;
+        document.getElementById('welcomeTitle').innerHTML = 'Welcome, ' + escapeHtml(supplierData.name) + '!';
         
         // Setup user dropdown
         setupUserDropdown(supplierData);
+        
+        // Setup logo
+        setupLogo();
         
         return true;
       } catch (e) {
@@ -323,41 +348,46 @@
     }
 
     function setupUserDropdown(supplier) {
-      const userIcon = document.getElementById('userIcon');
+      var userIcon = document.getElementById('userIcon');
       if (!userIcon) return;
       
-      userIcon.addEventListener('click', (e) => {
+      userIcon.addEventListener('click', function(e) {
         e.preventDefault();
         toggleSupplierDropdown(supplier);
       });
     }
 
     function toggleSupplierDropdown(supplier) {
-      const existing = document.querySelector('.user-dropdown');
+      var existing = document.querySelector('.user-dropdown');
       if (existing) { existing.remove(); return; }
       
-      const dropdown = document.createElement('div');
+      var dropdown = document.createElement('div');
       dropdown.className = 'user-dropdown';
-      dropdown.innerHTML = `
-        <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #eee;">
-          <div style="font-weight:bold; margin-bottom:4px;">${escapeHtml(supplier.name)} <span class="badge-supplier">SUPPLIER</span></div>
-          <div style="font-size:13px; color:#6d6d6d;">${escapeHtml(supplier.email)}</div>
-        </div>
-        <button id="logoutBtn" style="margin-top:12px; padding:10px; background:#6b0d2b; color:white; border:none; border-radius:8px; width:100%; cursor:pointer; font-weight:600;">Logout</button>
-      `;
+      dropdown.innerHTML = 
+        '<div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #eee;">' +
+          '<div style="font-weight:bold; margin-bottom:4px;">' + escapeHtml(supplier.name) + ' <span class="badge-supplier">SUPPLIER</span></div>' +
+          '<div style="font-size:13px; color:#6d6d6d;">' + escapeHtml(supplier.email) + '</div>' +
+        '</div>' +
+        '<a href="profile.html" style="display:flex; align-items:center; gap:10px; padding:10px 0; color:#1b1b1b; text-decoration:none;"><i class="fas fa-user"></i> My Profile</a>' +
+        '<button id="logoutBtn" style="margin-top:12px; padding:10px; background:#6b0d2b; color:white; border:none; border-radius:8px; width:100%; cursor:pointer; font-weight:600;">Logout</button>';
       document.body.appendChild(dropdown);
       
-      document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        localStorage.removeItem('supplier_auth_token');
-        localStorage.removeItem('supplier_data');
-        localStorage.removeItem('supplier_token_timestamp');
-        window.location.href = '../login/login.html';
-      });
+      var logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+          localStorage.removeItem('supplier_auth_token');
+          localStorage.removeItem('supplier_data');
+          localStorage.removeItem('supplier_token_timestamp');
+          window.location.href = '../login/login.html';
+        });
+      }
       
-      setTimeout(() => {
+      setTimeout(function() {
         document.addEventListener('click', function closeDropdown(e) {
-          if (!dropdown.contains(e.target) && !document.getElementById('userIcon')?.contains(e.target)) {
-            dropdown.remove();
+          var dropdownEl = document.querySelector('.user-dropdown');
+          var userIconEl = document.getElementById('userIcon');
+          if (dropdownEl && !dropdownEl.contains(e.target) && userIconEl && !userIconEl.contains(e.target)) {
+            dropdownEl.remove();
             document.removeEventListener('click', closeDropdown);
           }
         });
@@ -372,33 +402,33 @@
       showLoadingStates();
       
       try {
-        const token = localStorage.getItem('supplier_auth_token');
+        var token = localStorage.getItem('supplier_auth_token');
         
         // Fetch all wines to get details
-        const winesResponse = await fetch(`${API_BASE}/api/wines?all=true`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+        var winesResponse = await fetch(API_BASE + '/api/wines?all=true&_=' + Date.now(), {
+          headers: { 'Authorization': 'Bearer ' + token }
         });
         if (winesResponse.ok) {
-          const winesData = await winesResponse.json();
+          var winesData = await winesResponse.json();
           allWines = winesData;
           console.log('✅ Loaded all wines:', allWines.length);
         }
         
         // Get supplier's wines by matching IDs
-        const wineIds = supplierData.wineIds || [];
-        supplierWines = allWines.filter(wine => wineIds.includes(wine.id));
+        var wineIds = supplierData.wineIds || [];
+        supplierWines = allWines.filter(function(wine) { return wineIds.indexOf(wine.id) !== -1; });
         console.log('✅ Supplier wines:', supplierWines.length);
         
         // Fetch deliveries containing supplier's wines
         if (wineIds.length > 0) {
-          const deliveriesResponse = await fetch(`${API_BASE}/api/deliveries/supplier`, {
+          var deliveriesResponse = await fetch(API_BASE + '/api/deliveries/supplier', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
             body: JSON.stringify({ wineIds: wineIds, page: 0, limit: 1000 })
           });
           
           if (deliveriesResponse.ok) {
-            const deliveriesData = await deliveriesResponse.json();
+            var deliveriesData = await deliveriesResponse.json();
             supplierDeliveries = deliveriesData.data || [];
             console.log('✅ Supplier deliveries:', supplierDeliveries.length);
           }
@@ -421,32 +451,32 @@
     }
 
     function showError(message) {
-      const containers = ['winesContainer', 'analyticsContainer', 'deliveriesContainer'];
-      containers.forEach(id => {
-        const container = document.getElementById(id);
+      var containers = ['winesContainer', 'analyticsContainer', 'deliveriesContainer'];
+      containers.forEach(function(id) {
+        var container = document.getElementById(id);
         if (container) {
-          container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>${escapeHtml(message)}</p><button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#6b0d2b; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button></div>`;
+          container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>' + escapeHtml(message) + '</p><button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#6b0d2b; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button></div>';
         }
       });
     }
 
     function renderDashboard() {
       // Calculate stats
-      const salesData = calculateSalesData(supplierDeliveries, supplierWines);
+      var salesData = calculateSalesData(supplierDeliveries, supplierWines);
       
       // Update stats cards
       document.getElementById('statTotalWines').innerText = supplierWines.length;
       document.getElementById('statWinesSelling').innerText = salesData.winesWithSales;
       document.getElementById('statTotalOrders').innerText = salesData.totalOrders;
-      document.getElementById('statAverageOrder').innerHTML = `R${salesData.averageOrderValue.toFixed(2)}`;
+      document.getElementById('statAverageOrder').innerHTML = 'R' + salesData.averageOrderValue.toFixed(2);
       
       // Update welcome stats
       document.getElementById('totalWinesStat').innerText = supplierWines.length;
-      document.getElementById('totalRevenueStat').innerHTML = `R${salesData.totalRevenue.toFixed(2)}`;
+      document.getElementById('totalRevenueStat').innerHTML = 'R' + salesData.totalRevenue.toFixed(2);
       document.getElementById('totalBottlesStat').innerText = salesData.totalBottlesSold;
       
-      document.getElementById('winesCount').innerHTML = `${supplierWines.length} wines`;
-      document.getElementById('deliveriesCount').innerHTML = `${supplierDeliveries.length} deliveries`;
+      document.getElementById('winesCount').innerHTML = supplierWines.length + ' wines';
+      document.getElementById('deliveriesCount').innerHTML = supplierDeliveries.length + ' deliveries';
       
       // Render wines
       renderWines(salesData);
@@ -459,21 +489,24 @@
     }
 
     function calculateSalesData(deliveries, wines) {
-      let totalRevenue = 0;
-      let totalBottlesSold = 0;
-      const wineBottlesSold = {};
-      const wineRevenue = {};
+      var totalRevenue = 0;
+      var totalBottlesSold = 0;
+      var wineBottlesSold = {};
+      var wineRevenue = {};
       
-      for (const delivery of deliveries) {
-        for (const item of delivery.items || []) {
-          const wineId = item.id;
-          const quantity = item.quantity || 1;
-          const price = parsePrice(item.price);
-          const isCase = item.isCase === true;
+      for (var d = 0; d < deliveries.length; d++) {
+        var delivery = deliveries[d];
+        var items = delivery.items || [];
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i];
+          var wineId = item.id;
+          var quantity = item.quantity || 1;
+          var price = parsePrice(item.price);
+          var isCase = item.isCase === true;
           
-          const bottlesInItem = isCase ? quantity * 6 : quantity;
-          const itemPrice = isCase ? price * 6 : price;
-          const revenue = itemPrice * quantity;
+          var bottlesInItem = isCase ? quantity * 6 : quantity;
+          var itemPrice = isCase ? price * 6 : price;
+          var revenue = itemPrice * quantity;
           
           totalBottlesSold += bottlesInItem;
           totalRevenue += revenue;
@@ -483,62 +516,68 @@
         }
       }
       
-      const winesWithSales = Object.keys(wineBottlesSold).length;
-      const totalOrders = deliveries.length;
-      const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+      var winesWithSales = Object.keys(wineBottlesSold).length;
+      var totalOrders = deliveries.length;
+      var averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
       
       return {
-        totalRevenue,
-        totalBottlesSold,
-        winesWithSales,
-        totalOrders,
-        averageOrderValue,
-        wineBottlesSold,
-        wineRevenue
+        totalRevenue: totalRevenue,
+        totalBottlesSold: totalBottlesSold,
+        winesWithSales: winesWithSales,
+        totalOrders: totalOrders,
+        averageOrderValue: averageOrderValue,
+        wineBottlesSold: wineBottlesSold,
+        wineRevenue: wineRevenue
       };
     }
 
     function renderWines(salesData) {
-      const container = document.getElementById('winesContainer');
+      var container = document.getElementById('winesContainer');
       
       if (supplierWines.length === 0) {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-wine-bottle" style="font-size:48px; margin-bottom:16px;"></i><p>No wines assigned to your account yet</p><p style="font-size:12px; margin-top:8px;">Contact admin to get wines assigned</p></div>';
         return;
       }
       
-      const wineBottlesSold = salesData.wineBottlesSold;
-      const wineRevenue = salesData.wineRevenue;
+      var wineBottlesSold = salesData.wineBottlesSold;
+      var wineRevenue = salesData.wineRevenue;
       
-      container.innerHTML = supplierWines.map(wine => {
-        const bottlesSold = wineBottlesSold[wine.id] || 0;
-        const revenue = wineRevenue[wine.id] || 0;
-        const hasSales = bottlesSold > 0;
+      var winesHtml = '';
+      for (var w = 0; w < supplierWines.length; w++) {
+        var wine = supplierWines[w];
+        var bottlesSold = wineBottlesSold[wine.id] || 0;
+        var revenue = wineRevenue[wine.id] || 0;
+        var hasSales = bottlesSold > 0;
         
-        return `
-          <div class="wine-item" onclick="viewWineAnalytics(${wine.id})">
-            ${buildWineImageHtml(wine.imageUrl, wine.name)}
-            <div class="wine-info">
-              <div class="wine-name">${escapeHtml(wine.name)}</div>
-              <div class="wine-type">${escapeHtml(wine.type)} • ${escapeHtml(wine.category)}</div>
-              <div class="wine-stats">
-                ${hasSales ? 
-                  `<div><span class="wine-price">R${wine.price.toFixed(2)}</span> <span class="wine-sold">${bottlesSold} bottles sold</span></div>
-                   <div><strong>R${revenue.toFixed(2)}</strong></div>` :
-                  `<div><span class="wine-price">R${wine.price.toFixed(2)}</span></div>
-                   <div class="no-sales-badge">No sales yet</div>`
-                }
-              </div>
-              <div style="margin-top: 12px;">
-                <button class="restock-btn" onclick="event.stopPropagation(); requestRestock(${wine.id})"><i class="fas fa-truck"></i> Request Restock</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
+        winesHtml += 
+          '<div class="wine-item" onclick="viewWineAnalytics(' + wine.id + ')">' +
+            buildWineImageHtml(wine.imageUrl, wine.name) +
+            '<div class="wine-info">' +
+              '<div class="wine-name">' + escapeHtml(wine.name) + '</div>' +
+              '<div class="wine-type">' + escapeHtml(wine.type) + ' • ' + escapeHtml(wine.category) + '</div>' +
+              '<div class="wine-stats">';
+        if (hasSales) {
+          winesHtml += 
+                '<div><span class="wine-price">R' + wine.price.toFixed(2) + '</span> <span class="wine-sold">' + bottlesSold + ' bottles sold</span></div>' +
+                '<div><strong>R' + revenue.toFixed(2) + '</strong></div>';
+        } else {
+          winesHtml += 
+                '<div><span class="wine-price">R' + wine.price.toFixed(2) + '</span></div>' +
+                '<div class="no-sales-badge">No sales yet</div>';
+        }
+        winesHtml += 
+              '</div>' +
+              '<div style="margin-top: 12px;">' +
+                '<button class="restock-btn" onclick="event.stopPropagation(); requestRestock(' + wine.id + ')"><i class="fas fa-truck"></i> Request Restock</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      }
+      container.innerHTML = winesHtml;
     }
 
     function renderAnalytics(salesData) {
-      const container = document.getElementById('analyticsContainer');
+      var container = document.getElementById('analyticsContainer');
       
       if (supplierDeliveries.length === 0) {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line" style="font-size:48px; margin-bottom:16px;"></i><p>No sales data available yet</p><p>Delivered orders will appear here</p></div>';
@@ -546,79 +585,94 @@
       }
       
       // Filter by timeframe
-      let filteredDeliveries = filterDeliveriesByTimeframe(supplierDeliveries, currentTimeframe);
-      const filteredSales = calculateSalesData(filteredDeliveries, supplierWines);
+      var filteredDeliveries = filterDeliveriesByTimeframe(supplierDeliveries, currentTimeframe);
+      var filteredSales = calculateSalesData(filteredDeliveries, supplierWines);
       
       // Get top wines
-      const topWines = supplierWines.map(wine => ({
-        wine: wine,
-        bottlesSold: filteredSales.wineBottlesSold[wine.id] || 0,
-        revenue: filteredSales.wineRevenue[wine.id] || 0
-      })).filter(w => w.bottlesSold > 0).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+      var topWinesArray = [];
+      for (var w = 0; w < supplierWines.length; w++) {
+        var wine = supplierWines[w];
+        var bottlesSold = filteredSales.wineBottlesSold[wine.id] || 0;
+        var revenue = filteredSales.wineRevenue[wine.id] || 0;
+        if (bottlesSold > 0) {
+          topWinesArray.push({ wine: wine, bottlesSold: bottlesSold, revenue: revenue });
+        }
+      }
+      topWinesArray.sort(function(a, b) { return b.revenue - a.revenue; });
+      var topWines = topWinesArray.slice(0, 5);
       
       // Generate chart data by month
-      const chartData = getChartDataByMonth(filteredDeliveries);
-      const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
+      var chartData = getChartDataByMonth(filteredDeliveries);
+      var maxRevenue = 1;
+      for (var c = 0; c < chartData.length; c++) {
+        if (chartData[c].revenue > maxRevenue) maxRevenue = chartData[c].revenue;
+      }
       
-      container.innerHTML = `
-        <div class="chart-container">
-          <h4 style="margin-bottom: 20px;">Revenue Trend (${getTimeframeLabel()})</h4>
-          <div class="chart-bars">
-            ${chartData.map(data => {
-              const heightPercent = (data.revenue / maxRevenue) * 200;
-              return `
-                <div class="chart-bar-wrapper">
-                  <div class="chart-value">R${data.revenue.toFixed(0)}</div>
-                  <div class="chart-bar" style="height: ${Math.max(heightPercent, 4)}px; width: 50px;"></div>
-                  <div class="chart-label">${data.label}</div>
-                  <div style="font-size: 10px; color: #888;">${data.bottles} bottles</div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          
-          <div style="margin-top: 32px;">
-            <h4>Sales Summary (${getTimeframeLabel()})</h4>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">
-              <div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">
-                <div style="font-size: 28px; font-weight: bold; color: var(--admin-primary);">R${filteredSales.totalRevenue.toFixed(2)}</div>
-                <div style="font-size: 12px; color: #888;">Total Revenue</div>
-              </div>
-              <div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">
-                <div style="font-size: 28px; font-weight: bold; color: var(--admin-info);">${filteredSales.totalBottlesSold}</div>
-                <div style="font-size: 12px; color: #888;">Bottles Sold</div>
-              </div>
-              <div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">
-                <div style="font-size: 28px; font-weight: bold; color: var(--admin-success);">${filteredSales.totalOrders}</div>
-                <div style="font-size: 12px; color: #888;">Total Orders</div>
-              </div>
-            </div>
-          </div>
-          
-          ${topWines.length > 0 ? `
-          <div style="margin-top: 32px;">
-            <h4>Top Performing Wines</h4>
-            <div class="top-wines-list">
-              ${topWines.map((w, idx) => `
-                <div class="top-wine-item">
-                  <div class="top-wine-rank">#${idx + 1}</div>
-                  <div class="top-wine-name">${escapeHtml(w.wine.name)}</div>
-                  <div class="top-wine-stats">
-                    <div class="top-wine-bottles">${w.bottlesSold} bottles</div>
-                    <div class="top-wine-revenue">R${w.revenue.toFixed(2)}</div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-          ` : ''}
-        </div>
-      `;
+      var chartHtml = '<div class="chart-container">' +
+        '<h4 style="margin-bottom: 20px;">Revenue Trend (' + getTimeframeLabel() + ')</h4>' +
+        '<div class="chart-bars">';
+      
+      for (var c2 = 0; c2 < chartData.length; c2++) {
+        var data = chartData[c2];
+        var heightPercent = (data.revenue / maxRevenue) * 200;
+        chartHtml += 
+          '<div class="chart-bar-wrapper">' +
+            '<div class="chart-value">R' + data.revenue.toFixed(0) + '</div>' +
+            '<div class="chart-bar" style="height: ' + Math.max(heightPercent, 4) + 'px; width: 50px;"></div>' +
+            '<div class="chart-label">' + data.label + '</div>' +
+            '<div style="font-size: 10px; color: #888;">' + data.bottles + ' bottles</div>' +
+          '</div>';
+      }
+      
+      chartHtml += 
+          '</div>' +
+          '<div style="margin-top: 32px;">' +
+            '<h4>Sales Summary (' + getTimeframeLabel() + ')</h4>' +
+            '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">' +
+              '<div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">' +
+                '<div style="font-size: 28px; font-weight: bold; color: var(--admin-primary);">R' + filteredSales.totalRevenue.toFixed(2) + '</div>' +
+                '<div style="font-size: 12px; color: #888;">Total Revenue</div>' +
+              '</div>' +
+              '<div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">' +
+                '<div style="font-size: 28px; font-weight: bold; color: var(--admin-info);">' + filteredSales.totalBottlesSold + '</div>' +
+                '<div style="font-size: 12px; color: #888;">Bottles Sold</div>' +
+              '</div>' +
+              '<div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">' +
+                '<div style="font-size: 28px; font-weight: bold; color: var(--admin-success);">' + filteredSales.totalOrders + '</div>' +
+                '<div style="font-size: 12px; color: #888;">Total Orders</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      
+      if (topWines.length > 0) {
+        chartHtml += 
+          '<div style="margin-top: 32px;">' +
+            '<h4>Top Performing Wines</h4>' +
+            '<div class="top-wines-list">';
+        for (var t = 0; t < topWines.length; t++) {
+          var wData = topWines[t];
+          chartHtml += 
+            '<div class="top-wine-item">' +
+              '<div class="top-wine-rank">#' + (t + 1) + '</div>' +
+              '<div class="top-wine-name">' + escapeHtml(wData.wine.name) + '</div>' +
+              '<div class="top-wine-stats">' +
+                '<div class="top-wine-bottles">' + wData.bottlesSold + ' bottles</div>' +
+                '<div class="top-wine-revenue">R' + wData.revenue.toFixed(2) + '</div>' +
+              '</div>' +
+            '</div>';
+        }
+        chartHtml += 
+            '</div>' +
+          '</div>';
+      }
+      
+      chartHtml += '</div>';
+      container.innerHTML = chartHtml;
     }
 
     function filterDeliveriesByTimeframe(deliveries, timeframe) {
-      const now = new Date();
-      let startDate;
+      var now = new Date();
+      var startDate;
       
       switch (timeframe) {
         case 'weekly':
@@ -631,28 +685,31 @@
           return deliveries;
       }
       
-      return deliveries.filter(d => new Date(d.createdAt) >= startDate);
+      return deliveries.filter(function(d) { return new Date(d.createdAt) >= startDate; });
     }
 
     function getChartDataByMonth(deliveries) {
-      const monthMap = new Map();
+      var monthMap = new Map();
       
-      for (const delivery of deliveries) {
-        const date = new Date(delivery.createdAt);
-        const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
-        const monthLabel = date.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+      for (var d = 0; d < deliveries.length; d++) {
+        var delivery = deliveries[d];
+        var date = new Date(delivery.createdAt);
+        var monthKey = date.getFullYear() + '-' + (date.getMonth() + 1);
+        var monthLabel = date.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
         
         if (!monthMap.has(monthKey)) {
           monthMap.set(monthKey, { label: monthLabel, revenue: 0, bottles: 0 });
         }
         
-        const entry = monthMap.get(monthKey);
-        for (const item of delivery.items || []) {
-          const quantity = item.quantity || 1;
-          const price = parsePrice(item.price);
-          const isCase = item.isCase === true;
-          const bottlesInItem = isCase ? quantity * 6 : quantity;
-          const itemPrice = isCase ? price * 6 : price;
+        var entry = monthMap.get(monthKey);
+        var items = delivery.items || [];
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i];
+          var quantity = item.quantity || 1;
+          var price = parsePrice(item.price);
+          var isCase = item.isCase === true;
+          var bottlesInItem = isCase ? quantity * 6 : quantity;
+          var itemPrice = isCase ? price * 6 : price;
           
           entry.revenue += itemPrice * quantity;
           entry.bottles += bottlesInItem;
@@ -660,8 +717,8 @@
       }
       
       // Get last 6 months
-      const sortedEntries = Array.from(monthMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-      return sortedEntries.slice(-6).map(([_, data]) => data);
+      var sortedEntries = Array.from(monthMap.entries()).sort(function(a, b) { return a[0].localeCompare(b[0]); });
+      return sortedEntries.slice(-6).map(function(entry) { return entry[1]; });
     }
 
     function getTimeframeLabel() {
@@ -673,7 +730,7 @@
     }
 
     function renderDeliveries() {
-      const container = document.getElementById('deliveriesContainer');
+      var container = document.getElementById('deliveriesContainer');
       
       if (supplierDeliveries.length === 0) {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-truck" style="font-size:48px; margin-bottom:16px;"></i><p>No deliveries found</p><p>Delivered orders containing your wines will appear here</p></div>';
@@ -681,67 +738,81 @@
       }
       
       // Sort by date (newest first) and take last 10
-      const recentDeliveries = [...supplierDeliveries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10);
+      var sortedDeliveries = supplierDeliveries.slice();
+      sortedDeliveries.sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+      var recentDeliveries = sortedDeliveries.slice(0, 10);
       
-      container.innerHTML = recentDeliveries.map(delivery => {
+      var deliveriesHtml = '';
+      for (var d = 0; d < recentDeliveries.length; d++) {
+        var delivery = recentDeliveries[d];
         // Calculate totals for this delivery
-        let deliveryBottles = 0;
-        let deliveryRevenue = 0;
-        
-        for (const item of delivery.items || []) {
-          const quantity = item.quantity || 1;
-          const price = parsePrice(item.price);
-          const isCase = item.isCase === true;
-          const bottlesInItem = isCase ? quantity * 6 : quantity;
-          const itemPrice = isCase ? price * 6 : price;
+        var deliveryBottles = 0;
+        var deliveryRevenue = 0;
+        var items = delivery.items || [];
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i];
+          var quantity = item.quantity || 1;
+          var price = parsePrice(item.price);
+          var isCase = item.isCase === true;
+          var bottlesInItem = isCase ? quantity * 6 : quantity;
+          var itemPrice = isCase ? price * 6 : price;
           
           deliveryBottles += bottlesInItem;
           deliveryRevenue += itemPrice * quantity;
         }
         
-        const customerName = delivery.userFullName || (delivery.userEmail ? delivery.userEmail.split('@')[0] : 'Customer');
-        const orderId = (delivery._id || delivery.id || '').substring(0, 8);
+        var customerName = delivery.userFullName || (delivery.userEmail ? delivery.userEmail.split('@')[0] : 'Customer');
+        var orderId = (delivery._id || delivery.id || '').substring(0, 8);
+        var deliveryIdAttr = delivery._id || delivery.id;
         
-        return `
-          <div class="delivery-item" onclick="viewDeliveryDetails('${delivery._id || delivery.id}')">
-            <div class="delivery-header">
-              <span class="delivery-id">Order #${orderId}</span>
-              <span class="delivery-date">${formatDateTime(delivery.createdAt)}</span>
-            </div>
-            <div class="delivery-customer"><i class="fas fa-user"></i> ${escapeHtml(customerName)}</div>
-            <div class="delivery-address"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(delivery.address?.substring(0, 80) || '—')}</div>
-            <div class="delivery-footer">
-              <span class="delivery-bottles"><i class="fas fa-wine-bottle"></i> ${deliveryBottles} bottles</span>
-              <span class="delivery-revenue">R${deliveryRevenue.toFixed(2)}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
+        deliveriesHtml += 
+          '<div class="delivery-item" onclick="viewDeliveryDetails(\'' + deliveryIdAttr + '\')">' +
+            '<div class="delivery-header">' +
+              '<span class="delivery-id">Order #' + orderId + '</span>' +
+              '<span class="delivery-date">' + formatDateTime(delivery.createdAt) + '</span>' +
+            '</div>' +
+            '<div class="delivery-customer"><i class="fas fa-user"></i> ' + escapeHtml(customerName) + '</div>' +
+            '<div class="delivery-address"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml((delivery.address || '—').substring(0, 80)) + '</div>' +
+            '<div class="delivery-footer">' +
+              '<span class="delivery-bottles"><i class="fas fa-wine-bottle"></i> ' + deliveryBottles + ' bottles</span>' +
+              '<span class="delivery-revenue">R' + deliveryRevenue.toFixed(2) + '</span>' +
+            '</div>' +
+          '</div>';
+      }
+      container.innerHTML = deliveriesHtml;
     }
 
     // Navigation functions
     window.viewWineAnalytics = function(wineId) {
-      window.location.href = `wine_analytics.html?id=${wineId}&supplierId=${supplierData?.id}`;
+      if (supplierData && supplierData.id) {
+        window.location.href = 'wine_analytics.html?id=' + wineId + '&supplierId=' + supplierData.id;
+      } else {
+        window.location.href = 'wine_analytics.html?id=' + wineId;
+      }
     };
 
     window.viewDeliveryDetails = function(deliveryId) {
-      window.location.href = `delivery_detail.html?id=${deliveryId}`;
+      window.location.href = 'delivery_detail.html?id=' + deliveryId;
     };
 
     window.requestRestock = function(wineId) {
-      window.location.href = `restock_request.html?wineId=${wineId}&supplierId=${supplierData?.id}`;
+      if (supplierData && supplierData.id) {
+        window.location.href = 'restock_request.html?wineId=' + wineId + '&supplierId=' + supplierData.id;
+      } else {
+        window.location.href = 'restock_request.html?wineId=' + wineId;
+      }
     };
 
     // Tab switching
     function initTabs() {
-      const tabs = document.querySelectorAll('.tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const tabName = tab.dataset.tab;
+      var tabs = document.querySelectorAll('.tab');
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          var tabName = this.dataset.tab;
           currentTab = tabName;
           
-          tabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
+          tabs.forEach(function(t) { t.classList.remove('active'); });
+          this.classList.add('active');
           
           document.getElementById('winesTab').style.display = tabName === 'wines' ? 'block' : 'none';
           document.getElementById('analyticsTab').style.display = tabName === 'analytics' ? 'block' : 'none';
@@ -751,26 +822,21 @@
     }
 
     function initTimeframeButtons() {
-      const btns = document.querySelectorAll('.timeframe-btn');
-      btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          btns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentTimeframe = btn.dataset.timeframe;
-          const salesData = calculateSalesData(supplierDeliveries, supplierWines);
+      var btns = document.querySelectorAll('.timeframe-btn');
+      btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          btns.forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          currentTimeframe = this.dataset.timeframe;
+          var salesData = calculateSalesData(supplierDeliveries, supplierWines);
           renderAnalytics(salesData);
         });
       });
     }
 
-    // Refresh button
-    document.getElementById('refreshBtn')?.addEventListener('click', async () => {
-      await loadSupplierData();
-    });
-
     // Initialize
     async function init() {
-      const authenticated = await checkAuth();
+      var authenticated = await checkAuth();
       if (authenticated) {
         await loadSupplierData();
         initTabs();
