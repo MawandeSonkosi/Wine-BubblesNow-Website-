@@ -1,4 +1,4 @@
-// Configuration - USE PROXY SERVER
+// Configuration - USE RELATIVE URL
 const API_BASE_URL = '/api';  // Works on both localhost and app.wineandbubblesnow.co.za
 
 // State

@@ -270,14 +270,14 @@
   </footer>
 
   <!-- JavaScript with cache busting -->
-  <script src="wine_list.js?v=3"></script>
+  <script src="wine_list.js?v=4"></script>
   <script>
-    // Authentication logic for Wine List page - UPDATED FOR UNIFIED CART
+    // Authentication logic for Wine List page - UPDATED TO MATCH ALL_WINES.HTML
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🍷 Wine List page loaded - checking authentication');
         
         // Configuration
-        const API_BASE_URL = 'http://localhost:3000/api';
+        const API_BASE_URL = window.location.origin;
         
         // Token validation function
         function isTokenValid() {
@@ -374,7 +374,7 @@
             clearUserSession();
             resetUserIcon();
             
-            // Cart requires login
+            // Cart requires login for non-logged in users
             if (cartIcon) {
                 cartIcon.addEventListener('click', function(e) {
                     e.preventDefault();
