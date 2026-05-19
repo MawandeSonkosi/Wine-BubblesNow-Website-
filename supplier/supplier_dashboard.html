@@ -21,8 +21,6 @@
       --admin-warning: #ed6c02;
       --admin-error: #d32f2f;
       --admin-info: #0288d1;
-      --admin-advert: #03a9f4;
-      --admin-food: #ff9800;
       --card-bg: #1A1A1A;
     }
     body { background: var(--admin-bg); }
@@ -30,12 +28,12 @@
     .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
     .admin-container { max-width: 1400px; margin: 30px auto 50px; padding: 0 24px; }
     
-    /* Dashboard Header - Removed Back Button */
-    .dashboard-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    /* Dashboard Header */
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
     .dashboard-title { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--admin-text); margin: 0; }
     .dashboard-title i { color: var(--admin-primary); margin-right: 12px; }
     
-    /* Logo clickable but stays on dashboard */
+    /* Logo */
     .logo { cursor: pointer; }
     
     /* Welcome Card */
@@ -56,14 +54,20 @@
     .stat-value { font-size: 32px; font-weight: 700; color: var(--admin-text); margin-bottom: 4px; }
     .stat-label { font-size: 14px; color: var(--admin-muted); }
     
-    /* Section Cards */
-    .section-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 32px; }
-    .section-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-    .section-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--admin-text); margin: 0; }
-    .section-header h3 i { color: var(--admin-primary); margin-right: 10px; }
+    /* Main Section Card - Everything in one card */
+    .main-card { background: white; border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 32px; }
     
-    /* Wine Grid - Improved Images */
-    .wines-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; padding: 24px; }
+    /* Tabs inside card */
+    .tabs { display: flex; gap: 8px; background: var(--admin-bg); padding: 16px 24px 0 24px; border-bottom: 1px solid var(--admin-border); }
+    .tab { padding: 12px 24px; text-align: center; border: none; background: transparent; border-radius: 12px 12px 0 0; cursor: pointer; font-weight: 600; transition: all 0.2s; color: var(--admin-muted); }
+    .tab.active { background: white; color: var(--admin-primary); border-bottom: 3px solid var(--admin-primary); }
+    .tab:hover:not(.active) { background: rgba(107,13,43,0.05); color: var(--admin-primary); }
+    
+    /* Tab Content */
+    .tab-content { padding: 24px; }
+    
+    /* Wine Grid */
+    .wines-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
     .wine-item { background: var(--card-bg); border-radius: 16px; overflow: hidden; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(107,13,43,0.2); }
     .wine-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--admin-primary); }
     .wine-image-container { width: 100%; height: 200px; overflow: hidden; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
@@ -71,37 +75,30 @@
     .wine-info { padding: 16px; }
     .wine-name { font-weight: 700; font-size: 16px; color: var(--admin-accent); margin-bottom: 4px; }
     .wine-type { font-size: 12px; color: #888; margin-bottom: 8px; }
-    .wine-stats { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .wine-stats { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; }
     .wine-price { font-weight: 700; color: var(--admin-primary); }
     .wine-sold { font-size: 12px; color: var(--admin-success); }
     .no-sales-badge { background: rgba(255,152,0,0.1); color: #ff9800; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+    .restock-btn { background: transparent; border: 1px solid var(--admin-primary); color: var(--admin-primary); padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 12px; }
+    .restock-btn:hover { background: var(--admin-primary); color: white; }
     
     /* Delivery Item */
-    .delivery-item { padding: 16px 24px; border-bottom: 1px solid var(--admin-border); transition: background 0.2s; cursor: pointer; }
+    .delivery-item { padding: 16px; border-bottom: 1px solid var(--admin-border); transition: background 0.2s; cursor: pointer; border-radius: 12px; margin-bottom: 8px; }
     .delivery-item:hover { background: #f8f7f5; }
     .delivery-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
-    .delivery-id { font-weight: 700; color: var(--admin-text); font-size: 14px; }
+    .delivery-id { font-weight: 700; color: var(--admin-text); font-size: 14px; background: rgba(107,13,43,0.1); padding: 2px 8px; border-radius: 12px; }
     .delivery-date { font-size: 12px; color: var(--admin-muted); }
     .delivery-customer { font-size: 14px; color: var(--admin-muted); margin-bottom: 8px; }
     .delivery-customer i { margin-right: 6px; color: var(--admin-primary); }
     .delivery-address { font-size: 12px; color: #888; margin-bottom: 8px; }
-    .delivery-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .delivery-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--admin-border); }
     .delivery-bottles { font-size: 12px; color: var(--admin-info); }
     .delivery-revenue { font-weight: 700; color: var(--admin-success); font-size: 14px; }
     
     /* Loading & Empty States */
-    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
+    .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); }
     .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    
-    /* Tabs */
-    .tabs { display: flex; gap: 8px; background: white; border-radius: 16px; padding: 6px; margin-bottom: 24px; border: 1px solid var(--admin-border); }
-    .tab { flex: 1; padding: 12px 20px; text-align: center; border: none; background: transparent; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; color: var(--admin-muted); }
-    .tab.active { background: var(--admin-primary); color: white; }
-    .tab:hover:not(.active) { background: rgba(107,13,43,0.1); color: var(--admin-primary); }
-    
-    /* Footer */
-    .footer { margin-top: auto; background: var(--admin-primary); }
     
     /* User Dropdown */
     .user-dropdown {
@@ -120,20 +117,21 @@
     .user-dropdown.show { display: block !important; }
     .badge-supplier { background: #6b0d2b; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 8px; }
     
-    .timeframe-selector { display: flex; gap: 8px; }
+    /* Timeframe Selector */
+    .timeframe-selector { display: flex; gap: 8px; margin-bottom: 20px; }
     .timeframe-btn { background: transparent; border: 1px solid var(--admin-border); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
     .timeframe-btn.active { background: var(--admin-primary); color: white; border-color: var(--admin-primary); }
+    
+    /* Chart Styles */
     .wine-image-placeholder { width: 100%; height: 200px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
     .wine-image-placeholder i { font-size: 48px; color: #555; }
-    .restock-btn { background: transparent; border: 1px solid var(--admin-primary); color: var(--admin-primary); padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
-    .restock-btn:hover { background: var(--admin-primary); color: white; }
-    .chart-container { padding: 24px; }
+    .chart-container { padding: 0; }
     .chart-bars { display: flex; align-items: flex-end; justify-content: space-around; gap: 16px; min-height: 250px; margin: 20px 0; flex-wrap: wrap; }
     .chart-bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 60px; }
     .chart-bar { width: 100%; max-width: 60px; background: var(--admin-primary); border-radius: 8px 8px 0 0; transition: height 0.3s; min-width: 40px; }
     .chart-label { font-size: 11px; color: var(--admin-muted); text-align: center; }
     .chart-value { font-size: 10px; font-weight: bold; color: var(--admin-success); }
-    .top-wines-list { padding: 16px 24px; }
+    .top-wines-list { margin-top: 24px; }
     .top-wine-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--admin-border); }
     .top-wine-rank { width: 30px; height: 30px; background: rgba(107,13,43,0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--admin-primary); }
     .top-wine-name { flex: 1; margin-left: 12px; font-weight: 600; }
@@ -141,12 +139,22 @@
     .top-wine-bottles { font-size: 12px; color: var(--admin-info); }
     .top-wine-revenue { font-size: 14px; font-weight: bold; color: var(--admin-success); }
     
+    .sales-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+    .summary-card { text-align: center; padding: 20px; background: #f8f7f5; border-radius: 16px; }
+    .summary-value { font-size: 28px; font-weight: bold; color: var(--admin-primary); }
+    .summary-label { font-size: 12px; color: #888; margin-top: 8px; }
+    
+    .footer { margin-top: auto; background: var(--admin-primary); }
+    
     @media (max-width: 768px) {
       .admin-container { padding: 0 16px; margin-top: 20px; }
-      .wines-grid { grid-template-columns: 1fr; padding: 16px; }
+      .wines-grid { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: 1fr; }
       .welcome-stats { flex-direction: column; gap: 12px; }
-      .section-header { flex-direction: column; align-items: flex-start; }
+      .tabs { flex-direction: column; gap: 4px; }
+      .tab { border-radius: 8px; }
+      .tab.active { border-bottom: none; background: var(--admin-primary); color: white; }
+      .sales-summary-grid { grid-template-columns: 1fr; gap: 12px; }
       .chart-bars { flex-direction: column; align-items: center; }
       .chart-bar-wrapper { width: 100%; }
       .chart-bar { width: 100%; max-width: none; height: 40px !important; border-radius: 0 8px 8px 0; }
@@ -161,15 +169,13 @@
       <div class="logo" id="dashboardLogo" style="cursor: pointer;">
         <img src="../assets/categories/Logo_Top.png" alt="Logo">
       </div>
-      <div class="top-icons"><a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a></div>
+      <div class="top-icons">
+        <a href="#" id="userIcon"><i class="fas fa-user-circle" style="font-size:24px; color:#6b0d2b;"></i></a>
+      </div>
     </div>
   </div>
 
   <div class="admin-container">
-    <div class="dashboard-header">
-      <h1 class="dashboard-title"><i class="fas fa-boxes"></i> Supplier Dashboard</h1>
-    </div>
-
     <!-- Welcome Card -->
     <div class="welcome-card" id="welcomeCard">
       <h2 id="welcomeTitle">Welcome, Supplier!</h2>
@@ -189,42 +195,44 @@
       <div class="stat-card"><div class="stat-icon" style="background: rgba(107,13,43,0.1);"><i class="fas fa-chart-simple" style="color: var(--admin-primary);"></i></div><div class="stat-value" id="statAverageOrder">R0</div><div class="stat-label">Average Order Value</div></div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" data-tab="wines"><i class="fas fa-wine-bottle"></i> My Wines</button>
-      <button class="tab" data-tab="analytics"><i class="fas fa-chart-line"></i> Analytics</button>
-      <button class="tab" data-tab="deliveries"><i class="fas fa-truck"></i> Recent Deliveries</button>
-    </div>
-
-    <!-- My Wines Tab -->
-    <div id="winesTab" class="section-card">
-      <div class="section-header">
-        <h3><i class="fas fa-wine-bottle"></i> My Wines</h3>
-        <span class="badge" id="winesCount" style="background: rgba(107,13,43,0.1); padding: 6px 12px; border-radius: 20px; font-size: 12px;">0 wines</span>
+    <!-- Main Card with Tabs -->
+    <div class="main-card">
+      <div class="tabs">
+        <button class="tab active" data-tab="wines"><i class="fas fa-wine-bottle"></i> My Wines</button>
+        <button class="tab" data-tab="analytics"><i class="fas fa-chart-line"></i> Analytics</button>
+        <button class="tab" data-tab="deliveries"><i class="fas fa-truck"></i> Recent Deliveries</button>
       </div>
-      <div id="winesContainer" class="wines-grid"><div class="loading-state"><div class="loading-spinner"></div><p>Loading wines...</p></div></div>
-    </div>
 
-    <!-- Analytics Tab (hidden by default) -->
-    <div id="analyticsTab" class="section-card" style="display: none;">
-      <div class="section-header">
-        <h3><i class="fas fa-chart-line"></i> Sales Analytics</h3>
-        <div class="timeframe-selector">
-          <button class="timeframe-btn active" data-timeframe="all">All Time</button>
-          <button class="timeframe-btn" data-timeframe="monthly">Monthly</button>
-          <button class="timeframe-btn" data-timeframe="weekly">Weekly</button>
+      <!-- My Wines Tab Content -->
+      <div id="winesTab" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <h3 style="margin: 0; color: var(--admin-text);"><i class="fas fa-wine-bottle" style="color: var(--admin-primary); margin-right: 8px;"></i> My Wines</h3>
+          <span class="badge" id="winesCount" style="background: rgba(107,13,43,0.1); padding: 6px 12px; border-radius: 20px; font-size: 12px;">0 wines</span>
         </div>
+        <div id="winesContainer" class="wines-grid"><div class="loading-state"><div class="loading-spinner"></div><p>Loading wines...</p></div></div>
       </div>
-      <div id="analyticsContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading analytics...</p></div></div>
-    </div>
 
-    <!-- Recent Deliveries Tab (hidden by default) -->
-    <div id="deliveriesTab" class="section-card" style="display: none;">
-      <div class="section-header">
-        <h3><i class="fas fa-truck"></i> Recent Deliveries</h3>
-        <span class="badge" id="deliveriesCount" style="background: rgba(107,13,43,0.1); padding: 6px 12px; border-radius: 20px; font-size: 12px;">0 deliveries</span>
+      <!-- Analytics Tab Content -->
+      <div id="analyticsTab" class="tab-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <h3 style="margin: 0; color: var(--admin-text);"><i class="fas fa-chart-line" style="color: var(--admin-primary); margin-right: 8px;"></i> Sales Analytics</h3>
+          <div class="timeframe-selector">
+            <button class="timeframe-btn active" data-timeframe="all">All Time</button>
+            <button class="timeframe-btn" data-timeframe="monthly">Monthly</button>
+            <button class="timeframe-btn" data-timeframe="weekly">Weekly</button>
+          </div>
+        </div>
+        <div id="analyticsContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading analytics...</p></div></div>
       </div>
-      <div id="deliveriesContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading deliveries...</p></div></div>
+
+      <!-- Recent Deliveries Tab Content -->
+      <div id="deliveriesTab" class="tab-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <h3 style="margin: 0; color: var(--admin-text);"><i class="fas fa-truck" style="color: var(--admin-primary); margin-right: 8px;"></i> Recent Deliveries</h3>
+          <span class="badge" id="deliveriesCount" style="background: rgba(107,13,43,0.1); padding: 6px 12px; border-radius: 20px; font-size: 12px;">0 deliveries</span>
+        </div>
+        <div id="deliveriesContainer"><div class="loading-state"><div class="loading-spinner"></div><p>Loading deliveries...</p></div></div>
+      </div>
     </div>
   </div>
 
@@ -238,7 +246,7 @@
   </footer>
 
   <script>
-    // Supplier Dashboard JavaScript - Full Flutter-like Functionality
+    // Supplier Dashboard JavaScript
     var API_BASE = window.location.origin;
     var supplierData = null;
     var supplierWines = [];
@@ -248,7 +256,6 @@
     var currentTimeframe = 'all';
     var isLoading = false;
 
-    // Helper functions
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/[&<>]/g, function(m) {
@@ -257,14 +264,6 @@
         if (m === '>') return '&gt;';
         return m;
       });
-    }
-
-    function formatDate(dateStr) {
-      if (!dateStr) return '—';
-      try {
-        var d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-      } catch(e) { return '—'; }
     }
 
     function formatDateTime(dateStr) {
@@ -297,104 +296,55 @@
       return '<div class="wine-image-placeholder"><i class="fas fa-wine-bottle"></i></div>';
     }
 
-    // Check if wine item is a case
-    function isWineCase(item) {
-      if (item && item.isCase === true) return true;
-      return false;
-    }
-
-    // Setup logo click handler - stays on dashboard
+    // Setup logo click handler
     function setupLogo() {
       var logo = document.getElementById('dashboardLogo');
       if (logo) {
         logo.addEventListener('click', function(e) {
           e.preventDefault();
-          // Stay on supplier dashboard - just refresh the page
           window.location.reload();
         });
       }
     }
 
-    // Check authentication and load supplier data
+    // Go to profile page
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+
+    // Check authentication
     async function checkAuth() {
       var token = localStorage.getItem('supplier_auth_token');
       var supplierStr = localStorage.getItem('supplier_data');
       
       if (!token || !supplierStr) {
-        console.log('❌ No supplier session found, redirecting to login');
         window.location.href = '../login/login.html';
         return false;
       }
       
       try {
         supplierData = JSON.parse(supplierStr);
-        console.log('✅ Supplier authenticated:', supplierData.name);
-        
-        // Update welcome card
         document.getElementById('welcomeTitle').innerHTML = 'Welcome, ' + escapeHtml(supplierData.name) + '!';
-        
-        // Setup user dropdown
-        setupUserDropdown(supplierData);
-        
-        // Setup logo
+        setupUserIcon();
         setupLogo();
-        
         return true;
       } catch (e) {
-        console.error('Error parsing supplier data:', e);
         window.location.href = '../login/login.html';
         return false;
       }
     }
 
-    function setupUserDropdown(supplier) {
+    function setupUserIcon() {
       var userIcon = document.getElementById('userIcon');
-      if (!userIcon) return;
-      
-      userIcon.addEventListener('click', function(e) {
-        e.preventDefault();
-        toggleSupplierDropdown(supplier);
-      });
-    }
-
-    function toggleSupplierDropdown(supplier) {
-      var existing = document.querySelector('.user-dropdown');
-      if (existing) { existing.remove(); return; }
-      
-      var dropdown = document.createElement('div');
-      dropdown.className = 'user-dropdown';
-      dropdown.innerHTML = 
-        '<div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #eee;">' +
-          '<div style="font-weight:bold; margin-bottom:4px;">' + escapeHtml(supplier.name) + ' <span class="badge-supplier">SUPPLIER</span></div>' +
-          '<div style="font-size:13px; color:#6d6d6d;">' + escapeHtml(supplier.email) + '</div>' +
-        '</div>' +
-        '<a href="profile.html" style="display:flex; align-items:center; gap:10px; padding:10px 0; color:#1b1b1b; text-decoration:none;"><i class="fas fa-user"></i> My Profile</a>' +
-        '<button id="logoutBtn" style="margin-top:12px; padding:10px; background:#6b0d2b; color:white; border:none; border-radius:8px; width:100%; cursor:pointer; font-weight:600;">Logout</button>';
-      document.body.appendChild(dropdown);
-      
-      var logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-          localStorage.removeItem('supplier_auth_token');
-          localStorage.removeItem('supplier_data');
-          localStorage.removeItem('supplier_token_timestamp');
-          window.location.href = '../login/login.html';
+      if (userIcon) {
+        userIcon.addEventListener('click', function(e) {
+          e.preventDefault();
+          goToProfile();
         });
       }
-      
-      setTimeout(function() {
-        document.addEventListener('click', function closeDropdown(e) {
-          var dropdownEl = document.querySelector('.user-dropdown');
-          var userIconEl = document.getElementById('userIcon');
-          if (dropdownEl && !dropdownEl.contains(e.target) && userIconEl && !userIconEl.contains(e.target)) {
-            dropdownEl.remove();
-            document.removeEventListener('click', closeDropdown);
-          }
-        });
-      }, 100);
     }
 
-    // Load supplier wines and deliveries
+    // Load supplier data
     async function loadSupplierData() {
       if (!supplierData) return;
       
@@ -404,22 +354,17 @@
       try {
         var token = localStorage.getItem('supplier_auth_token');
         
-        // Fetch all wines to get details
         var winesResponse = await fetch(API_BASE + '/api/wines?all=true&_=' + Date.now(), {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         if (winesResponse.ok) {
           var winesData = await winesResponse.json();
           allWines = winesData;
-          console.log('✅ Loaded all wines:', allWines.length);
         }
         
-        // Get supplier's wines by matching IDs
         var wineIds = supplierData.wineIds || [];
         supplierWines = allWines.filter(function(wine) { return wineIds.indexOf(wine.id) !== -1; });
-        console.log('✅ Supplier wines:', supplierWines.length);
         
-        // Fetch deliveries containing supplier's wines
         if (wineIds.length > 0) {
           var deliveriesResponse = await fetch(API_BASE + '/api/deliveries/supplier', {
             method: 'POST',
@@ -430,7 +375,6 @@
           if (deliveriesResponse.ok) {
             var deliveriesData = await deliveriesResponse.json();
             supplierDeliveries = deliveriesData.data || [];
-            console.log('✅ Supplier deliveries:', supplierDeliveries.length);
           }
         }
         
@@ -452,25 +396,22 @@
 
     function showError(message) {
       var containers = ['winesContainer', 'analyticsContainer', 'deliveriesContainer'];
-      containers.forEach(function(id) {
-        var container = document.getElementById(id);
+      for (var i = 0; i < containers.length; i++) {
+        var container = document.getElementById(containers[i]);
         if (container) {
           container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>' + escapeHtml(message) + '</p><button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#6b0d2b; color:white; border:none; border-radius:8px; cursor:pointer;">Retry</button></div>';
         }
-      });
+      }
     }
 
     function renderDashboard() {
-      // Calculate stats
       var salesData = calculateSalesData(supplierDeliveries, supplierWines);
       
-      // Update stats cards
       document.getElementById('statTotalWines').innerText = supplierWines.length;
       document.getElementById('statWinesSelling').innerText = salesData.winesWithSales;
       document.getElementById('statTotalOrders').innerText = salesData.totalOrders;
       document.getElementById('statAverageOrder').innerHTML = 'R' + salesData.averageOrderValue.toFixed(2);
       
-      // Update welcome stats
       document.getElementById('totalWinesStat').innerText = supplierWines.length;
       document.getElementById('totalRevenueStat').innerHTML = 'R' + salesData.totalRevenue.toFixed(2);
       document.getElementById('totalBottlesStat').innerText = salesData.totalBottlesSold;
@@ -478,13 +419,8 @@
       document.getElementById('winesCount').innerHTML = supplierWines.length + ' wines';
       document.getElementById('deliveriesCount').innerHTML = supplierDeliveries.length + ' deliveries';
       
-      // Render wines
       renderWines(salesData);
-      
-      // Render analytics
       renderAnalytics(salesData);
-      
-      // Render deliveries
       renderDeliveries();
     }
 
@@ -567,9 +503,7 @@
         }
         winesHtml += 
               '</div>' +
-              '<div style="margin-top: 12px;">' +
-                '<button class="restock-btn" onclick="event.stopPropagation(); requestRestock(' + wine.id + ')"><i class="fas fa-truck"></i> Request Restock</button>' +
-              '</div>' +
+              '<button class="restock-btn" onclick="event.stopPropagation(); requestRestock(' + wine.id + ')"><i class="fas fa-truck"></i> Request Restock</button>' +
             '</div>' +
           '</div>';
       }
@@ -584,7 +518,6 @@
         return;
       }
       
-      // Filter by timeframe
       var filteredDeliveries = filterDeliveriesByTimeframe(supplierDeliveries, currentTimeframe);
       var filteredSales = calculateSalesData(filteredDeliveries, supplierWines);
       
@@ -601,7 +534,6 @@
       topWinesArray.sort(function(a, b) { return b.revenue - a.revenue; });
       var topWines = topWinesArray.slice(0, 5);
       
-      // Generate chart data by month
       var chartData = getChartDataByMonth(filteredDeliveries);
       var maxRevenue = 1;
       for (var c = 0; c < chartData.length; c++) {
@@ -626,29 +558,16 @@
       
       chartHtml += 
           '</div>' +
-          '<div style="margin-top: 32px;">' +
-            '<h4>Sales Summary (' + getTimeframeLabel() + ')</h4>' +
-            '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">' +
-              '<div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">' +
-                '<div style="font-size: 28px; font-weight: bold; color: var(--admin-primary);">R' + filteredSales.totalRevenue.toFixed(2) + '</div>' +
-                '<div style="font-size: 12px; color: #888;">Total Revenue</div>' +
-              '</div>' +
-              '<div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">' +
-                '<div style="font-size: 28px; font-weight: bold; color: var(--admin-info);">' + filteredSales.totalBottlesSold + '</div>' +
-                '<div style="font-size: 12px; color: #888;">Bottles Sold</div>' +
-              '</div>' +
-              '<div style="text-align: center; padding: 16px; background: #f8f7f5; border-radius: 12px;">' +
-                '<div style="font-size: 28px; font-weight: bold; color: var(--admin-success);">' + filteredSales.totalOrders + '</div>' +
-                '<div style="font-size: 12px; color: #888;">Total Orders</div>' +
-              '</div>' +
-            '</div>' +
+          '<div class="sales-summary-grid">' +
+            '<div class="summary-card"><div class="summary-value">R' + filteredSales.totalRevenue.toFixed(2) + '</div><div class="summary-label">Total Revenue</div></div>' +
+            '<div class="summary-card"><div class="summary-value">' + filteredSales.totalBottlesSold + '</div><div class="summary-label">Bottles Sold</div></div>' +
+            '<div class="summary-card"><div class="summary-value">' + filteredSales.totalOrders + '</div><div class="summary-label">Total Orders</div></div>' +
           '</div>';
       
       if (topWines.length > 0) {
         chartHtml += 
-          '<div style="margin-top: 32px;">' +
-            '<h4>Top Performing Wines</h4>' +
-            '<div class="top-wines-list">';
+          '<div class="top-wines-list">' +
+            '<h4>Top Performing Wines</h4>';
         for (var t = 0; t < topWines.length; t++) {
           var wData = topWines[t];
           chartHtml += 
@@ -661,9 +580,7 @@
               '</div>' +
             '</div>';
         }
-        chartHtml += 
-            '</div>' +
-          '</div>';
+        chartHtml += '</div>';
       }
       
       chartHtml += '</div>';
@@ -685,7 +602,13 @@
           return deliveries;
       }
       
-      return deliveries.filter(function(d) { return new Date(d.createdAt) >= startDate; });
+      var filtered = [];
+      for (var d = 0; d < deliveries.length; d++) {
+        if (new Date(deliveries[d].createdAt) >= startDate) {
+          filtered.push(deliveries[d]);
+        }
+      }
+      return filtered;
     }
 
     function getChartDataByMonth(deliveries) {
@@ -716,9 +639,13 @@
         }
       }
       
-      // Get last 6 months
       var sortedEntries = Array.from(monthMap.entries()).sort(function(a, b) { return a[0].localeCompare(b[0]); });
-      return sortedEntries.slice(-6).map(function(entry) { return entry[1]; });
+      var result = [];
+      var startIdx = Math.max(0, sortedEntries.length - 6);
+      for (var i = startIdx; i < sortedEntries.length; i++) {
+        result.push(sortedEntries[i][1]);
+      }
+      return result;
     }
 
     function getTimeframeLabel() {
@@ -737,7 +664,6 @@
         return;
       }
       
-      // Sort by date (newest first) and take last 10
       var sortedDeliveries = supplierDeliveries.slice();
       sortedDeliveries.sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
       var recentDeliveries = sortedDeliveries.slice(0, 10);
@@ -745,7 +671,6 @@
       var deliveriesHtml = '';
       for (var d = 0; d < recentDeliveries.length; d++) {
         var delivery = recentDeliveries[d];
-        // Calculate totals for this delivery
         var deliveryBottles = 0;
         var deliveryRevenue = 0;
         var items = delivery.items || [];
@@ -784,11 +709,7 @@
 
     // Navigation functions
     window.viewWineAnalytics = function(wineId) {
-      if (supplierData && supplierData.id) {
-        window.location.href = 'wine_analytics.html?id=' + wineId + '&supplierId=' + supplierData.id;
-      } else {
-        window.location.href = 'wine_analytics.html?id=' + wineId;
-      }
+      window.location.href = 'wine_analytics.html?id=' + wineId + '&supplierId=' + supplierData.id;
     };
 
     window.viewDeliveryDetails = function(deliveryId) {
@@ -796,45 +717,46 @@
     };
 
     window.requestRestock = function(wineId) {
-      if (supplierData && supplierData.id) {
-        window.location.href = 'restock_request.html?wineId=' + wineId + '&supplierId=' + supplierData.id;
-      } else {
-        window.location.href = 'restock_request.html?wineId=' + wineId;
-      }
+      window.location.href = 'restock_request.html?wineId=' + wineId + '&supplierId=' + supplierData.id;
     };
 
     // Tab switching
     function initTabs() {
       var tabs = document.querySelectorAll('.tab');
-      tabs.forEach(function(tab) {
+      for (var i = 0; i < tabs.length; i++) {
+        var tab = tabs[i];
         tab.addEventListener('click', function() {
           var tabName = this.dataset.tab;
           currentTab = tabName;
           
-          tabs.forEach(function(t) { t.classList.remove('active'); });
+          for (var j = 0; j < tabs.length; j++) {
+            tabs[j].classList.remove('active');
+          }
           this.classList.add('active');
           
           document.getElementById('winesTab').style.display = tabName === 'wines' ? 'block' : 'none';
           document.getElementById('analyticsTab').style.display = tabName === 'analytics' ? 'block' : 'none';
           document.getElementById('deliveriesTab').style.display = tabName === 'deliveries' ? 'block' : 'none';
         });
-      });
+      }
     }
 
     function initTimeframeButtons() {
       var btns = document.querySelectorAll('.timeframe-btn');
-      btns.forEach(function(btn) {
+      for (var i = 0; i < btns.length; i++) {
+        var btn = btns[i];
         btn.addEventListener('click', function() {
-          btns.forEach(function(b) { b.classList.remove('active'); });
+          for (var j = 0; j < btns.length; j++) {
+            btns[j].classList.remove('active');
+          }
           this.classList.add('active');
           currentTimeframe = this.dataset.timeframe;
           var salesData = calculateSalesData(supplierDeliveries, supplierWines);
           renderAnalytics(salesData);
         });
-      });
+      }
     }
 
-    // Initialize
     async function init() {
       var authenticated = await checkAuth();
       if (authenticated) {
