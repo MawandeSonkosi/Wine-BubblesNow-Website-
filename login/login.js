@@ -1,4 +1,4 @@
-// login/login.js - WITH DRIVER LOGIN SUPPORT
+// login/login.js - WITH DRIVER AND SUPPLIER LOGIN SUPPORT
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔧 Login page loaded');
     
@@ -73,6 +73,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const userData = localStorage.getItem('wineBubbles_user');
         const driverToken = localStorage.getItem('driver_auth_token');
         const driverData = localStorage.getItem('driver_data');
+        const supplierToken = localStorage.getItem('supplier_auth_token');
+        const supplierData = localStorage.getItem('supplier_data');
+        
+        // Check supplier session first
+        if (supplierToken && supplierData) {
+            try {
+                const supplier = JSON.parse(supplierData);
+                console.log('✅ Already logged in as Supplier:', supplier.name);
+                window.location.href = '../supplier/supplier_dashboard.html';
+                return;
+            } catch(e) {}
+        }
         
         if (token && userData) {
             const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
@@ -178,6 +190,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (role === 'driver') {
             iconHtml = '<i class="fas fa-truck"></i>';
             titleText = 'Welcome Driver!';
+        } else if (role === 'supplier') {
+            iconHtml = '<i class="fas fa-boxes"></i>';
+            titleText = 'Welcome Supplier!';
         }
         
         toast.style.cssText = `
@@ -274,6 +289,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => toast.remove(), 500);
             }
         }, 5000);
+    }
+    
+    // ========== SUPPLIER LOGIN FUNCTION ==========
+    async function supplierLogin(email, password) {
+        console.log('📦 Attempting supplier login for:', email);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/suppliers/auth`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            console.log(`📡 Supplier login response status: ${response.status}`);
+            
+            const data = await response.json();
+            console.log('📦 Supplier login response:', data);
+            
+            if (response.ok && data.token) {
+                const supplier = {
+                    id: data.id,
+                    name: data.name,
+                    email: data.email,
+                    phone: data.phone,
+                    status: data.status,
+                    isVerified: data.isVerified,
+                    wineIds: data.wineIds || [],
+                    createdAt: data.createdAt,
+                    updatedAt: data.updatedAt
+                };
+                const token = data.token;
+                
+                if (supplier && token) {
+                    // Store supplier session
+                    localStorage.setItem('supplier_auth_token', token);
+                    localStorage.setItem('supplier_data', JSON.stringify(supplier));
+                    localStorage.setItem('supplier_token_timestamp', Date.now().toString());
+                    
+                    console.log('✅ Supplier login successful:', supplier.name);
+                    return { success: true, supplier: supplier };
+                }
+            }
+            
+            return { success: false, error: data.message || 'Supplier login failed' };
+            
+        } catch (error) {
+            console.error('Supplier login error:', error);
+            return { success: false, error: error.message };
+        }
     }
     
     // ========== DRIVER LOGIN FUNCTION ==========
@@ -384,7 +451,28 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log('🔐 Attempting login sequence for:', email);
             
-            // FIRST: Try driver login (matches Flutter order)
+            // FIRST: Try supplier login
+            console.log('📦 Trying supplier login...');
+            const supplierResult = await supplierLogin(email, password);
+            
+            if (supplierResult.success && supplierResult.supplier) {
+                const supplier = supplierResult.supplier;
+                const userName = supplier.name || email.split('@')[0];
+                
+                showWelcomeToast(userName, 'supplier');
+                showSnackbar('Supplier login successful!', 'success');
+                
+                if (rememberMe && rememberMe.checked && email) {
+                    localStorage.setItem('wineBubbles_rememberedEmail', email);
+                }
+                
+                setTimeout(() => {
+                    window.location.href = '../supplier/supplier_dashboard.html';
+                }, 1500);
+                return;
+            }
+            
+            // SECOND: Try driver login
             console.log('🚗 Trying driver login...');
             const driverResult = await driverLogin(email, password);
             
@@ -405,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // SECOND: Try regular user login (which includes admin check)
+            // THIRD: Try regular user login (which includes admin check)
             console.log('👤 Trying user login...');
             const userResult = await userLogin(email, password);
             
@@ -445,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // All logins failed
-            const errorMsg = driverResult.error || userResult.error || 'Login failed. Please check your credentials.';
+            const errorMsg = supplierResult.error || driverResult.error || userResult.error || 'Login failed. Please check your credentials.';
             throw new Error(errorMsg);
             
         } catch (error) {
