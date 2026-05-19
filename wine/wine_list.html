@@ -190,8 +190,8 @@
           <i class="fas fa-shopping-cart"></i>
           <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
         </a>
-        <a href="../user/profile.html" class="icon" id="userIcon">
-          <i class="fas fa-user" id="userIconElement"></i>
+        <a href="#" class="icon" id="userIcon">
+          <i class="fas fa-sign-in-alt" id="userIconElement"></i>
         </a>
       </div>
     </div>
@@ -273,7 +273,7 @@
   <script src="wine_list.js?v=4"></script>
   <script>
     // Authentication logic for Wine List page - UPDATED TO MATCH ALL_WINES.HTML
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         console.log('🍷 Wine List page loaded - checking authentication');
         
         // Configuration
@@ -352,14 +352,7 @@
                 // Cart functionality
                 if (cartIcon) {
                     cartIcon.addEventListener('click', function(e) {
-                        if (isValidToken) {
-                            // Allow cart access for logged in users
-                            window.location.href = '../cart/cart.html';
-                        } else {
-                            e.preventDefault();
-                            alert('Please login to view your cart');
-                            window.location.href = '../login/login.html';
-                        }
+                        window.location.href = '../cart/cart.html';
                     });
                 }
                 
@@ -548,7 +541,7 @@
         });
         
         console.log('✅ Wine List page authentication initialized');
-    });
+    })();
   </script>
 </body>
 </html>
