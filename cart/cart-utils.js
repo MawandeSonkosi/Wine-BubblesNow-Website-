@@ -7,6 +7,7 @@
     class CartUtils {
         constructor() {
             this.CART_KEY = 'wine_cart';
+            this.DELIVERY_FEE = 40; // Always R40 - no free delivery
             this.initCart();
             this.setupEventListeners();
             console.log('✅ CartUtils initialized');
@@ -18,7 +19,7 @@
                 const emptyCart = {
                     items: [],
                     subtotal: 0,
-                    deliveryFee: 0,
+                    deliveryFee: this.DELIVERY_FEE,
                     total: 0,
                     updatedAt: new Date().toISOString()
                 };
@@ -59,7 +60,7 @@
             return {
                 items: [],
                 subtotal: 0,
-                deliveryFee: 0,
+                deliveryFee: this.DELIVERY_FEE,
                 total: 0,
                 updatedAt: new Date().toISOString()
             };
@@ -146,7 +147,7 @@
             const emptyCart = {
                 items: [],
                 subtotal: 0,
-                deliveryFee: 0,
+                deliveryFee: this.DELIVERY_FEE,
                 total: 0,
                 updatedAt: new Date().toISOString()
             };
@@ -199,8 +200,8 @@
                 }
             });
             
-            // Free delivery over R500
-            const deliveryFee = subtotal >= 500 ? 0 : 50;
+            // Always R40 delivery fee - no free delivery
+            const deliveryFee = this.DELIVERY_FEE;
             const total = subtotal + deliveryFee;
             
             cart.subtotal = parseFloat(subtotal.toFixed(2));
