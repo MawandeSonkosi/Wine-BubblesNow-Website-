@@ -59,24 +59,27 @@
     
     .tab-content { padding: 24px; }
     
-    .adverts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-    .advert-item { background: var(--card-bg); border-radius: 16px; overflow: hidden; transition: all 0.2s; cursor: pointer; border: 1px solid rgba(107,13,43,0.2); }
-    .advert-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--admin-primary); }
-    .advert-image-container { width: 100%; height: 60px; overflow: hidden; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
-    .advert-image { width: 100%; height: 100%; object-fit: cover; background: #2a2a2a; }
-    .advert-image-placeholder { width: 60px; height: 60px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; border-radius: 8px; }
-    .advert-image-placeholder i { font-size: 24px; color: #555; }
-    .advert-info { padding: 16px; }
-    .advert-title { font-weight: 700; font-size: 16px; color: var(--admin-accent); margin-bottom: 4px; }
-    .advert-subtitle { font-size: 12px; color: #888; margin-bottom: 8px; }
-    .advert-stats { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; }
-    .advert-price { font-weight: 700; color: var(--admin-primary); }
-    .advert-clicks { font-size: 12px; color: var(--admin-success); }
-    .advert-revenue { font-weight: 700; color: var(--admin-success); }
-    .no-clicks-badge { background: rgba(255,152,0,0.1); color: #ff9800; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+    /* My Adverts List View - Matching Flutter */
+    .adverts-list { display: flex; flex-direction: column; gap: 12px; }
+    .advert-card { background: var(--card-bg); border-radius: 16px; overflow: hidden; cursor: pointer; border: 1px solid rgba(107,13,43,0.2); padding: 16px; transition: all 0.2s; }
+    .advert-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--admin-primary); }
+    .advert-card-row { display: flex; gap: 16px; }
+    .advert-image-small { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: #2a2a2a; }
+    .advert-image-placeholder-small { width: 60px; height: 60px; border-radius: 8px; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
+    .advert-image-placeholder-small i { font-size: 24px; color: #555; }
+    .advert-details { flex: 1; }
+    .advert-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; flex-wrap: wrap; gap: 8px; }
+    .advert-title-text { font-weight: 700; font-size: 16px; color: var(--admin-accent); }
+    .advert-revenue-badge { background: rgba(46,125,50,0.1); padding: 2px 8px; border-radius: 12px; border: 1px solid #2e7d32; }
+    .advert-revenue-badge span { color: #2e7d32; font-size: 12px; font-weight: bold; }
+    .advert-subtitle-text { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .advert-meta-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 4px; }
+    .advert-price-text { font-weight: 700; color: var(--admin-primary); }
     .status-badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
     .status-active { background: rgba(46,125,50,0.1); color: #2e7d32; border: 1px solid #2e7d32; }
     .status-inactive { background: rgba(211,47,47,0.1); color: #d32f2f; border: 1px solid #d32f2f; }
+    .clicks-badge { background: rgba(33,150,243,0.1); padding: 2px 8px; border-radius: 12px; border: 1px solid #2196f3; color: #2196f3; font-size: 10px; font-weight: bold; }
+    .no-clicks-badge { background: rgba(255,152,0,0.1); color: #ff9800; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
     
     .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); }
     .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(107,13,43,0.1); border-top-color: var(--admin-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
@@ -114,15 +117,11 @@
     
     .footer { margin-top: auto; background: var(--admin-primary); }
     
-    /* Match Flutter's card layout for My Adverts */
-    .advert-card-row { display: flex; gap: 16px; }
-    .advert-image-small { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: #2a2a2a; }
-    .advert-details { flex: 1; }
-    .advert-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
-    
     @media (max-width: 768px) {
       .admin-container { padding: 0 16px; margin-top: 20px; }
-      .adverts-grid { grid-template-columns: 1fr; }
+      .adverts-list { gap: 8px; }
+      .advert-card { padding: 12px; }
+      .advert-card-row { gap: 12px; }
       .stats-grid { grid-template-columns: 1fr; }
       .welcome-stats { flex-direction: column; gap: 12px; }
       .tabs { flex-direction: column; gap: 4px; }
@@ -184,7 +183,7 @@
           <h3 style="margin: 0; color: var(--admin-text);"><i class="fas fa-campaign" style="color: var(--admin-primary); margin-right: 8px;"></i> My Adverts</h3>
           <span class="badge" id="advertsCount" style="background: rgba(107,13,43,0.1); padding: 6px 12px; border-radius: 20px; font-size: 12px;">0 adverts</span>
         </div>
-        <div id="advertsContainer" class="adverts-grid"><div class="loading-state"><div class="loading-spinner"></div><p>Loading adverts...</p></div></div>
+        <div id="advertsContainer" class="adverts-list"><div class="loading-state"><div class="loading-spinner"></div><p>Loading adverts...</p></div></div>
       </div>
 
       <div id="analyticsTab" class="tab-content" style="display: none;">
@@ -222,12 +221,12 @@
       });
     }
 
-    // MATCHES FLUTTER'S IMAGE DISPLAY METHOD
-    // Flutter uses: if (advert.targetUrl.contains('assets/')) imagePath = advert.targetUrl;
-    //              else if (advert.imageUrl.contains('assets/')) imagePath = advert.imageUrl;
+    // EXACTLY MATCHING FLUTTER'S IMAGE DISPLAY LOGIC
+    // Flutter uses: if (advert.targetUrl.contains('assets/')) { imagePath = advert.targetUrl; }
+    //              else if (advert.imageUrl.contains('assets/')) { imagePath = advert.imageUrl; }
     // Then: Image.asset(imagePath, fit: BoxFit.cover)
     function getAssetImagePath(advert) {
-      // First check targetUrl (like Flutter does)
+      // First check targetUrl (primary as in Flutter)
       if (advert.targetUrl && advert.targetUrl.indexOf('assets/') !== -1) {
         return advert.targetUrl;
       }
@@ -242,23 +241,22 @@
       return null;
     }
 
-    // Build image HTML matching Flutter's Image.asset with BoxFit.cover
-    function buildAdvertImageHtml(advert, title) {
+    // Build image for list view (60x60 thumbnail)
+    function buildThumbnailImageHtml(advert, title) {
       var imagePath = getAssetImagePath(advert);
-      console.log('Flutter-style image path for:', title, '=', imagePath);
+      console.log('Thumbnail for:', title, '->', imagePath);
       
       if (imagePath) {
-        // For asset images, they are relative to the root
-        // Remove 'assets/' prefix and add '../' to go up from marketing folder
+        // Convert asset path to URL (remove 'assets/' and add '../')
         var imgSrc = imagePath;
         if (imgSrc.indexOf('assets/') === 0) {
           imgSrc = '../' + imgSrc;
         } else if (imgSrc.indexOf('/assets/') === 0) {
           imgSrc = '..' + imgSrc;
         }
-        return '<img src="' + imgSrc + '" alt="' + escapeHtml(title) + '" class="advert-image" onerror="this.onerror=null; this.parentElement.innerHTML=\'<div class=\"advert-image-placeholder\"><i class=\"fas fa-campaign\"></i></div>\'">';
+        return '<img src="' + imgSrc + '" alt="' + escapeHtml(title) + '" class="advert-image-small" onerror="this.onerror=null; this.parentElement.innerHTML=\'<div class=\"advert-image-placeholder-small\"><i class=\"fas fa-campaign\"></i></div>\'">';
       }
-      return '<div class="advert-image-placeholder"><i class="fas fa-campaign"></i></div>';
+      return '<div class="advert-image-placeholder-small"><i class="fas fa-campaign"></i></div>';
     }
 
     function setupLogo() {
@@ -432,7 +430,7 @@
       container.innerHTML = overviewHtml;
     }
 
-    // RENDER ADVERTS MATCHING FLUTTER'S MyAdvertsSection layout
+    // RENDER ADVERTS - EXACTLY MATCHING FLUTTER'S MyAdvertsSection layout
     function renderAdverts(adverts) {
       var container = document.getElementById('advertsContainer');
       
@@ -441,8 +439,7 @@
         return;
       }
       
-      // Create a list view like Flutter's ListView.builder
-      var advertsHtml = '<div class="adverts-list" style="display: flex; flex-direction: column; gap: 12px;">';
+      var advertsHtml = '<div class="adverts-list">';
       
       for (var i = 0; i < adverts.length; i++) {
         var advert = adverts[i];
@@ -455,39 +452,32 @@
         console.log('Rendering advert card:', advert.title);
         console.log('  - targetUrl:', advert.targetUrl);
         console.log('  - imageUrl:', advert.imageUrl);
-        console.log('  - imagePath:', advert.imagePath);
         
-        // MATCH FLUTTER LAYOUT: Row with image (60x60), then column with title, subtitle, and price/clicks row
         advertsHtml += 
-          '<div class="advert-card" onclick="viewAdvertDetail(\'' + advert.id + '\')" style="background: var(--card-bg); border-radius: 16px; overflow: hidden; cursor: pointer; border: 1px solid rgba(107,13,43,0.2); padding: 16px;">' +
-            '<div style="display: flex; gap: 16px;">' +
-              '<div style="width: 60px; height: 60px; flex-shrink: 0; background: #2a2a2a; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">' +
-                buildAdvertImageHtml(advert, advert.title) +
+          '<div class="advert-card" onclick="viewAdvertDetail(\'' + advert.id + '\')">' +
+            '<div class="advert-card-row">' +
+              '<div style="width: 60px; height: 60px; flex-shrink: 0;">' +
+                buildThumbnailImageHtml(advert, advert.title) +
               '</div>' +
-              '<div style="flex: 1;">' +
-                '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">' +
-                  '<div style="font-weight: 700; font-size: 16px; color: var(--admin-accent);">' + escapeHtml(advert.title) + '</div>';
+              '<div class="advert-details">' +
+                '<div class="advert-title-row">' +
+                  '<div class="advert-title-text">' + escapeHtml(advert.title) + '</div>';
         
         if (hasClicks) {
-          advertsHtml += 
-                  '<div style="background: rgba(46,125,50,0.1); padding: 2px 8px; border-radius: 12px; border: 1px solid #2e7d32;">' +
-                    '<span style="color: #2e7d32; font-size: 12px; font-weight: bold;">R' + revenue.toFixed(2) + '</span>' +
-                  '</div>';
+          advertsHtml += '<div class="advert-revenue-badge"><span>R' + revenue.toFixed(2) + '</span></div>';
         }
         
         advertsHtml += 
                 '</div>' +
-                '<div style="font-size: 12px; color: #888; margin-bottom: 8px;">' + escapeHtml(advert.subtitle || '') + '</div>' +
-                '<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">' +
-                  '<span style="font-weight: 700; color: var(--admin-primary);">R' + (advert.price || 0).toFixed(2) + '</span>' +
+                '<div class="advert-subtitle-text">' + escapeHtml(advert.subtitle || '') + '</div>' +
+                '<div class="advert-meta-row">' +
+                  '<span class="advert-price-text">R' + (advert.price || 0).toFixed(2) + '</span>' +
                   '<span class="status-badge ' + statusClass + '">' + statusText + '</span>';
         
         if (hasClicks) {
-          advertsHtml += 
-                  '<span style="background: rgba(33,150,243,0.1); padding: 2px 8px; border-radius: 12px; border: 1px solid #2196f3; color: #2196f3; font-size: 10px; font-weight: bold;">' + (advert.clicks || 0) + ' clicks</span>';
+          advertsHtml += '<span class="clicks-badge">' + (advert.clicks || 0) + ' clicks</span>';
         } else {
-          advertsHtml += 
-                  '<span class="no-clicks-badge">No clicks yet</span>';
+          advertsHtml += '<span class="no-clicks-badge">No clicks yet</span>';
         }
         
         advertsHtml += 
