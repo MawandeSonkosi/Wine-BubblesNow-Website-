@@ -217,23 +217,50 @@
       });
     }
 
-    // FIXED: Better image URL handling
-    function getImageUrl(imageUrl) {
-      if (!imageUrl) return null;
-      if (imageUrl.indexOf('http') === 0) return imageUrl;
-      if (imageUrl.indexOf('/') === 0) return imageUrl;
-      if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
-      if (imageUrl.indexOf('uploads/') === 0) return '/' + imageUrl;
-      return '/assets/' + imageUrl;
+    // FIXED: Image URL handling - prioritize imagePath for marketing assets (like Flutter's Image.asset)
+    function getImageUrl(advert) {
+      // First priority: imagePath (used for marketing banners like in Flutter)
+      if (advert.imagePath && advert.imagePath.trim() !== '') {
+        var path = advert.imagePath;
+        // If path doesn't start with assets/, add it
+        if (path.indexOf('assets/') === -1 && path.indexOf('/assets/') === -1) {
+          return '../assets/marketing/' + path;
+        }
+        return '../' + path;
+      }
+      
+      // Second priority: imageUrl
+      if (advert.imageUrl && advert.imageUrl.trim() !== '') {
+        var url = advert.imageUrl;
+        if (url.indexOf('http') === 0) return url;
+        if (url.indexOf('/') === 0) return url;
+        if (url.indexOf('assets/') === 0) return '/' + url;
+        return '/assets/' + url;
+      }
+      
+      // Third priority: targetUrl (for older data)
+      if (advert.targetUrl && advert.targetUrl.trim() !== '') {
+        var target = advert.targetUrl;
+        if (target.indexOf('assets/') !== -1) {
+          if (target.indexOf('assets/') === 0) return '/' + target;
+          return '../' + target;
+        }
+      }
+      
+      return null;
     }
 
-    // FIXED: Build advert image HTML with better error handling
-    function buildAdvertImageHtml(imageUrl, title) {
-      var url = getImageUrl(imageUrl);
-      console.log('Building image for:', title, 'URL:', url);
+    // Build advert image HTML - uses imagePath like Flutter's Image.asset
+    function buildAdvertImageHtml(advert, title) {
+      var imageUrl = getImageUrl(advert);
+      console.log('Building image for:', title);
+      console.log('  - imagePath:', advert.imagePath);
+      console.log('  - imageUrl:', advert.imageUrl);
+      console.log('  - targetUrl:', advert.targetUrl);
+      console.log('  - Resolved URL:', imageUrl);
       
-      if (url) {
-        return '<div class="advert-image-container"><img src="' + url + '" alt="' + escapeHtml(title) + '" class="advert-image" onerror="this.onerror=null; this.parentElement.innerHTML=\'<div class=\"advert-image-placeholder\"><i class=\"fas fa-campaign\"></i><span>No Image</span></div>\'"></div>';
+      if (imageUrl) {
+        return '<div class="advert-image-container"><img src="' + imageUrl + '" alt="' + escapeHtml(title) + '" class="advert-image" onerror="this.onerror=null; this.parentElement.innerHTML=\'<div class=\"advert-image-placeholder\"><i class=\"fas fa-campaign\"></i><span>No Image</span></div>\'"></div>';
       }
       return '<div class="advert-image-placeholder"><i class="fas fa-campaign"></i><span>No Image</span></div>';
     }
@@ -304,7 +331,7 @@
             marketingAdverts = dashboardData.adverts || [];
             var stats = dashboardData.stats || {};
             
-            console.log('Loaded adverts:', marketingAdverts);
+            console.log('Loaded adverts:', marketingAdverts.length);
             
             document.getElementById('statTotalAdverts').innerText = stats.totalAdverts || 0;
             var activeAdverts = marketingAdverts.filter(function(a) { return a.isActive; }).length;
@@ -409,7 +436,7 @@
       container.innerHTML = overviewHtml;
     }
 
-    // FIXED: Render adverts with proper image display
+    // Render adverts with proper image display using imagePath
     function renderAdverts(adverts) {
       var container = document.getElementById('advertsContainer');
       
@@ -427,14 +454,13 @@
         var statusClass = isActive ? 'status-active' : 'status-inactive';
         var statusText = isActive ? 'Active' : 'Inactive';
         
-        // Try multiple possible image URL fields
-        var imageUrl = advert.imageUrl || advert.targetUrl || advert.imagePath || null;
-        
-        console.log('Rendering advert:', advert.title, 'Image URL:', imageUrl);
+        console.log('Rendering advert:', advert.title);
+        console.log('  - imagePath:', advert.imagePath);
+        console.log('  - imageUrl:', advert.imageUrl);
         
         advertsHtml += 
           '<div class="advert-item" onclick="viewAdvertDetail(\'' + advert.id + '\')">' +
-            buildAdvertImageHtml(imageUrl, advert.title) +
+            buildAdvertImageHtml(advert, advert.title) +
             '<div class="advert-info">' +
               '<div class="advert-title">' + escapeHtml(advert.title) + '</div>' +
               '<div class="advert-subtitle">' + escapeHtml(advert.subtitle || '') + '</div>' +
