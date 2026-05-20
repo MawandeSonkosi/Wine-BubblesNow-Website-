@@ -1048,7 +1048,7 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
       <div class="top-icons">
         <a href="/cart/cart.html" class="icon cart-icon">
           <i class="fas fa-shopping-cart"></i>
-          <span class="cart-badge" style="display: none;">0</span>
+          <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
         </a>
         <a href="user//profile.html" class="icon" id="userIcon">
           <i class="fas fa-user" id="userIconElement"></i>
@@ -1427,7 +1427,7 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
           cartBadges.forEach(badge => {
               if (count > 0) {
                   badge.textContent = count;
-                  badge.style.display = 'inline-block';
+                  badge.style.display = 'flex';
               } else {
                   badge.textContent = '0';
                   badge.style.display = 'none';
@@ -1452,6 +1452,8 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
           
           let itemCount = 0;
           
+          // IMPORTANT: Only check the primary cart source (wine_cart)
+          // This avoids showing stale data from other sources
           const wineCartData = localStorage.getItem('wine_cart');
           if (wineCartData) {
               try {
@@ -1459,43 +1461,19 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
                   if (wineCart.items && Array.isArray(wineCart.items)) {
                       itemCount = wineCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
                       console.log(`📦 wine_cart has ${itemCount} items`);
+                  } else {
+                      itemCount = 0;
                   }
               } catch (error) {
                   console.error('Error parsing wine_cart:', error);
+                  itemCount = 0;
               }
+          } else {
+              itemCount = 0;
           }
           
-          const wineBubblesCartData = localStorage.getItem('wineBubbles_cart');
-          if (wineBubblesCartData && itemCount === 0) {
-              try {
-                  const wineBubblesCart = JSON.parse(wineBubblesCartData);
-                  if (wineBubblesCart.items && Array.isArray(wineBubblesCart.items)) {
-                      itemCount = wineBubblesCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                      console.log(`📦 wineBubbles_cart has ${itemCount} items`);
-                  }
-              } catch (error) {
-                  console.error('Error parsing wineBubbles_cart:', error);
-              }
-          }
-          
-          const oldCartData = localStorage.getItem('cart');
-          if (oldCartData && itemCount === 0) {
-              try {
-                  const oldCart = JSON.parse(oldCartData);
-                  if (Array.isArray(oldCart)) {
-                      itemCount = oldCart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                      console.log(`📦 Old cart has ${itemCount} items`);
-                  }
-              } catch (error) {
-                  console.error('Error parsing old cart data:', error);
-              }
-          }
-          
-          const storedCount = localStorage.getItem('wineBubbles_cart_count');
-          if (storedCount && itemCount === 0) {
-              itemCount = parseInt(storedCount) || 0;
-              console.log(`📦 Stored count: ${itemCount}`);
-          }
+          // Don't check other cart sources to avoid showing stale data
+          // This ensures the badge only shows actual items in the cart
           
           console.log(`📊 Final cart count: ${itemCount}`);
           return updateCartBadge(itemCount);
