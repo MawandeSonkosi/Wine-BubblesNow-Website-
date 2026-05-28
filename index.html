@@ -385,7 +385,7 @@
       background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
       background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
       background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      height: 380px;
+      height: 500px;
       z-index: 1;
     }
     
@@ -426,15 +426,16 @@
     .top-banner-image {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      -webkit-object-fit: cover;
-      -moz-object-fit: cover;
-      -o-object-fit: cover;
+      object-fit: contain;
+      -webkit-object-fit: contain;
+      -moz-object-fit: contain;
+      -o-object-fit: contain;
       object-position: center center;
       -webkit-object-position: center center;
       -moz-object-position: center center;
       -o-object-position: center center;
       display: block;
+      background: #f5f5f5;
       -webkit-transition: -webkit-transform 0.8s ease;
       -moz-transition: -moz-transform 0.8s ease;
       -o-transition: -o-transform 0.8s ease;
@@ -480,18 +481,6 @@
       font-weight: 500;
     }
     
-    .top-banner-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: #6b0d2b;
-      background: rgba(255,255,255,0.95);
-      display: inline-block;
-      padding: 8px 20px;
-      border-radius: 25px;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    
     /* ========== BOTTOM BANNER CAROUSEL STYLES ========== */
     .bottom-banner-carousel-container {
       position: relative;
@@ -505,7 +494,7 @@
       background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
       background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
       background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      height: 380px;
+      height: 500px;
       z-index: 1;
     }
     
@@ -546,15 +535,16 @@
     .bottom-banner-image {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      -webkit-object-fit: cover;
-      -moz-object-fit: cover;
-      -o-object-fit: cover;
+      object-fit: contain;
+      -webkit-object-fit: contain;
+      -moz-object-fit: contain;
+      -o-object-fit: contain;
       object-position: center center;
       -webkit-object-position: center center;
       -moz-object-position: center center;
       -o-object-position: center center;
       display: block;
+      background: #f5f5f5;
       -webkit-transition: -webkit-transform 0.8s ease;
       -moz-transition: -moz-transform 0.8s ease;
       -o-transition: -o-transform 0.8s ease;
@@ -598,18 +588,6 @@
       opacity: 0.95;
       margin-bottom: 12px;
       font-weight: 500;
-    }
-    
-    .bottom-banner-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: #6b0d2b;
-      background: rgba(255,255,255,0.95);
-      display: inline-block;
-      padding: 8px 20px;
-      border-radius: 25px;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     
     /* Navigation Buttons */
@@ -757,6 +735,56 @@
     
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+    
+    /* Responsive adjustments for banners */
+    @media (max-width: 768px) {
+      .top-banner-carousel-container,
+      .bottom-banner-carousel-container {
+        height: 350px;
+      }
+      
+      .top-banner-title,
+      .bottom-banner-title {
+        font-size: 20px;
+      }
+      
+      .top-banner-subtitle,
+      .bottom-banner-subtitle {
+        font-size: 14px;
+      }
+      
+      .carousel-nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+      
+      .prev-btn { left: 10px; }
+      .next-btn { right: 10px; }
+    }
+    
+    @media (max-width: 480px) {
+      .top-banner-carousel-container,
+      .bottom-banner-carousel-container {
+        height: 280px;
+      }
+      
+      .top-banner-overlay,
+      .bottom-banner-overlay {
+        padding: 15px;
+        padding-top: 40px;
+      }
+      
+      .top-banner-title,
+      .bottom-banner-title {
+        font-size: 16px;
+      }
+      
+      .top-banner-subtitle,
+      .bottom-banner-subtitle {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
