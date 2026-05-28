@@ -372,619 +372,392 @@
       -webkit-justify-content: center;
     }
     
-   /* ========== BANNER CAROUSEL STYLES ========== */
-.banner-carousel-container {
-  position: relative;
-  max-width: 1000px;
-  margin: 0 auto 40px;
-  overflow: hidden;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-  
-  /* Cross-browser gradient */
-  background: #f9f9f9;
-  background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  
-  /* Fixed height for consistency */
-  height: 380px;
-  z-index: 1;
-}
-
-.banner-carousel-track {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  
-  -webkit-transition: -webkit-transform 0.6s ease-in-out;
-  -moz-transition: -moz-transform 0.6s ease-in-out;
-  -o-transition: -o-transform 0.6s ease-in-out;
-  transition: transform 0.6s ease-in-out;
-  
-  height: 100%;
-  width: 100%;
-  will-change: transform;
-  
-  margin: 0;
-  padding: 0;
-}
-
-.banner-carousel-slide {
-  min-width: 100%;
-  -webkit-flex-shrink: 0;
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-  
-  position: relative;
-  cursor: pointer;
-  border-radius: 16px;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-  background: #f8f8f8;
-  
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* Chrome - use cover (zoomed) centered */
-.banner-carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  -webkit-object-fit: cover;
-  -moz-object-fit: cover;
-  -o-object-fit: cover;
-  object-position: center center;
-  -webkit-object-position: center center;
-  -moz-object-position: center center;
-  -o-object-position: center center;
-  display: block;
-  
-  -webkit-transition: -webkit-transform 0.8s ease;
-  -moz-transition: -moz-transform 0.8s ease;
-  -o-transition: -o-transform 0.8s ease;
-  transition: transform 0.8s ease;
-}
-
-/* Safari - ensure images fill the slide and align LEFT */
-@media not all and (min-resolution: 0.001dpcm) {
-  @supports (-webkit-appearance: none) {
-    .banner-carousel-image {
-      object-fit: cover !important;
-      -webkit-object-fit: cover !important;
-      object-position: 0 center !important;
-      -webkit-object-position: 0 center !important;
-      width: 100% !important;
-      height: 100% !important;
+    /* ========== TOP BANNER CAROUSEL STYLES ========== */
+    .top-banner-carousel-container {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto 40px;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      background: #f9f9f9;
+      background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      height: 380px;
+      z-index: 1;
     }
-  }
-}
-
-/* Alternative Safari detection */
-_::-webkit-full-page-media, _:future, :root .banner-carousel-image {
-  object-fit: cover !important;
-  object-position: 0 center !important;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.banner-carousel-slide:hover .banner-carousel-image {
-  -webkit-transform: scale(1.05);
-  -moz-transform: scale(1.05);
-  -ms-transform: scale(1.05);
-  -o-transform: scale(1.05);
-  transform: scale(1.05);
-}
-
-.banner-slide-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  
-  /* Cross-browser gradient */
-  background: rgba(0,0,0,0.7);
-  background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  
-  color: white;
-  padding: 25px;
-  padding-top: 60px;
-}
-
-.banner-slide-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-.banner-slide-subtitle {
-  font-size: 18px;
-  opacity: 0.95;
-  margin-bottom: 12px;
-  font-weight: 500;
-}
-
-.banner-slide-price {
-  font-size: 24px;
-  font-weight: 700;
-  color: #6b0d2b;
-  background: rgba(255,255,255,0.95);
-  display: inline-block;
-  padding: 8px 20px;
-  border-radius: 25px;
-  margin-top: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* Navigation Buttons */
-.carousel-nav-btn {
-  position: absolute;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  
-  display: -webkit-box !important;
-  display: -moz-box !important;
-  display: -ms-flexbox !important;
-  display: -webkit-flex !important;
-  display: flex !important;
-  
-  -webkit-box-align: center;
-  -moz-box-align: center;
-  -ms-flex-align: center;
-  -webkit-align-items: center;
-  align-items: center;
-  
-  -webkit-box-pack: center;
-  -moz-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  
-  cursor: pointer;
-  font-size: 22px;
-  color: #6b0d2b;
-  
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-  
-  z-index: 100;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  -webkit-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  -moz-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  outline: none;
-}
-
-.carousel-nav-btn:hover {
-  background: white;
-  -webkit-transform: translateY(-50%) scale(1.15);
-  -moz-transform: translateY(-50%) scale(1.15);
-  -ms-transform: translateY(-50%) scale(1.15);
-  -o-transform: translateY(-50%) scale(1.15);
-  transform: translateY(-50%) scale(1.15);
-  
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  -webkit-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  -moz-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
-
-.carousel-nav-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  -webkit-transform: translateY(-50%) scale(1);
-  -moz-transform: translateY(-50%) scale(1);
-  -ms-transform: translateY(-50%) scale(1);
-  -o-transform: translateY(-50%) scale(1);
-  transform: translateY(-50%) scale(1);
-  pointer-events: none;
-}
-
-.prev-btn {
-  left: 25px;
-}
-
-.next-btn {
-  right: 25px;
-}
-
-.carousel-dots {
-  position: absolute;
-  bottom: 25px;
-  left: 0;
-  right: 0;
-  
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  
-  -webkit-box-pack: center;
-  -moz-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  
-  gap: 12px;
-  z-index: 10;
-}
-
-.carousel-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  border: 2px solid transparent;
-  cursor: pointer;
-  
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-
-.carousel-dot.active {
-  background: #6b0d2b;
-  border-color: white;
-  -webkit-transform: scale(1.3);
-  -moz-transform: scale(1.3);
-  -ms-transform: scale(1.3);
-  -o-transform: scale(1.3);
-  transform: scale(1.3);
-  
-  box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-  -webkit-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-  -moz-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-}
-
-.carousel-dot:hover:not(.active) {
-  background: white;
-  -webkit-transform: scale(1.2);
-  -moz-transform: scale(1.2);
-  -ms-transform: scale(1.2);
-  -o-transform: scale(1.2);
-  transform: scale(1.2);
-}
-
-/* ========== MARKETING BANNERS SECTION ========== */
-.marketing-banners-section {
-  margin: 0 auto 40px;
-  max-width: 1000px;
-  position: relative;
-  width: 100%;
-}
-
-.marketing-banners-container {
-  position: relative;
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  overflow: hidden;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-  
-  /* Cross-browser gradient */
-  background: #f9f9f9;
-  background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-  
-  /* Fixed height for consistency */
-  height: 450px;
-  z-index: 1;
-}
-
-.marketing-banners-track {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  
-  -webkit-transition: -webkit-transform 0.6s ease-in-out;
-  -moz-transition: -moz-transform 0.6s ease-in-out;
-  -o-transition: -o-transform 0.6s ease-in-out;
-  transition: transform 0.6s ease-in-out;
-  
-  height: 100%;
-  width: 100%;
-  will-change: transform;
-  
-  margin: 0;
-  padding: 0;
-}
-
-.marketing-banner-slide {
-  min-width: 100%;
-  -webkit-flex-shrink: 0;
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-  
-  position: relative;
-  cursor: pointer;
-  border-radius: 16px;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-  background: #f5f5f5;
-  
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* Chrome - use cover (zoomed) centered */
-.marketing-banner-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  -webkit-object-fit: cover;
-  -moz-object-fit: cover;
-  -o-object-fit: cover;
-  object-position: center center;
-  -webkit-object-position: center center;
-  -moz-object-position: center center;
-  -o-object-position: center center;
-  display: block;
-  
-  -webkit-transition: -webkit-transform 0.8s ease;
-  -moz-transition: -moz-transform 0.8s ease;
-  -o-transition: -o-transform 0.8s ease;
-  transition: transform 0.8s ease;
-}
-
-/* Safari - ensure images fill the slide and align LEFT */
-@media not all and (min-resolution: 0.001dpcm) {
-  @supports (-webkit-appearance: none) {
-    .marketing-banner-image {
-      object-fit: cover !important;
-      -webkit-object-fit: cover !important;
-      object-position: 0 center !important;
-      -webkit-object-position: 0 center !important;
-      width: 100% !important;
-      height: 100% !important;
+    
+    .top-banner-carousel-track {
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-transition: -webkit-transform 0.6s ease-in-out;
+      -moz-transition: -moz-transform 0.6s ease-in-out;
+      -o-transition: -o-transform 0.6s ease-in-out;
+      transition: transform 0.6s ease-in-out;
+      height: 100%;
+      width: 100%;
+      will-change: transform;
+      margin: 0;
+      padding: 0;
     }
-  }
-}
-
-/* Alternative Safari detection */
-_::-webkit-full-page-media, _:future, :root .marketing-banner-image {
-  object-fit: cover !important;
-  object-position: 0 center !important;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.marketing-banner-slide:hover .marketing-banner-image {
-  -webkit-transform: scale(1.05);
-  -moz-transform: scale(1.05);
-  -ms-transform: scale(1.05);
-  -o-transform: scale(1.05);
-  transform: scale(1.05);
-}
-
-.marketing-banner-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  
-  /* Cross-browser gradient */
-  background: rgba(0,0,0,0.7);
-  background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
-  
-  color: white;
-  padding: 30px;
-  padding-top: 80px;
-}
-
-.marketing-banner-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-.marketing-banner-subtitle {
-  font-size: 20px;
-  opacity: 0.95;
-  margin-bottom: 15px;
-  font-weight: 500;
-}
-
-/* Marketing navigation buttons */
-.marketing-nav-btn {
-  position: absolute;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  
-  display: -webkit-box !important;
-  display: -moz-box !important;
-  display: -ms-flexbox !important;
-  display: -webkit-flex !important;
-  display: flex !important;
-  
-  -webkit-box-align: center;
-  -moz-box-align: center;
-  -ms-flex-align: center;
-  -webkit-align-items: center;
-  align-items: center;
-  
-  -webkit-box-pack: center;
-  -moz-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  
-  cursor: pointer;
-  font-size: 22px;
-  color: #6b0d2b;
-  
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-  
-  z-index: 100;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  -webkit-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  -moz-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  outline: none;
-}
-
-.marketing-nav-btn:hover {
-  background: white;
-  -webkit-transform: translateY(-50%) scale(1.15);
-  -moz-transform: translateY(-50%) scale(1.15);
-  -ms-transform: translateY(-50%) scale(1.15);
-  -o-transform: translateY(-50%) scale(1.15);
-  transform: translateY(-50%) scale(1.15);
-  
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  -webkit-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  -moz-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
-
-.marketing-nav-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  -webkit-transform: translateY(-50%) scale(1);
-  -moz-transform: translateY(-50%) scale(1);
-  -ms-transform: translateY(-50%) scale(1);
-  -o-transform: translateY(-50%) scale(1);
-  transform: translateY(-50%) scale(1);
-  pointer-events: none;
-}
-
-.marketing-prev-btn {
-  left: 25px;
-}
-
-.marketing-next-btn {
-  right: 25px;
-}
-
-.marketing-dots {
-  position: absolute;
-  bottom: 25px;
-  left: 0;
-  right: 0;
-  
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  
-  -webkit-box-pack: center;
-  -moz-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  
-  gap: 12px;
-  z-index: 10;
-}
-
-.marketing-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  border: 2px solid transparent;
-  cursor: pointer;
-  
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-
-.marketing-dot.active {
-  background: #6b0d2b;
-  border-color: white;
-  -webkit-transform: scale(1.3);
-  -moz-transform: scale(1.3);
-  -ms-transform: scale(1.3);
-  -o-transform: scale(1.3);
-  transform: scale(1.3);
-  
-  box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-  -webkit-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-  -moz-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
-}
-
-.marketing-dot:hover:not(.active) {
-  background: white;
-  -webkit-transform: scale(1.2);
-  -moz-transform: scale(1.2);
-  -ms-transform: scale(1.2);
-  -o-transform: scale(1.2);
-  transform: scale(1.2);
-}
-
-/* Force arrows to show */
-#marketingPrevBtn,
-#marketingNextBtn,
-#prevBtn,
-#nextBtn {
-  display: -webkit-box !important;
-  display: -moz-box !important;
-  display: -ms-flexbox !important;
-  display: -webkit-flex !important;
-  display: flex !important;
-  z-index: 1000 !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
-.marketing-dots,
-.carousel-dots {
-  display: -webkit-box !important;
-  display: -moz-box !important;
-  display: -ms-flexbox !important;
-  display: -webkit-flex !important;
-  display: flex !important;
-}
+    
+    .top-banner-slide {
+      min-width: 100%;
+      -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      border-radius: 16px;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      background: #f8f8f8;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .top-banner-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      -webkit-object-fit: cover;
+      -moz-object-fit: cover;
+      -o-object-fit: cover;
+      object-position: center center;
+      -webkit-object-position: center center;
+      -moz-object-position: center center;
+      -o-object-position: center center;
+      display: block;
+      -webkit-transition: -webkit-transform 0.8s ease;
+      -moz-transition: -moz-transform 0.8s ease;
+      -o-transition: -o-transform 0.8s ease;
+      transition: transform 0.8s ease;
+    }
+    
+    .top-banner-slide:hover .top-banner-image {
+      -webkit-transform: scale(1.05);
+      -moz-transform: scale(1.05);
+      -ms-transform: scale(1.05);
+      -o-transform: scale(1.05);
+      transform: scale(1.05);
+    }
+    
+    .top-banner-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      background: rgba(0,0,0,0.7);
+      background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      color: white;
+      padding: 25px;
+      padding-top: 60px;
+    }
+    
+    .top-banner-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    
+    .top-banner-subtitle {
+      font-size: 18px;
+      opacity: 0.95;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    
+    .top-banner-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: #6b0d2b;
+      background: rgba(255,255,255,0.95);
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 25px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    /* ========== BOTTOM BANNER CAROUSEL STYLES ========== */
+    .bottom-banner-carousel-container {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto 40px;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      background: #f9f9f9;
+      background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
+      height: 380px;
+      z-index: 1;
+    }
+    
+    .bottom-banner-carousel-track {
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-transition: -webkit-transform 0.6s ease-in-out;
+      -moz-transition: -moz-transform 0.6s ease-in-out;
+      -o-transition: -o-transform 0.6s ease-in-out;
+      transition: transform 0.6s ease-in-out;
+      height: 100%;
+      width: 100%;
+      will-change: transform;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .bottom-banner-slide {
+      min-width: 100%;
+      -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      border-radius: 16px;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      background: #f8f8f8;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .bottom-banner-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      -webkit-object-fit: cover;
+      -moz-object-fit: cover;
+      -o-object-fit: cover;
+      object-position: center center;
+      -webkit-object-position: center center;
+      -moz-object-position: center center;
+      -o-object-position: center center;
+      display: block;
+      -webkit-transition: -webkit-transform 0.8s ease;
+      -moz-transition: -moz-transform 0.8s ease;
+      -o-transition: -o-transform 0.8s ease;
+      transition: transform 0.8s ease;
+    }
+    
+    .bottom-banner-slide:hover .bottom-banner-image {
+      -webkit-transform: scale(1.05);
+      -moz-transform: scale(1.05);
+      -ms-transform: scale(1.05);
+      -o-transform: scale(1.05);
+      transform: scale(1.05);
+    }
+    
+    .bottom-banner-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      background: rgba(0,0,0,0.7);
+      background: -webkit-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      background: -moz-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      background: -o-linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5), rgba(0,0,0,0));
+      color: white;
+      padding: 25px;
+      padding-top: 60px;
+    }
+    
+    .bottom-banner-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    
+    .bottom-banner-subtitle {
+      font-size: 18px;
+      opacity: 0.95;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    
+    .bottom-banner-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: #6b0d2b;
+      background: rgba(255,255,255,0.95);
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 25px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    /* Navigation Buttons */
+    .carousel-nav-btn {
+      position: absolute;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -moz-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      -o-transform: translateY(-50%);
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      display: -webkit-box !important;
+      display: -moz-box !important;
+      display: -ms-flexbox !important;
+      display: -webkit-flex !important;
+      display: flex !important;
+      -webkit-box-align: center;
+      -moz-box-align: center;
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -moz-box-pack: center;
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 22px;
+      color: #6b0d2b;
+      -webkit-transition: all 0.3s ease;
+      -moz-transition: all 0.3s ease;
+      -o-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      -webkit-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      -moz-box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      outline: none;
+    }
+    
+    .carousel-nav-btn:hover {
+      background: white;
+      -webkit-transform: translateY(-50%) scale(1.15);
+      -moz-transform: translateY(-50%) scale(1.15);
+      -ms-transform: translateY(-50%) scale(1.15);
+      -o-transform: translateY(-50%) scale(1.15);
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      -webkit-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      -moz-box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    .carousel-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      -webkit-transform: translateY(-50%) scale(1);
+      -moz-transform: translateY(-50%) scale(1);
+      -ms-transform: translateY(-50%) scale(1);
+      -o-transform: translateY(-50%) scale(1);
+      transform: translateY(-50%) scale(1);
+      pointer-events: none;
+    }
+    
+    .prev-btn { left: 25px; }
+    .next-btn { right: 25px; }
+    
+    .carousel-dots {
+      position: absolute;
+      bottom: 25px;
+      left: 0;
+      right: 0;
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-pack: center;
+      -moz-box-pack: center;
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 10;
+    }
+    
+    .carousel-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      border: 2px solid transparent;
+      cursor: pointer;
+      -webkit-transition: all 0.3s ease;
+      -moz-transition: all 0.3s ease;
+      -o-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+    }
+    
+    .carousel-dot.active {
+      background: #6b0d2b;
+      border-color: white;
+      -webkit-transform: scale(1.3);
+      -moz-transform: scale(1.3);
+      -ms-transform: scale(1.3);
+      -o-transform: scale(1.3);
+      transform: scale(1.3);
+      box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+      -webkit-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+      -moz-box-shadow: 0 2px 8px rgba(107, 13, 43, 0.4);
+    }
+    
+    .carousel-dot:hover:not(.active) {
+      background: white;
+      -webkit-transform: scale(1.2);
+      -moz-transform: scale(1.2);
+      -ms-transform: scale(1.2);
+      -o-transform: scale(1.2);
+      transform: scale(1.2);
+    }
+    
+    /* Loading State */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #999;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(107,13,43,0.1);
+      border-top-color: #6b0d2b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -1022,9 +795,7 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
 
   <!-- Top bar with two sections -->
   <div class="topbar-top">
-    <div class="topbar-top-inner">
-      <!-- Empty - no content as requested -->
-    </div>
+    <div class="topbar-top-inner"></div>
   </div>
 
   <div class="topbar-main">
@@ -1050,34 +821,26 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
           <i class="fas fa-shopping-cart"></i>
           <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
         </a>
-        <a href="user//profile.html" class="icon" id="userIcon">
+        <a href="user/profile.html" class="icon" id="userIcon">
           <i class="fas fa-user" id="userIconElement"></i>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- MARKETING BANNERS SECTION -->
-  <section class="marketing-banners-section" id="marketingBannersSection">
+  <!-- TOP BANNERS SECTION (Banner Position = top) -->
+  <section class="top-banners-section">
     <div class="container">
-      <h2 class="section-title">Special Offers</h2>
-      
-      <div class="marketing-banners-container">
-        <div class="marketing-banners-track" id="marketingBannersTrack">
+      <div class="top-banner-carousel-container" id="topBannerContainer">
+        <div class="top-banner-carousel-track" id="topBannerTrack">
           <div class="loading-state">
             <div class="loading-spinner"></div>
-            <p>Loading special offers...</p>
+            <p>Loading offers...</p>
           </div>
         </div>
-        
-        <button class="marketing-nav-btn marketing-prev-btn" id="marketingPrevBtn">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="marketing-nav-btn marketing-next-btn" id="marketingNextBtn">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-        
-        <div class="marketing-dots" id="marketingDots"></div>
+        <button class="carousel-nav-btn prev-btn" id="topPrevBtn"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-nav-btn next-btn" id="topNextBtn"><i class="fas fa-chevron-right"></i></button>
+        <div class="carousel-dots" id="topDots"></div>
       </div>
     </div>
   </section>
@@ -1133,25 +896,17 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
         </div>
       </div>
 
-      <!-- WINE BANNERS -->
-      <h2 class="section-title" style="margin-top: 40px;">Curated Selection</h2>
-      
-      <div class="banner-carousel-container">
-        <div class="banner-carousel-track" id="bannerCarouselTrack">
+      <!-- BOTTOM BANNERS SECTION (Banner Position = bottom) - Replaces Featured Wines -->
+      <div class="bottom-banner-carousel-container" id="bottomBannerContainer">
+        <div class="bottom-banner-carousel-track" id="bottomBannerTrack">
           <div class="loading-state">
             <div class="loading-spinner"></div>
             <p>Loading featured wines...</p>
           </div>
         </div>
-        
-        <button class="carousel-nav-btn prev-btn" id="prevBtn">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="carousel-nav-btn next-btn" id="nextBtn">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-        
-        <div class="carousel-dots" id="carouselDots"></div>
+        <button class="carousel-nav-btn prev-btn" id="bottomPrevBtn"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-nav-btn next-btn" id="bottomNextBtn"><i class="fas fa-chevron-right"></i></button>
+        <div class="carousel-dots" id="bottomDots"></div>
       </div>
 
       <!-- Second Icon Row - Discover by Category -->
@@ -1258,35 +1013,32 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
   </section>
 
   <!-- App promo -->
-<section class="section app-promo">
-  <div class="container app-inner">
-    <div class="app-copy">
-      <h3>Luxury Wine & Champagne</h3>
-      <p class="muted">NOW AT YOUR FINGERTIPS</p>
-      <ul class="feature-list">
-        <li>Deliver Now – Boutique wines delivered to your door</li>
-        <li>Book a Wine Bar – For events or celebrations</li>
-        <li>Wine Bars Near Me – Explore what's happening around you</li>
-        <li>Gifting & Bulk Orders – Make an impression, instantly</li>
-      </ul>
-
-      <p class="tiny">Your luxury wine lifestyle — simplified.</p>
-
-      <div class="app-buttons">
-        <a href="https://play.google.com/store/apps/details?id=com.winebubbles.wine_bubbles_now" target="_blank" rel="noopener noreferrer">
-          <img src="assets/adverts/play_store.png" alt="Google Play" class="app-button">
-        </a>
-        <a href="https://apps.apple.com/app/id6753283481" target="_blank" rel="noopener noreferrer">
-          <img src="assets/adverts/app_store.png" alt="App Store" class="app-button">
-        </a>
+  <section class="section app-promo">
+    <div class="container app-inner">
+      <div class="app-copy">
+        <h3>Luxury Wine & Champagne</h3>
+        <p class="muted">NOW AT YOUR FINGERTIPS</p>
+        <ul class="feature-list">
+          <li>Deliver Now – Boutique wines delivered to your door</li>
+          <li>Book a Wine Bar – For events or celebrations</li>
+          <li>Wine Bars Near Me – Explore what's happening around you</li>
+          <li>Gifting & Bulk Orders – Make an impression, instantly</li>
+        </ul>
+        <p class="tiny">Your luxury wine lifestyle — simplified.</p>
+        <div class="app-buttons">
+          <a href="https://play.google.com/store/apps/details?id=com.winebubbles.wine_bubbles_now" target="_blank" rel="noopener noreferrer">
+            <img src="assets/adverts/play_store.png" alt="Google Play" class="app-button">
+          </a>
+          <a href="https://apps.apple.com/app/id6753283481" target="_blank" rel="noopener noreferrer">
+            <img src="assets/adverts/app_store.png" alt="App Store" class="app-button">
+          </a>
+        </div>
+      </div>
+      <div class="app-visual">
+        <img src="assets/adverts/phone.png" alt="Mobile Apps">
       </div>
     </div>
-
-    <div class="app-visual">
-      <img src="assets/adverts/phone.png" alt="Mobile Apps">
-    </div>
-  </div>
-</section>
+  </section>
 
   <!-- Footer -->
   <footer class="footer">
@@ -1296,13 +1048,12 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
         <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
         <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
         <div class="socials">
-         <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
-         <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-         <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
-         <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
         </div>
       </div>
-
       <div class="footer-links-grid">
         <div class="footer-links-column">
           <h4 class="footer-heading">Quick Links</h4>
@@ -1313,7 +1064,6 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
             <li><a href="wine_farm/wine_farm.html">Wine Bars</a></li>
           </ul>
         </div>
-
         <div class="footer-links-column">
           <h4 class="footer-heading">&nbsp;</h4>
           <ul class="footer-links">
@@ -1341,6 +1091,7 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
           ageModal.style.display = 'none';
           document.body.style.overflow = 'auto';
           console.log('✅ Age verified - user is 18+');
+          location.reload();
         });
         
         document.getElementById('ageConfirmNo').addEventListener('click', function() {
@@ -1358,386 +1109,28 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
     });
   </script>
 
-  <script>
-    // Homepage authentication script with ADMIN REDIRECT
-    document.addEventListener('DOMContentLoaded', function() {
-      const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
-      
-      if (!ageConfirmed) {
-          console.log('⏳ Waiting for age verification...');
-          return;
-      }
-      
-      console.log('🏠 Homepage loaded - checking authentication');
-      
-      // Check if admin should be redirected
-      const storedIsAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
-      const storedToken = localStorage.getItem('wineBubbles_token');
-      
-      // If user is admin, redirect to admin dashboard immediately
-      if (storedIsAdmin && storedToken) {
-          console.log('👑 Admin user detected - redirecting to admin dashboard');
-          window.location.href = 'admin/admin_dashboard.html';
-          return;
-      }
-      
-      function isTokenValid() {
-          const token = localStorage.getItem('wineBubbles_token');
-          const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
-          
-          if (!token || !timestamp) return false;
-          
-          const tokenAge = Date.now() - parseInt(timestamp);
-          const sevenDays = 7 * 24 * 60 * 60 * 1000;
-          
-          return tokenAge < sevenDays;
-      }
-      
-      function clearUserSession() {
-          localStorage.removeItem('wineBubbles_token');
-          localStorage.removeItem('wineBubbles_token_timestamp');
-          localStorage.removeItem('wineBubbles_user');
-          localStorage.removeItem('wineBubbles_isAdmin');
-          localStorage.removeItem('wineBubbles_isDriver');
-          localStorage.removeItem('wineBubbles_userFullName');
-          localStorage.removeItem('wineBubbles_userEmail');
-          localStorage.removeItem('wineBubbles_userPhone');
-          localStorage.removeItem('wineBubbles_userImage');
-          localStorage.removeItem('wineBubbles_userVerified');
-          localStorage.removeItem('wineBubbles_userCreated');
-          
-          clearCartData();
-          updateCartBadge(0);
-      }
-      
-      function clearCartData() {
-          console.log('🧹 Clearing all cart data...');
-          localStorage.removeItem('wineBubbles_cart');
-          localStorage.removeItem('wine_cart');
-          localStorage.removeItem('cart');
-          localStorage.removeItem('wineBubbles_cart_count');
-          localStorage.removeItem('wineBubbles_justLoggedIn');
-      }
-      
-      function updateCartBadge(count) {
-          console.log(`🛒 Updating cart badge to: ${count}`);
-          
-          const cartBadges = document.querySelectorAll('.cart-badge');
-          
-          cartBadges.forEach(badge => {
-              if (count > 0) {
-                  badge.textContent = count;
-                  badge.style.display = 'flex';
-              } else {
-                  badge.textContent = '0';
-                  badge.style.display = 'none';
-              }
-          });
-          
-          localStorage.setItem('wineBubbles_cart_count', count.toString());
-          return count;
-      }
-      
-      function loadCartCount() {
-          console.log('📊 Loading cart count...');
-          
-          const justLoggedIn = localStorage.getItem('wineBubbles_justLoggedIn') === 'true';
-          
-          if (justLoggedIn) {
-              console.log('🆕 User just logged in - resetting cart');
-              localStorage.removeItem('wineBubbles_justLoggedIn');
-              clearCartData();
-              return updateCartBadge(0);
-          }
-          
-          let itemCount = 0;
-          
-          // IMPORTANT: Only check the primary cart source (wine_cart)
-          // This avoids showing stale data from other sources
-          const wineCartData = localStorage.getItem('wine_cart');
-          if (wineCartData) {
-              try {
-                  const wineCart = JSON.parse(wineCartData);
-                  if (wineCart.items && Array.isArray(wineCart.items)) {
-                      itemCount = wineCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                      console.log(`📦 wine_cart has ${itemCount} items`);
-                  } else {
-                      itemCount = 0;
-                  }
-              } catch (error) {
-                  console.error('Error parsing wine_cart:', error);
-                  itemCount = 0;
-              }
-          } else {
-              itemCount = 0;
-          }
-          
-          // Don't check other cart sources to avoid showing stale data
-          // This ensures the badge only shows actual items in the cart
-          
-          console.log(`📊 Final cart count: ${itemCount}`);
-          return updateCartBadge(itemCount);
-      }
-      
-      const token = localStorage.getItem('wineBubbles_token');
-      const userData = localStorage.getItem('wineBubbles_user');
-      const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
-      const isDriver = localStorage.getItem('wineBubbles_isDriver') === 'true';
-      const isValidToken = isTokenValid();
-      
-      const userIcon = document.getElementById('userIcon');
-      const userIconElement = document.getElementById('userIconElement');
-      
-      loadCartCount();
-      
-      if (isValidToken && userData && !isAdmin) {
-          console.log('✅ Regular user is logged in');
-          
-          try {
-              const user = JSON.parse(userData);
-              
-              if (userIconElement) {
-                  userIconElement.className = 'fas fa-user-check';
-                  userIconElement.style.color = '#6b0d2b';
-              }
-              
-              if (userIcon) {
-                  userIcon.href = '#';
-                  userIcon.addEventListener('click', function(e) {
-                      e.preventDefault();
-                      toggleUserDropdown();
-                  });
-              }
-              
-              createUserDropdown(user, isAdmin, isDriver);
-              
-          } catch (error) {
-              console.error('Error parsing user data:', error);
-              clearUserSession();
-              resetUserIcon();
-          }
-          
-      } else if (isValidToken && userData && isAdmin) {
-          // This should not happen due to redirect above, but as a safety net
-          console.log('👑 Admin redirect safety check - redirecting');
-          window.location.href = 'admin/admin_dashboard.html';
-          return;
-      } else {
-          console.log('❌ User is not logged in or token expired');
-          clearUserSession();
-          resetUserIcon();
-      }
-      
-      function resetUserIcon() {
-          if (userIcon) {
-              userIcon.href = 'login/login.html';
-              if (userIconElement) {
-                  userIconElement.className = 'fas fa-sign-in-alt';
-                  userIconElement.style.color = '#6b0d2b';
-              }
-          }
-      }
-      
-      function toggleUserDropdown() {
-          const dropdown = document.querySelector('.user-dropdown');
-          if (dropdown) {
-              dropdown.classList.toggle('show');
-          }
-      }
-      
-      function createUserDropdown(user, isAdmin, isDriver) {
-          const existingDropdown = document.querySelector('.user-dropdown');
-          if (existingDropdown) {
-              existingDropdown.remove();
-          }
-          
-          const dropdown = document.createElement('div');
-          dropdown.className = 'user-dropdown';
-          
-          const userInfo = document.createElement('div');
-          userInfo.className = 'user-dropdown-info';
-          
-          const userName = document.createElement('div');
-          userName.className = 'user-dropdown-name';
-          userName.textContent = user.fullName || user.email.split('@')[0];
-          
-          if (isAdmin) {
-              const adminBadge = document.createElement('span');
-              adminBadge.className = 'admin-badge';
-              adminBadge.textContent = 'ADMIN';
-              userName.appendChild(adminBadge);
-          } else if (isDriver) {
-              const driverBadge = document.createElement('span');
-              driverBadge.className = 'driver-badge';
-              driverBadge.textContent = 'DRIVER';
-              userName.appendChild(driverBadge);
-          }
-          
-          const userEmail = document.createElement('div');
-          userEmail.className = 'user-dropdown-email';
-          userEmail.textContent = user.email;
-          
-          userInfo.appendChild(userName);
-          userInfo.appendChild(userEmail);
-          dropdown.appendChild(userInfo);
-          
-          const items = [];
-          
-          if (isAdmin || isDriver) {
-              items.push(
-                  { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
-              );
-          } else {
-              items.push(
-                  { text: 'My Profile', icon: 'fas fa-user', href: 'user/profile.html' }
-              );
-          }
-          
-          items.forEach(item => {
-              const link = document.createElement('a');
-              link.href = item.href;
-              link.className = 'user-dropdown-link';
-              link.innerHTML = `
-                  <i class="${item.icon}"></i>
-                  <span>${item.text}</span>
-              `;
-              link.addEventListener('mouseenter', () => {
-                  link.style.color = '#6b0d2b';
-              });
-              link.addEventListener('mouseleave', () => {
-                  link.style.color = '#333';
-              });
-              dropdown.appendChild(link);
-          });
-          
-          const logoutButton = document.createElement('button');
-          logoutButton.className = 'user-dropdown-logout';
-          logoutButton.textContent = 'Logout';
-          logoutButton.addEventListener('click', function() {
-              clearUserSession();
-              window.location.href = 'index.html';
-          });
-          
-          dropdown.appendChild(logoutButton);
-          document.body.appendChild(dropdown);
-          
-          document.addEventListener('click', function(event) {
-              const dropdown = document.querySelector('.user-dropdown');
-              if (dropdown && !dropdown.contains(event.target) && 
-                  userIcon && !userIcon.contains(event.target)) {
-                  dropdown.classList.remove('show');
-              }
-          });
-          
-          document.addEventListener('keydown', function(event) {
-              if (event.key === 'Escape') {
-                  const dropdown = document.querySelector('.user-dropdown');
-                  if (dropdown) {
-                      dropdown.classList.remove('show');
-                  }
-              }
-          });
-      }
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      const justLoggedInParam = urlParams.get('login') === 'success';
-
-      if (justLoggedInParam) {
-          const url = new URL(window.location);
-          url.searchParams.delete('login');
-          window.history.replaceState({}, '', url);
-          console.log('✅ Login success parameter cleaned up');
-      }
-      
-      window.addEventListener('storage', function(event) {
-          if (event.key === 'wineBubbles_cart' || event.key === 'wine_cart') {
-              console.log('🔄 Cart storage event detected');
-              loadCartCount();
-          }
-      });
-      
-      window.addEventListener('cartUpdated', function() {
-          console.log('🔄 Custom cart update event received');
-          loadCartCount();
-      });
-      
-      function initializeCart() {
-          if (!localStorage.getItem('wine_cart')) {
-              console.log('📦 Initializing empty cart');
-              const emptyCart = {
-                  items: [],
-                  subtotal: 0,
-                  deliveryFee: 0,
-                  total: 0,
-                  updatedAt: new Date().toISOString()
-              };
-              localStorage.setItem('wine_cart', JSON.stringify(emptyCart));
-          }
-      }
-      
-      initializeCart();
-      
-      console.log('✅ Homepage authentication initialized');
-    });
-  </script>
-
-  <!-- FEATURED WINES BANNER - AUTO-LOAD ON FIRST PAGE LOAD -->
+  <!-- Top Banner Script - Loads adverts with bannerPosition=top -->
   <script>
     (function() {
       'use strict';
       
-      console.log('🎠 Initializing wine banner carousel...');
+      console.log('🎪 Loading TOP BANNERS (bannerPosition=top)...');
       
-      // Immediate execution - don't wait for events
-      let initAttempts = 0;
-      const maxAttempts = 10;
-      
-      function tryInit() {
-        const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+      function loadTopBanners() {
+        const topBannerTrack = document.getElementById('topBannerTrack');
+        const topPrevBtn = document.getElementById('topPrevBtn');
+        const topNextBtn = document.getElementById('topNextBtn');
+        const topDots = document.getElementById('topDots');
         
-        if (!ageConfirmed) {
-          console.log('⏳ Age not verified, will retry in 500ms');
-          if (initAttempts < maxAttempts) {
-            initAttempts++;
-            setTimeout(tryInit, 500);
-          }
-          return;
-        }
+        if (!topBannerTrack) return;
         
-        // Check if admin before loading content
-        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
-        if (isAdmin) return; // Don't load content, redirect already happened
-        
-        // Age verified, load banners immediately
-        loadWineBanners();
-      }
-      
-      // Start immediately
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', tryInit);
-      } else {
-        tryInit();
-      }
-      
-      async function loadWineBanners() {
         const API_BASE_URL = '/api';
         
-        const bannerCarouselTrack = document.getElementById('bannerCarouselTrack');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const carouselDots = document.getElementById('carouselDots');
-        
-        if (!bannerCarouselTrack) {
-          console.error('❌ Banner carousel track not found');
-          return;
-        }
-        
-        let featuredWines = [];
+        let topAdverts = [];
         let currentSlide = 0;
         let isTransitioning = false;
         let autoSlideInterval;
         
-        // Pre-load function to ensure images load
         function preloadImage(url) {
           return new Promise((resolve, reject) => {
             const img = new Image();
@@ -1747,632 +1140,564 @@ _::-webkit-full-page-media, _:future, :root .marketing-banner-image {
           });
         }
         
-        try {
-          console.log('🌐 Fetching ALL featured wines...');
-          
-          // Add cache busting to API call
-          const apiUrl = `${API_BASE_URL}/wines/featured/featured?all=true&_=${Date.now()}`;
-          console.log('📡 Fetching from:', apiUrl);
-          
-          const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Cache-Control': 'no-cache, no-store, must-revalidate'
-            }
-          });
-          
-          if (!response.ok) {
-            throw new Error(`Failed to fetch featured wines: ${response.status}`);
-          }
-          
-          const wines = await response.json();
-          console.log('✅ Raw wines response:', wines);
-          
-          featuredWines = wines;
-          
-          console.log(`🖼️ Found ${featuredWines.length} featured wines`);
-          
-          if (featuredWines.length === 0) {
-            console.log('⚠️ No featured wines found, using fallback');
-            useFallbackWines();
-            return;
-          }
-          
-          // Pre-load all images before rendering
-          const imagePromises = featuredWines.map(wine => {
-            let imageUrl = wine.bannerImageUrl || wine.imageUrl || '';
-            if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
-              if (!imageUrl.startsWith('assets/')) {
-                imageUrl = 'assets/' + imageUrl;
-              }
-            }
-            return preloadImage(imageUrl).catch(() => console.log('Failed to preload:', imageUrl));
-          });
-          
-          await Promise.all(imagePromises);
-          
-          renderCarousel();
-          setupEventListeners();
-          startAutoSlide();
-          
-        } catch (error) {
-          console.error('❌ Error loading featured wines:', error);
-          useFallbackWines();
-        }
+        topBannerTrack.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading offers...</p></div>`;
         
-        function useFallbackWines() {
-          console.log('🍷 Using fallback featured wines');
-          featuredWines = [
-            {
-              id: 1,
-              name: 'The African Diamond Grenache Noir',
-              type: 'Red Wine',
-              price: 299.99,
-              imageUrl: 'assets/wines/breakfast/Noir.png',
-              isFeatured: true
-            },
-            {
-              id: 2,
-              name: 'The African Diamond Grenache Blanc',
-              type: 'White Wine',
-              price: 299.99,
-              imageUrl: 'assets/wines/breakfast/Blanc.png',
-              isFeatured: true
-            },
-            {
-              id: 3,
-              name: 'YBY Crystal Dry',
-              type: 'Champagne',
-              price: 499.99,
-              imageUrl: 'assets/wines/breakfast/YBY.png',
-              isFeatured: true
-            },
-            {
-              id: 4,
-              name: 'Montpellier MCC Brut Chardonnay',
-              type: 'Champagne',
-              price: 255.00,
-              imageUrl: 'assets/wines/breakfast/Montpellier_MCC.png',
-              isFeatured: true
+        fetch(`${API_BASE_URL}/adverts/active?bannerPosition=top&_=${Date.now()}`)
+          .then(response => response.json())
+          .then(adverts => {
+            console.log('✅ Top banners API response:', adverts);
+            if (Array.isArray(adverts) && adverts.length > 0) {
+              topAdverts = adverts.filter(ad => ad.isActive !== false);
+            } else {
+              topAdverts = [];
             }
-          ];
-          
-          renderCarousel();
-          setupEventListeners();
-          startAutoSlide();
-        }
-        
-        function renderCarousel() {
-          if (!bannerCarouselTrack) return;
-          
-          bannerCarouselTrack.innerHTML = '';
-          if (carouselDots) carouselDots.innerHTML = '';
-          
-          featuredWines.forEach((wine, index) => {
-            createSlide(wine, index);
-          });
-          
-          // Force immediate display
-          setTimeout(() => {
-            updateCarouselPosition();
-          }, 10);
-        }
-        
-        function createSlide(wine, index) {
-          const slide = document.createElement('div');
-          slide.className = 'banner-carousel-slide';
-          slide.dataset.index = index;
-          slide.dataset.wineId = wine.id;
-          
-          let imageUrl = wine.bannerImageUrl || wine.imageUrl || '';
-          
-          if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
-            if (!imageUrl.startsWith('assets/')) {
-              imageUrl = 'assets/' + imageUrl;
+            
+            if (topAdverts.length === 0) {
+              topBannerTrack.innerHTML = '';
+              topBannerTrack.parentElement.style.display = 'none';
+              return;
             }
-          }
-          
-          if (!imageUrl) {
-            imageUrl = 'assets/wines/breakfast/Noir.png';
-          }
-          
-          slide.innerHTML = `
-            <img src="${imageUrl}" 
-                 alt="${wine.name}" 
-                 class="banner-carousel-image"
-                 loading="eager"
-                 decoding="async"
-                 onload="this.style.opacity=1"
-                 style="opacity: 1;"
-                 onerror="this.onerror=null; this.src='assets/wines/breakfast/Noir.png';">
-            <div class="banner-slide-overlay">
-              <div class="banner-slide-title">${wine.name}</div>
-              <div class="banner-slide-subtitle">${wine.type || 'Premium Wine'}</div>
-              <div class="banner-slide-price">R${(wine.price || 0).toFixed(2)}</div>
-            </div>
-          `;
-          
-          slide.addEventListener('click', (e) => {
-            if (!isTransitioning) {
-              navigateToWineDetail(wine.id);
-            }
-          });
-          
-          bannerCarouselTrack.appendChild(slide);
-          
-          if (carouselDots) {
-            const dot = document.createElement('span');
-            dot.className = 'carousel-dot';
-            if (index === 0) dot.classList.add('active');
-            dot.dataset.index = index;
-            dot.addEventListener('click', (event) => {
-              event.stopPropagation();
-              if (!isTransitioning) {
-                clearInterval(autoSlideInterval);
-                goToSlide(index);
-                startAutoSlide();
-              }
-            });
-            carouselDots.appendChild(dot);
-          }
-        }
-        
-        function setupEventListeners() {
-          if (prevBtn) {
-            prevBtn.addEventListener('click', (event) => {
-              event.stopPropagation();
-              if (!isTransitioning) {
-                clearInterval(autoSlideInterval);
-                prevSlide();
-                startAutoSlide();
-              }
-            });
-          }
-          
-          if (nextBtn) {
-            nextBtn.addEventListener('click', (event) => {
-              event.stopPropagation();
-              if (!isTransitioning) {
-                clearInterval(autoSlideInterval);
-                nextSlide();
-                startAutoSlide();
-              }
-            });
-          }
-          
-          if (bannerCarouselTrack) {
-            bannerCarouselTrack.addEventListener('mouseenter', () => {
-              clearInterval(autoSlideInterval);
+            
+            const imagePromises = topAdverts.map(ad => {
+              let imagePath = ad.targetUrl || ad.imageUrl || '';
+              return preloadImage(imagePath).catch(() => console.log('Failed to preload:', imagePath));
             });
             
-            bannerCarouselTrack.addEventListener('mouseleave', () => {
-              startAutoSlide();
+            return Promise.all(imagePromises).then(() => {
+              renderTopBanners();
+              setupTopEventListeners();
+              startTopAutoSlide();
             });
-          }
-        }
-        
-        function nextSlide() {
-          if (isTransitioning || featuredWines.length === 0) return;
-          const nextSlideIndex = (currentSlide + 1) % featuredWines.length;
-          goToSlide(nextSlideIndex);
-        }
-        
-        function prevSlide() {
-          if (isTransitioning || featuredWines.length === 0) return;
-          const prevSlideIndex = (currentSlide - 1 + featuredWines.length) % featuredWines.length;
-          goToSlide(prevSlideIndex);
-        }
-        
-        function goToSlide(slideIndex) {
-          if (isTransitioning || slideIndex === currentSlide || featuredWines.length === 0) return;
-          
-          isTransitioning = true;
-          currentSlide = slideIndex;
-          updateCarouselPosition();
-          
-          setTimeout(() => {
-            isTransitioning = false;
-          }, 600);
-        }
-        
-        function updateCarouselPosition() {
-          if (!bannerCarouselTrack) return;
-          
-          const translateX = -currentSlide * 100;
-          bannerCarouselTrack.style.transition = 'transform 0.6s ease-in-out';
-          bannerCarouselTrack.style.transform = `translateX(${translateX}%)`;
-          
-          if (carouselDots) {
-            document.querySelectorAll('.carousel-dot').forEach((dot, index) => {
-              dot.classList.toggle('active', index === currentSlide);
-            });
-          }
-          
-          if (prevBtn) prevBtn.disabled = currentSlide === 0;
-          if (nextBtn) nextBtn.disabled = currentSlide >= featuredWines.length - 1;
-        }
-        
-        function startAutoSlide() {
-          clearInterval(autoSlideInterval);
-          if (featuredWines.length > 1) {
-            autoSlideInterval = setInterval(() => {
-              if (!isTransitioning) {
-                nextSlide();
-              }
-            }, 4000);
-          }
-        }
-        
-        function navigateToWineDetail(wineId) {
-          console.log(`📱 Navigating to wine detail: ${wineId}`);
-          window.location.href = `wine/wine_detail.html?id=${wineId}`;
-        }
-      }
-    })();
-  </script>
-
-  <!-- MARKETING BANNERS - AUTO-LOAD ON FIRST PAGE LOAD -->
-  <script>
-    (function() {
-      'use strict';
-      
-      console.log('🎪 Starting marketing banners');
-      
-      let initAttempts = 0;
-      const maxAttempts = 10;
-      
-      function tryInit() {
-        const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
-        
-        if (!ageConfirmed) {
-          console.log('⏳ Age not verified for marketing, will retry in 500ms');
-          if (initAttempts < maxAttempts) {
-            initAttempts++;
-            setTimeout(tryInit, 500);
-          }
-          return;
-        }
-        
-        // Check if admin before loading content
-        const isAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
-        if (isAdmin) return; // Don't load content, redirect already happened
-        
-        loadMarketingBanners();
-      }
-      
-      // Start immediately
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', tryInit);
-      } else {
-        tryInit();
-      }
-      
-      async function loadMarketingBanners() {
-        const marketingBannersTrack = document.getElementById('marketingBannersTrack');
-        const marketingPrevBtn = document.getElementById('marketingPrevBtn');
-        const marketingNextBtn = document.getElementById('marketingNextBtn');
-        const marketingDots = document.getElementById('marketingDots');
-        
-        if (!marketingBannersTrack) {
-          console.error('❌ Marketing banners track not found!');
-          return;
-        }
-        
-        const API_BASE_URL = '/api';
-        
-        let marketingAdverts = [];
-        let currentMarketingSlide = 0;
-        let isMarketingTransitioning = false;
-        let marketingAutoSlideInterval;
-        
-        // Pre-load function
-        function preloadImage(url) {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(url);
-            img.onerror = () => reject(url);
-            img.src = url;
+          })
+          .catch(error => {
+            console.error('Error loading top banners:', error);
+            topBannerTrack.innerHTML = '';
+            topBannerTrack.parentElement.style.display = 'none';
           });
-        }
         
-        // Show loading state
-        marketingBannersTrack.innerHTML = `
-          <div class="loading-state">
-            <div class="loading-spinner"></div>
-            <p>Loading special offers...</p>
-          </div>
-        `;
-        
-        try {
-          const apiUrl = `${API_BASE_URL}/adverts/active?type=homepage&_=${Date.now()}`;
-          console.log('🌐 FETCHING FROM PROXY:', apiUrl);
+        function renderTopBanners() {
+          topBannerTrack.innerHTML = '';
+          if (topDots) topDots.innerHTML = '';
           
-          const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Cache-Control': 'no-cache, no-store, must-revalidate'
-            }
-          });
-          
-          console.log('📡 RESPONSE STATUS:', response.status);
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-          
-          const adverts = await response.json();
-          console.log('✅ BACKEND RESPONSE:', adverts);
-          
-          if (Array.isArray(adverts) && adverts.length > 0) {
-            marketingAdverts = adverts.filter(advert => 
-              advert.isActive === true || advert.isActive === undefined
-            );
-            console.log(`✅ GOT ${marketingAdverts.length} ACTIVE ADVERTS FROM BACKEND`);
-          } else if (Array.isArray(adverts) && adverts.length === 0) {
-            console.log('⚠️ Backend returned empty array');
-            marketingAdverts = [];
-          } else {
-            console.log('⚠️ Unexpected response format, using fallback');
-            useFallbackAdverts();
-            return;
-          }
-          
-          if (marketingAdverts.length === 0) {
-            console.log('⚠️ No active adverts found');
-            showEmptyState();
-            return;
-          }
-          
-          // Pre-load all images before rendering
-          const imagePromises = marketingAdverts.map(advert => {
-            let imagePath = advert.targetUrl || advert.imageUrl || advert.imagePath || '';
+          topAdverts.forEach((advert, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'top-banner-slide';
+            slide.dataset.index = index;
+            slide.dataset.advertId = advert.id;
+            
+            let imagePath = advert.targetUrl || advert.imageUrl || '';
             if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
               if (!imagePath.startsWith('assets/')) {
                 imagePath = 'assets/' + imagePath;
               }
             }
-            return preloadImage(imagePath).catch(() => console.log('Failed to preload:', imagePath));
-          });
-          
-          await Promise.all(imagePromises);
-          
-          renderMarketingBanners();
-          setupMarketingEventListeners();
-          startMarketingAutoSlide();
-          
-        } catch (error) {
-          console.error('❌ ERROR LOADING ADVERTS:', error);
-          useFallbackAdverts();
-        }
-        
-        function useFallbackAdverts() {
-          console.log('🔄 USING FALLBACK ADVERTS');
-          
-          marketingAdverts = [
-            {
-              id: 'fallback-1',
-              title: 'African Diamond Blanc',
-              subtitle: 'Premium selection for connoisseurs',
-              targetUrl: 'assets/adverts/African_Diamond_Blanc.png',
-              isActive: true,
-              type: 'homepage'
-            },
-            {
-              id: 'fallback-2',
-              title: 'Ferrero Rocher Collection',
-              subtitle: 'Perfect pairing for special moments',
-              targetUrl: 'assets/adverts/ferrero.png',
-              isActive: true,
-              type: 'homepage'
-            },
-            {
-              id: 'fallback-3',
-              title: 'Moët & Chandon Rosé',
-              subtitle: 'Celebrate with premium champagne',
-              targetUrl: 'assets/adverts/moet_rose.png',
-              isActive: true,
-              type: 'homepage'
-            }
-          ];
-          
-          renderMarketingBanners();
-          setupMarketingEventListeners();
-          startMarketingAutoSlide();
-        }
-        
-        function showEmptyState() {
-          marketingBannersTrack.innerHTML = `
-            <div class="carousel-empty-state">
-              <i class="fas fa-tag"></i>
-              <h3>No Special Offers Available</h3>
-              <p>Check back soon for exciting promotions</p>
-            </div>
-          `;
-          
-          if (marketingPrevBtn) marketingPrevBtn.style.display = 'none';
-          if (marketingNextBtn) marketingNextBtn.style.display = 'none';
-          if (marketingDots) marketingDots.style.display = 'none';
-        }
-        
-        function renderMarketingBanners() {
-          console.log('🎨 RENDERING BANNERS:', marketingAdverts.length);
-          
-          marketingBannersTrack.innerHTML = '';
-          if (marketingDots) marketingDots.innerHTML = '';
-          
-          marketingAdverts.forEach((advert, index) => {
-            createMarketingSlide(advert, index);
-          });
-          
-          setTimeout(() => {
-            updateMarketingCarouselPosition();
-          }, 10);
-        }
-        
-        function createMarketingSlide(advert, index) {
-          const slide = document.createElement('div');
-          slide.className = 'marketing-banner-slide';
-          slide.dataset.index = index;
-          slide.dataset.advertId = advert.id;
-          
-          let imagePath = advert.targetUrl || '';
-          
-          if (!imagePath) {
-            imagePath = advert.imageUrl || advert.imagePath || '';
-          }
-          
-          if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
-            if (!imagePath.startsWith('assets/')) {
-              imagePath = 'assets/' + imagePath;
-            }
-          }
-          
-          if (!imagePath) {
-            imagePath = 'assets/adverts/default_marketing.jpg';
-          }
-          
-          slide.innerHTML = `
-            <img src="${imagePath}" 
-                 alt="${advert.title}" 
-                 class="marketing-banner-image"
-                 loading="eager"
-                 decoding="async"
-                 onload="this.style.opacity=1"
-                 style="opacity: 1;"
-                 onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg';">
             
-            <div class="marketing-banner-overlay">
-              <div class="marketing-banner-title">${advert.title}</div>
-              <div class="marketing-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
-            </div>
-          `;
-          
-          slide.addEventListener('click', (event) => {
-            if (!isMarketingTransitioning) {
-              event.preventDefault();
-              handleAdvertClick(advert);
+            slide.innerHTML = `
+              <img src="${imagePath}" alt="${advert.title}" class="top-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
+              <div class="top-banner-overlay">
+                <div class="top-banner-title">${advert.title}</div>
+                <div class="top-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
+              </div>
+            `;
+            
+            slide.addEventListener('click', () => {
+              if (!isTransitioning) {
+                if (advert.wineId) {
+                  window.location.href = `wine/wine_detail.html?id=${advert.wineId}`;
+                } else if (advert.targetUrl && advert.targetUrl.includes('http')) {
+                  window.open(advert.targetUrl, '_blank');
+                }
+              }
+            });
+            
+            topBannerTrack.appendChild(slide);
+            
+            if (topDots) {
+              const dot = document.createElement('span');
+              dot.className = 'carousel-dot';
+              if (index === 0) dot.classList.add('active');
+              dot.dataset.index = index;
+              dot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!isTransitioning) {
+                  clearInterval(autoSlideInterval);
+                  goToSlide(index);
+                  startTopAutoSlide();
+                }
+              });
+              topDots.appendChild(dot);
             }
           });
           
-          slide.style.cursor = 'pointer';
-          
-          marketingBannersTrack.appendChild(slide);
-          
-          if (marketingDots) {
-            const dot = document.createElement('span');
-            dot.className = 'marketing-dot';
-            if (index === 0) dot.classList.add('active');
-            dot.dataset.index = index;
-            dot.addEventListener('click', (event) => {
-              event.stopPropagation();
-              if (!isMarketingTransitioning) {
-                clearInterval(marketingAutoSlideInterval);
-                goToMarketingSlide(index);
-                startMarketingAutoSlide();
-              }
-            });
-            marketingDots.appendChild(dot);
-          }
+          setTimeout(() => updateCarouselPosition(), 10);
         }
         
-        function setupMarketingEventListeners() {
-          if (marketingPrevBtn) {
-            marketingPrevBtn.addEventListener('click', (event) => {
-              event.stopPropagation();
-              if (!isMarketingTransitioning) {
-                clearInterval(marketingAutoSlideInterval);
-                prevMarketingSlide();
-                startMarketingAutoSlide();
+        function setupTopEventListeners() {
+          if (topPrevBtn) {
+            topPrevBtn.addEventListener('click', () => {
+              if (!isTransitioning) {
+                clearInterval(autoSlideInterval);
+                prevSlide();
+                startTopAutoSlide();
               }
             });
           }
-          
-          if (marketingNextBtn) {
-            marketingNextBtn.addEventListener('click', (event) => {
-              event.stopPropagation();
-              if (!isMarketingTransitioning) {
-                clearInterval(marketingAutoSlideInterval);
-                nextMarketingSlide();
-                startMarketingAutoSlide();
+          if (topNextBtn) {
+            topNextBtn.addEventListener('click', () => {
+              if (!isTransitioning) {
+                clearInterval(autoSlideInterval);
+                nextSlide();
+                startTopAutoSlide();
               }
             });
           }
-          
-          if (marketingBannersTrack) {
-            marketingBannersTrack.addEventListener('mouseenter', () => {
-              clearInterval(marketingAutoSlideInterval);
-            });
-            
-            marketingBannersTrack.addEventListener('mouseleave', () => {
-              startMarketingAutoSlide();
-            });
+          if (topBannerTrack) {
+            topBannerTrack.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+            topBannerTrack.addEventListener('mouseleave', () => startTopAutoSlide());
           }
         }
         
-        function nextMarketingSlide() {
-          if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-          const nextSlideIndex = (currentMarketingSlide + 1) % marketingAdverts.length;
-          goToMarketingSlide(nextSlideIndex);
+        function nextSlide() {
+          if (isTransitioning || topAdverts.length === 0) return;
+          goToSlide((currentSlide + 1) % topAdverts.length);
         }
         
-        function prevMarketingSlide() {
-          if (isMarketingTransitioning || marketingAdverts.length === 0) return;
-          const prevSlideIndex = (currentMarketingSlide - 1 + marketingAdverts.length) % marketingAdverts.length;
-          goToMarketingSlide(prevSlideIndex);
+        function prevSlide() {
+          if (isTransitioning || topAdverts.length === 0) return;
+          goToSlide((currentSlide - 1 + topAdverts.length) % topAdverts.length);
         }
         
-        function goToMarketingSlide(slideIndex) {
-          if (isMarketingTransitioning || slideIndex === currentMarketingSlide || marketingAdverts.length === 0) return;
-          currentMarketingSlide = slideIndex;
-          updateMarketingCarouselPosition();
+        function goToSlide(slideIndex) {
+          if (isTransitioning || slideIndex === currentSlide || topAdverts.length === 0) return;
+          isTransitioning = true;
+          currentSlide = slideIndex;
+          updateCarouselPosition();
+          setTimeout(() => { isTransitioning = false; }, 600);
         }
         
-        function updateMarketingCarouselPosition() {
-          if (!marketingBannersTrack) return;
-          const translateX = -currentMarketingSlide * 100;
-          marketingBannersTrack.style.transition = 'transform 0.6s ease-in-out';
-          marketingBannersTrack.style.transform = `translateX(${translateX}%)`;
+        function updateCarouselPosition() {
+          if (!topBannerTrack) return;
+          topBannerTrack.style.transition = 'transform 0.6s ease-in-out';
+          topBannerTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
           
-          if (marketingDots) {
-            document.querySelectorAll('.marketing-dot').forEach((dot, index) => {
-              dot.classList.toggle('active', index === currentMarketingSlide);
+          if (topDots) {
+            document.querySelectorAll('#topDots .carousel-dot').forEach((dot, idx) => {
+              dot.classList.toggle('active', idx === currentSlide);
             });
           }
         }
         
-        function startMarketingAutoSlide() {
-          clearInterval(marketingAutoSlideInterval);
-          if (marketingAdverts.length > 1) {
-            marketingAutoSlideInterval = setInterval(() => {
-              if (!isMarketingTransitioning) {
-                nextMarketingSlide();
-              }
-            }, 4000);
-          }
-        }
-        
-        function handleAdvertClick(advert) {
-          console.log(`📱 Advert clicked:`, advert);
-          
-          if (advert.id && !advert.id.toString().startsWith('fallback')) {
-            fetch(`${API_BASE_URL}/adverts/track/click`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ advertId: advert.id })
-            }).catch(err => console.log('Click tracking error:', err));
-            
-            const advertId = encodeURIComponent(advert.id);
-            window.location.href = `adverts/advert_detail.html?id=${advertId}`;
-          } else {
-            alert(`Special Offer: ${advert.title}\n${advert.subtitle || ''}`);
+        function startTopAutoSlide() {
+          clearInterval(autoSlideInterval);
+          if (topAdverts.length > 1) {
+            autoSlideInterval = setInterval(nextSlide, 4000);
           }
         }
       }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadTopBanners);
+      } else {
+        loadTopBanners();
+      }
     })();
+  </script>
+
+  <!-- Bottom Banner Script - Loads adverts with bannerPosition=bottom OR fallback to featured wines -->
+  <script>
+    (function() {
+      'use strict';
+      
+      console.log('🎪 Loading BOTTOM BANNERS (bannerPosition=bottom) or featured wines...');
+      
+      function loadBottomBanners() {
+        const bottomBannerTrack = document.getElementById('bottomBannerTrack');
+        const bottomPrevBtn = document.getElementById('bottomPrevBtn');
+        const bottomNextBtn = document.getElementById('bottomNextBtn');
+        const bottomDots = document.getElementById('bottomDots');
+        
+        if (!bottomBannerTrack) return;
+        
+        const API_BASE_URL = '/api';
+        
+        let items = [];
+        let currentSlide = 0;
+        let isTransitioning = false;
+        let autoSlideInterval;
+        
+        function preloadImage(url) {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(url);
+            img.onerror = () => reject(url);
+            img.src = url;
+          });
+        }
+        
+        bottomBannerTrack.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading featured wines...</p></div>`;
+        
+        // First try to load bottom banner adverts
+        fetch(`${API_BASE_URL}/adverts/active?bannerPosition=bottom&_=${Date.now()}`)
+          .then(response => response.json())
+          .then(adverts => {
+            console.log('✅ Bottom banners API response:', adverts);
+            if (Array.isArray(adverts) && adverts.length > 0) {
+              const activeAdverts = adverts.filter(ad => ad.isActive !== false);
+              if (activeAdverts.length > 0) {
+                items = activeAdverts.map(ad => ({ type: 'advert', data: ad }));
+                return Promise.resolve();
+              }
+            }
+            // If no bottom adverts, load featured wines as fallback
+            return fetch(`${API_BASE_URL}/wines/featured/featured?all=true&_=${Date.now()}`);
+          })
+          .then(response => {
+            if (response && response.ok && items.length === 0) {
+              return response.json();
+            }
+            return null;
+          })
+          .then(wines => {
+            if (wines && Array.isArray(wines) && wines.length > 0 && items.length === 0) {
+              items = wines.map(wine => ({ type: 'wine', data: wine }));
+            }
+            
+            if (items.length === 0) {
+              bottomBannerTrack.innerHTML = '';
+              bottomBannerTrack.parentElement.style.display = 'none';
+              return;
+            }
+            
+            const imagePromises = items.map(item => {
+              let imagePath = '';
+              if (item.type === 'advert') {
+                imagePath = item.data.targetUrl || item.data.imageUrl || '';
+              } else {
+                imagePath = item.data.bannerImageUrl || item.data.imageUrl || '';
+              }
+              return preloadImage(imagePath).catch(() => console.log('Failed to preload:', imagePath));
+            });
+            
+            return Promise.all(imagePromises).then(() => {
+              renderBottomBanners();
+              setupBottomEventListeners();
+              startBottomAutoSlide();
+            });
+          })
+          .catch(error => {
+            console.error('Error loading bottom banners:', error);
+            bottomBannerTrack.innerHTML = '';
+            bottomBannerTrack.parentElement.style.display = 'none';
+          });
+        
+        function renderBottomBanners() {
+          bottomBannerTrack.innerHTML = '';
+          if (bottomDots) bottomDots.innerHTML = '';
+          
+          items.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'bottom-banner-slide';
+            
+            let imagePath = '';
+            let title = '';
+            let subtitle = '';
+            let linkId = null;
+            let linkUrl = '';
+            
+            if (item.type === 'advert') {
+              imagePath = item.data.targetUrl || item.data.imageUrl || '';
+              title = item.data.title;
+              subtitle = item.data.subtitle || 'Special Offer';
+              linkId = item.data.wineId;
+              linkUrl = item.data.targetUrl;
+            } else {
+              imagePath = item.data.bannerImageUrl || item.data.imageUrl || '';
+              title = item.data.name;
+              subtitle = item.data.type || 'Premium Wine';
+              linkId = item.data.id;
+            }
+            
+            if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+              if (!imagePath.startsWith('assets/')) {
+                imagePath = 'assets/' + imagePath;
+              }
+            }
+            
+            slide.innerHTML = `
+              <img src="${imagePath}" alt="${title}" class="bottom-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
+              <div class="bottom-banner-overlay">
+                <div class="bottom-banner-title">${title}</div>
+                <div class="bottom-banner-subtitle">${subtitle}</div>
+              </div>
+            `;
+            
+            slide.addEventListener('click', () => {
+              if (!isTransitioning) {
+                if (item.type === 'advert' && linkId) {
+                  window.location.href = `wine/wine_detail.html?id=${linkId}`;
+                } else if (item.type === 'advert' && linkUrl && linkUrl.includes('http')) {
+                  window.open(linkUrl, '_blank');
+                } else if (item.type === 'wine' && linkId) {
+                  window.location.href = `wine/wine_detail.html?id=${linkId}`;
+                }
+              }
+            });
+            
+            bottomBannerTrack.appendChild(slide);
+            
+            if (bottomDots) {
+              const dot = document.createElement('span');
+              dot.className = 'carousel-dot';
+              if (index === 0) dot.classList.add('active');
+              dot.dataset.index = index;
+              dot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!isTransitioning) {
+                  clearInterval(autoSlideInterval);
+                  goToSlide(index);
+                  startBottomAutoSlide();
+                }
+              });
+              bottomDots.appendChild(dot);
+            }
+          });
+          
+          setTimeout(() => updateCarouselPosition(), 10);
+        }
+        
+        function setupBottomEventListeners() {
+          if (bottomPrevBtn) {
+            bottomPrevBtn.addEventListener('click', () => {
+              if (!isTransitioning) {
+                clearInterval(autoSlideInterval);
+                prevSlide();
+                startBottomAutoSlide();
+              }
+            });
+          }
+          if (bottomNextBtn) {
+            bottomNextBtn.addEventListener('click', () => {
+              if (!isTransitioning) {
+                clearInterval(autoSlideInterval);
+                nextSlide();
+                startBottomAutoSlide();
+              }
+            });
+          }
+          if (bottomBannerTrack) {
+            bottomBannerTrack.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+            bottomBannerTrack.addEventListener('mouseleave', () => startBottomAutoSlide());
+          }
+        }
+        
+        function nextSlide() {
+          if (isTransitioning || items.length === 0) return;
+          goToSlide((currentSlide + 1) % items.length);
+        }
+        
+        function prevSlide() {
+          if (isTransitioning || items.length === 0) return;
+          goToSlide((currentSlide - 1 + items.length) % items.length);
+        }
+        
+        function goToSlide(slideIndex) {
+          if (isTransitioning || slideIndex === currentSlide || items.length === 0) return;
+          isTransitioning = true;
+          currentSlide = slideIndex;
+          updateCarouselPosition();
+          setTimeout(() => { isTransitioning = false; }, 600);
+        }
+        
+        function updateCarouselPosition() {
+          if (!bottomBannerTrack) return;
+          bottomBannerTrack.style.transition = 'transform 0.6s ease-in-out';
+          bottomBannerTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+          
+          if (bottomDots) {
+            document.querySelectorAll('#bottomDots .carousel-dot').forEach((dot, idx) => {
+              dot.classList.toggle('active', idx === currentSlide);
+            });
+          }
+        }
+        
+        function startBottomAutoSlide() {
+          clearInterval(autoSlideInterval);
+          if (items.length > 1) {
+            autoSlideInterval = setInterval(nextSlide, 4000);
+          }
+        }
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadBottomBanners);
+      } else {
+        loadBottomBanners();
+      }
+    })();
+  </script>
+
+  <!-- Authentication Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+      if (!ageConfirmed) return;
+      
+      const storedIsAdmin = localStorage.getItem('wineBubbles_isAdmin') === 'true';
+      const storedToken = localStorage.getItem('wineBubbles_token');
+      
+      if (storedIsAdmin && storedToken) {
+        window.location.href = 'admin/admin_dashboard.html';
+        return;
+      }
+      
+      function isTokenValid() {
+        const token = localStorage.getItem('wineBubbles_token');
+        const timestamp = localStorage.getItem('wineBubbles_token_timestamp');
+        if (!token || !timestamp) return false;
+        const tokenAge = Date.now() - parseInt(timestamp);
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        return tokenAge < sevenDays;
+      }
+      
+      function clearUserSession() {
+        localStorage.removeItem('wineBubbles_token');
+        localStorage.removeItem('wineBubbles_token_timestamp');
+        localStorage.removeItem('wineBubbles_user');
+        localStorage.removeItem('wineBubbles_isAdmin');
+        localStorage.removeItem('wineBubbles_isDriver');
+        localStorage.removeItem('wineBubbles_userFullName');
+        localStorage.removeItem('wineBubbles_userEmail');
+        localStorage.removeItem('wineBubbles_userPhone');
+        localStorage.removeItem('wineBubbles_userImage');
+        localStorage.removeItem('wineBubbles_userVerified');
+        localStorage.removeItem('wineBubbles_userCreated');
+        localStorage.removeItem('wineBubbles_cart');
+        localStorage.removeItem('wine_cart');
+        localStorage.removeItem('cart');
+        localStorage.removeItem('wineBubbles_cart_count');
+      }
+      
+      function updateCartBadge(count) {
+        const cartBadges = document.querySelectorAll('.cart-badge');
+        cartBadges.forEach(badge => {
+          if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'flex';
+          } else {
+            badge.textContent = '0';
+            badge.style.display = 'none';
+          }
+        });
+        localStorage.setItem('wineBubbles_cart_count', count.toString());
+        return count;
+      }
+      
+      function loadCartCount() {
+        let itemCount = 0;
+        const wineCartData = localStorage.getItem('wine_cart');
+        if (wineCartData) {
+          try {
+            const wineCart = JSON.parse(wineCartData);
+            if (wineCart.items && Array.isArray(wineCart.items)) {
+              itemCount = wineCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+            }
+          } catch (error) {
+            console.error('Error parsing wine_cart:', error);
+          }
+        }
+        return updateCartBadge(itemCount);
+      }
+      
+      const userData = localStorage.getItem('wineBubbles_user');
+      const isValidToken = isTokenValid();
+      const userIcon = document.getElementById('userIcon');
+      const userIconElement = document.getElementById('userIconElement');
+      
+      loadCartCount();
+      
+      if (isValidToken && userData && !storedIsAdmin) {
+        try {
+          const user = JSON.parse(userData);
+          if (userIconElement) {
+            userIconElement.className = 'fas fa-user-check';
+            userIconElement.style.color = '#6b0d2b';
+          }
+          if (userIcon) {
+            userIcon.href = '#';
+            userIcon.addEventListener('click', function(e) {
+              e.preventDefault();
+              toggleUserDropdown();
+            });
+          }
+          createUserDropdown(user, false, false);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          clearUserSession();
+          resetUserIcon();
+        }
+      } else if (!isValidToken || !userData) {
+        clearUserSession();
+        resetUserIcon();
+      }
+      
+      function resetUserIcon() {
+        if (userIcon) {
+          userIcon.href = 'login/login.html';
+          if (userIconElement) {
+            userIconElement.className = 'fas fa-sign-in-alt';
+            userIconElement.style.color = '#6b0d2b';
+          }
+        }
+      }
+      
+      function toggleUserDropdown() {
+        const dropdown = document.querySelector('.user-dropdown');
+        if (dropdown) dropdown.classList.toggle('show');
+      }
+      
+      function createUserDropdown(user, isAdmin, isDriver) {
+        const existingDropdown = document.querySelector('.user-dropdown');
+        if (existingDropdown) existingDropdown.remove();
+        
+        const dropdown = document.createElement('div');
+        dropdown.className = 'user-dropdown';
+        dropdown.innerHTML = `
+          <div class="user-dropdown-info">
+            <div class="user-dropdown-name">${user.fullName || user.email.split('@')[0]}${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}${isDriver ? '<span class="driver-badge">DRIVER</span>' : ''}</div>
+            <div class="user-dropdown-email">${user.email}</div>
+          </div>
+          <a href="user/profile.html" class="user-dropdown-link"><i class="fas fa-user"></i> My Profile</a>
+          <button class="user-dropdown-logout">Logout</button>
+        `;
+        
+        dropdown.querySelector('.user-dropdown-logout').addEventListener('click', function() {
+          clearUserSession();
+          window.location.href = 'index.html';
+        });
+        
+        document.body.appendChild(dropdown);
+        
+        document.addEventListener('click', function(event) {
+          const dropdownEl = document.querySelector('.user-dropdown');
+          if (dropdownEl && !dropdownEl.contains(event.target) && userIcon && !userIcon.contains(event.target)) {
+            dropdownEl.classList.remove('show');
+          }
+        });
+      }
+      
+      window.addEventListener('storage', function(event) {
+        if (event.key === 'wine_cart') loadCartCount();
+      });
+      
+      window.addEventListener('cartUpdated', function() { loadCartCount(); });
+      
+      function initializeCart() {
+        if (!localStorage.getItem('wine_cart')) {
+          localStorage.setItem('wine_cart', JSON.stringify({ items: [], subtotal: 0, deliveryFee: 0, total: 0, updatedAt: new Date().toISOString() }));
+        }
+      }
+      initializeCart();
+    });
   </script>
 </body>
 </html>
