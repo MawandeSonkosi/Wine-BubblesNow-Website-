@@ -373,6 +373,10 @@
     }
     
     /* ========== TOP BANNER CAROUSEL STYLES ========== */
+    .top-banners-section {
+      margin-top: 40px;
+    }
+    
     .top-banner-carousel-container {
       position: relative;
       max-width: 1000px;
@@ -380,12 +384,7 @@
       overflow: hidden;
       border-radius: 16px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-      background: #f9f9f9;
-      background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      height: 380px;
+      height: 550px;
       z-index: 1;
     }
     
@@ -417,7 +416,6 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      background: #f8f8f8;
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -426,10 +424,10 @@
     .top-banner-image {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      -webkit-object-fit: cover;
-      -moz-object-fit: cover;
-      -o-object-fit: cover;
+      object-fit: contain;
+      -webkit-object-fit: contain;
+      -moz-object-fit: contain;
+      -o-object-fit: contain;
       object-position: center center;
       -webkit-object-position: center center;
       -moz-object-position: center center;
@@ -480,18 +478,6 @@
       font-weight: 500;
     }
     
-    .top-banner-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: #6b0d2b;
-      background: rgba(255,255,255,0.95);
-      display: inline-block;
-      padding: 8px 20px;
-      border-radius: 25px;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    
     /* ========== BOTTOM BANNER CAROUSEL STYLES ========== */
     .bottom-banner-carousel-container {
       position: relative;
@@ -500,12 +486,7 @@
       overflow: hidden;
       border-radius: 16px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-      background: #f9f9f9;
-      background: -webkit-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -moz-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: -o-linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      background: linear-gradient(135deg, #f9f9f9, #f5f5f5);
-      height: 380px;
+      height: 550px;
       z-index: 1;
     }
     
@@ -537,7 +518,6 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      background: #f8f8f8;
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -546,10 +526,10 @@
     .bottom-banner-image {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      -webkit-object-fit: cover;
-      -moz-object-fit: cover;
-      -o-object-fit: cover;
+      object-fit: contain;
+      -webkit-object-fit: contain;
+      -moz-object-fit: contain;
+      -o-object-fit: contain;
       object-position: center center;
       -webkit-object-position: center center;
       -moz-object-position: center center;
@@ -598,18 +578,6 @@
       opacity: 0.95;
       margin-bottom: 12px;
       font-weight: 500;
-    }
-    
-    .bottom-banner-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: #6b0d2b;
-      background: rgba(255,255,255,0.95);
-      display: inline-block;
-      padding: 8px 20px;
-      border-radius: 25px;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     
     /* Navigation Buttons */
@@ -758,6 +726,64 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    
+    /* Responsive adjustments for banners */
+    @media (max-width: 768px) {
+      .top-banner-carousel-container,
+      .bottom-banner-carousel-container {
+        height: 400px;
+      }
+      
+      .top-banner-title,
+      .bottom-banner-title {
+        font-size: 20px;
+      }
+      
+      .top-banner-subtitle,
+      .bottom-banner-subtitle {
+        font-size: 14px;
+      }
+      
+      .carousel-nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+      
+      .prev-btn { left: 10px; }
+      .next-btn { right: 10px; }
+      
+      .top-banners-section {
+        margin-top: 20px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .top-banner-carousel-container,
+      .bottom-banner-carousel-container {
+        height: 300px;
+      }
+      
+      .top-banner-overlay,
+      .bottom-banner-overlay {
+        padding: 15px;
+        padding-top: 40px;
+      }
+      
+      .top-banner-title,
+      .bottom-banner-title {
+        font-size: 16px;
+      }
+      
+      .top-banner-subtitle,
+      .bottom-banner-subtitle {
+        font-size: 12px;
+      }
+      
+      .top-banners-section {
+        margin-top: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -828,7 +854,7 @@
     </div>
   </div>
 
-  <!-- TOP BANNERS SECTION (Banner Position = top) -->
+  <!-- TOP BANNERS SECTION (Banner Position = top) - Added margin-top to shift down -->
   <section class="top-banners-section">
     <div class="container">
       <div class="top-banner-carousel-container" id="topBannerContainer">
