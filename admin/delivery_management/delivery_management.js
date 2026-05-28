@@ -1,4 +1,4 @@
-// Delivery Management JavaScript - With Full Image Support
+// Delivery Management JavaScript - With Full Image Support (Adverts Removed)
 
 const API_BASE = window.location.origin;
 let allDeliveries = [];
@@ -124,13 +124,6 @@ function getAddOnImageUrl(addOn) {
     return null;
 }
 
-function getAdvertImageUrl(advert) {
-    if (advert.imageUrl) {
-        return getImageUrl(advert.imageUrl);
-    }
-    return null;
-}
-
 function getFoodImageUrl(foodItem) {
     if (foodItem.imageUrl) {
         return getImageUrl(foodItem.imageUrl);
@@ -173,7 +166,7 @@ async function fetchDeliveries() {
     }
 }
 
-// ========== RENDER DELIVERIES WITH IMAGES ==========
+// ========== RENDER DELIVERIES WITH IMAGES (NO ADVERTS) ==========
 function renderDeliveries() {
     const container = document.getElementById('deliveriesContainer');
     
@@ -202,11 +195,7 @@ function renderDeliveries() {
         const statusIcon = getStatusIcon(delivery.status);
         const userName = getUserName(delivery.userId);
         const caseCount = getCaseCount(delivery);
-        const advertCount = getAdvertCount(delivery);
         const foodCount = getFoodCount(delivery);
-        
-        // Get first item for preview image
-        const firstItem = getFirstItemWithImage(delivery);
         
         return `
             <div class="delivery-card" onclick="viewDeliveryDetails('${delivery._id || delivery.id}')">
@@ -229,7 +218,6 @@ function renderDeliveries() {
                         </div>
                         <div class="delivery-details" style="margin-top: 8px;">
                             ${caseCount > 0 ? `<span class="badge-chip badge-case"><i class="fas fa-cubes"></i> ${caseCount} Case${caseCount > 1 ? 's' : ''}</span>` : ''}
-                            ${advertCount > 0 ? `<span class="badge-chip badge-advert"><i class="fas fa-ad"></i> ${advertCount} Advert${advertCount > 1 ? 's' : ''}</span>` : ''}
                             ${foodCount > 0 ? `<span class="badge-chip badge-food"><i class="fas fa-utensils"></i> ${foodCount} Food</span>` : ''}
                         </div>
                     </div>
@@ -243,34 +231,6 @@ function renderDeliveries() {
             </div>
         `;
     }).join('');
-}
-
-function getFirstItemWithImage(delivery) {
-    // Check wine items first
-    if (delivery.items && delivery.items.length > 0) {
-        for (const item of delivery.items) {
-            if (item.imageUrl) return { type: 'wine', item: item, imageUrl: item.imageUrl };
-        }
-    }
-    // Check food items
-    if (delivery.foodItems && delivery.foodItems.length > 0) {
-        for (const item of delivery.foodItems) {
-            if (item.imageUrl) return { type: 'food', item: item, imageUrl: item.imageUrl };
-        }
-    }
-    // Check adverts
-    if (delivery.adverts && delivery.adverts.length > 0) {
-        for (const item of delivery.adverts) {
-            if (item.imageUrl) return { type: 'advert', item: item, imageUrl: item.imageUrl };
-        }
-    }
-    // Check add-ons
-    if (delivery.addOns && delivery.addOns.length > 0) {
-        for (const item of delivery.addOns) {
-            if (item.imageUrl) return { type: 'addon', item: item, imageUrl: item.imageUrl };
-        }
-    }
-    return null;
 }
 
 function getStatusClass(status) {
@@ -298,10 +258,6 @@ function getStatusIcon(status) {
 function getCaseCount(delivery) {
     if (!delivery.items) return 0;
     return delivery.items.filter(item => item.isCase === true).length;
-}
-
-function getAdvertCount(delivery) {
-    return delivery.adverts?.length || 0;
 }
 
 function getFoodCount(delivery) {
@@ -398,7 +354,6 @@ window.viewDeliveryDetails = async function(deliveryId) {
         const userPhone = getUserPhone(deliveryData.userId);
         const orderId = (deliveryData._id || deliveryData.id || '').substring(0, 8);
         const caseCount = getCaseCount(deliveryData);
-        const advertCount = getAdvertCount(deliveryData);
         const foodCount = getFoodCount(deliveryData);
         
         if (currentModal) closeModal();
@@ -468,38 +423,7 @@ window.viewDeliveryDetails = async function(deliveryId) {
             `;
         }
         
-        // Build adverts HTML with images
-        let advertsHtml = '';
-        if (deliveryData.adverts && deliveryData.adverts.length > 0) {
-            advertsHtml = `
-                <div class="section-title"><i class="fas fa-ad"></i> Advert Placements (${deliveryData.adverts.length})</div>
-                ${deliveryData.adverts.map(advert => {
-                    const imageUrl = getAdvertImageUrl(advert);
-                    const quantity = advert.quantity || 1;
-                    const price = parsePrice(advert.price);
-                    const total = price * quantity;
-                    
-                    return `
-                        <div class="detail-row" style="padding: 12px 0;">
-                            <div style="width: 60px; height: 60px; margin-right: 12px; flex-shrink: 0;">
-                                ${buildImageHtml(imageUrl, advert.title, 'item-image-medium', 'fa-ad', '#03a9f4')}
-                            </div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: bold; color: #1b1b1b;">${escapeHtml(advert.title)}</div>
-                                ${advert.subtitle ? `<div style="font-size: 12px; color: #6d6d6d;">${escapeHtml(advert.subtitle)}</div>` : ''}
-                                <div style="font-size: 12px; color: #6d6d6d; margin-top: 4px;">Quantity: ${quantity}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-weight: bold; color: #03a9f4;">R${price.toFixed(2)}</div>
-                                <div style="font-size: 12px; color: #6d6d6d;">Total: R${total.toFixed(2)}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            `;
-        }
-        
-        // Build food items HTML with images
+        // Build food items HTML with images (NO ADVERTS)
         let foodItemsHtml = '';
         if (deliveryData.foodItems && deliveryData.foodItems.length > 0) {
             const restaurantCount = getRestaurantCount(deliveryData);
@@ -533,6 +457,9 @@ window.viewDeliveryDetails = async function(deliveryId) {
             `;
         }
         
+        // Price summary - without adverts
+        const winesTotal = (deliveryData.totalAmount || 0) - (deliveryData.addOnsTotal || 0) - (deliveryData.foodItemsTotal || 0);
+        
         currentModal.innerHTML = `
             <div class="modal-content">
                 <h3><i class="fas fa-truck" style="color:#6b0d2b; margin-right:10px;"></i> Order #${orderId}</h3>
@@ -546,13 +473,18 @@ window.viewDeliveryDetails = async function(deliveryId) {
                 <div class="detail-row"><div class="detail-label">Address:</div><div class="detail-value">${escapeHtml(deliveryData.address || '—')}</div></div>
                 <div class="detail-row"><div class="detail-label">Payment Method:</div><div class="detail-value">${escapeHtml(deliveryData.paymentMethod || '—')}</div></div>
                 <div class="detail-row"><div class="detail-label">Status:</div><div class="detail-value"><span class="delivery-status ${getStatusClass(deliveryData.status)}" style="display:inline-block; padding:4px 12px;">${deliveryData.status}</span></div></div>
-                <div class="detail-row"><div class="detail-label">Total Amount:</div><div class="detail-value">R${(deliveryData.totalAmount || 0).toFixed(2)}</div></div>
                 <div class="detail-row"><div class="detail-label">Order Date:</div><div class="detail-value">${formatDateTime(deliveryData.createdAt)}</div></div>
                 
                 ${wineItemsHtml}
                 ${addOnsHtml}
-                ${advertsHtml}
                 ${foodItemsHtml}
+                
+                <div class="section-title"><i class="fas fa-receipt"></i> Price Summary</div>
+                ${caseCount > 0 ? `<div class="detail-row"><div class="detail-label">Wine Cases Total:</div><div class="detail-value">R${(deliveryData.wineCasesTotal || 0).toFixed(2)}</div></div>` : ''}
+                ${caseCount > 0 ? `<div class="detail-row"><div class="detail-label">Regular Wines Total:</div><div class="detail-value">R${(deliveryData.regularWinesTotal || 0).toFixed(2)}</div></div>` : `<div class="detail-row"><div class="detail-label">Wines Total:</div><div class="detail-value">R${winesTotal.toFixed(2)}</div></div>`}
+                ${deliveryData.addOns && deliveryData.addOns.length > 0 ? `<div class="detail-row"><div class="detail-label">Add-ons Total:</div><div class="detail-value">R${(deliveryData.addOnsTotal || 0).toFixed(2)}</div></div>` : ''}
+                ${deliveryData.foodItems && deliveryData.foodItems.length > 0 ? `<div class="detail-row"><div class="detail-label">Food Items Total:</div><div class="detail-value">R${(deliveryData.foodItemsTotal || 0).toFixed(2)}</div></div>` : ''}
+                <div class="detail-row" style="margin-top: 8px; border-top: 1px solid #ddd; padding-top: 8px;"><div class="detail-label" style="font-weight: bold;">TOTAL AMOUNT:</div><div class="detail-value" style="font-weight: bold;">R${(deliveryData.totalAmount || 0).toFixed(2)}</div></div>
                 
                 <div style="display:flex; gap:12px; margin-top:24px; flex-wrap:wrap;">
                     <button class="btn-primary" onclick="closeModal(); editDelivery('${deliveryId}')" style="flex:1;"><i class="fas fa-edit"></i> Edit</button>

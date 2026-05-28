@@ -21,7 +21,6 @@
       --admin-warning: #ed6c02;
       --admin-error: #d32f2f;
       --admin-info: #0288d1;
-      --admin-advert: #03a9f4;
       --admin-food: #ff9800;
     }
     body { background: var(--admin-bg); }
@@ -74,31 +73,7 @@
     
     .badge-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; }
     .badge-case { background: rgba(230,199,156,0.1); color: var(--admin-accent); border: 1px solid var(--admin-accent); }
-    .badge-advert { background: rgba(3,169,244,0.1); color: var(--admin-advert); border: 1px solid var(--admin-advert); }
     .badge-food { background: rgba(255,152,0,0.1); color: var(--admin-food); border: 1px solid var(--admin-food); }
-    
-    /* Image preview styles */
-    .item-image-preview {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: #f0f0f0;
-    }
-    .item-image-small {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: #f0f0f0;
-    }
-    .item-image-medium {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: #f0f0f0;
-    }
     
     .delivery-actions { display: flex; gap: 8px; flex-shrink: 0; }
     .icon-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 8px; border-radius: 40px; transition: 0.2s; color: var(--admin-muted); width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; }
@@ -160,6 +135,6 @@
 
   <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Delivery Management</p></div></div></footer>
 
-  <script src="delivery_management.js?v=2"></script>
+  <script src="delivery_management.js?v=3"></script>
 </body>
 </html>
