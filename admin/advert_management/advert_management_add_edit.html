@@ -110,6 +110,17 @@
     .error-message { background: rgba(211,47,47,0.1); border: 1px solid var(--admin-error); border-radius: 12px; padding: 14px; margin-bottom: 24px; color: var(--admin-error); display: none; }
     .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--admin-success); color: white; padding: 12px 24px; border-radius: 40px; z-index: 10002; font-family: 'Montserrat', sans-serif; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     
+    .info-note {
+      background: rgba(33,150,243,0.08);
+      border-left: 3px solid #1976d2;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: var(--admin-muted);
+    }
+    .info-note i { margin-right: 8px; color: #1976d2; }
+    
     @media (max-width: 768px) { .form-card { padding: 24px; } .admin-container { padding: 0 16px; } .radio-group { flex-direction: column; gap: 12px; } }
   </style>
 </head>
@@ -125,27 +136,40 @@
   <div class="admin-container">
     <div class="form-card">
       <h1 class="form-title" id="formTitle">Add New Advert</h1>
-      <p class="form-subtitle" id="formSubtitle">Create a new advertising banner or campaign</p>
+      <p class="form-subtitle" id="formSubtitle">Link an advert to a wine for display on the home screen</p>
+      
+      <div class="info-note">
+        <i class="fas fa-info-circle"></i> Adverts are now linked to wines. When clicked, users will be directed to the wine detail page. Stock and pricing are automatically synced from the linked wine.
+      </div>
       
       <div id="errorMessage" class="error-message"></div>
       <div id="loadingContainer" style="display:none;"><div class="loading-overlay"><div class="loading-spinner"></div></div></div>
       
       <form id="advertForm">
-        <!-- Basic Information -->
+        <!-- Wine Selection -->
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-wine-bottle"></i> Select Wine *</label>
+          <select id="wineId" class="form-select" onchange="onWineSelect()">
+            <option value="">-- Select a Wine --</option>
+          </select>
+          <small style="color: var(--admin-muted); display: block; margin-top: 5px;">Select a wine to link to this advert. All details will be auto-populated.</small>
+        </div>
+        
+        <!-- Basic Information (Auto-populated) -->
         <div class="form-group">
           <label class="form-label"><i class="fas fa-heading"></i> Title *</label>
-          <input type="text" id="title" class="form-input" placeholder="e.g., Summer Wine Collection">
+          <input type="text" id="title" class="form-input" placeholder="Auto-populated from wine" readonly style="background:#f5f5f5;">
         </div>
         
         <div class="form-group">
           <label class="form-label"><i class="fas fa-align-left"></i> Subtitle</label>
-          <textarea id="subtitle" class="form-textarea" placeholder="Brief description of the advert" rows="2"></textarea>
+          <textarea id="subtitle" class="form-textarea" placeholder="Auto-populated from wine" readonly rows="2" style="background:#f5f5f5;"></textarea>
         </div>
         
-        <!-- Image URL -->
+        <!-- Image URL (Auto-populated) -->
         <div class="form-group">
           <label class="form-label"><i class="fas fa-image"></i> Image URL</label>
-          <input type="text" id="imageUrl" class="form-input" placeholder="https://... or assets/marketing/filename.png">
+          <input type="text" id="imageUrl" class="form-input" placeholder="Auto-populated from wine" readonly style="background:#f5f5f5;">
           <div id="imagePreviewArea" class="image-preview-area" style="display: none;">
             <img id="imagePreview" class="image-preview" alt="Preview">
             <div id="imagePlaceholder" class="image-placeholder"><i class="fas fa-image"></i><p style="margin-top:8px;">Enter an image URL above</p></div>
@@ -153,72 +177,44 @@
         </div>
         
         <div class="form-group">
-          <label class="form-label"><i class="fas fa-link"></i> Target URL</label>
+          <label class="form-label"><i class="fas fa-link"></i> Target URL (Optional)</label>
           <input type="url" id="targetUrl" class="form-input" placeholder="https://example.com/campaign">
+          <small style="color: var(--admin-muted);">Where users should be directed when clicking the banner</small>
         </div>
         
-        <!-- Type & Category Row -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div class="form-group">
-            <label class="form-label"><i class="fas fa-tag"></i> Type</label>
-            <select id="type" class="form-select">
-              <option value="homepage">Homepage</option>
-              <option value="occasion">Occasion</option>
-              <option value="category">Category</option>
-              <option value="featured">Featured</option>
-              <option value="marketing">Marketing</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label"><i class="fas fa-folder"></i> Category</label>
-            <select id="category" class="form-select">
-              <option value="marketing">Marketing</option>
-              <option value="homepage">Homepage</option>
-              <option value="featured">Featured</option>
-              <option value="sponsored">Sponsored</option>
-            </select>
-          </div>
-        </div>
-        
+        <!-- Banner Position -->
         <div class="form-group">
-          <label class="form-label"><i class="fas fa-box"></i> Product Type</label>
-          <select id="productType" class="form-select">
-            <option value="advert">Advert</option>
-            <option value="marketing_banner">Marketing Banner</option>
-            <option value="sponsored_content">Sponsored Content</option>
-            <option value="featured_ad">Featured Ad</option>
+          <label class="form-label"><i class="fas fa-arrows-alt"></i> Banner Position</label>
+          <select id="bannerPosition" class="form-select">
+            <option value="top">Top Banner</option>
+            <option value="bottom">Bottom Banner</option>
           </select>
+          <small style="color: var(--admin-muted);">Choose where this banner should appear on the home screen</small>
         </div>
         
-        <!-- Pricing & Stock -->
+        <!-- Read-only pricing and stock (from wine) -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
           <div class="form-group">
-            <label class="form-label"><i class="fas fa-tag"></i> Price (R) *</label>
-            <input type="number" id="price" class="form-input" step="0.01" placeholder="0.00">
+            <label class="form-label"><i class="fas fa-tag"></i> Price (Auto from Wine)</label>
+            <input type="text" id="price" class="form-input" readonly style="background:#f5f5f5;">
           </div>
           
           <div class="form-group">
-            <label class="form-label"><i class="fas fa-boxes"></i> Stock Count</label>
-            <input type="number" id="stockCount" class="form-input" value="1" min="0">
+            <label class="form-label"><i class="fas fa-boxes"></i> Stock Count (Auto from Wine)</label>
+            <input type="text" id="stockCount" class="form-input" readonly style="background:#f5f5f5;">
           </div>
         </div>
         
         <div class="form-group">
           <label class="form-label"><i class="fas fa-sort-numeric-down"></i> Display Position</label>
           <input type="number" id="position" class="form-input" value="0" min="0">
-          <small style="color: var(--admin-muted);">Lower numbers appear first</small>
+          <small style="color: var(--admin-muted);">Lower numbers appear first in the carousel</small>
         </div>
         
         <!-- Settings Switches -->
         <div class="switch-group">
           <div class="switch-label"><i class="fas fa-toggle-on"></i> Active Advert</div>
           <label class="switch"><input type="checkbox" id="isActive" checked><span class="slider"></span></label>
-        </div>
-        
-        <div class="switch-group">
-          <div class="switch-label"><i class="fas fa-shopping-cart"></i> Available for Purchase</div>
-          <label class="switch"><input type="checkbox" id="isAvailableForPurchase"><span class="slider"></span></label>
         </div>
         
         <div class="form-actions">
@@ -238,6 +234,6 @@
     </div>
   </footer>
 
-  <script src="advert_management_add_edit.js"></script>
+  <script src="advert_management_add_edit.js?v=2"></script>
 </body>
 </html>

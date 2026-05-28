@@ -5,6 +5,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const advertId = urlParams.get('id');
 
 let advertData = null;
+let linkedWine = null;
 let isLoading = false;
 
 // ========== AUTHENTICATION ==========
@@ -70,6 +71,31 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
+// ========== LOAD LINKED WINE ==========
+async function loadLinkedWine(wineId) {
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        const response = await fetch(`${API_BASE}/api/wines/${wineId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load wine');
+        
+        const data = await response.json();
+        
+        if (data.data && typeof data.data === 'object') {
+            linkedWine = data.data;
+        } else if (data._id || data.id) {
+            linkedWine = data;
+        }
+        
+        console.log('✅ Linked wine loaded:', linkedWine?.name);
+        
+    } catch (error) {
+        console.error('Error loading linked wine:', error);
+    }
+}
+
 // ========== FETCH ADVERT DETAILS ==========
 async function fetchAdvertDetails() {
     if (!advertId) {
@@ -104,6 +130,11 @@ async function fetchAdvertDetails() {
             throw new Error('Invalid response format');
         }
         
+        // Load linked wine if wineId exists
+        if (advertData.wineId) {
+            await loadLinkedWine(advertData.wineId);
+        }
+        
         renderDetail();
         
     } catch (error) {
@@ -119,9 +150,10 @@ function renderDetail() {
     const container = document.getElementById('detailContent');
     if (!container || !advertData) return;
     
-    const revenue = (advertData.price || 0) * (advertData.purchases || 0);
-    const ctr = (advertData.ctr || 0).toFixed(1);
-    const conversionRate = (advertData.conversionRate || 0).toFixed(1);
+    const stockCount = linkedWine?.stockCount || advertData.stockCount || 0;
+    const isInStock = stockCount > 0;
+    const isLowStock = stockCount > 0 && stockCount <= 10;
+    
     const imageUrl = getImageUrl(advertData.imageUrl);
     
     // Determine icon based on advert type
@@ -163,21 +195,35 @@ function renderDetail() {
                 <div class="info-grid">
                     <div class="info-row"><div class="info-label">Title:</div><div class="info-value">${escapeHtml(advertData.title)}</div></div>
                     <div class="info-row"><div class="info-label">Subtitle:</div><div class="info-value">${escapeHtml(advertData.subtitle || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.type || '—')}</span></div></div>
-                    <div class="info-row"><div class="info-label">Category:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${escapeHtml(advertData.category || '—')}</span></div></div>
-                    <div class="info-row"><div class="info-label">Product Type:</div><div class="info-value">${escapeHtml((advertData.productType || 'advert').replace(/_/g, ' '))}</div></div>
+                    <div class="info-row"><div class="info-label">Banner Position:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${advertData.bannerPosition === 'top' ? 'TOP BANNER' : 'BOTTOM BANNER'}</span></div></div>
                     <div class="info-row"><div class="info-label">Target URL:</div><div class="info-value">${advertData.targetUrl ? `<a href="${escapeHtml(advertData.targetUrl)}" target="_blank" style="color:var(--admin-primary); text-decoration:none;"><i class="fas fa-external-link-alt"></i> ${escapeHtml(advertData.targetUrl)}</a>` : '—'}</div></div>
                     <div class="info-row"><div class="info-label">Display Position:</div><div class="info-value">${advertData.position || 0}</div></div>
-                    <div class="info-row"><div class="info-label">Price:</div><div class="info-value"><strong style="color:var(--admin-primary); font-size:18px;">R${(advertData.price || 0).toFixed(2)}</strong></div></div>
-                    <div class="info-row"><div class="info-label">Stock:</div><div class="info-value">${advertData.stockCount || 0} placement${(advertData.stockCount || 0) !== 1 ? 's' : ''}</div></div>
                     <div class="info-row"><div class="info-label">Status:</div><div class="info-value">
                         <span class="badge ${advertData.isActive ? 'badge-active' : 'badge-inactive'}">${advertData.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
-                        <span class="badge ${advertData.isAvailableForPurchase && advertData.stockCount > 0 ? 'badge-purchasable' : 'badge-display'}" style="margin-left:8px;">${advertData.isAvailableForPurchase && advertData.stockCount > 0 ? 'PURCHASABLE' : 'DISPLAY ONLY'}</span>
                     </div></div>
                     ${advertData.createdAt ? `<div class="info-row"><div class="info-label">Created:</div><div class="info-value">${formatDate(advertData.createdAt)}</div></div>` : ''}
                     ${advertData.updatedAt ? `<div class="info-row"><div class="info-label">Last Updated:</div><div class="info-value">${formatDate(advertData.updatedAt)}</div></div>` : ''}
                 </div>
             </div>
+            
+            ${linkedWine ? `
+            <div class="detail-section">
+                <h3 class="section-title"><i class="fas fa-wine-bottle"></i> Linked Wine Information</h3>
+                <div class="info-grid">
+                    <div class="info-row"><div class="info-label">Wine Name:</div><div class="info-value">${escapeHtml(linkedWine.name)}</div></div>
+                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value">${escapeHtml(linkedWine.type || '—')}</div></div>
+                    <div class="info-row"><div class="info-label">Category:</div><div class="info-value">${escapeHtml(linkedWine.category || '—')}</div></div>
+                    <div class="info-row"><div class="info-label">Price per Bottle:</div><div class="info-value"><strong style="color:var(--admin-primary);">R${(linkedWine.price || 0).toFixed(2)}</strong></div></div>
+                    <div class="info-row"><div class="info-label">Stock Count:</div><div class="info-value">
+                        <span style="color: ${isInStock ? (isLowStock ? '#ed6c02' : '#2e7d32') : '#d32f2f'};">
+                            ${stockCount} bottle${stockCount !== 1 ? 's' : ''}
+                            ${isLowStock && isInStock ? ' <i class="fas fa-exclamation-triangle"></i> Low Stock' : ''}
+                        </span>
+                    </div></div>
+                    ${linkedWine.isCase ? `<div class="info-row"><div class="info-label">Case Option:</div><div class="info-value">Available as case of 6 (R${(linkedWine.price * 6).toFixed(2)} per case)</div></div>` : ''}
+                </div>
+            </div>
+            ` : ''}
             
             <div class="detail-section">
                 <h3 class="section-title"><i class="fas fa-chart-line"></i> Performance Analytics</h3>
@@ -191,20 +237,8 @@ function renderDetail() {
                         <div class="stat-label"><i class="fas fa-mouse-pointer"></i> Clicks</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">${formatNumber(advertData.purchases || 0)}</div>
-                        <div class="stat-label"><i class="fas fa-shopping-cart"></i> Purchases</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${ctr}%</div>
+                        <div class="stat-value">${((advertData.ctr || 0)).toFixed(1)}%</div>
                         <div class="stat-label"><i class="fas fa-chart-line"></i> CTR</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${conversionRate}%</div>
-                        <div class="stat-label"><i class="fas fa-percent"></i> Conversion Rate</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">R${revenue.toFixed(2)}</div>
-                        <div class="stat-label"><i class="fas fa-rand"></i> Total Revenue</div>
                     </div>
                 </div>
             </div>

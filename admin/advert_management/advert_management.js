@@ -1,5 +1,4 @@
 // Advert Management JavaScript
-// MATCHES MARKETING MANAGEMENT PATTERN EXACTLY
 
 const API_BASE = window.location.origin;
 let allAdverts = [];
@@ -111,7 +110,6 @@ function renderStats() {
     
     const total = allAdverts.length;
     const active = allAdverts.filter(a => a.isActive === true).length;
-    const purchasable = allAdverts.filter(a => a.isAvailableForPurchase === true && a.stockCount > 0).length;
     const totalImpressions = allAdverts.reduce((sum, a) => sum + (a.impressions || 0), 0);
     const totalClicks = allAdverts.reduce((sum, a) => sum + (a.clicks || 0), 0);
     const avgCTR = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(1) : 0;
@@ -119,7 +117,6 @@ function renderStats() {
     container.innerHTML = `
         <div class="stat-box"><i class="fas fa-ad"></i><div class="stat-box-info"><div class="stat-box-value">${total}</div><div class="stat-box-label">Total Adverts</div></div></div>
         <div class="stat-box"><i class="fas fa-check-circle" style="color:#2e7d32;"></i><div class="stat-box-info"><div class="stat-box-value">${active}</div><div class="stat-box-label">Active</div></div></div>
-        <div class="stat-box"><i class="fas fa-shopping-cart" style="color:#1976d2;"></i><div class="stat-box-info"><div class="stat-box-value">${purchasable}</div><div class="stat-box-label">Purchasable</div></div></div>
         <div class="stat-box"><i class="fas fa-chart-line" style="color:#ed6c02;"></i><div class="stat-box-info"><div class="stat-box-value">${avgCTR}%</div><div class="stat-box-label">Avg CTR</div></div></div>
     `;
 }
@@ -149,16 +146,9 @@ function filterAdverts() {
         filtered = filtered.filter(a => a.type === typeFilter);
     }
     
-    if (purchaseFilter === 'purchasable') {
-        filtered = filtered.filter(a => a.isAvailableForPurchase === true && a.stockCount > 0);
-    } else if (purchaseFilter === 'display') {
-        filtered = filtered.filter(a => a.isAvailableForPurchase === false || a.stockCount === 0);
-    }
-    
     return filtered;
 }
 
-// Improved image URL helper
 function getImageUrl(imageUrl) {
     if (!imageUrl) return '';
     if (imageUrl.indexOf('http') === 0) return imageUrl;
@@ -167,24 +157,19 @@ function getImageUrl(imageUrl) {
     return '/assets/images/' + imageUrl;
 }
 
-// Improved image HTML generator with better placeholders
 function getAdvertImageHtml(advert) {
     const imageUrl = getImageUrl(advert.imageUrl);
     const title = escapeHtml(advert.title || 'Advert');
-    const type = advert.productType || advert.type || 'advert';
+    const bannerPosition = advert.bannerPosition === 'top' ? 'TOP BANNER' : 'BOTTOM BANNER';
     
-    // Determine appropriate icon based on advert type
     let icon = 'fa-ad';
-    if (type === 'marketing_banner' || type === 'marketing') icon = 'fa-bullhorn';
-    if (type === 'wine' || type === 'wine_banner') icon = 'fa-wine-bottle';
-    if (type === 'sponsored_content') icon = 'fa-star';
-    if (type === 'featured_ad') icon = 'fa-crown';
+    if (advert.type === 'wine') icon = 'fa-wine-bottle';
     
     if (imageUrl) {
-        return `<img src="${imageUrl}" alt="${title}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'advert-image-placeholder\\'><i class=\\'fas ${icon}\\'></i><span>${title}</span></div>'">`;
+        return `<img src="${imageUrl}" alt="${title}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'advert-image-placeholder\\'><i class=\\'fas ${icon}\\'></i><span>${title}</span><span style=\\'font-size:10px; margin-top:5px;\\'>${bannerPosition}</span></div>'">`;
     }
     
-    return `<div class="advert-image-placeholder"><i class="fas ${icon}"></i><span>${title}</span></div>`;
+    return `<div class="advert-image-placeholder"><i class="fas ${icon}"></i><span>${title}</span><span style="font-size:10px; margin-top:5px;">${bannerPosition}</span></div>`;
 }
 
 function formatNumber(num) {
@@ -210,7 +195,7 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 3000);
 }
 
-// ========== RENDER ADVERTS WITH IMPROVED LAYOUT ==========
+// ========== RENDER ADVERTS ==========
 function renderAdverts() {
     const container = document.getElementById('advertContainer');
     if (!container) return;
@@ -227,8 +212,7 @@ function renderAdverts() {
             ${filtered.map(advert => {
                 const advertId = getAdvertId(advert);
                 const ctr = (advert.ctr || 0).toFixed(1);
-                const conversion = (advert.conversionRate || 0).toFixed(1);
-                const stockStatus = (advert.stockCount || 0) > 0;
+                const bannerPosition = advert.bannerPosition === 'top' ? 'TOP BANNER' : 'BOTTOM BANNER';
                 
                 return `
                     <div class="advert-card" onclick="viewAdvertDetail('${advertId}')">
@@ -239,7 +223,6 @@ function renderAdverts() {
                             <span class="advert-title" title="${escapeHtml(advert.title)}">${escapeHtml(advert.title)}</span>
                             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                                 <span class="badge ${advert.isActive ? 'badge-active' : 'badge-inactive'}">${advert.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
-                                <span class="badge ${advert.isAvailableForPurchase && stockStatus ? 'badge-purchasable' : 'badge-display'}">${advert.isAvailableForPurchase && stockStatus ? 'PURCHASABLE' : 'DISPLAY'}</span>
                             </div>
                         </div>
                         <div class="advert-body">
@@ -248,17 +231,16 @@ function renderAdverts() {
                                 <span class="stat-chip"><i class="fas fa-eye"></i> ${formatNumber(advert.impressions || 0)}</span>
                                 <span class="stat-chip"><i class="fas fa-mouse-pointer"></i> ${formatNumber(advert.clicks || 0)}</span>
                                 <span class="stat-chip"><i class="fas fa-chart-line"></i> ${ctr}% CTR</span>
-                                <span class="stat-chip"><i class="fas fa-percent"></i> ${conversion}% Conv</span>
                             </div>
-                            <div class="advert-price">R${(advert.price || 0).toFixed(2)}</div>
-                            <div class="stock-info ${!stockStatus ? 'out-of-stock' : ''}">
-                                <i class="fas ${stockStatus ? 'fa-boxes' : 'fa-exclamation-triangle'}"></i>
-                                ${stockStatus ? `${advert.stockCount} placement${advert.stockCount !== 1 ? 's' : ''} available` : 'Out of stock'}
+                            <div class="advert-price">Position: ${advert.position || 0}</div>
+                            <div class="stock-info">
+                                <i class="fas fa-map-pin"></i> ${bannerPosition}
                             </div>
+                            ${advert.wineId ? `<div class="stock-info" style="margin-top:4px;"><i class="fas fa-wine-bottle"></i> Linked to Wine ID: ${advert.wineId}</div>` : ''}
                         </div>
                         <div class="advert-actions" onclick="event.stopPropagation()">
                             <button class="icon-btn" onclick="editAdvert('${advertId}')" title="Edit Advert"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="icon-btn" onclick="viewAdvertDetail('${advertId}')" title="View Analytics"><i class="fas fa-chart-simple"></i> Analytics</button>
+                            <button class="icon-btn" onclick="viewAdvertDetail('${advertId}')" title="View Details"><i class="fas fa-info-circle"></i> Details</button>
                             <button class="icon-btn danger" onclick="deleteAdvertPrompt('${advertId}', '${escapeHtml(advert.title)}')" title="Delete Advert"><i class="fas fa-trash-alt"></i> Delete</button>
                         </div>
                     </div>
@@ -289,7 +271,7 @@ window.editAdvert = function(advertId) {
 };
 
 window.deleteAdvertPrompt = function(advertId, advertTitle) {
-    if (confirm(`⚠️ Permanently delete "${advertTitle}"?\n\nThis action cannot be undone.\nThis will also remove this advert from all marketing companies.`)) {
+    if (confirm(`⚠️ Permanently delete "${advertTitle}"?\n\nThis action cannot be undone.`)) {
         deleteAdvert(advertId);
     }
 };
@@ -339,26 +321,16 @@ function setupFilters() {
         });
     }
     
-    const purchaseFilterEl = document.getElementById('purchaseFilter');
-    if (purchaseFilterEl) {
-        purchaseFilterEl.addEventListener('change', (e) => {
-            purchaseFilter = e.target.value;
-            renderAdverts();
-        });
-    }
-    
     const clearBtn = document.getElementById('clearFiltersBtn');
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
             searchQuery = '';
             statusFilter = 'all';
             typeFilter = 'all';
-            purchaseFilter = 'all';
             
             if (searchInput) searchInput.value = '';
             if (statusFilterEl) statusFilterEl.value = 'all';
             if (typeFilterEl) typeFilterEl.value = 'all';
-            if (purchaseFilterEl) purchaseFilterEl.value = 'all';
             
             renderAdverts();
         });

@@ -5,6 +5,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const advertId = urlParams.get('id');
 
 let advertData = null;
+let wines = [];
+let isLoadingWines = false;
 
 // ========== AUTHENTICATION ==========
 function checkAuth() {
@@ -69,6 +71,67 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
+// ========== LOAD WINES ==========
+async function loadWines() {
+    isLoadingWines = true;
+    
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        const response = await fetch(`${API_BASE}/api/wines?all=true`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load wines');
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            wines = data.filter(w => w.isActive === true);
+        } else if (data.data && Array.isArray(data.data)) {
+            wines = data.data.filter(w => w.isActive === true);
+        } else {
+            wines = [];
+        }
+        
+        console.log(`✅ Loaded ${wines.length} active wines`);
+        populateWineSelect();
+        
+    } catch (error) {
+        console.error('Error loading wines:', error);
+        showError('Failed to load wines: ' + error.message);
+    } finally {
+        isLoadingWines = false;
+    }
+}
+
+function populateWineSelect() {
+    const select = document.getElementById('wineId');
+    if (!select) return;
+    
+    const currentWineId = document.getElementById('wineId').value;
+    
+    select.innerHTML = '<option value="">-- Select a Wine --</option>' +
+        wines.map(wine => `<option value="${wine.id}" ${currentWineId == wine.id ? 'selected' : ''}>${escapeHtml(wine.name)} (${escapeHtml(wine.type)} - R${wine.price.toFixed(2)})</option>`).join('');
+}
+
+function onWineSelect() {
+    const wineId = document.getElementById('wineId').value;
+    if (!wineId) return;
+    
+    const selectedWine = wines.find(w => w.id == wineId);
+    if (!selectedWine) return;
+    
+    // Auto-populate fields from selected wine
+    document.getElementById('title').value = selectedWine.name;
+    document.getElementById('subtitle').value = selectedWine.type;
+    document.getElementById('imageUrl').value = selectedWine.bannerImageUrl || selectedWine.imageUrl;
+    document.getElementById('price').value = selectedWine.price;
+    document.getElementById('stockCount').value = selectedWine.stockCount;
+    
+    // Update image preview
+    updateImagePreview();
+}
+
 // ========== LOAD ADVERT DATA (if editing) ==========
 async function loadAdvertData() {
     console.log('🔍 Advert ID from URL:', advertId);
@@ -76,14 +139,14 @@ async function loadAdvertData() {
     if (!advertId || advertId === 'null' || advertId === 'undefined') {
         // Create mode
         document.getElementById('formTitle').textContent = 'Add New Advert';
-        document.getElementById('formSubtitle').textContent = 'Create a new advertising banner or campaign';
+        document.getElementById('formSubtitle').textContent = 'Link an advert to a wine for display on the home screen';
         document.getElementById('submitBtn').textContent = 'Create Advert';
         return;
     }
     
     // Edit mode
     document.getElementById('formTitle').textContent = 'Edit Advert';
-    document.getElementById('formSubtitle').textContent = 'Update advert information and settings';
+    document.getElementById('formSubtitle').textContent = 'Update advert information - linked to wine';
     document.getElementById('submitBtn').textContent = 'Update Advert';
     
     // Add delete button for edit mode
@@ -140,11 +203,13 @@ async function loadAdvertData() {
         document.getElementById('price').value = advert.price || 0;
         document.getElementById('stockCount').value = advert.stockCount || 0;
         document.getElementById('position').value = advert.position || 0;
-        document.getElementById('type').value = advert.type || 'homepage';
-        document.getElementById('category').value = advert.category || 'marketing';
-        document.getElementById('productType').value = advert.productType || 'advert';
+        document.getElementById('bannerPosition').value = advert.bannerPosition || 'top';
         document.getElementById('isActive').checked = advert.isActive === true;
-        document.getElementById('isAvailableForPurchase').checked = advert.isAvailableForPurchase === true;
+        
+        // Set wine selection if linked
+        if (advert.wineId) {
+            document.getElementById('wineId').value = advert.wineId;
+        }
         
         // Update image preview
         updateImagePreview();
@@ -179,7 +244,7 @@ async function deleteAdvert() {
     if (!advertId) return;
     
     const advertTitle = document.getElementById('title').value || 'this advert';
-    if (!confirm(`⚠️ Permanently delete "${advertTitle}"?\n\nThis action cannot be undone.\nThis will also remove this advert from all marketing companies.`)) return;
+    if (!confirm(`⚠️ Permanently delete "${advertTitle}"?\n\nThis action cannot be undone.`)) return;
     
     showLoading(true);
     
@@ -253,21 +318,21 @@ function getImageUrl(imageUrl) {
 // ========== VALIDATION ==========
 function validateForm() {
     const title = document.getElementById('title').value.trim();
-    const price = parseFloat(document.getElementById('price').value);
+    const wineId = document.getElementById('wineId').value;
     
     if (!title) {
         showError('Title is required');
         return false;
     }
     
-    if (isNaN(price) || price < 0) {
-        showError('Please enter a valid price');
+    if (!wineId) {
+        showError('Please select a wine to link to this advert');
         return false;
     }
     
-    const stockCount = parseInt(document.getElementById('stockCount').value);
-    if (isNaN(stockCount) || stockCount < 0) {
-        showError('Stock count must be a valid number');
+    const position = parseInt(document.getElementById('position').value);
+    if (isNaN(position) || position < 0) {
+        showError('Position must be a valid number');
         return false;
     }
     
@@ -324,19 +389,23 @@ async function saveAdvert(event) {
     
     showLoading(true);
     
+    const selectedWine = wines.find(w => w.id == document.getElementById('wineId').value);
+    
     const advertDataToSave = {
         title: document.getElementById('title').value.trim(),
         subtitle: document.getElementById('subtitle').value.trim(),
         imageUrl: document.getElementById('imageUrl').value.trim(),
         targetUrl: document.getElementById('targetUrl').value.trim(),
-        price: parseFloat(document.getElementById('price').value),
-        type: document.getElementById('type').value,
-        category: document.getElementById('category').value,
-        productType: document.getElementById('productType').value,
-        stockCount: parseInt(document.getElementById('stockCount').value),
+        price: selectedWine ? selectedWine.price : parseFloat(document.getElementById('price').value),
+        type: 'wine',
+        category: 'wine',
+        productType: 'wine',
+        stockCount: selectedWine ? selectedWine.stockCount : parseInt(document.getElementById('stockCount').value),
         position: parseInt(document.getElementById('position').value) || 0,
         isActive: document.getElementById('isActive').checked,
-        isAvailableForPurchase: document.getElementById('isAvailableForPurchase').checked
+        isAvailableForPurchase: false, // Adverts are not purchasable items
+        wineId: parseInt(document.getElementById('wineId').value),
+        bannerPosition: document.getElementById('bannerPosition').value
     };
     
     console.log('📤 Saving advert:', advertDataToSave);
@@ -394,5 +463,7 @@ if (form) {
 setupImagePreview();
 
 if (checkAuth()) {
-    loadAdvertData();
+    loadWines().then(() => {
+        loadAdvertData();
+    });
 }
