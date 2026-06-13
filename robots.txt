@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /login/
+Disallow: /cart/
+Disallow: /order/track_order.html
+Sitemap: https://app.wineandbubblesnow.co.za/sitemap.xml
+
+# Allow Google to see your main pages
+Allow: /wine/
+Allow: /booking/
+Allow: /wine_farm/
+Allow: /pairings/
+Allow: /contact_us.html
+Allow: /faq.html
+Allow: /terms_conditions.html

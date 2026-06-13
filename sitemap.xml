@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- Homepage -->
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/</loc>
+        <lastmod>2026-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    
+    <!-- Wine Pages -->
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/wine/all_wines.html</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/wine/wine_cases_list.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Booking -->
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/booking/booking.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Wine Bars -->
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/wine_farm/wine_farm.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Pairings -->
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/pairings/pairings.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- Information Pages -->
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/contact_us.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/faq.html</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://app.wineandbubblesnow.co.za/terms_conditions.html</loc>
+        <changefreq>yearly</changefreq>
+        <priority>0.5</priority>
+    </url>
+</urlset>
