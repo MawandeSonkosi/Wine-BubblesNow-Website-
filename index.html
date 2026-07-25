@@ -413,7 +413,6 @@
   -ms-flex-negative: 0;
   flex-shrink: 0;
   position: relative;
-  cursor: pointer;
   border-radius: 16px;
   overflow: hidden;
   height: 100%;
@@ -426,6 +425,10 @@
 
 .top-banner-slide.not-clickable {
   cursor: default;
+}
+
+.top-banner-slide.clickable {
+  cursor: pointer;
 }
 
 .top-banner-image {
@@ -446,7 +449,7 @@
   transition: transform 0.8s ease;
 }
 
-.top-banner-slide:not(.not-clickable):hover .top-banner-image {
+.top-banner-slide.clickable:hover .top-banner-image {
   -webkit-transform: scale(1.05);
   -moz-transform: scale(1.05);
   -ms-transform: scale(1.05);
@@ -485,23 +488,6 @@
   font-weight: 500;
 }
 
-.display-only-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(0,0,0,0.75);
-  color: #FFA500;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  border: 1px solid rgba(255, 165, 0, 0.4);
-  z-index: 20;
-  font-family: 'Montserrat', sans-serif;
-  text-transform: uppercase;
-}
-
 /* ========== BOTTOM BANNER CAROUSEL STYLES ========== */
 .bottom-banner-carousel-container {
   position: relative;
@@ -538,7 +524,6 @@
   -ms-flex-negative: 0;
   flex-shrink: 0;
   position: relative;
-  cursor: pointer;
   border-radius: 16px;
   overflow: hidden;
   height: 100%;
@@ -551,6 +536,10 @@
 
 .bottom-banner-slide.not-clickable {
   cursor: default;
+}
+
+.bottom-banner-slide.clickable {
+  cursor: pointer;
 }
 
 .bottom-banner-image {
@@ -571,7 +560,7 @@
   transition: transform 0.8s ease;
 }
 
-.bottom-banner-slide:not(.not-clickable):hover .bottom-banner-image {
+.bottom-banner-slide.clickable:hover .bottom-banner-image {
   -webkit-transform: scale(1.05);
   -moz-transform: scale(1.05);
   -ms-transform: scale(1.05);
@@ -1245,7 +1234,9 @@
             
             // Check if advert has wine linked (clickable)
             const isClickable = advert.wineId && advert.wineId > 0;
-            if (!isClickable) {
+            if (isClickable) {
+              slide.classList.add('clickable');
+            } else {
               slide.classList.add('not-clickable');
             }
             
@@ -1256,14 +1247,8 @@
               }
             }
             
-            let displayOnlyBadge = '';
-            if (!isClickable) {
-              displayOnlyBadge = `<div class="display-only-badge">DISPLAY ONLY</div>`;
-            }
-            
             slide.innerHTML = `
               <img src="${imagePath}" alt="${advert.title}" class="top-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
-              ${displayOnlyBadge}
               <div class="top-banner-overlay">
                 <div class="top-banner-title">${advert.title}</div>
                 <div class="top-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
@@ -1496,7 +1481,9 @@
               isClickable = true; // Wines are always clickable
             }
             
-            if (!isClickable) {
+            if (isClickable) {
+              slide.classList.add('clickable');
+            } else {
               slide.classList.add('not-clickable');
             }
             
@@ -1506,14 +1493,8 @@
               }
             }
             
-            let displayOnlyBadge = '';
-            if (item.type === 'advert' && !isClickable) {
-              displayOnlyBadge = `<div class="display-only-badge">DISPLAY ONLY</div>`;
-            }
-            
             slide.innerHTML = `
               <img src="${imagePath}" alt="${title}" class="bottom-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
-              ${displayOnlyBadge}
               <div class="bottom-banner-overlay">
                 <div class="bottom-banner-title">${title}</div>
                 <div class="bottom-banner-subtitle">${subtitle}</div>
