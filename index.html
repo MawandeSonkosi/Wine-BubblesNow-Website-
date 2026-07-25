@@ -473,6 +473,10 @@
   padding-top: 60px;
 }
 
+.top-banner-overlay.hidden {
+  display: none;
+}
+
 .top-banner-title {
   font-family: 'Playfair Display', serif;
   font-size: 28px;
@@ -582,6 +586,10 @@
   color: white;
   padding: 25px;
   padding-top: 60px;
+}
+
+.bottom-banner-overlay.hidden {
+  display: none;
 }
 
 .bottom-banner-title {
@@ -1247,12 +1255,20 @@
               }
             }
             
+            // Only show overlay text if clickable (has wine assigned)
+            let overlayHtml = '';
+            if (isClickable) {
+              overlayHtml = `
+                <div class="top-banner-overlay">
+                  <div class="top-banner-title">${advert.title}</div>
+                  <div class="top-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
+                </div>
+              `;
+            }
+            
             slide.innerHTML = `
               <img src="${imagePath}" alt="${advert.title}" class="top-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
-              <div class="top-banner-overlay">
-                <div class="top-banner-title">${advert.title}</div>
-                <div class="top-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
-              </div>
+              ${overlayHtml}
             `;
             
             // Only add click handler if clickable
@@ -1493,12 +1509,20 @@
               }
             }
             
+            // Only show overlay text if clickable (has wine assigned for adverts, or is a wine)
+            let overlayHtml = '';
+            if (isClickable) {
+              overlayHtml = `
+                <div class="bottom-banner-overlay">
+                  <div class="bottom-banner-title">${title}</div>
+                  <div class="bottom-banner-subtitle">${subtitle}</div>
+                </div>
+              `;
+            }
+            
             slide.innerHTML = `
               <img src="${imagePath}" alt="${title}" class="bottom-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
-              <div class="bottom-banner-overlay">
-                <div class="bottom-banner-title">${title}</div>
-                <div class="bottom-banner-subtitle">${subtitle}</div>
-              </div>
+              ${overlayHtml}
             `;
             
             // Only add click handler if clickable
