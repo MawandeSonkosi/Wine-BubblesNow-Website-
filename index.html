@@ -424,6 +424,10 @@
   background: transparent;
 }
 
+.top-banner-slide.not-clickable {
+  cursor: default;
+}
+
 .top-banner-image {
   width: 100%;
   height: 100%;
@@ -442,7 +446,7 @@
   transition: transform 0.8s ease;
 }
 
-.top-banner-slide:hover .top-banner-image {
+.top-banner-slide:not(.not-clickable):hover .top-banner-image {
   -webkit-transform: scale(1.05);
   -moz-transform: scale(1.05);
   -ms-transform: scale(1.05);
@@ -479,6 +483,23 @@
   opacity: 0.95;
   margin-bottom: 12px;
   font-weight: 500;
+}
+
+.display-only-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0,0,0,0.75);
+  color: #FFA500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 165, 0, 0.4);
+  z-index: 20;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
 }
 
 /* ========== BOTTOM BANNER CAROUSEL STYLES ========== */
@@ -528,6 +549,10 @@
   background: transparent;
 }
 
+.bottom-banner-slide.not-clickable {
+  cursor: default;
+}
+
 .bottom-banner-image {
   width: 100%;
   height: 100%;
@@ -546,7 +571,7 @@
   transition: transform 0.8s ease;
 }
 
-.bottom-banner-slide:hover .bottom-banner-image {
+.bottom-banner-slide:not(.not-clickable):hover .bottom-banner-image {
   -webkit-transform: scale(1.05);
   -moz-transform: scale(1.05);
   -ms-transform: scale(1.05);
@@ -841,7 +866,7 @@
         <ul>
           <li><a href="wine/all_wines.html">In-Stock</a></li>
           <li><a href="booking/booking.html">Book African Wine Bar</a></li>
-          <li><a href="wine_farm/wine_farm.html">Wine Bars Near Me</a></li>
+          <li><a href="wine_farm/wine_farm.html">Liquor Stores Near Me</a></li>
           <li><a href="pairings/pairings.html">Pairings</a></li>
           <li><a href="order/track_order.html">Track Order</a></li>
         </ul>
@@ -1052,7 +1077,7 @@
         <ul class="feature-list">
           <li>Deliver Now – Boutique wines delivered to your door</li>
           <li>Book a Wine Bar – For events or celebrations</li>
-          <li>Wine Bars Near Me – Explore what's happening around you</li>
+          <li>Liquor Stores Near Me – Explore what's happening around you</li>
           <li>Gifting & Bulk Orders – Make an impression, instantly</li>
         </ul>
         <p class="tiny">Your luxury wine lifestyle — simplified.</p>
@@ -1092,7 +1117,7 @@
             <li><a href="wine/all_wines.html">All Wines</a></li>
             <li><a href="wine/wine_cases_list.html">Wine Cases</a></li>
             <li><a href="pairings/pairings.html">Pairings</a></li>
-            <li><a href="wine_farm/wine_farm.html">Wine Bars</a></li>
+            <li><a href="wine_farm/wine_farm.html">Liquor Stores</a></li>
           </ul>
         </div>
         <div class="footer-links-column">
@@ -1173,7 +1198,9 @@
         
         topBannerTrack.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading offers...</p></div>`;
         
-        fetch(`${API_BASE_URL}/adverts/active?bannerPosition=top&_=${Date.now()}`)
+        // Add cache-busting timestamp to prevent browser caching
+        const timestamp = Date.now();
+        fetch(`${API_BASE_URL}/adverts/active?bannerPosition=top&_=${timestamp}`)
           .then(response => response.json())
           .then(adverts => {
             console.log('✅ Top banners API response:', adverts);
@@ -1216,6 +1243,12 @@
             slide.dataset.index = index;
             slide.dataset.advertId = advert.id;
             
+            // Check if advert has wine linked (clickable)
+            const isClickable = advert.wineId && advert.wineId > 0;
+            if (!isClickable) {
+              slide.classList.add('not-clickable');
+            }
+            
             let imagePath = advert.targetUrl || advert.imageUrl || '';
             if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
               if (!imagePath.startsWith('assets/')) {
@@ -1223,23 +1256,32 @@
               }
             }
             
+            let displayOnlyBadge = '';
+            if (!isClickable) {
+              displayOnlyBadge = `<div class="display-only-badge">DISPLAY ONLY</div>`;
+            }
+            
             slide.innerHTML = `
               <img src="${imagePath}" alt="${advert.title}" class="top-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
+              ${displayOnlyBadge}
               <div class="top-banner-overlay">
                 <div class="top-banner-title">${advert.title}</div>
                 <div class="top-banner-subtitle">${advert.subtitle || 'Special Offer'}</div>
               </div>
             `;
             
-            slide.addEventListener('click', () => {
-              if (!isTransitioning) {
-                if (advert.wineId) {
-                  window.location.href = `wine/wine_detail.html?id=${advert.wineId}`;
-                } else if (advert.targetUrl && advert.targetUrl.includes('http')) {
-                  window.open(advert.targetUrl, '_blank');
+            // Only add click handler if clickable
+            if (isClickable) {
+              slide.addEventListener('click', () => {
+                if (!isTransitioning) {
+                  if (advert.wineId) {
+                    window.location.href = `wine/wine_detail.html?id=${advert.wineId}`;
+                  } else if (advert.targetUrl && advert.targetUrl.includes('http')) {
+                    window.open(advert.targetUrl, '_blank');
+                  }
                 }
-              }
-            });
+              });
+            }
             
             topBannerTrack.appendChild(slide);
             
@@ -1367,8 +1409,11 @@
         
         bottomBannerTrack.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p>Loading featured wines...</p></div>`;
         
+        // Add cache-busting timestamp
+        const timestamp = Date.now();
+        
         // First try to load bottom banner adverts
-        fetch(`${API_BASE_URL}/adverts/active?bannerPosition=bottom&_=${Date.now()}`)
+        fetch(`${API_BASE_URL}/adverts/active?bannerPosition=bottom&_=${timestamp}`)
           .then(response => response.json())
           .then(adverts => {
             console.log('✅ Bottom banners API response:', adverts);
@@ -1380,7 +1425,7 @@
               }
             }
             // If no bottom adverts, load featured wines as fallback
-            return fetch(`${API_BASE_URL}/wines/featured/featured?all=true&_=${Date.now()}`);
+            return fetch(`${API_BASE_URL}/wines/featured/featured?all=true&_=${timestamp}`);
           })
           .then(response => {
             if (response && response.ok && items.length === 0) {
@@ -1434,6 +1479,7 @@
             let subtitle = '';
             let linkId = null;
             let linkUrl = '';
+            let isClickable = false;
             
             if (item.type === 'advert') {
               imagePath = item.data.targetUrl || item.data.imageUrl || '';
@@ -1441,11 +1487,17 @@
               subtitle = item.data.subtitle || 'Special Offer';
               linkId = item.data.wineId;
               linkUrl = item.data.targetUrl;
+              isClickable = item.data.wineId && item.data.wineId > 0;
             } else {
               imagePath = item.data.bannerImageUrl || item.data.imageUrl || '';
               title = item.data.name;
               subtitle = item.data.type || 'Premium Wine';
               linkId = item.data.id;
+              isClickable = true; // Wines are always clickable
+            }
+            
+            if (!isClickable) {
+              slide.classList.add('not-clickable');
             }
             
             if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
@@ -1454,25 +1506,34 @@
               }
             }
             
+            let displayOnlyBadge = '';
+            if (item.type === 'advert' && !isClickable) {
+              displayOnlyBadge = `<div class="display-only-badge">DISPLAY ONLY</div>`;
+            }
+            
             slide.innerHTML = `
               <img src="${imagePath}" alt="${title}" class="bottom-banner-image" loading="eager" style="opacity: 1;" onerror="this.onerror=null; this.src='assets/adverts/default_marketing.jpg'">
+              ${displayOnlyBadge}
               <div class="bottom-banner-overlay">
                 <div class="bottom-banner-title">${title}</div>
                 <div class="bottom-banner-subtitle">${subtitle}</div>
               </div>
             `;
             
-            slide.addEventListener('click', () => {
-              if (!isTransitioning) {
-                if (item.type === 'advert' && linkId) {
-                  window.location.href = `wine/wine_detail.html?id=${linkId}`;
-                } else if (item.type === 'advert' && linkUrl && linkUrl.includes('http')) {
-                  window.open(linkUrl, '_blank');
-                } else if (item.type === 'wine' && linkId) {
-                  window.location.href = `wine/wine_detail.html?id=${linkId}`;
+            // Only add click handler if clickable
+            if (isClickable) {
+              slide.addEventListener('click', () => {
+                if (!isTransitioning) {
+                  if (item.type === 'advert' && linkId) {
+                    window.location.href = `wine/wine_detail.html?id=${linkId}`;
+                  } else if (item.type === 'advert' && linkUrl && linkUrl.includes('http')) {
+                    window.open(linkUrl, '_blank');
+                  } else if (item.type === 'wine' && linkId) {
+                    window.location.href = `wine/wine_detail.html?id=${linkId}`;
+                  }
                 }
-              }
-            });
+              });
+            }
             
             bottomBannerTrack.appendChild(slide);
             
