@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wine & Bubbles — Wine Bars</title>
+  <title>Wine & Bubbles — Liquor Stores</title>
   
   <!-- Cache Control Meta Tags -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -144,121 +144,105 @@
       vertical-align: middle;
     }
     
-    /* Coming Soon Badge Styles */
-    .coming-soon-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
+    /* Coming Soon Page Styles */
+    .coming-soon-page {
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      min-height: 60vh;
+      padding: 40px 20px;
     }
     
-    .coming-soon-overlay span {
-      background: #6b0d2b;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-      letter-spacing: 1px;
-      border: 1px solid #D8C09D;
+    .coming-soon-content {
+      text-align: center;
+      max-width: 500px;
     }
     
-    .coming-soon-badge {
-      display: inline-block;
-      background: #6b0d2b;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: bold;
-      margin-top: 8px;
-      letter-spacing: 0.5px;
-    }
-    
-    .wine-farm-card.coming-soon {
-      opacity: 0.9;
-    }
-    
-    .wine-farm-card.coming-soon .wine-farm-title {
-      color: #999;
-    }
-    
-    .wine-farm-card.coming-soon .wine-farm-description {
-      color: #aaa;
-    }
-    
-    /* Filter Dropdown Styles */
-    .filter-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    
-    .filter-btn {
-      background: #6b0d2b;
-      color: white;
-      border: none;
-      padding: 14px 20px;
-      border-radius: 12px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background-color 0.3s;
-      white-space: nowrap;
-    }
-    
-    .filter-btn:hover {
-      background: #5a0b23;
-    }
-    
-    .filter-dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: white;
-      min-width: 200px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-      z-index: 1000;
-      border-radius: 12px;
-      overflow: hidden;
-      right: 0;
-      margin-top: 5px;
-    }
-    
-    .filter-dropdown-content a {
-      color: #333;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      border-bottom: 1px solid #f0f0f0;
-      transition: background-color 0.3s;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 14px;
-    }
-    
-    .filter-dropdown-content a:hover {
-      background-color: #f8f8f8;
+    .coming-soon-icon {
+      font-size: 80px;
       color: #6b0d2b;
+      margin-bottom: 24px;
+      opacity: 0.8;
     }
     
-    .filter-dropdown-content a.active-filter {
-      background-color: #6b0d2b;
-      color: white !important;
+    .coming-soon-title {
+      font-family: 'Playfair Display', serif;
+      color: #6b0d2b;
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 16px;
     }
     
-    .filter-dropdown-content a:last-child {
-      border-bottom: none;
+    .coming-soon-description {
+      color: #666;
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+      font-family: 'Montserrat', sans-serif;
     }
     
-    .filter-dropdown-content.show {
-      display: block;
+    .coming-soon-sub {
+      color: #999;
+      font-size: 16px;
+      font-style: italic;
+      font-family: 'Montserrat', sans-serif;
+      margin-bottom: 32px;
+    }
+    
+    .coming-soon-back-btn {
+      display: inline-block;
+      padding: 14px 40px;
+      background: #6b0d2b;
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .coming-soon-back-btn:hover {
+      background: #8a1e3d;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(107, 13, 43, 0.3);
+    }
+    
+    .coming-soon-back-btn i {
+      margin-right: 8px;
+    }
+    
+    @media (max-width: 768px) {
+      .coming-soon-title {
+        font-size: 32px;
+      }
+      
+      .coming-soon-description {
+        font-size: 16px;
+      }
+      
+      .coming-soon-icon {
+        font-size: 60px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .coming-soon-title {
+        font-size: 26px;
+      }
+      
+      .coming-soon-description {
+        font-size: 14px;
+      }
+      
+      .coming-soon-icon {
+        font-size: 48px;
+      }
+      
+      .coming-soon-back-btn {
+        padding: 12px 30px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -282,7 +266,7 @@
         <ul>
           <li><a href="../wine/all_wines.html">In-Stock</a></li>
           <li><a href="../booking/booking.html">Book African Wine Bar</a></li>
-          <li><a href="wine_farm.html" class="active">Wine Bars Near Me</a></li>
+          <li><a href="wine_farm.html" class="active">Liquor Stores Near Me</a></li>
           <li><a href="../pairings/pairings.html">Pairings</a></li>
           <li><a href="../order/track_order.html">Track Order</a></li>
         </ul>
@@ -300,35 +284,35 @@
     </div>
   </div>
 
-  <!-- Wine Bars Content -->
+  <!-- Wine Bars Content - Coming Soon -->
   <section class="section wine-farms-section">
     <div class="container">
-      <h2 class="section-title">Wine Bars</h2>
-      <p class="muted">Discover beautiful wine bars near you</p>
-      
-      <!-- Search Bar with Filter Button -->
-      <div class="search-filter-bar">
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Search wine bars..." class="search-input">
-        </div>
-        <div class="filter-dropdown">
-          <button class="filter-btn" id="filterBtn">
-            <i class="fas fa-filter"></i>
-            Filter
-          </button>
-          <div class="filter-dropdown-content" id="filterDropdown">
-            <!-- Cities will be populated dynamically -->
+      <div class="coming-soon-page">
+        <div class="coming-soon-content">
+          <!-- Store Icon -->
+          <div class="coming-soon-icon">
+            <i class="fas fa-store"></i>
           </div>
-        </div>
-      </div>
-
-      <!-- Wine Bars Grid -->
-      <div class="wine-farms-grid" id="wineFarmsGrid">
-        <!-- Loading state -->
-        <div class="loading-state">
-          <div class="loading-spinner"></div>
-          <p>Loading wine bars...</p>
+          
+          <!-- Coming Soon Title -->
+          <h1 class="coming-soon-title">Coming Soon!</h1>
+          
+          <!-- Description -->
+          <p class="coming-soon-description">
+            We're currently curating the best liquor stores for you. 
+            Soon you'll be able to discover and find liquor stores 
+            near you that stock our premium wine selection.
+          </p>
+          
+          <!-- Sub description -->
+          <p class="coming-soon-sub">
+            Stay tuned for updates! 🍷✨
+          </p>
+          
+          <!-- Back to Home Button -->
+          <a href="../index.html" class="coming-soon-back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+          </a>
         </div>
       </div>
     </div>
@@ -355,7 +339,7 @@
           <ul class="footer-links">
             <li><a href="../wine/all_wines.html">In-Stock</a></li>
             <li><a href="../booking/booking.html">Bookings</a></li>
-            <li><a href="wine_farm.html">Tastings</a></li>
+            <li><a href="wine_farm.html">Liquor Stores</a></li>
             <li><a href="#">Blog</a></li>
           </ul>
         </div>
@@ -372,13 +356,10 @@
     </div>
   </footer>
 
-  <!-- JavaScript with cache busting -->
-  <script src="wine_farm.js?v=5"></script>
-
   <!-- Profile Authentication Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🍷 Wine Bars page loaded - checking authentication');
+        console.log('🍷 Liquor Stores page loaded - Coming Soon');
         
         const API_BASE_URL = '/api';
         
