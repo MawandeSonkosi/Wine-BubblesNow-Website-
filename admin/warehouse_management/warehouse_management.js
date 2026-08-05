@@ -75,6 +75,8 @@ async function fetchWarehouses() {
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
+        
+        // First fetch warehouses
         const response = await fetch(`${API_BASE}/api/warehouse/locations`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -94,11 +96,12 @@ async function fetchWarehouses() {
         
         console.log(`✅ Loaded ${allWarehouses.length} warehouses`);
         
-        // Load warehouse items for stats
+        // NOW fetch warehouse items - IMPORTANT: Do this BEFORE rendering
         await fetchWarehouseItems();
         
-        renderWarehouses();
+        // Render everything after items are loaded
         renderStats();
+        renderWarehouses();
         
     } catch (error) {
         console.error('Error fetching warehouses:', error);
@@ -116,6 +119,7 @@ async function fetchWarehouseItems() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const data = await response.json();
+        console.log('📦 Warehouse items response:', data);
         
         if (data.success && Array.isArray(data.data)) {
             allWarehouseItems = data.data;
@@ -126,6 +130,17 @@ async function fetchWarehouseItems() {
         }
         
         console.log(`✅ Loaded ${allWarehouseItems.length} warehouse items`);
+        
+        // Log items by warehouse for debugging
+        const itemsByWarehouse = {};
+        allWarehouseItems.forEach(item => {
+            const warehouseId = item.warehouseId || item.warehouseId;
+            if (warehouseId) {
+                if (!itemsByWarehouse[warehouseId]) itemsByWarehouse[warehouseId] = [];
+                itemsByWarehouse[warehouseId].push(item);
+            }
+        });
+        console.log('📊 Items by warehouse:', Object.keys(itemsByWarehouse).length, 'warehouses have items');
         
     } catch (error) {
         console.error('Error fetching warehouse items:', error);
@@ -178,6 +193,17 @@ function getWarehouseId(warehouse) {
     return warehouse.id || warehouse._id;
 }
 
+function getItemCountForWarehouse(warehouseId) {
+    if (!warehouseId) return 0;
+    // Count items where warehouseId matches (handles both string and ObjectId)
+    return allWarehouseItems.filter(item => {
+        const itemWarehouseId = item.warehouseId || item.warehouseId;
+        return itemWarehouseId === warehouseId || 
+               itemWarehouseId === warehouseId.toString() ||
+               warehouseId === itemWarehouseId?.toString();
+    }).length;
+}
+
 function renderWarehouses() {
     const container = document.getElementById('warehouseContainer');
     
@@ -200,7 +226,7 @@ function renderWarehouses() {
             ${allWarehouses.map(warehouse => {
                 const warehouseId = getWarehouseId(warehouse);
                 const statusClass = warehouse.isActive ? 'status-active' : 'status-inactive';
-                const itemCount = allWarehouseItems.filter(i => i.warehouseId === warehouseId).length;
+                const itemCount = getItemCountForWarehouse(warehouseId);
                 
                 return `
                     <div class="warehouse-card" onclick="viewWarehouseDetail('${warehouseId}')">
@@ -227,22 +253,15 @@ function renderWarehouses() {
                                 ${escapeHtml(warehouse.email)}
                             </div>
                             ` : ''}
-                            ${!warehouse.isActive ? `
-                            <div style="margin-top: 8px;">
-                                <span class="status-badge status-inactive">
-                                    <i class="fas fa-times-circle"></i> INACTIVE
-                                </span>
-                            </div>
-                            ` : `
                             <div style="margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap;">
-                                <span class="status-badge status-active">
-                                    <i class="fas fa-check-circle"></i> ACTIVE
+                                <span class="status-badge ${statusClass}">
+                                    <i class="fas ${warehouse.isActive ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                    ${warehouse.isActive ? 'ACTIVE' : 'INACTIVE'}
                                 </span>
                                 <span class="status-badge" style="background:rgba(107,13,43,0.1); color:#6b0d2b;">
-                                    <i class="fas fa-boxes"></i> ${itemCount} items
+                                    <i class="fas fa-boxes"></i> ${itemCount} item${itemCount !== 1 ? 's' : ''}
                                 </span>
                             </div>
-                            `}
                         </div>
                         <div class="warehouse-actions" onclick="event.stopPropagation()">
                             <button class="icon-btn" onclick="editWarehouse('${warehouseId}')" title="Edit">
@@ -339,11 +358,17 @@ async function deleteWarehouse(warehouseId) {
     }
 }
 
+// ========== REFRESH ==========
+function refreshData() {
+    fetchWarehouses();
+}
+
 // ========== INITIALIZE ==========
 document.getElementById('addWarehouseBtn')?.addEventListener('click', () => {
     window.location.href = '/admin/warehouse_management/warehouse_management_add_edit.html';
 });
 
+// Add refresh on page load
 if (checkAuth()) {
     fetchWarehouses();
 }
