@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Wine & Bubbles — Delivery Address</title>
     <link rel="icon" type="image/png" href="../assets/categories/Icons.png">
     <link rel="shortcut icon" href="../assets/categories/Icons.png" type="image/png">
@@ -61,16 +61,16 @@
 
         /* City Selection Cards */
         .city-selector {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .city-card {
-            flex: 1;
-            padding: 24px 20px;
+            padding: 16px 12px;
             background: #f5f5f5;
-            border-radius: 16px;
+            border-radius: 12px;
             cursor: pointer;
             text-align: center;
             transition: all 0.3s ease;
@@ -78,8 +78,8 @@
         }
 
         .city-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .city-card.selected {
@@ -89,22 +89,21 @@
         }
 
         .city-card i {
-            font-size: 36px;
+            font-size: 28px;
             color: #6b0d2b;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
+            display: block;
         }
 
-        .city-card h3 {
-            color: #1b1b1b;
-            margin-bottom: 8px;
-            font-size: 20px;
+        .city-card .city-name {
+            color: #333;
+            font-size: 13px;
             font-weight: 600;
         }
 
-        .city-card p {
-            color: #666;
-            font-size: 12px;
-            line-height: 1.4;
+        .city-card .city-sub {
+            color: #999;
+            font-size: 10px;
         }
 
         /* Quick Suburb Selector */
@@ -120,7 +119,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .quick-header i {
@@ -132,6 +131,7 @@
             color: #1b1b1b;
             font-size: 15px;
             font-weight: 600;
+            margin: 0;
         }
 
         .quick-subtitle {
@@ -143,16 +143,16 @@
         .suburb-chips {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
 
         .suburb-chip {
-            padding: 8px 18px;
+            padding: 6px 14px;
             background: white;
             border: 1px solid #ddd;
             border-radius: 25px;
             color: #555;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -175,7 +175,7 @@
             background: rgba(107, 13, 43, 0.05);
             border: 1px solid rgba(107, 13, 43, 0.15);
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px 20px;
             margin-bottom: 24px;
         }
 
@@ -183,45 +183,46 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         .info-icon {
             color: #6b0d2b;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .info-title {
             font-weight: 600;
             color: #6b0d2b;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .info-text {
             color: #666;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.5;
+            margin: 0;
         }
 
         /* Form Groups */
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .form-label {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
             color: #333;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .form-label i {
             color: #6b0d2b;
             opacity: 0.7;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .required {
@@ -230,16 +231,16 @@
 
         .optional {
             color: #999;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 400;
         }
 
         .form-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 12px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
             font-family: 'Montserrat', sans-serif;
             transition: all 0.3s ease;
             background: white;
@@ -256,14 +257,19 @@
             color: #bbb;
         }
 
+        .form-input.readonly {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
         .form-input.error {
             border-color: #e74c3c;
         }
 
         .error-message {
             color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
+            font-size: 11px;
+            margin-top: 4px;
             display: none;
         }
 
@@ -276,7 +282,7 @@
             padding: 16px;
             border-radius: 12px;
             font-family: 'Montserrat', sans-serif;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -284,7 +290,7 @@
             justify-content: center;
             gap: 12px;
             transition: all 0.3s ease;
-            margin-top: 24px;
+            margin-top: 8px;
         }
 
         .continue-btn:hover:not(:disabled) {
@@ -319,13 +325,13 @@
             gap: 8px;
             background: #6b0d2b;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 25px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-decoration: none;
             border: none;
         }
@@ -346,13 +352,14 @@
             right: 20px;
             background: #323232;
             color: white;
-            padding: 16px 24px;
+            padding: 14px 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             z-index: 1001;
             display: none;
             max-width: 400px;
             animation: slideIn 0.3s ease;
+            font-size: 14px;
         }
 
         @keyframes slideIn {
@@ -372,6 +379,10 @@
 
         .toast.error {
             background: #e74c3c;
+        }
+
+        .toast.warning {
+            background: #f39c12;
         }
 
         /* Loading Overlay */
@@ -408,18 +419,13 @@
                 padding: 24px;
             }
 
+            .city-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .continue-btn {
                 padding: 14px;
-                font-size: 15px;
-            }
-
-            .city-selector {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .city-card {
-                padding: 18px;
+                font-size: 14px;
             }
         }
 
@@ -430,6 +436,23 @@
 
             .delivery-container {
                 padding: 0 16px;
+            }
+
+            .city-selector {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .city-card {
+                padding: 12px 8px;
+            }
+
+            .city-card i {
+                font-size: 22px;
+            }
+
+            .city-card .city-name {
+                font-size: 11px;
             }
         }
 
@@ -451,7 +474,7 @@
     </style>
 </head>
 <body>
-    <!-- Top bar with two sections -->
+    <!-- Top bar -->
     <div class="topbar-top">
         <div class="topbar-top-inner"></div>
     </div>
@@ -496,7 +519,7 @@
 
             <div class="delivery-card">
                 <!-- Heatmap Button -->
-                <div style="text-align: right;">
+                <div style="text-align: right; margin-bottom: 8px;">
                     <a href="heatmap.html" class="heatmap-btn">
                         <i class="fas fa-map-marked-alt"></i>
                         View Delivery Areas
@@ -507,13 +530,23 @@
                 <div class="city-selector" id="citySelector">
                     <div class="city-card" data-city="Johannesburg" id="cityJhb">
                         <i class="fas fa-city"></i>
-                        <h3>Johannesburg</h3>
-                        <p>Sandton • Rosebank • Hyde Park • Fourways • Midrand</p>
+                        <div class="city-name">Johannesburg</div>
+                        <div class="city-sub">Sandton • Rosebank</div>
                     </div>
                     <div class="city-card" data-city="Durban" id="cityDbn">
                         <i class="fas fa-umbrella-beach"></i>
-                        <h3>Durban</h3>
-                        <p>Umhlanga • Ballito • Durban North • Westville</p>
+                        <div class="city-name">Durban</div>
+                        <div class="city-sub">Umhlanga • Ballito</div>
+                    </div>
+                    <div class="city-card" data-city="Pietermaritzburg" id="cityPmb">
+                        <i class="fas fa-landmark"></i>
+                        <div class="city-name">Pietermaritzburg</div>
+                        <div class="city-sub">CBD • Scottsville</div>
+                    </div>
+                    <div class="city-card" data-city="South Coast" id="citySc">
+                        <i class="fas fa-waves"></i>
+                        <div class="city-name">South Coast</div>
+                        <div class="city-sub">Margate • Shelly Beach</div>
                     </div>
                 </div>
 
@@ -590,7 +623,7 @@
                             <span>City</span>
                             <span class="required">*</span>
                         </label>
-                        <input type="text" id="city" class="form-input" readonly style="background: #f5f5f5; font-weight: 500;">
+                        <input type="text" id="city" class="form-input readonly" readonly style="background: #f5f5f5; font-weight: 500; cursor: pointer;" onclick="openCitySelector()">
                     </div>
 
                     <!-- Postal Code (Required) -->
@@ -662,7 +695,7 @@
 
     <!-- JavaScript -->
     <script>
-        // Delivery zones data
+        // Delivery zones data - 4 cities with suburbs
         const deliveryZones = {
             'Johannesburg': [
                 'Sandton', 'Rosebank', 'Hyde Park', 'Illovo', 'Morningside',
@@ -672,6 +705,16 @@
             'Durban': [
                 'Umhlanga', 'Ballito', 'Durban North', 'Westville', 'Florida',
                 'Essenwood', 'Morningside (DBN)', 'Glenwood', 'Berea', 'La Lucia'
+            ],
+            'Pietermaritzburg': [
+                'Pietermaritzburg CBD', 'Scottsville', 'Pelham', 'Hayfields', 'Wembley',
+                'Lynwood', 'Cascades', 'Bisley', 'Montrose', 'Clarendon',
+                'Athlone', 'Oak Tree', 'Worlds View', 'Mountain Rise', 'Eastwood',
+                'Dove House', 'New England'
+            ],
+            'South Coast': [
+                'Port Shepstone', 'Southbroom', 'Ramsgate', 'Margate', 'Uvongo',
+                'St Michaels', 'Shelly Beach'
             ]
         };
 
@@ -694,39 +737,45 @@
                 this.validateCart();
                 this.setupCitySelection();
                 this.updateSuburbChips();
+                this.setupFormValidation();
             }
 
             setupCitySelection() {
-                const cityJhb = document.getElementById('cityJhb');
-                const cityDbn = document.getElementById('cityDbn');
+                const cityCards = document.querySelectorAll('.city-card');
                 const cityInput = document.getElementById('city');
                 const cityNameSpan = document.getElementById('selectedCityName');
 
                 // Set initial city
                 cityInput.value = 'Johannesburg';
-                cityJhb.classList.add('selected');
+                document.getElementById('cityJhb').classList.add('selected');
 
-                cityJhb.addEventListener('click', () => {
-                    selectedCity = 'Johannesburg';
-                    cityJhb.classList.add('selected');
-                    cityDbn.classList.remove('selected');
-                    cityInput.value = 'Johannesburg';
-                    cityNameSpan.textContent = 'Johannesburg';
-                    this.updateSuburbChips();
-                    document.getElementById('suburb').value = '';
-                    document.getElementById('postalCode').value = '';
+                cityCards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        const city = card.dataset.city;
+                        selectedCity = city;
+                        
+                        // Update UI
+                        cityCards.forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        
+                        cityInput.value = city;
+                        cityNameSpan.textContent = city;
+                        
+                        // Reset suburb and postal code
+                        document.getElementById('suburb').value = '';
+                        document.getElementById('postalCode').value = '';
+                        
+                        this.updateSuburbChips();
+                    });
                 });
+            }
 
-                cityDbn.addEventListener('click', () => {
-                    selectedCity = 'Durban';
-                    cityDbn.classList.add('selected');
-                    cityJhb.classList.remove('selected');
-                    cityInput.value = 'Durban';
-                    cityNameSpan.textContent = 'Durban';
-                    this.updateSuburbChips();
-                    document.getElementById('suburb').value = '';
-                    document.getElementById('postalCode').value = '';
-                });
+            openCitySelector() {
+                const cityCards = document.querySelectorAll('.city-card');
+                // Scroll to city selector
+                document.getElementById('citySelector').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Highlight the first city card
+                cityCards.forEach(c => c.style.transition = 'all 0.3s ease');
             }
 
             updateSuburbChips() {
@@ -750,22 +799,7 @@
                 });
             }
 
-            setupEventListeners() {
-                if (this.form) {
-                    this.form.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        this.submitAddress();
-                    });
-                }
-
-                this.setupRealTimeValidation();
-                
-                window.addEventListener('cartUpdated', () => {
-                    this.updateCartBadge();
-                });
-            }
-
-            setupRealTimeValidation() {
+            setupFormValidation() {
                 const inputs = [
                     { id: 'street', minLength: 5, errorId: 'streetError' },
                     { id: 'suburb', minLength: 2, errorId: 'suburbError' },
@@ -855,6 +889,19 @@
                 });
 
                 return isValid;
+            }
+
+            setupEventListeners() {
+                if (this.form) {
+                    this.form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.submitAddress();
+                    });
+                }
+
+                window.addEventListener('cartUpdated', () => {
+                    this.updateCartBadge();
+                });
             }
 
             async submitAddress() {
@@ -963,7 +1010,6 @@
                 
                 const userIcon = document.getElementById('userIcon');
                 const userIconElement = document.getElementById('userIconElement');
-                const cartIcon = document.getElementById('cartIcon');
                 
                 if (isValidToken && userData) {
                     try {
@@ -1063,6 +1109,13 @@
             showLoading(show) {
                 const overlay = document.getElementById('loadingOverlay');
                 overlay.style.display = show ? 'flex' : 'none';
+            }
+        }
+
+        // Make openCitySelector global for onclick
+        function openCitySelector() {
+            if (window.deliverySystem) {
+                window.deliverySystem.openCitySelector();
             }
         }
 
