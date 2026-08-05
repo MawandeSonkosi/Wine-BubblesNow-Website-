@@ -20,7 +20,6 @@
       --admin-success: #2e7d32;
       --admin-warning: #ed6c02;
       --admin-error: #d32f2f;
-      --admin-info: #0288d1;
     }
     
     html, body { height: 100%; margin: 0; padding: 0; }
@@ -29,37 +28,27 @@
     .top-icons { margin-left: auto; display: flex; gap: 25px; align-items: center; }
     
     .admin-wrapper { flex: 1; display: flex; flex-direction: column; }
-    .admin-container { max-width: 1400px; margin: 30px auto 0; padding: 0 24px; flex: 1; }
+    .admin-container { max-width: 1200px; margin: 30px auto 0; padding: 0 24px; flex: 1; }
     
     .detail-card { background: var(--admin-card); border-radius: 24px; border: 1px solid var(--admin-border); overflow: hidden; margin-bottom: 24px; }
-    .detail-header { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-    .detail-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--admin-text); margin: 0; display: flex; align-items: center; gap: 12px; }
+    .detail-header { padding: 16px 24px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .detail-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--admin-text); margin: 0; display: flex; align-items: center; gap: 10px; }
     .detail-title i { color: var(--admin-primary); }
     
-    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
     .status-active { background: rgba(46,125,50,0.1); color: #2e7d32; }
     .status-inactive { background: rgba(211,47,47,0.1); color: #d32f2f; }
     
-    .header-actions { display: flex; gap: 12px; align-items: center; }
-    .btn-icon { background: transparent; border: 1px solid var(--admin-border); padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: 500; font-family: 'Montserrat', sans-serif; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; color: var(--admin-text); }
+    .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .btn-icon { background: transparent; border: 1px solid var(--admin-border); padding: 6px 14px; border-radius: 40px; cursor: pointer; font-weight: 500; font-family: 'Montserrat', sans-serif; font-size: 13px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; color: var(--admin-text); }
     .btn-icon:hover { background: #f5f5f5; border-color: var(--admin-primary); color: var(--admin-primary); }
     
-    .detail-section { padding: 20px 24px; border-bottom: 1px solid var(--admin-border); }
+    .detail-section { padding: 16px 24px; border-bottom: 1px solid var(--admin-border); }
     .section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--admin-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     
-    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .info-row { display: flex; padding: 8px 0; }
-    .info-label { width: 140px; font-weight: 600; color: var(--admin-text); }
-    .info-value { flex: 1; color: var(--admin-muted); }
-    
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
-    .stat-card { background: #f8f7f5; border-radius: 16px; padding: 16px; text-align: center; border: 1px solid var(--admin-border); }
-    .stat-value { font-size: 28px; font-weight: 700; color: var(--admin-primary); }
-    .stat-label { font-size: 12px; color: var(--admin-muted); margin-top: 4px; }
-    
-    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif; font-size: 14px; }
+    .btn-primary { background: var(--admin-primary); color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Montserrat', sans-serif; font-size: 13px; }
     .btn-primary:hover { background: #8a1e3d; transform: translateY(-2px); }
-    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 12px 24px; border-radius: 40px; cursor: pointer; font-weight: 500; }
+    .btn-secondary { background: transparent; border: 1px solid var(--admin-border); padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 500; font-family: 'Montserrat', sans-serif; font-size: 13px; }
     .btn-secondary:hover { background: #f5f5f5; }
     
     .loading-state, .empty-state { text-align: center; padding: 60px; color: var(--admin-muted); background: white; border-radius: 24px; border: 1px solid var(--admin-border); }
@@ -68,12 +57,18 @@
     
     .footer { margin-top: auto; background: var(--admin-primary); }
     
+    .item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--admin-success); color: white; padding: 12px 24px; border-radius: 40px; z-index: 10002; font-family: 'Montserrat', sans-serif; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    
     @media (max-width: 768px) {
       .admin-container { padding: 0 16px; margin-top: 20px; }
-      .info-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .info-row { flex-direction: column; gap: 4px; }
-      .info-label { width: auto; }
+      .detail-header { flex-direction: column; align-items: stretch; }
+      .header-actions { justify-content: flex-start; }
+      .detail-section { padding: 16px; }
     }
   </style>
 </head>
@@ -101,6 +96,6 @@
     </div>
   </footer>
 
-  <script src="/admin/warehouse_management/warehouse_management_detail.js?v=1"></script>
+  <script src="/admin/warehouse_management/warehouse_management_detail.js?v=2"></script>
 </body>
 </html>

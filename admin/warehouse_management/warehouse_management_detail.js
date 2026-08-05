@@ -1,4 +1,4 @@
-// Warehouse Management Detail JavaScript
+// Warehouse Management Detail JavaScript - Matches Flutter WarehouseDetailScreen
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -8,6 +8,7 @@ let warehouseData = null;
 let warehouseItems = [];
 let dashboardData = null;
 let isLoading = false;
+let searchQuery = '';
 
 function checkAuth() {
     const token = localStorage.getItem('wineBubbles_token');
@@ -71,6 +72,7 @@ function toggleUserDropdown(user) {
     }, 100);
 }
 
+// ========== FETCH WAREHOUSE DETAILS ==========
 async function fetchWarehouseDetails() {
     if (!warehouseId) {
         showError('No warehouse ID provided');
@@ -104,7 +106,7 @@ async function fetchWarehouseDetails() {
         
         if (!warehouseData) throw new Error('Warehouse not found');
         
-        // Fetch warehouse items
+        // Fetch warehouse items for this warehouse
         const itemsRes = await fetch(`${API_BASE}/api/warehouse?warehouseId=${warehouseId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -113,8 +115,11 @@ async function fetchWarehouseDetails() {
             const itemsData = await itemsRes.json();
             if (itemsData.success && Array.isArray(itemsData.data)) {
                 warehouseItems = itemsData.data;
+            } else if (Array.isArray(itemsData)) {
+                warehouseItems = itemsData;
             }
         }
+        console.log(`✅ Loaded ${warehouseItems.length} items for warehouse`);
         
         // Fetch dashboard data
         const dashboardRes = await fetch(`${API_BASE}/api/warehouse/dashboard?warehouseId=${warehouseId}`, {
@@ -138,161 +143,33 @@ async function fetchWarehouseDetails() {
     }
 }
 
-function renderDetail() {
-    const container = document.getElementById('detailContent');
-    if (!container || !warehouseData) return;
+// ========== GET STOCK STATUS ==========
+function getStockStatus(item) {
+    const stock = item.currentStock || 0;
+    const reorderLevel = item.reorderLevel || 10;
     
-    const summary = dashboardData?.summary || {};
-    const statusClass = warehouseData.isActive ? 'status-active' : 'status-inactive';
-    
-    // Calculate stats
-    const totalItems = summary.totalItems || warehouseItems.length;
-    const totalStock = summary.totalStock || warehouseItems.reduce((sum, i) => sum + (i.currentStock || 0), 0);
-    const totalValue = summary.totalValue || warehouseItems.reduce((sum, i) => sum + ((i.currentStock || 0) * (i.unitPrice || 0)), 0);
-    const lowStockCount = warehouseItems.filter(i => i.stockStatus === 'low_stock').length;
-    const outOfStockCount = warehouseItems.filter(i => i.stockStatus === 'out_of_stock').length;
-    
-    container.innerHTML = `
-        <div class="detail-card">
-            <div class="detail-header">
-                <div class="detail-title">
-                    <i class="fas fa-warehouse"></i>
-                    ${escapeHtml(warehouseData.name)}
-                    <span class="status-badge ${statusClass}" style="margin-left: 12px;">${warehouseData.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
-                </div>
-                <div class="header-actions">
-                    <button class="btn-icon" onclick="window.location.href='warehouse_management_screen.html'">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </button>
-                    <button class="btn-icon" onclick="editWarehouse()">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button class="btn-icon" onclick="addSupplierToWarehouse()">
-                        <i class="fas fa-plus"></i> Add Supplier
-                    </button>
-                </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-info-circle"></i> Warehouse Information</h3>
-                <div class="info-grid">
-                    <div class="info-row"><div class="info-label">Name:</div><div class="info-value">${escapeHtml(warehouseData.name)}</div></div>
-                    <div class="info-row"><div class="info-label">Address:</div><div class="info-value">${escapeHtml(warehouseData.address)}</div></div>
-                    <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">${escapeHtml(warehouseData.phone || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Email:</div><div class="info-value">${escapeHtml(warehouseData.email || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Created:</div><div class="info-value">${formatDate(warehouseData.createdAt)}</div></div>
-                    <div class="info-row"><div class="info-label">Last Updated:</div><div class="info-value">${formatDate(warehouseData.updatedAt)}</div></div>
-                </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-chart-line"></i> Warehouse Overview</h3>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value">${totalItems}</div><div class="stat-label">Total Items</div></div>
-                    <div class="stat-card"><div class="stat-value">${totalStock}</div><div class="stat-label">Total Stock</div></div>
-                    <div class="stat-card"><div class="stat-value">R${formatNumber(totalValue)}</div><div class="stat-label">Total Value</div></div>
-                    <div class="stat-card"><div class="stat-value">${lowStockCount}</div><div class="stat-label">Low Stock</div></div>
-                    <div class="stat-card"><div class="stat-value">${outOfStockCount}</div><div class="stat-label">Out of Stock</div></div>
-                    <div class="stat-card"><div class="stat-value">${warehouseItems.length}</div><div class="stat-label">Suppliers</div></div>
-                </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-boxes"></i> Inventory Items</h3>
-                <div id="itemsContainer">
-                    ${renderItemsList()}
-                </div>
-            </div>
-            
-            <div class="detail-section" style="display: flex; gap: 16px; justify-content: flex-end; border-bottom: none;">
-                <button class="btn-secondary" onclick="window.location.href='warehouse_management_screen.html'"><i class="fas fa-arrow-left"></i> Back to List</button>
-                <button class="btn-primary" onclick="addSupplierToWarehouse()"><i class="fas fa-plus"></i> Add Supplier</button>
-                <button class="btn-primary" onclick="editWarehouse()"><i class="fas fa-edit"></i> Edit Warehouse</button>
-            </div>
-        </div>
-    `;
+    if (stock <= 0) return { text: 'Out of Stock', color: '#d32f2f', class: 'status-out-of-stock' };
+    if (stock <= reorderLevel) return { text: 'Low Stock', color: '#ed6c02', class: 'status-low-stock' };
+    return { text: 'In Stock', color: '#2e7d32', class: 'status-in-stock' };
 }
 
-function renderItemsList() {
-    if (warehouseItems.length === 0) {
-        return '<div class="empty-state" style="padding: 40px;"><i class="fas fa-boxes" style="font-size:48px; margin-bottom:16px; opacity:0.5;"></i><p>No items in this warehouse yet</p><button class="btn-primary" onclick="addSupplierToWarehouse()" style="margin-top:16px;"><i class="fas fa-plus"></i> Add First Supplier</button></div>';
-    }
-    
-    // Group items by supplier
-    const suppliers = {};
-    warehouseItems.forEach(item => {
-        if (!suppliers[item.companyId]) {
-            suppliers[item.companyId] = {
-                name: item.companyName,
-                email: item.companyEmail,
-                items: []
-            };
-        }
-        suppliers[item.companyId].items.push(item);
-    });
-    
-    let html = '';
-    for (const [supplierId, supplier] of Object.entries(suppliers)) {
-        const totalStock = supplier.items.reduce((sum, i) => sum + (i.currentStock || 0), 0);
-        const totalValue = supplier.items.reduce((sum, i) => sum + ((i.currentStock || 0) * (i.unitPrice || 0)), 0);
-        
-        html += `
-            <div style="margin-bottom: 24px; border: 1px solid var(--admin-border); border-radius: 16px; overflow: hidden;">
-                <div style="padding: 16px; background: #f8f7f5; border-bottom: 1px solid var(--admin-border);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                        <div>
-                            <h4 style="margin: 0; color: var(--admin-primary);"><i class="fas fa-building"></i> ${escapeHtml(supplier.name)}</h4>
-                            <p style="margin: 4px 0 0; font-size: 12px; color: var(--admin-muted);">${escapeHtml(supplier.email)}</p>
-                        </div>
-                        <div style="display: flex; gap: 16px;">
-                            <div><span style="font-weight: bold;">${totalStock}</span> total stock</div>
-                            <div><span style="font-weight: bold;">R${formatNumber(totalValue)}</span> total value</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="padding: 16px;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 1px solid var(--admin-border);">
-                                <th style="text-align: left; padding: 8px; color: var(--admin-muted); font-weight: 600;">Item</th>
-                                <th style="text-align: center; padding: 8px; color: var(--admin-muted); font-weight: 600;">Stock</th>
-                                <th style="text-align: right; padding: 8px; color: var(--admin-muted); font-weight: 600;">Price</th>
-                                <th style="text-align: right; padding: 8px; color: var(--admin-muted); font-weight: 600;">Value</th>
-                                <th style="text-align: center; padding: 8px; color: var(--admin-muted); font-weight: 600;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${supplier.items.map(item => {
-                                const statusColor = item.stockStatus === 'in_stock' ? '#2e7d32' : 
-                                                   item.stockStatus === 'low_stock' ? '#ed6c02' : '#d32f2f';
-                                const statusText = item.stockStatus === 'in_stock' ? 'In Stock' : 
-                                                  item.stockStatus === 'low_stock' ? 'Low Stock' : 'Out of Stock';
-                                return `
-                                    <tr style="border-bottom: 1px solid var(--admin-border); cursor: pointer;" onclick="viewItemDetail('${item.id}')">
-                                        <td style="padding: 12px 8px;">${escapeHtml(item.itemName)}</td>
-                                        <td style="text-align: center; padding: 12px 8px;">${item.currentStock || 0}</td>
-                                        <td style="text-align: right; padding: 12px 8px;">R${formatNumber(item.unitPrice || 0)}</td>
-                                        <td style="text-align: right; padding: 12px 8px;">R${formatNumber((item.currentStock || 0) * (item.unitPrice || 0))}</td>
-                                        <td style="text-align: center; padding: 12px 8px;">
-                                            <span style="background: ${statusColor}20; color: ${statusColor}; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;">${statusText}</span>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-    }
-    
-    return html;
+function getImageUrl(imageUrl) {
+    if (!imageUrl) return '';
+    if (imageUrl.indexOf('http') === 0) return imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+    return '/assets/images/' + imageUrl;
+}
+
+function formatCurrency(value) {
+    if (value == null) return '0.00';
+    return Number(value).toFixed(2);
 }
 
 function formatNumber(num) {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toFixed(2);
+    return num.toString();
 }
 
 function formatDate(dateStr) {
@@ -331,6 +208,259 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 3000);
 }
 
+// ========== FILTER ITEMS ==========
+function filterItems() {
+    if (!warehouseItems || warehouseItems.length === 0) return [];
+    
+    if (!searchQuery || searchQuery.trim() === '') {
+        return warehouseItems;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    return warehouseItems.filter(item => {
+        const nameMatch = item.itemName && item.itemName.toLowerCase().includes(query);
+        const categoryMatch = item.itemCategory && item.itemCategory.toLowerCase().includes(query);
+        return nameMatch || categoryMatch;
+    });
+}
+
+// ========== RENDER DETAIL ==========
+function renderDetail() {
+    const container = document.getElementById('detailContent');
+    if (!container || !warehouseData) return;
+    
+    const summary = dashboardData?.summary || {};
+    const statusClass = warehouseData.isActive ? 'status-active' : 'status-inactive';
+    
+    // Calculate stats
+    const totalItems = summary.totalItems || warehouseItems.length;
+    const totalStock = summary.totalStock || warehouseItems.reduce((sum, i) => sum + (i.currentStock || 0), 0);
+    const totalValue = summary.totalValue || warehouseItems.reduce((sum, i) => sum + ((i.currentStock || 0) * (i.unitPrice || 0)), 0);
+    
+    // Filter items based on search
+    const filteredItems = filterItems();
+    const itemsToShow = filteredItems.length > 0 ? filteredItems : warehouseItems;
+    
+    container.innerHTML = `
+        <div class="detail-card">
+            <!-- Header -->
+            <div class="detail-header">
+                <div class="detail-title">
+                    <i class="fas fa-warehouse"></i>
+                    ${escapeHtml(warehouseData.name)}
+                    <span class="status-badge ${statusClass}" style="margin-left: 12px;">${warehouseData.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" onclick="refreshData()" title="Refresh">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="btn-icon" onclick="editWarehouse()" title="Edit Warehouse">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon" onclick="addWineToWarehouse()" title="Add Wine" style="color:#2e7d32;">
+                        <i class="fas fa-plus"></i> Add Wine
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="search-bar-container" style="padding: 12px 24px; border-bottom: 1px solid var(--admin-border);">
+                <div class="search-bar-wrapper" style="display: flex; align-items: center; background: white; border-radius: 12px; padding: 8px 16px; border: 1px solid var(--admin-border);">
+                    <i class="fas fa-search" style="color: var(--admin-muted); margin-right: 12px;"></i>
+                    <input type="text" id="searchInput" placeholder="Search wines..." style="border: none; flex: 1; outline: none; font-family: 'Montserrat', sans-serif; font-size: 14px; background: transparent;">
+                    <i class="fas fa-times" id="clearSearchBtn" style="color: var(--admin-muted); cursor: pointer; display: ${searchQuery ? 'block' : 'none'};" onclick="clearSearch()"></i>
+                </div>
+            </div>
+            
+            <!-- Warehouse Info Card -->
+            <div class="detail-section" style="background: var(--admin-primary); margin: 16px 24px; border-radius: 16px; border: none; padding: 16px 20px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="background: rgba(212,175,55,0.2); border-radius: 8px; padding: 8px;">
+                        <i class="fas fa-warehouse" style="color: var(--admin-accent); font-size: 24px;"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="color: var(--admin-accent); font-weight: bold; font-size: 16px;">${escapeHtml(warehouseData.name)}</div>
+                        <div style="color: rgba(212,175,55,0.8); font-size: 12px;">${escapeHtml(warehouseData.address)}</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-phone" style="color: rgba(212,175,55,0.7); font-size: 14px;"></i>
+                        <span style="color: rgba(212,175,55,0.8); font-size: 12px;">${escapeHtml(warehouseData.phone || 'No phone')}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-envelope" style="color: rgba(212,175,55,0.7); font-size: 14px;"></i>
+                        <span style="color: rgba(212,175,55,0.8); font-size: 12px;">${escapeHtml(warehouseData.email || 'No email')}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="detail-section" style="border-bottom: 1px solid var(--admin-border);">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                    <div class="stat-item" style="background: #f8f7f5; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid var(--admin-border);">
+                        <div style="font-size: 20px; font-weight: 700; color: var(--admin-primary);">${totalItems}</div>
+                        <div style="font-size: 11px; color: var(--admin-muted);">Total Wines</div>
+                    </div>
+                    <div class="stat-item" style="background: #f8f7f5; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid var(--admin-border);">
+                        <div style="font-size: 20px; font-weight: 700; color: var(--admin-primary);">R${formatCurrency(totalValue)}</div>
+                        <div style="font-size: 11px; color: var(--admin-muted);">Total Value</div>
+                    </div>
+                    <div class="stat-item" style="background: #f8f7f5; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid var(--admin-border);">
+                        <div style="font-size: 20px; font-weight: 700; color: var(--admin-primary);">${totalStock}</div>
+                        <div style="font-size: 11px; color: var(--admin-muted);">Total Stock</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Wines Section -->
+            <div class="detail-section" style="border-bottom: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 class="section-title" style="margin: 0;">
+                        <i class="fas fa-wine-bottle"></i> Wines in Warehouse
+                    </h3>
+                    <span style="font-size: 13px; color: var(--admin-muted);">${itemsToShow.length} item${itemsToShow.length !== 1 ? 's' : ''}</span>
+                </div>
+                <div id="itemsContainer">
+                    ${renderItemsList(itemsToShow)}
+                </div>
+            </div>
+            
+            <!-- Footer Actions -->
+            <div class="detail-section" style="display: flex; gap: 16px; justify-content: flex-end; border-top: 1px solid var(--admin-border); padding: 16px 24px;">
+                <button class="btn-secondary" onclick="window.location.href='warehouse_management_screen.html'">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </button>
+                <button class="btn-primary" onclick="addWineToWarehouse()">
+                    <i class="fas fa-plus"></i> Add Wine
+                </button>
+                <button class="btn-primary" onclick="editWarehouse()">
+                    <i class="fas fa-edit"></i> Edit Warehouse
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Setup search listener
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = searchQuery;
+        searchInput.addEventListener('input', function() {
+            searchQuery = this.value;
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) {
+                clearBtn.style.display = searchQuery ? 'block' : 'none';
+            }
+            // Re-render with filter
+            renderDetail();
+        });
+    }
+}
+
+function renderItemsList(items) {
+    if (!items || items.length === 0) {
+        return `
+            <div class="empty-state" style="padding: 40px;">
+                <i class="fas fa-wine-bottle" style="font-size:48px; margin-bottom:16px; opacity:0.5;"></i>
+                <p>${searchQuery ? 'No wines match your search' : 'No wines in this warehouse yet'}</p>
+                ${!searchQuery ? `<button class="btn-primary" onclick="addWineToWarehouse()" style="margin-top:16px;"><i class="fas fa-plus"></i> Add First Wine</button>` : ''}
+            </div>
+        `;
+    }
+    
+    return items.map(item => {
+        const status = getStockStatus(item);
+        const imageUrl = getImageUrl(item.metadata?.imageUrl || 'assets/images/default_wine.png');
+        const itemType = item.itemType || 'wine';
+        
+        return `
+            <div class="item-card" onclick="viewItemDetail('${item.id}')" style="
+                background: #f8f7f5;
+                border-radius: 12px;
+                padding: 12px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                border: 1px solid var(--admin-border);
+                transition: all 0.2s;
+            ">
+                <!-- Item Image -->
+                <div style="
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 8px;
+                    background: #e0e0e0;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.itemName)}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-wine-bottle\\' style=\\'font-size: 24px; color: #999;\\'></i>'">` : '<i class="fas fa-wine-bottle" style="font-size: 24px; color: #999;"></i>'}
+                </div>
+                
+                <!-- Item Details -->
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 600; color: var(--admin-text); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${escapeHtml(item.itemName)}
+                    </div>
+                    ${item.itemCategory ? `<div style="font-size: 11px; color: var(--admin-muted);">Category: ${escapeHtml(item.itemCategory)}</div>` : ''}
+                    <div style="display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;">
+                        <span style="
+                            background: ${status.color}20;
+                            color: ${status.color};
+                            padding: 2px 8px;
+                            border-radius: 4px;
+                            font-size: 10px;
+                            font-weight: 600;
+                            border: 1px solid ${status.color};
+                        ">${status.text}</span>
+                        <span style="font-size: 10px; color: var(--admin-muted);">
+                            Stock: ${item.currentStock || 0}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Price -->
+                <div style="text-align: right; flex-shrink: 0;">
+                    <div style="
+                        background: rgba(107,13,43,0.1);
+                        border-radius: 4px;
+                        padding: 2px 8px;
+                        font-size: 10px;
+                        font-weight: 600;
+                        color: var(--admin-primary);
+                        text-align: center;
+                    ">${itemType.toUpperCase()}</div>
+                    <div style="font-weight: 700; color: var(--admin-success); font-size: 14px; margin-top: 4px;">
+                        R${formatCurrency(item.unitPrice)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function clearSearch() {
+    searchQuery = '';
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (clearBtn) {
+        clearBtn.style.display = 'none';
+    }
+    renderDetail();
+}
+
+// ========== ACTIONS ==========
+function refreshData() {
+    fetchWarehouseDetails();
+}
+
 function editWarehouse() {
     if (warehouseId && warehouseId !== 'undefined' && warehouseId !== 'null') {
         window.location.href = `/admin/warehouse_management/warehouse_management_add_edit.html?id=${warehouseId}`;
@@ -339,11 +469,11 @@ function editWarehouse() {
     }
 }
 
-function addSupplierToWarehouse() {
+function addWineToWarehouse() {
     if (warehouseId && warehouseId !== 'undefined' && warehouseId !== 'null') {
-        window.location.href = `/admin/warehouse_management/warehouse_add_supplier.html?id=${warehouseId}`;
+        window.location.href = `/admin/warehouse_management/warehouse_add_wine.html?warehouseId=${warehouseId}`;
     } else {
-        showError('Unable to add supplier: Invalid warehouse ID');
+        showError('Unable to add wine: Invalid warehouse ID');
     }
 }
 
@@ -353,6 +483,7 @@ window.viewItemDetail = function(itemId) {
     }
 };
 
+// ========== INITIALIZE ==========
 if (checkAuth()) {
     fetchWarehouseDetails();
 }
