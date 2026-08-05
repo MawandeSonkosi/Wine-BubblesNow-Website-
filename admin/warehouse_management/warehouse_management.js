@@ -1,4 +1,4 @@
-// Warehouse Management JavaScript - Updated with item detail navigation
+// Warehouse Management JavaScript - Matches Flutter WarehouseManagementScreen
 
 const API_BASE = window.location.origin;
 let allWarehouses = [];
@@ -93,11 +93,12 @@ async function fetchWarehouses() {
         }
         
         console.log(`✅ Loaded ${allWarehouses.length} warehouses`);
+        
+        // Load warehouse items for stats
+        await fetchWarehouseItems();
+        
         renderWarehouses();
         renderStats();
-        
-        // Also load warehouse items for stats
-        await fetchWarehouseItems();
         
     } catch (error) {
         console.error('Error fetching warehouses:', error);
@@ -125,25 +126,51 @@ async function fetchWarehouseItems() {
         }
         
         console.log(`✅ Loaded ${allWarehouseItems.length} warehouse items`);
-        renderStats();
         
     } catch (error) {
         console.error('Error fetching warehouse items:', error);
+        allWarehouseItems = [];
     }
 }
 
 function renderStats() {
     const container = document.getElementById('statsContainer');
+    if (!container) return;
+    
     const total = allWarehouses.length;
     const active = allWarehouses.filter(w => w.isActive === true).length;
     const totalItems = allWarehouseItems.length;
     const totalStock = allWarehouseItems.reduce((sum, i) => sum + (i.currentStock || 0), 0);
     
     container.innerHTML = `
-        <div class="stat-box"><i class="fas fa-warehouse"></i><div class="stat-box-info"><div class="stat-box-value">${total}</div><div class="stat-box-label">Total Warehouses</div></div></div>
-        <div class="stat-box"><i class="fas fa-check-circle" style="color:#2e7d32;"></i><div class="stat-box-info"><div class="stat-box-value">${active}</div><div class="stat-box-label">Active</div></div></div>
-        <div class="stat-box"><i class="fas fa-boxes"></i><div class="stat-box-info"><div class="stat-box-value">${totalItems}</div><div class="stat-box-label">Total Items</div></div></div>
-        <div class="stat-box"><i class="fas fa-cubes"></i><div class="stat-box-info"><div class="stat-box-value">${totalStock}</div><div class="stat-box-label">Total Stock</div></div></div>
+        <div class="stat-box">
+            <i class="fas fa-warehouse"></i>
+            <div class="stat-box-info">
+                <div class="stat-box-value">${total}</div>
+                <div class="stat-box-label">Total Warehouses</div>
+            </div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-check-circle" style="color:#2e7d32;"></i>
+            <div class="stat-box-info">
+                <div class="stat-box-value">${active}</div>
+                <div class="stat-box-label">Active</div>
+            </div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-boxes" style="color:#6b0d2b;"></i>
+            <div class="stat-box-info">
+                <div class="stat-box-value">${totalItems}</div>
+                <div class="stat-box-label">Total Items</div>
+            </div>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-cubes" style="color:#ed6c02;"></i>
+            <div class="stat-box-info">
+                <div class="stat-box-value">${totalStock}</div>
+                <div class="stat-box-label">Total Stock</div>
+            </div>
+        </div>
     `;
 }
 
@@ -155,7 +182,16 @@ function renderWarehouses() {
     const container = document.getElementById('warehouseContainer');
     
     if (allWarehouses.length === 0) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-warehouse" style="font-size:48px; margin-bottom:16px;"></i><p>No warehouses found</p><button class="btn-primary" onclick="window.location.href='warehouse_management_add_edit.html'"><i class="fas fa-plus"></i> Create First Warehouse</button></div>`;
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-warehouse" style="font-size:48px; margin-bottom:16px;"></i>
+                <p style="font-size:16px; margin-bottom:8px;">No warehouses found</p>
+                <p style="font-size:13px; color:var(--admin-muted); margin-bottom:20px;">Tap the + button to add your first warehouse</p>
+                <button class="btn-primary" onclick="window.location.href='warehouse_management_add_edit.html'">
+                    <i class="fas fa-plus"></i> Add Warehouse
+                </button>
+            </div>
+        `;
         return;
     }
     
@@ -191,21 +227,36 @@ function renderWarehouses() {
                                 ${escapeHtml(warehouse.email)}
                             </div>
                             ` : ''}
+                            ${!warehouse.isActive ? `
+                            <div style="margin-top: 8px;">
+                                <span class="status-badge status-inactive">
+                                    <i class="fas fa-times-circle"></i> INACTIVE
+                                </span>
+                            </div>
+                            ` : `
                             <div style="margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap;">
-                                <span class="status-badge ${statusClass}">
-                                    <i class="fas ${warehouse.isActive ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                                    ${warehouse.isActive ? 'ACTIVE' : 'INACTIVE'}
+                                <span class="status-badge status-active">
+                                    <i class="fas fa-check-circle"></i> ACTIVE
                                 </span>
                                 <span class="status-badge" style="background:rgba(107,13,43,0.1); color:#6b0d2b;">
                                     <i class="fas fa-boxes"></i> ${itemCount} items
                                 </span>
                             </div>
+                            `}
                         </div>
                         <div class="warehouse-actions" onclick="event.stopPropagation()">
-                            <button class="icon-btn" onclick="editWarehouse('${warehouseId}')" title="Edit"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="icon-btn" onclick="viewWarehouseDetail('${warehouseId}')" title="View Details"><i class="fas fa-eye"></i> View</button>
-                            <button class="icon-btn" onclick="addWineToWarehouse('${warehouseId}')" title="Add Wine" style="color:#2e7d32;"><i class="fas fa-plus"></i> Add Wine</button>
-                            <button class="icon-btn danger" onclick="deleteWarehousePrompt('${warehouseId}', '${escapeHtml(warehouse.name)}')" title="Delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                            <button class="icon-btn" onclick="editWarehouse('${warehouseId}')" title="Edit">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="icon-btn" onclick="viewWarehouseDetail('${warehouseId}')" title="View Details">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="icon-btn" onclick="addWineToWarehouse('${warehouseId}')" title="Add Wine" style="color:#2e7d32;">
+                                <i class="fas fa-plus"></i> Add Wine
+                            </button>
+                            <button class="icon-btn danger" onclick="deleteWarehousePrompt('${warehouseId}', '${escapeHtml(warehouse.name)}')" title="Delete">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
                         </div>
                     </div>
                 `;
@@ -221,7 +272,11 @@ function escapeHtml(str) {
 }
 
 function showToast(message, type = 'success') {
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) existingToast.remove();
+    
     const toast = document.createElement('div');
+    toast.className = 'toast-notification';
     toast.textContent = message;
     toast.style.cssText = `position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:${type === 'success' ? '#2e7d32' : '#d32f2f'}; color:white; padding:12px 24px; border-radius:40px; z-index:10002; font-family:Montserrat; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
     document.body.appendChild(toast);
