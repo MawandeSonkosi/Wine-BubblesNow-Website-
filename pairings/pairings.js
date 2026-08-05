@@ -161,20 +161,41 @@ function renderPairings() {
     const imageUrl = fixImageUrl(pairing.imageUrl);
     const price = pairing.price || 0;
     const category = pairing.category || 'Add-On';
+    const stockCount = pairing.stockCount || 0;
+    const isOutOfStock = stockCount <= 0;
+    
+    // Determine stock status for display
+    let stockStatus = '';
+    let stockColor = '';
+    if (isOutOfStock) {
+      stockStatus = 'Out of Stock';
+      stockColor = '#e74c3c';
+    } else if (stockCount <= 5) {
+      stockStatus = `Low Stock (${stockCount} left)`;
+      stockColor = '#f39c12';
+    } else {
+      stockStatus = `In Stock (${stockCount} available)`;
+      stockColor = '#27ae60';
+    }
     
     return `
-      <div class="wine-card" onclick="navigateToPairingDetail(${pairing.id})">
+      <div class="wine-card ${isOutOfStock ? 'out-of-stock' : ''}" onclick="navigateToPairingDetail(${pairing.id})">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${pairing.name}" 
                class="wine-image"
                loading="lazy"
                onerror="this.onerror=null; this.src='../assets/images/default_addon.png';">
+          ${isOutOfStock ? '<div class="out-of-stock-overlay"><span>OUT OF STOCK</span></div>' : ''}
         </div>
         <div class="wine-label">
           <div class="wine-title">${pairing.name}</div>
           <div class="wine-sub">${category}</div>
           <div class="wine-price">R${price.toFixed(2)}</div>
+          <div class="stock-status" style="color: ${stockColor}; font-size: 12px; margin-top: 4px;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${stockColor}; margin-right: 6px;"></span>
+            ${stockStatus}
+          </div>
         </div>
       </div>
     `;

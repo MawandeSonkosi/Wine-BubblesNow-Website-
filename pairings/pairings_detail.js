@@ -135,24 +135,55 @@ function renderPairingDetail(pairing) {
   const imageUrl = fixImageUrl(pairing.imageUrl);
   const price = pairing.price || 0;
   const category = pairing.category || 'Add-On';
+  const stockCount = pairing.stockCount || 0;
+  const isOutOfStock = stockCount <= 0;
+  
+  // Determine stock status for display
+  let stockStatus = '';
+  let stockColor = '';
+  let statusText = '';
+  if (isOutOfStock) {
+    stockStatus = 'Out of Stock';
+    stockColor = '#e74c3c';
+    statusText = 'This item is currently out of stock.';
+  } else if (stockCount <= 5) {
+    stockStatus = `Low Stock (${stockCount} left)`;
+    stockColor = '#f39c12';
+    statusText = `Only ${stockCount} units remaining!`;
+  } else {
+    stockStatus = `In Stock (${stockCount} available)`;
+    stockColor = '#27ae60';
+    statusText = `${stockCount} units available`;
+  }
   
   const template = `
-    <div class="pairing-detail-card">
+    <div class="pairing-detail-card ${isOutOfStock ? 'out-of-stock' : ''}">
       <div class="pairing-detail-image-container">
         <img src="${imageUrl}" 
              alt="${pairing.name}" 
              class="pairing-detail-image"
              loading="lazy"
              onerror="this.onerror=null; this.src='../assets/images/default_addon.png';">
+        ${isOutOfStock ? '<div class="out-of-stock-overlay"><span>OUT OF STOCK</span></div>' : ''}
       </div>
       <div class="pairing-detail-content">
         <h1 class="pairing-detail-name">${pairing.name}</h1>
         <div class="pairing-detail-category">${category}</div>
         <div class="pairing-detail-price">R${price.toFixed(2)}</div>
         
+        <!-- Stock Status -->
+        <div class="stock-status-container" style="text-align: center; margin: 10px 0 20px;">
+          <span class="stock-status-badge" style="display: inline-block; padding: 6px 16px; border-radius: 20px; background: ${stockColor}20; color: ${stockColor}; border: 1px solid ${stockColor}40; font-weight: 600; font-size: 14px;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${stockColor}; margin-right: 8px;"></span>
+            ${stockStatus}
+          </span>
+          ${!isOutOfStock ? `<p style="color: #666; font-size: 13px; margin-top: 4px;">${statusText}</p>` : `<p style="color: #e74c3c; font-size: 13px; margin-top: 4px;">${statusText}</p>`}
+        </div>
+        
         <p class="pairing-detail-description">${pairing.description || 'No description available.'}</p>
         
-        <!-- Quantity Selector -->
+        <!-- Quantity Selector - Only show if in stock -->
+        ${!isOutOfStock ? `
         <div class="quantity-selector">
           <button class="quantity-btn" id="decrementBtn" ${quantity <= 1 ? 'disabled' : ''}>
             <i class="fas fa-minus"></i>
@@ -162,10 +193,11 @@ function renderPairingDetail(pairing) {
             <i class="fas fa-plus"></i>
           </button>
         </div>
+        ` : ''}
         
         <!-- Add to Cart Button -->
-        <button class="add-to-cart-btn" id="addToCartBtn">
-          Add to Cart
+        <button class="add-to-cart-btn" id="addToCartBtn" ${isOutOfStock ? 'disabled' : ''}>
+          ${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
         </button>
       </div>
     </div>
@@ -173,16 +205,22 @@ function renderPairingDetail(pairing) {
   
   pairingDetailContainer.innerHTML = template;
   
-  // Setup quantity buttons
-  document.getElementById('decrementBtn')?.addEventListener('click', decrementQuantity);
-  document.getElementById('incrementBtn')?.addEventListener('click', incrementQuantity);
-  document.getElementById('addToCartBtn')?.addEventListener('click', addToCart);
+  // Setup quantity buttons - only if in stock
+  if (!isOutOfStock) {
+    document.getElementById('decrementBtn')?.addEventListener('click', decrementQuantity);
+    document.getElementById('incrementBtn')?.addEventListener('click', incrementQuantity);
+    document.getElementById('addToCartBtn')?.addEventListener('click', addToCart);
+  }
 }
 
 // Quantity controls
 function incrementQuantity() {
-  quantity++;
-  updateQuantityDisplay();
+  if (currentPairing && quantity < (currentPairing.stockCount || 0)) {
+    quantity++;
+    updateQuantityDisplay();
+  } else if (currentPairing && quantity >= (currentPairing.stockCount || 0)) {
+    showToast(`Only ${currentPairing.stockCount} units available`, 'error');
+  }
 }
 
 function decrementQuantity() {
@@ -208,6 +246,12 @@ function updateQuantityDisplay() {
 // Add to cart
 function addToCart() {
   if (!currentPairing) return;
+  
+  // Check stock before adding
+  if (currentPairing.stockCount <= 0) {
+    showToast('This item is out of stock', 'error');
+    return;
+  }
   
   // Create cart item for pairing/addon
   const cartItem = {
@@ -379,20 +423,41 @@ function renderRelatedPairings(pairings) {
     const imageUrl = fixImageUrl(pairing.imageUrl);
     const price = pairing.price || 0;
     const category = pairing.category || 'Add-On';
+    const stockCount = pairing.stockCount || 0;
+    const isOutOfStock = stockCount <= 0;
+    
+    // Determine stock status for display
+    let stockStatus = '';
+    let stockColor = '';
+    if (isOutOfStock) {
+      stockStatus = 'Out of Stock';
+      stockColor = '#e74c3c';
+    } else if (stockCount <= 5) {
+      stockStatus = `Low Stock (${stockCount} left)`;
+      stockColor = '#f39c12';
+    } else {
+      stockStatus = `In Stock (${stockCount} available)`;
+      stockColor = '#27ae60';
+    }
     
     return `
-      <div class="wine-card" onclick="window.location.href='pairings_detail.html?id=${pairing.id}'">
+      <div class="wine-card ${isOutOfStock ? 'out-of-stock' : ''}" onclick="window.location.href='pairings_detail.html?id=${pairing.id}'">
         <div class="wine-image-container">
           <img src="${imageUrl}" 
                alt="${pairing.name}" 
                class="wine-image"
                loading="lazy"
                onerror="this.onerror=null; this.src='../assets/images/default_addon.png';">
+          ${isOutOfStock ? '<div class="out-of-stock-overlay"><span>OUT OF STOCK</span></div>' : ''}
         </div>
         <div class="wine-label">
           <div class="wine-title">${pairing.name}</div>
           <div class="wine-sub">${category}</div>
           <div class="wine-price">R${price.toFixed(2)}</div>
+          <div class="stock-status" style="color: ${stockColor}; font-size: 12px; margin-top: 4px;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${stockColor}; margin-right: 6px;"></span>
+            ${stockStatus}
+          </div>
         </div>
       </div>
     `;

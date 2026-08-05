@@ -148,6 +148,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .wine-card:hover {
@@ -156,20 +157,48 @@
 }
 
 .wine-card.out-of-stock {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
-.wine-card.out-of-stock::after {
-  content: 'Out of Stock';
+.wine-card.out-of-stock .wine-image-container {
+  position: relative;
+}
+
+.wine-card.out-of-stock .wine-label {
+  opacity: 0.85;
+}
+
+.wine-card.out-of-stock .wine-title {
+  color: #888;
+}
+
+.wine-card.out-of-stock .wine-price {
+  color: #999;
+}
+
+/* Out of Stock Overlay */
+.out-of-stock-overlay {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 0, 0, 0.9);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.out-of-stock-overlay span {
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  background: rgba(231, 76, 60, 0.9);
+  padding: 8px 16px;
+  border-radius: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .wine-image-container {
@@ -214,6 +243,15 @@
   font-weight: 600;
   color: white;
   margin-top: 8px;
+}
+
+/* Stock Status in List */
+.stock-status {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  margin-top: 4px;
+  opacity: 0.9;
 }
 
 /* Loading State */
@@ -305,20 +343,6 @@
 .main-nav a.active {
   color: var(--maroon);
   font-weight: 600;
-} /* In pairings.css, make sure this exists: */
-.wine-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  cursor: pointer; /* This makes it clear it's clickable */
-}
-
-.wine-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 /* Responsive */
