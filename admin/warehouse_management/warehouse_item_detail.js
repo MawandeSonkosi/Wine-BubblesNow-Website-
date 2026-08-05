@@ -1,4 +1,4 @@
-// Warehouse Item Detail JavaScript
+// Warehouse Item Detail JavaScript - Matches Flutter WarehouseItemDetailScreen
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -6,9 +6,11 @@ const itemId = urlParams.get('id');
 
 let itemData = null;
 let wineData = null;
+let allWarehouseItems = [];
 let isLoading = false;
 let isRestocking = false;
 let isDeleting = false;
+let isAddingAvailable = false;
 
 // ========== AUTHENTICATION ==========
 function checkAuth() {
@@ -88,8 +90,8 @@ async function fetchItemDetails() {
     try {
         const token = localStorage.getItem('wineBubbles_token');
         
-        // Fetch the specific warehouse item
-        const response = await fetch(`${API_BASE}/api/warehouse/${itemId}`, {
+        // Fetch all warehouse items to get the specific one
+        const response = await fetch(`${API_BASE}/api/warehouse`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -98,13 +100,25 @@ async function fetchItemDetails() {
         }
         
         const data = await response.json();
-        console.log('📦 Item details:', data);
+        console.log('📦 Warehouse items response:', data);
         
-        if (data.success && data.data) {
-            itemData = data.data;
-        } else {
-            throw new Error('Invalid response format');
+        let items = [];
+        if (data.success && Array.isArray(data.data)) {
+            items = data.data;
+        } else if (Array.isArray(data)) {
+            items = data;
         }
+        
+        allWarehouseItems = items;
+        
+        // Find the specific item by ID
+        itemData = items.find(item => item.id === itemId);
+        
+        if (!itemData) {
+            throw new Error('Item not found');
+        }
+        
+        console.log('✅ Item found:', itemData.itemName);
         
         // If it's a wine item, fetch the wine details
         if (itemData.itemType === 'wine' && itemData.itemId) {
@@ -164,10 +178,9 @@ function getImageUrl(imageUrl) {
     return '/assets/images/' + imageUrl;
 }
 
-function formatNumber(num) {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toFixed(2);
+function formatCurrency(value) {
+    if (value == null) return '0.00';
+    return Number(value).toFixed(2);
 }
 
 function formatDate(dateStr) {
@@ -206,6 +219,35 @@ function showError(message) {
     }
 }
 
+// ========== CALCULATE AVAILABLE STOCK ==========
+function getAvailableStock() {
+    if (!itemData || !wineData) return 0;
+    
+    // Get stock allocated in OTHER warehouses (excluding current)
+    const allocatedInOthers = allWarehouseItems
+        .filter(item => 
+            item.itemId === itemData.itemId && 
+            item.warehouseId !== itemData.warehouseId
+        )
+        .reduce((sum, item) => sum + (item.currentStock || 0), 0);
+    
+    // Available for this warehouse = Total stock - Allocated in others
+    const available = (wineData.stockCount || 0) - allocatedInOthers;
+    return available > 0 ? available : 0;
+}
+
+function getAllocatedInOthers() {
+    if (!itemData) return 0;
+    
+    const allocated = allWarehouseItems
+        .filter(item => 
+            item.itemId === itemData.itemId && 
+            item.warehouseId !== itemData.warehouseId
+        )
+        .reduce((sum, item) => sum + (item.currentStock || 0), 0);
+    return allocated;
+}
+
 // ========== RENDER DETAIL ==========
 function renderDetail() {
     const container = document.getElementById('detailContent');
@@ -215,9 +257,12 @@ function renderDetail() {
     const imageUrl = getImageUrl(itemData.metadata?.imageUrl || wineData?.imageUrl || '');
     const soldUnits = (itemData.initialStock || 0) - (itemData.currentStock || 0);
     const sellThroughRate = itemData.initialStock > 0 ? ((soldUnits / itemData.initialStock) * 100) : 0;
+    const availableStock = getAvailableStock();
+    const allocatedInOthers = getAllocatedInOthers();
     
     container.innerHTML = `
         <div class="detail-card">
+            <!-- Header -->
             <div class="detail-header">
                 <div class="detail-title">
                     <i class="fas fa-box"></i>
@@ -226,105 +271,220 @@ function renderDetail() {
                 </div>
                 <div class="header-actions">
                     <button class="btn-icon" onclick="window.location.href='warehouse_management_detail.html?id=${itemData.warehouseId}'">
-                        <i class="fas fa-arrow-left"></i> Back to Warehouse
+                        <i class="fas fa-arrow-left"></i> Back
                     </button>
                     <button class="btn-icon" onclick="refreshData()">
-                        <i class="fas fa-refresh"></i> Refresh
+                        <i class="fas fa-sync-alt"></i> Refresh
                     </button>
                 </div>
             </div>
             
-            <div class="detail-section">
+            <!-- Warehouse Info Card -->
+            <div class="detail-section" style="background: rgba(107,13,43,0.08); margin: 0 24px 16px; border-radius: 12px; border: 1px solid rgba(107,13,43,0.1);">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+                    <div style="background: rgba(107,13,43,0.15); padding: 8px; border-radius: 8px;">
+                        <i class="fas fa-warehouse" style="color: var(--admin-primary); font-size: 20px;"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--admin-text); font-size: 14px;">Warehouse: ${escapeHtml(itemData.warehouseName)}</div>
+                        <div style="font-size: 12px; color: var(--admin-muted);">Item ID: ${escapeHtml(itemData.itemId)}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Section -->
+            <div class="detail-section" style="padding-top: 0;">
                 <div class="image-container">
                     ${imageUrl ? 
                         `<img src="${imageUrl}" alt="${escapeHtml(itemData.itemName)}" onerror="this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas fa-wine-bottle\\'></i><p>${escapeHtml(itemData.itemName)}</p></div>'">` : 
                         `<div class="image-placeholder"><i class="fas fa-wine-bottle"></i><p>${escapeHtml(itemData.itemName)}</p></div>`
                     }
                 </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-info-circle"></i> Item Information</h3>
-                <div class="info-grid">
-                    <div class="info-row"><div class="info-label">Name:</div><div class="info-value">${escapeHtml(itemData.itemName)}</div></div>
-                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value">${escapeHtml(itemData.itemType || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Category:</div><div class="info-value">${escapeHtml(itemData.itemCategory || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Warehouse:</div><div class="info-value">${escapeHtml(itemData.warehouseName)}</div></div>
-                    <div class="info-row"><div class="info-label">Unit Price:</div><div class="info-value"><strong style="color:var(--admin-primary);">R${(itemData.unitPrice || 0).toFixed(2)}</strong></div></div>
-                    <div class="info-row"><div class="info-label">Current Stock:</div><div class="info-value"><span style="color:${status.color}; font-weight:600;">${itemData.currentStock || 0} units</span></div></div>
-                    <div class="info-row"><div class="info-label">Initial Stock:</div><div class="info-value">${itemData.initialStock || 0} units</div></div>
-                    <div class="info-row"><div class="info-label">Reorder Level:</div><div class="info-value">${itemData.reorderLevel || 10} units</div></div>
-                    <div class="info-row"><div class="info-label">Units Sold:</div><div class="info-value">${soldUnits} units</div></div>
-                    <div class="info-row"><div class="info-label">Sell Through Rate:</div><div class="info-value">${sellThroughRate.toFixed(1)}%</div></div>
-                    ${itemData.lastRestockedAt ? `<div class="info-row"><div class="info-label">Last Restocked:</div><div class="info-value">${formatDate(itemData.lastRestockedAt)}</div></div>` : ''}
-                    ${itemData.lastSoldAt ? `<div class="info-row"><div class="info-label">Last Sold:</div><div class="info-value">${formatDate(itemData.lastSoldAt)}</div></div>` : ''}
+                
+                <!-- Item Name and Category -->
+                <div style="margin-top: 8px;">
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--admin-text); margin: 0;">${escapeHtml(itemData.itemName)}</h2>
+                    ${itemData.itemCategory ? `<div style="font-size: 14px; color: var(--admin-muted); margin-top: 4px;">${escapeHtml(itemData.itemCategory)}</div>` : ''}
                 </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-chart-line"></i> Performance</h3>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value">${itemData.currentStock || 0}</div><div class="stat-label">Current Stock</div></div>
-                    <div class="stat-card"><div class="stat-value">${soldUnits}</div><div class="stat-label">Units Sold</div></div>
-                    <div class="stat-card"><div class="stat-value">${sellThroughRate.toFixed(1)}%</div><div class="stat-label">Sell Through</div></div>
-                    <div class="stat-card"><div class="stat-value">R${((itemData.currentStock || 0) * (itemData.unitPrice || 0)).toFixed(2)}</div><div class="stat-label">Total Value</div></div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${Math.min(sellThroughRate, 100)}%; background: ${sellThroughRate > 70 ? '#2e7d32' : sellThroughRate > 40 ? '#ed6c02' : '#d32f2f'};"></div>
-                </div>
-                <div style="text-align: center; font-size: 12px; color: var(--admin-muted); margin-top: 4px;">
-                    ${sellThroughRate.toFixed(1)}% sold
-                </div>
-            </div>
-            
-            <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-tools"></i> Actions</h3>
-                <div class="action-buttons">
-                    <button class="btn-success" onclick="showRestockModal()" id="restockBtn">
-                        <i class="fas fa-plus-circle"></i> Restock
+                
+                <!-- Action Buttons Row -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+                    <!-- Stock Status Badge -->
+                    <span style="display: inline-flex; align-items: center; gap: 6px; background: ${status.color}15; padding: 6px 14px; border-radius: 20px; border: 1px solid ${status.color};">
+                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${status.color};"></span>
+                        <span style="color: ${status.color}; font-weight: 600; font-size: 14px;">${status.text}</span>
+                    </span>
+                    
+                    <!-- Add Available Button -->
+                    ${availableStock > 0 ? `
+                    <button class="btn-available" onclick="addAvailableStock()" id="addAvailableBtn" style="
+                        background: transparent;
+                        border: 1px solid var(--admin-success);
+                        color: var(--admin-success);
+                        padding: 6px 14px;
+                        border-radius: 40px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        font-family: 'Montserrat', sans-serif;
+                        font-size: 12px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        transition: all 0.2s;
+                    ">
+                        <i class="fas fa-inventory-2-outlined"></i>
+                        ${isAddingAvailable ? 'Adding...' : `Add Available (${availableStock})`}
                     </button>
-                    <button class="btn-secondary" onclick="window.location.href='warehouse_management_detail.html?id=${itemData.warehouseId}'">
-                        <i class="fas fa-arrow-left"></i> Back to Warehouse
+                    ` : ''}
+                    
+                    <!-- Restock Button -->
+                    <button class="btn-restock" onclick="showRestockModal()" id="restockBtn" style="
+                        background: transparent;
+                        border: 1px solid var(--admin-primary);
+                        color: var(--admin-primary);
+                        padding: 6px 14px;
+                        border-radius: 40px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        font-family: 'Montserrat', sans-serif;
+                        font-size: 12px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        transition: all 0.2s;
+                    ">
+                        <i class="fas fa-plus"></i>
+                        ${isRestocking ? 'Restocking...' : 'Restock'}
                     </button>
-                    <button class="btn-danger" onclick="deleteItem()" id="deleteBtn">
-                        <i class="fas fa-trash-alt"></i> Remove from Warehouse
+                    
+                    <!-- Remove Button -->
+                    <button class="btn-remove" onclick="deleteItem()" id="deleteBtn" style="
+                        background: transparent;
+                        border: 1px solid var(--admin-error);
+                        color: var(--admin-error);
+                        padding: 6px 14px;
+                        border-radius: 40px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        font-family: 'Montserrat', sans-serif;
+                        font-size: 12px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        transition: all 0.2s;
+                    ">
+                        <i class="fas fa-trash-alt"></i>
+                        ${isDeleting ? 'Removing...' : 'Remove'}
                     </button>
+                </div>
+                
+                <!-- Available Stock Info -->
+                ${availableStock > 0 ? `
+                <div style="margin-top: 10px; padding: 8px 12px; background: rgba(46,125,50,0.08); border-radius: 8px; border: 1px solid rgba(46,125,50,0.2); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-info-circle" style="color: var(--admin-success); font-size: 14px;"></i>
+                    <span style="font-size: 13px; color: var(--admin-success);">${availableStock} units available to add from total inventory</span>
+                </div>
+                ` : ''}
+            </div>
+            
+            <!-- Price and Stock Details -->
+            <div class="detail-section">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--admin-border);">
+                        <span style="color: var(--admin-muted); font-size: 14px;">Unit Price</span>
+                        <span style="font-weight: 700; color: var(--admin-primary); font-size: 16px;">R${formatCurrency(itemData.unitPrice)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--admin-border);">
+                        <span style="color: var(--admin-muted); font-size: 14px;">Current Stock</span>
+                        <span style="font-weight: 700; color: ${status.color}; font-size: 16px;">${itemData.currentStock || 0} units</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--admin-border);">
+                        <span style="color: var(--admin-muted); font-size: 14px;">Initial Stock</span>
+                        <span style="font-weight: 700; color: #0288d1; font-size: 16px;">${itemData.initialStock || 0} units</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--admin-border);">
+                        <span style="color: var(--admin-muted); font-size: 14px;">Units Sold</span>
+                        <span style="font-weight: 700; color: var(--admin-success); font-size: 16px;">${soldUnits} units</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--admin-border);">
+                        <span style="color: var(--admin-muted); font-size: 14px;">Sell Through Rate</span>
+                        <span style="font-weight: 700; color: ${status.color}; font-size: 16px;">${sellThroughRate.toFixed(1)}%</span>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div style="margin-top: 12px;">
+                    <div style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${Math.min(sellThroughRate, 100)}%; height: 100%; border-radius: 4px; background: ${sellThroughRate > 70 ? '#2e7d32' : sellThroughRate > 40 ? '#ed6c02' : '#d32f2f'}; transition: width 0.5s ease;"></div>
+                    </div>
+                    <div style="text-align: center; font-size: 12px; color: var(--admin-muted); margin-top: 4px;">${sellThroughRate.toFixed(1)}% sold</div>
                 </div>
             </div>
             
-            ${itemData.stockMovements && itemData.stockMovements.length > 0 ? `
+            <!-- Description -->
+            ${itemData.itemDescription ? `
             <div class="detail-section" style="border-bottom: none;">
-                <h3 class="section-title"><i class="fas fa-history"></i> Stock Movements</h3>
-                <div class="movement-list">
-                    ${itemData.stockMovements.slice().reverse().map(movement => {
-                        const typeClass = movement.movementType || 'adjustment';
-                        const typeLabel = movement.movementType === 'restock' ? 'Restock' :
-                                         movement.movementType === 'sale' ? 'Sale' :
-                                         movement.movementType === 'adjustment' ? 'Adjustment' :
-                                         movement.movementType === 'return' ? 'Return' : 'Damage';
-                        const quantityColor = movement.quantity > 0 ? '#2e7d32' : '#d32f2f';
-                        return `
-                            <div class="movement-item">
-                                <div>
-                                    <span class="movement-type ${typeClass}">${typeLabel}</span>
-                                    <span style="color: var(--admin-muted); margin-left: 8px;">${formatDate(movement.createdAt)}</span>
-                                </div>
-                                <div>
-                                    <span style="color: ${quantityColor}; font-weight: 600;">
-                                        ${movement.quantity > 0 ? '+' : ''}${movement.quantity}
-                                    </span>
-                                    <span style="color: var(--admin-muted); margin-left: 8px;">
-                                        ${movement.previousStock} → ${movement.newStock}
-                                    </span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
+                <h3 class="section-title"><i class="fas fa-align-left"></i> Description</h3>
+                <p style="color: var(--admin-muted); font-size: 14px; line-height: 1.6; margin: 0;">${escapeHtml(itemData.itemDescription)}</p>
             </div>
             ` : ''}
         </div>
     `;
+}
+
+// ========== ADD AVAILABLE STOCK ==========
+async function addAvailableStock() {
+    if (isAddingAvailable) return;
+    
+    const availableStock = getAvailableStock();
+    if (availableStock <= 0) {
+        showToast('No available stock to add', 'error');
+        return;
+    }
+    
+    // Show quantity selection dialog
+    const quantity = await showQuantityDialog(
+        'Add Available Stock',
+        `Add available stock for "${itemData.itemName}"`,
+        availableStock,
+        'This adds from EXISTING total wine stock (does not increase total stock).'
+    );
+    
+    if (quantity === null || quantity <= 0) return;
+    
+    isAddingAvailable = true;
+    updateButtonStates();
+    
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        const response = await fetch(`${API_BASE}/api/warehouse/${itemData.id}/stock`, {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                movementType: 'restock',
+                quantity: quantity,
+                notes: 'Added available stock from total inventory (no total stock increase)'
+            })
+        });
+        
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Failed to add available stock');
+        }
+        
+        showToast(`Added ${quantity} available units to warehouse!`, 'success');
+        await fetchItemDetails();
+        
+    } catch (error) {
+        console.error('Add available stock error:', error);
+        showToast('Failed to add available stock: ' + error.message, 'error');
+    } finally {
+        isAddingAvailable = false;
+        updateButtonStates();
+    }
 }
 
 // ========== RESTOCK MODAL ==========
@@ -334,27 +494,27 @@ function showRestockModal() {
     const modalHtml = `
         <div class="modal-overlay" id="restockModal">
             <div class="modal-content">
-                <h3><i class="fas fa-plus-circle" style="color: var(--admin-success);"></i> Restock Item</h3>
+                <h3><i class="fas fa-plus-circle" style="color: var(--admin-primary);"></i> Restock Wine</h3>
                 <p style="color: var(--admin-muted); margin-bottom: 16px;">
-                    Add stock to "${escapeHtml(itemData.itemName)}"
+                    Enter the quantity to add to this warehouse.
                 </p>
                 
                 <div style="margin-bottom: 16px;">
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px;">Current Stock: <span style="color: var(--admin-primary); font-weight: 700;">${itemData.currentStock} units</span></label>
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px;">Quantity to Add *</label>
+                    <label style="font-weight: 600; display: block; margin-bottom: 8px;">Quantity to add *</label>
                     <input type="number" id="restockQuantity" class="form-input" value="10" min="1" step="1" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px;">
-                    <small style="color: var(--admin-muted);">This will increase both warehouse stock and total inventory.</small>
                 </div>
                 
-                <div style="margin-bottom: 16px;">
-                    <label style="font-weight: 600; display: block; margin-bottom: 8px;">Notes (Optional)</label>
-                    <input type="text" id="restockNotes" class="form-input" placeholder="e.g., Monthly restock" style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 12px; font-size: 15px;">
+                <div style="margin-bottom: 16px; padding: 10px 14px; background: rgba(107,13,43,0.08); border-radius: 8px; border: 1px solid rgba(107,13,43,0.15);">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-info-circle" style="color: var(--admin-primary);"></i>
+                        <span style="font-size: 13px; color: var(--admin-primary);">This will INCREASE total wine stock AND add to this warehouse.</span>
+                    </div>
                 </div>
                 
                 <div class="modal-actions">
                     <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button class="btn-success" onclick="restockItem()" id="restockConfirmBtn">
-                        <i class="fas fa-plus"></i> Add Stock
+                    <button class="btn-primary" onclick="restockItem()" id="restockConfirmBtn" style="width: auto; margin: 0;">
+                        <i class="fas fa-plus"></i> Restock
                     </button>
                 </div>
             </div>
@@ -368,10 +528,122 @@ function closeModal() {
     if (modal) modal.remove();
 }
 
+// ========== SHOW QUANTITY DIALOG ==========
+function showQuantityDialog(title, message, maxAvailable, infoText) {
+    return new Promise((resolve) => {
+        const modalHtml = `
+            <div class="modal-overlay" id="quantityModal">
+                <div class="modal-content">
+                    <h3><i class="fas fa-plus-circle" style="color: var(--admin-success);"></i> ${title}</h3>
+                    <p style="color: var(--admin-muted); margin-bottom: 8px;">${escapeHtml(message)}</p>
+                    
+                    <div style="margin: 12px 0; padding: 12px; background: rgba(46,125,50,0.06); border-radius: 8px; border: 1px solid rgba(46,125,50,0.15);">
+                        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                            <span style="color: var(--admin-muted);">Total Stock:</span>
+                            <span style="font-weight: 600;">${wineData?.stockCount || 0} units</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                            <span style="color: var(--admin-muted);">Allocated in Other Warehouses:</span>
+                            <span style="font-weight: 600; color: var(--admin-warning);">${getAllocatedInOthers()} units</span>
+                        </div>
+                        <div style="border-top: 1px solid rgba(0,0,0,0.06); margin: 4px 0; padding-top: 6px; display: flex; justify-content: space-between;">
+                            <span style="color: var(--admin-success); font-weight: 600;">Available to Add:</span>
+                            <span style="color: var(--admin-success); font-weight: 700; font-size: 16px;">${maxAvailable} units</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 6px;">Quantity to Add</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button class="btn-secondary" onclick="adjustQuantity(-1)" style="width: auto; padding: 8px 16px; margin: 0;">-</button>
+                            <input type="number" id="quantityInput" class="form-input" value="${maxAvailable}" min="1" max="${maxAvailable}" step="1" style="text-align: center; width: 100px; padding: 10px;">
+                            <button class="btn-secondary" onclick="adjustQuantity(1)" style="width: auto; padding: 8px 16px; margin: 0;">+</button>
+                            <button class="btn-secondary" onclick="setMaxQuantity()" style="width: auto; padding: 8px 16px; margin: 0; background: var(--admin-primary); color: white;">All</button>
+                        </div>
+                    </div>
+                    
+                    ${infoText ? `
+                    <div style="margin-bottom: 12px; padding: 8px 12px; background: rgba(33,150,243,0.08); border-radius: 6px; border: 1px solid rgba(33,150,243,0.15);">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-info-circle" style="color: #1976d2; font-size: 14px;"></i>
+                            <span style="font-size: 12px; color: #1976d2;">${infoText}</span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="modal-actions">
+                        <button class="btn-secondary" onclick="closeQuantityDialog(null)">Cancel</button>
+                        <button class="btn-success" onclick="confirmQuantity()" style="width: auto; margin: 0; padding: 10px 24px;">
+                            <i class="fas fa-check"></i> Add Stock
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Store resolve function
+        window._quantityResolve = resolve;
+        window._maxAvailable = maxAvailable;
+        
+        // Setup quantity input listeners
+        const input = document.getElementById('quantityInput');
+        if (input) {
+            input.addEventListener('change', function() {
+                let val = parseInt(this.value) || 0;
+                if (val > maxAvailable) {
+                    this.value = maxAvailable;
+                    showToast(`Only ${maxAvailable} units available`, 'warning');
+                }
+                if (val < 0) this.value = 0;
+            });
+        }
+    });
+}
+
+window.adjustQuantity = function(delta) {
+    const input = document.getElementById('quantityInput');
+    if (!input) return;
+    let val = parseInt(input.value) || 0;
+    val += delta;
+    if (val < 1) val = 1;
+    if (val > window._maxAvailable) val = window._maxAvailable;
+    input.value = val;
+};
+
+window.setMaxQuantity = function() {
+    const input = document.getElementById('quantityInput');
+    if (!input) return;
+    input.value = window._maxAvailable;
+};
+
+window.closeQuantityDialog = function(result) {
+    const modal = document.getElementById('quantityModal');
+    if (modal) modal.remove();
+    if (window._quantityResolve) {
+        window._quantityResolve(result);
+        window._quantityResolve = null;
+    }
+};
+
+window.confirmQuantity = function() {
+    const input = document.getElementById('quantityInput');
+    if (!input) return;
+    const quantity = parseInt(input.value) || 0;
+    if (quantity <= 0) {
+        showToast('Please enter a valid quantity', 'error');
+        return;
+    }
+    if (quantity > window._maxAvailable) {
+        showToast(`Only ${window._maxAvailable} units available`, 'error');
+        return;
+    }
+    closeQuantityDialog(quantity);
+};
+
 // ========== RESTOCK ITEM ==========
 async function restockItem() {
     const quantityInput = document.getElementById('restockQuantity');
-    const notesInput = document.getElementById('restockNotes');
     const confirmBtn = document.getElementById('restockConfirmBtn');
     
     if (!quantityInput) return;
@@ -385,6 +657,7 @@ async function restockItem() {
     if (isRestocking) return;
     isRestocking = true;
     if (confirmBtn) confirmBtn.disabled = true;
+    updateButtonStates();
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
@@ -397,7 +670,7 @@ async function restockItem() {
             body: JSON.stringify({
                 movementType: 'restock',
                 quantity: quantity,
-                notes: notesInput?.value || 'Restock from warehouse item detail'
+                notes: 'Restock from warehouse item detail'
             })
         });
         
@@ -416,6 +689,7 @@ async function restockItem() {
     } finally {
         isRestocking = false;
         if (confirmBtn) confirmBtn.disabled = false;
+        updateButtonStates();
     }
 }
 
@@ -427,6 +701,7 @@ async function deleteItem() {
     
     if (isDeleting) return;
     isDeleting = true;
+    updateButtonStates();
     
     try {
         const token = localStorage.getItem('wineBubbles_token');
@@ -449,8 +724,28 @@ async function deleteItem() {
     } catch (error) {
         console.error('Delete error:', error);
         showToast('Failed to remove item: ' + error.message, 'error');
-    } finally {
         isDeleting = false;
+        updateButtonStates();
+    }
+}
+
+// ========== UPDATE BUTTON STATES ==========
+function updateButtonStates() {
+    const addBtn = document.getElementById('addAvailableBtn');
+    const restockBtn = document.getElementById('restockBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    if (addBtn) {
+        addBtn.disabled = isAddingAvailable;
+        addBtn.innerHTML = isAddingAvailable ? 'Adding...' : `Add Available (${getAvailableStock()})`;
+    }
+    if (restockBtn) {
+        restockBtn.disabled = isRestocking;
+        restockBtn.innerHTML = isRestocking ? 'Restocking...' : 'Restock';
+    }
+    if (deleteBtn) {
+        deleteBtn.disabled = isDeleting;
+        deleteBtn.innerHTML = isDeleting ? 'Removing...' : 'Remove';
     }
 }
 
