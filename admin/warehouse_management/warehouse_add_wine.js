@@ -1,4 +1,4 @@
-// Add Wine to Warehouse JavaScript
+// Add Wine to Warehouse JavaScript - Matches Flutter AddWineToWarehouseScreen
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -9,6 +9,7 @@ let warehouseItems = [];
 let selectedWine = null;
 let warehouseName = '';
 let maxAvailable = 0;
+let quantity = 0;
 
 // ========== AUTHENTICATION ==========
 function checkAuth() {
@@ -103,6 +104,16 @@ async function loadData() {
                 warehouseName = warehouse.name;
                 document.getElementById('formTitle').textContent = `Add Wine to ${warehouse.name}`;
                 document.getElementById('formSubtitle').textContent = `Select a wine to add to the ${warehouse.name} inventory.`;
+                
+                // Update warehouse info
+                const warehouseInfo = document.getElementById('warehouseInfo');
+                if (warehouseInfo) {
+                    warehouseInfo.innerHTML = `
+                        <i class="fas fa-warehouse" style="color: var(--admin-accent);"></i>
+                        <span>Warehouse: <strong>${escapeHtml(warehouse.name)}</strong></span>
+                        <span style="margin-left: auto; font-size: 12px; color: var(--admin-muted);" id="wineCount">Loading wines...</span>
+                    `;
+                }
             }
         }
         
@@ -118,6 +129,7 @@ async function loadData() {
             } else if (data.data && Array.isArray(data.data)) {
                 wines = data.data.filter(w => w.isActive === true);
             }
+            console.log(`✅ Loaded ${wines.length} active wines`);
         }
         
         // Get all warehouse items to check allocations
@@ -132,9 +144,21 @@ async function loadData() {
             } else if (Array.isArray(data)) {
                 warehouseItems = data;
             }
+            console.log(`✅ Loaded ${warehouseItems.length} warehouse items`);
         }
         
-        populateWineSelect();
+        // Show wines grid
+        renderWineGrid();
+        
+        // Update wine count
+        const wineCount = document.getElementById('wineCount');
+        if (wineCount) {
+            const existingIds = warehouseItems
+                .filter(item => item.warehouseId === warehouseId)
+                .map(item => item.itemId);
+            const availableCount = wines.filter(w => !existingIds.includes(w.id.toString())).length;
+            wineCount.textContent = `${availableCount} available`;
+        }
         
     } catch (error) {
         console.error('Error loading data:', error);
@@ -144,9 +168,10 @@ async function loadData() {
     }
 }
 
-function populateWineSelect() {
-    const select = document.getElementById('wineSelect');
-    if (!select) return;
+// ========== RENDER WINE GRID ==========
+function renderWineGrid() {
+    const gridContainer = document.getElementById('wineGridContainer');
+    if (!gridContainer) return;
     
     // Get wine IDs already in this warehouse
     const existingWineIds = warehouseItems
@@ -157,32 +182,104 @@ function populateWineSelect() {
     const availableWines = wines.filter(w => !existingWineIds.includes(w.id.toString()));
     
     if (availableWines.length === 0) {
-        select.innerHTML = '<option value="">All wines are already in this warehouse</option>';
+        gridContainer.innerHTML = `
+            <div class="empty-state" style="padding: 40px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 48px; color: var(--admin-success); margin-bottom: 16px;"></i>
+                <p style="font-size: 16px; font-weight: bold; color: var(--admin-text);">All active wines are already in this warehouse</p>
+                <p style="font-size: 13px; color: var(--admin-muted);">You can add more wines by creating them in the Wine Management section first.</p>
+                <button class="btn-secondary" onclick="window.location.href='warehouse_management_detail.html?id=${warehouseId}'" style="margin-top: 16px; width: auto; padding: 10px 24px;">
+                    <i class="fas fa-arrow-left"></i> Back to Warehouse
+                </button>
+            </div>
+        `;
         return;
     }
     
-    select.innerHTML = '<option value="">-- Select a Wine --</option>' +
-        availableWines.map(wine => 
-            `<option value="${wine.id}">${escapeHtml(wine.name)} (${escapeHtml(wine.type)} - R${wine.price.toFixed(2)})</option>`
-        ).join('');
+    // Calculate available stock for each wine
+    const winesWithStock = availableWines.map(wine => {
+        const allocatedInOthers = warehouseItems
+            .filter(item => 
+                item.itemId === wine.id.toString() && 
+                item.warehouseId !== warehouseId
+            )
+            .reduce((sum, item) => sum + (item.currentStock || 0), 0);
+        
+        const available = (wine.stockCount || 0) - allocatedInOthers;
+        return {
+            ...wine,
+            availableStock: available < 0 ? 0 : available,
+            allocatedInOthers: allocatedInOthers
+        };
+    });
+    
+    gridContainer.innerHTML = `
+        <div class="wine-grid">
+            ${winesWithStock.map(wine => {
+                const isSelected = selectedWine && selectedWine.id === wine.id;
+                const stockClass = wine.availableStock > 0 ? 'in-stock' : 'out-of-stock';
+                const stockText = wine.availableStock > 0 ? `${wine.availableStock} avail` : '0 avail';
+                
+                return `
+                    <div class="wine-card ${isSelected ? 'selected' : ''}" 
+                         onclick="selectWine(${wine.id})"
+                         data-wine-id="${wine.id}">
+                        <div class="wine-card-image">
+                            <img src="${getImageUrl(wine.imageUrl || wine.bannerImageUrl)}" 
+                                 alt="${escapeHtml(wine.name)}" 
+                                 onerror="this.parentElement.innerHTML='<i class=\\'fas fa-wine-bottle\\' style=\\'font-size: 40px; color: #999;\\'></i>'">
+                            ${isSelected ? '<div class="selected-overlay"><i class="fas fa-check-circle"></i> SELECTED</div>' : ''}
+                        </div>
+                        <div class="wine-card-info">
+                            <div class="wine-card-name">${escapeHtml(wine.name)}</div>
+                            <div class="wine-card-category">${escapeHtml(wine.category || wine.type || '')}</div>
+                            <div class="wine-card-bottom">
+                                <span class="wine-card-price">R${(wine.price || 0).toFixed(2)}</span>
+                                <span class="wine-card-stock ${stockClass}">${stockText}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
 }
 
-function onWineSelect() {
-    const wineId = document.getElementById('wineSelect').value;
-    const infoBox = document.getElementById('wineInfoBox');
-    const quantityInput = document.getElementById('quantityInput');
+// ========== SELECT WINE ==========
+function selectWine(wineId) {
+    const wine = wines.find(w => w.id === wineId);
+    if (!wine) return;
     
-    if (!wineId) {
-        infoBox.classList.remove('show');
-        selectedWine = null;
-        quantityInput.value = 0;
-        return;
+    // Calculate available stock
+    const allocatedInOthers = warehouseItems
+        .filter(item => 
+            item.itemId === wine.id.toString() && 
+            item.warehouseId !== warehouseId
+        )
+        .reduce((sum, item) => sum + (item.currentStock || 0), 0);
+    
+    const available = (wine.stockCount || 0) - allocatedInOthers;
+    maxAvailable = available < 0 ? 0 : available;
+    
+    selectedWine = wine;
+    quantity = 0;
+    
+    // Update UI
+    renderWineGrid();
+    updateSelectedWineInfo();
+    updateQuantityDisplay();
+    
+    // Show selected section
+    const selectedSection = document.getElementById('selectedSection');
+    if (selectedSection) {
+        selectedSection.style.display = 'block';
+        selectedSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    
-    selectedWine = wines.find(w => w.id == wineId);
+}
+
+// ========== UPDATE SELECTED WINE INFO ==========
+function updateSelectedWineInfo() {
     if (!selectedWine) return;
     
-    // Calculate available stock for this warehouse
     const allocatedInOthers = warehouseItems
         .filter(item => 
             item.itemId === selectedWine.id.toString() && 
@@ -190,44 +287,64 @@ function onWineSelect() {
         )
         .reduce((sum, item) => sum + (item.currentStock || 0), 0);
     
-    maxAvailable = (selectedWine.stockCount || 0) - allocatedInOthers;
-    if (maxAvailable < 0) maxAvailable = 0;
+    document.getElementById('selectedWineName').textContent = selectedWine.name;
+    document.getElementById('selectedWineCategory').textContent = `${selectedWine.category || selectedWine.type || ''} • R${(selectedWine.price || 0).toFixed(2)}`;
+    document.getElementById('selectedWineAvailable').textContent = `${maxAvailable} units`;
+    document.getElementById('selectedWineAvailable').style.color = maxAvailable > 0 ? 'var(--admin-success)' : 'var(--admin-warning)';
+    document.getElementById('selectedWineTotalStock').textContent = `${selectedWine.stockCount || 0} units`;
+    document.getElementById('selectedWineAllocated').textContent = `${allocatedInOthers} units`;
     
-    // Update info box
-    document.getElementById('wineName').textContent = selectedWine.name;
-    document.getElementById('wineType').textContent = selectedWine.type || '—';
-    document.getElementById('wineCategory').textContent = selectedWine.category || '—';
-    document.getElementById('winePrice').textContent = `R${(selectedWine.price || 0).toFixed(2)}`;
-    document.getElementById('wineStock').textContent = `${selectedWine.stockCount || 0} units`;
-    document.getElementById('wineAllocated').textContent = `${allocatedInOthers} units`;
-    document.getElementById('wineAvailable').textContent = `${maxAvailable} units`;
+    // Update image
+    const img = document.getElementById('selectedWineImage');
+    if (img) {
+        const url = getImageUrl(selectedWine.imageUrl || selectedWine.bannerImageUrl);
+        img.src = url;
+        img.onerror = () => {
+            img.style.display = 'none';
+            const placeholder = document.getElementById('selectedWineImagePlaceholder');
+            if (placeholder) placeholder.style.display = 'flex';
+        };
+    }
+}
+
+// ========== UPDATE QUANTITY DISPLAY ==========
+function updateQuantityDisplay() {
+    const quantityDisplay = document.getElementById('quantityDisplay');
+    if (quantityDisplay) {
+        quantityDisplay.textContent = quantity;
+    }
     
-    infoBox.classList.add('show');
-    quantityInput.value = 0;
-    quantityInput.max = maxAvailable;
+    const decrementBtn = document.getElementById('decrementBtn');
+    if (decrementBtn) {
+        decrementBtn.disabled = quantity <= 0;
+    }
+    
+    const incrementBtn = document.getElementById('incrementBtn');
+    if (incrementBtn) {
+        incrementBtn.disabled = quantity >= maxAvailable;
+    }
 }
 
 // ========== QUANTITY CONTROLS ==========
 function setupQuantityControls() {
-    const quantityInput = document.getElementById('quantityInput');
     const decrementBtn = document.getElementById('decrementBtn');
     const incrementBtn = document.getElementById('incrementBtn');
     const useAllBtn = document.getElementById('useAllBtn');
     
     if (decrementBtn) {
         decrementBtn.addEventListener('click', () => {
-            const val = parseInt(quantityInput.value) || 0;
-            if (val > 0) {
-                quantityInput.value = val - 1;
+            if (quantity > 0) {
+                quantity--;
+                updateQuantityDisplay();
             }
         });
     }
     
     if (incrementBtn) {
         incrementBtn.addEventListener('click', () => {
-            const val = parseInt(quantityInput.value) || 0;
-            if (val < maxAvailable) {
-                quantityInput.value = val + 1;
+            if (quantity < maxAvailable) {
+                quantity++;
+                updateQuantityDisplay();
             } else {
                 showToast(`Only ${maxAvailable} units available`, 'warning');
             }
@@ -236,26 +353,23 @@ function setupQuantityControls() {
     
     if (useAllBtn) {
         useAllBtn.addEventListener('click', () => {
-            quantityInput.value = maxAvailable;
+            quantity = maxAvailable;
+            updateQuantityDisplay();
         });
     }
-    
-    quantityInput.addEventListener('change', () => {
-        const val = parseInt(quantityInput.value) || 0;
-        if (val > maxAvailable) {
-            quantityInput.value = maxAvailable;
-            showToast(`Only ${maxAvailable} units available`, 'warning');
-        }
-        if (val < 0) quantityInput.value = 0;
-    });
+}
+
+function getImageUrl(imageUrl) {
+    if (!imageUrl) return '/assets/images/default_wine.png';
+    if (imageUrl.indexOf('http') === 0) return imageUrl;
+    if (imageUrl.indexOf('/') === 0) return imageUrl;
+    if (imageUrl.indexOf('assets/') === 0) return '/' + imageUrl;
+    return '/assets/images/' + imageUrl;
 }
 
 // ========== VALIDATION ==========
 function validateForm() {
-    const wineId = document.getElementById('wineSelect').value;
-    const quantity = parseInt(document.getElementById('quantityInput').value) || 0;
-    
-    if (!wineId) {
+    if (!selectedWine) {
         showError('Please select a wine');
         return false;
     }
@@ -318,9 +432,6 @@ async function saveWineToWarehouse(event) {
     
     showLoading(true);
     
-    const wineId = document.getElementById('wineSelect').value;
-    const quantity = parseInt(document.getElementById('quantityInput').value) || 0;
-    
     try {
         const token = localStorage.getItem('wineBubbles_token');
         const response = await fetch(`${API_BASE}/api/warehouse/add-wine`, {
@@ -330,7 +441,7 @@ async function saveWineToWarehouse(event) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                wineId: wineId,
+                wineId: selectedWine.id.toString(),
                 warehouseId: warehouseId,
                 quantity: quantity
             })
@@ -362,8 +473,6 @@ const form = document.getElementById('addWineForm');
 if (form) {
     form.addEventListener('submit', saveWineToWarehouse);
 }
-
-document.getElementById('wineSelect')?.addEventListener('change', onWineSelect);
 
 if (checkAuth()) {
     setupQuantityControls();
