@@ -1,7 +1,8 @@
-// Warehouse Management JavaScript
+// Warehouse Management JavaScript - Updated with item detail navigation
 
 const API_BASE = window.location.origin;
 let allWarehouses = [];
+let allWarehouseItems = [];
 let searchQuery = '';
 
 // ========== AUTHENTICATION ==========
@@ -95,9 +96,39 @@ async function fetchWarehouses() {
         renderWarehouses();
         renderStats();
         
+        // Also load warehouse items for stats
+        await fetchWarehouseItems();
+        
     } catch (error) {
         console.error('Error fetching warehouses:', error);
         container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle" style="font-size:48px; margin-bottom:16px; color:#d32f2f;"></i><p>Error loading warehouses: ${error.message}</p><button class="btn-primary" onclick="fetchWarehouses()" style="margin-top:16px;">Retry</button></div>`;
+    }
+}
+
+async function fetchWarehouseItems() {
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        const response = await fetch(`${API_BASE}/api/warehouse`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        
+        if (data.success && Array.isArray(data.data)) {
+            allWarehouseItems = data.data;
+        } else if (Array.isArray(data)) {
+            allWarehouseItems = data;
+        } else {
+            allWarehouseItems = [];
+        }
+        
+        console.log(`✅ Loaded ${allWarehouseItems.length} warehouse items`);
+        renderStats();
+        
+    } catch (error) {
+        console.error('Error fetching warehouse items:', error);
     }
 }
 
@@ -105,11 +136,14 @@ function renderStats() {
     const container = document.getElementById('statsContainer');
     const total = allWarehouses.length;
     const active = allWarehouses.filter(w => w.isActive === true).length;
+    const totalItems = allWarehouseItems.length;
+    const totalStock = allWarehouseItems.reduce((sum, i) => sum + (i.currentStock || 0), 0);
     
     container.innerHTML = `
         <div class="stat-box"><i class="fas fa-warehouse"></i><div class="stat-box-info"><div class="stat-box-value">${total}</div><div class="stat-box-label">Total Warehouses</div></div></div>
         <div class="stat-box"><i class="fas fa-check-circle" style="color:#2e7d32;"></i><div class="stat-box-info"><div class="stat-box-value">${active}</div><div class="stat-box-label">Active</div></div></div>
-        <div class="stat-box"><i class="fas fa-boxes"></i><div class="stat-box-info"><div class="stat-box-value">—</div><div class="stat-box-label">Total Items</div></div></div>
+        <div class="stat-box"><i class="fas fa-boxes"></i><div class="stat-box-info"><div class="stat-box-value">${totalItems}</div><div class="stat-box-label">Total Items</div></div></div>
+        <div class="stat-box"><i class="fas fa-cubes"></i><div class="stat-box-info"><div class="stat-box-value">${totalStock}</div><div class="stat-box-label">Total Stock</div></div></div>
     `;
 }
 
@@ -130,6 +164,8 @@ function renderWarehouses() {
             ${allWarehouses.map(warehouse => {
                 const warehouseId = getWarehouseId(warehouse);
                 const statusClass = warehouse.isActive ? 'status-active' : 'status-inactive';
+                const itemCount = allWarehouseItems.filter(i => i.warehouseId === warehouseId).length;
+                
                 return `
                     <div class="warehouse-card" onclick="viewWarehouseDetail('${warehouseId}')">
                         <div class="warehouse-header">
@@ -155,16 +191,20 @@ function renderWarehouses() {
                                 ${escapeHtml(warehouse.email)}
                             </div>
                             ` : ''}
-                            <div style="margin-top: 12px;">
+                            <div style="margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap;">
                                 <span class="status-badge ${statusClass}">
                                     <i class="fas ${warehouse.isActive ? 'fa-check-circle' : 'fa-times-circle'}"></i>
                                     ${warehouse.isActive ? 'ACTIVE' : 'INACTIVE'}
+                                </span>
+                                <span class="status-badge" style="background:rgba(107,13,43,0.1); color:#6b0d2b;">
+                                    <i class="fas fa-boxes"></i> ${itemCount} items
                                 </span>
                             </div>
                         </div>
                         <div class="warehouse-actions" onclick="event.stopPropagation()">
                             <button class="icon-btn" onclick="editWarehouse('${warehouseId}')" title="Edit"><i class="fas fa-edit"></i> Edit</button>
                             <button class="icon-btn" onclick="viewWarehouseDetail('${warehouseId}')" title="View Details"><i class="fas fa-eye"></i> View</button>
+                            <button class="icon-btn" onclick="addWineToWarehouse('${warehouseId}')" title="Add Wine" style="color:#2e7d32;"><i class="fas fa-plus"></i> Add Wine</button>
                             <button class="icon-btn danger" onclick="deleteWarehousePrompt('${warehouseId}', '${escapeHtml(warehouse.name)}')" title="Delete"><i class="fas fa-trash-alt"></i> Delete</button>
                         </div>
                     </div>
@@ -207,8 +247,17 @@ window.editWarehouse = function(warehouseId) {
     }
 };
 
+window.addWineToWarehouse = function(warehouseId) {
+    console.log('🍷 Adding wine to warehouse with ID:', warehouseId);
+    if (warehouseId && warehouseId !== 'undefined' && warehouseId !== 'null') {
+        window.location.href = `/admin/warehouse_management/warehouse_add_wine.html?warehouseId=${warehouseId}`;
+    } else {
+        showToast('Unable to add wine: Invalid warehouse ID', 'error');
+    }
+};
+
 window.deleteWarehousePrompt = function(warehouseId, warehouseName) {
-    if (confirm(`⚠️ Permanently delete "${warehouseName}"?\n\nThis action cannot be undone.\nThis will also remove all suppliers and items from this warehouse.`)) {
+    if (confirm(`⚠️ Permanently delete "${warehouseName}"?\n\nThis action cannot be undone.\nThis will also remove all wines from this warehouse.`)) {
         deleteWarehouse(warehouseId);
     }
 };
