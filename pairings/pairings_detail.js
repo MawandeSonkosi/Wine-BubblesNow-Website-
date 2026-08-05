@@ -138,24 +138,6 @@ function renderPairingDetail(pairing) {
   const stockCount = pairing.stockCount || 0;
   const isOutOfStock = stockCount <= 0;
   
-  // Determine stock status for display - NO COUNT SHOWN
-  let stockStatus = '';
-  let stockColor = '';
-  let statusText = '';
-  if (isOutOfStock) {
-    stockStatus = 'Out of Stock';
-    stockColor = '#e74c3c';
-    statusText = 'This item is currently out of stock.';
-  } else if (stockCount <= 5) {
-    stockStatus = 'Low Stock';
-    stockColor = '#f39c12';
-    statusText = 'Limited stock available.';
-  } else {
-    stockStatus = 'In Stock';
-    stockColor = '#27ae60';
-    statusText = 'Available for purchase.';
-  }
-  
   const template = `
     <div class="pairing-detail-card ${isOutOfStock ? 'out-of-stock' : ''}">
       <div class="pairing-detail-image-container">
@@ -170,15 +152,6 @@ function renderPairingDetail(pairing) {
         <h1 class="pairing-detail-name">${pairing.name}</h1>
         <div class="pairing-detail-category">${category}</div>
         <div class="pairing-detail-price">R${price.toFixed(2)}</div>
-        
-        <!-- Stock Status -->
-        <div class="stock-status-container" style="text-align: center; margin: 10px 0 20px;">
-          <span class="stock-status-badge" style="display: inline-block; padding: 6px 16px; border-radius: 20px; background: ${stockColor}20; color: ${stockColor}; border: 1px solid ${stockColor}40; font-weight: 600; font-size: 14px;">
-            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${stockColor}; margin-right: 8px;"></span>
-            ${stockStatus}
-          </span>
-          <p style="color: ${isOutOfStock ? '#e74c3c' : '#666'}; font-size: 13px; margin-top: 4px;">${statusText}</p>
-        </div>
         
         <p class="pairing-detail-description">${pairing.description || 'No description available.'}</p>
         
