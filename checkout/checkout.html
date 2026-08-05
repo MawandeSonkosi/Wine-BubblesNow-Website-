@@ -330,6 +330,146 @@
             font-size: 14px;
         }
 
+        /* Stock Unavailable Modal */
+        .stock-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            display: none;
+        }
+
+        .stock-modal-content {
+            background: #2a2a2a;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: #e6c79c;
+        }
+
+        .stock-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stock-modal-header .icon-circle {
+            background: rgba(255, 193, 7, 0.2);
+            padding: 10px;
+            border-radius: 50%;
+            color: #ffc107;
+            font-size: 24px;
+        }
+
+        .stock-modal-header h2 {
+            color: #e6c79c;
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+        }
+
+        .stock-modal-sub {
+            color: rgba(230, 199, 156, 0.6);
+            font-size: 13px;
+            margin-left: 52px;
+            margin-bottom: 16px;
+        }
+
+        .stock-unavailable-item {
+            background: rgba(255, 107, 107, 0.08);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stock-unavailable-item .close-icon {
+            background: rgba(255, 107, 107, 0.15);
+            padding: 6px;
+            border-radius: 50%;
+            color: #ff6b6b;
+            font-size: 12px;
+        }
+
+        .stock-unavailable-item .item-info {
+            flex: 1;
+        }
+
+        .stock-unavailable-item .item-name {
+            color: #e6c79c;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .stock-unavailable-item .item-requested {
+            background: rgba(255, 107, 107, 0.15);
+            padding: 2px 10px;
+            border-radius: 6px;
+            color: #ff6b6b;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .stock-help-box {
+            background: rgba(33, 150, 243, 0.08);
+            border: 1px solid rgba(33, 150, 243, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .stock-help-box i {
+            color: #2196f3;
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .stock-help-box .help-text {
+            color: rgba(230, 199, 156, 0.7);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .stock-help-box .help-text strong {
+            color: #e6c79c;
+        }
+
+        .stock-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .stock-modal-actions .btn-ok {
+            background: transparent;
+            border: 1px solid rgba(230, 199, 156, 0.3);
+            color: #e6c79c;
+            padding: 10px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .stock-modal-actions .btn-ok:hover {
+            background: rgba(230, 199, 156, 0.1);
+        }
+
         /* Toast Notification */
         .toast {
             position: fixed;
@@ -437,11 +577,9 @@
     </style>
 </head>
 <body>
-    <!-- Top bar with two sections -->
+    <!-- Top bar -->
     <div class="topbar-top">
-        <div class="topbar-top-inner">
-            <!-- Empty - no content as requested -->
-        </div>
+        <div class="topbar-top-inner"></div>
     </div>
 
     <div class="topbar-main">
@@ -525,9 +663,9 @@
                     
                     <div class="order-items" id="orderItems">
                         <!-- Order items will be loaded here -->
-                        <div class="loading-state">
-                            <div class="loading-spinner"></div>
-                            <p>Loading order items...</p>
+                        <div class="loading-state" style="text-align:center;padding:20px;">
+                            <div class="loading-spinner" style="display:inline-block;width:30px;height:30px;"></div>
+                            <p style="color:#666;">Loading order items...</p>
                         </div>
                     </div>
                 </div>
@@ -564,6 +702,39 @@
             </div>
         </div>
     </section>
+
+    <!-- Stock Unavailable Modal -->
+    <div class="stock-modal-overlay" id="stockModal">
+        <div class="stock-modal-content">
+            <div class="stock-modal-header">
+                <div class="icon-circle">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2>Stock Unavailable</h2>
+            </div>
+            <div class="stock-modal-sub">in your selected delivery location</div>
+            
+            <p style="color: rgba(230,199,156,0.8); font-size: 14px; margin-bottom: 16px;">
+                The following items are not available in sufficient quantity:
+            </p>
+            
+            <div id="stockUnavailableList"></div>
+            
+            <div class="stock-help-box">
+                <i class="fas fa-info-circle"></i>
+                <div class="help-text">
+                    <strong>What you can do:</strong><br>
+                    • Remove unavailable items from your cart<br>
+                    • Try a different delivery location<br>
+                    • Contact us for assistance
+                </div>
+            </div>
+            
+            <div class="stock-modal-actions">
+                <button class="btn-ok" onclick="closeStockModal()">OK, Got it</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -622,6 +793,7 @@
             this.payBtn = document.getElementById('payBtn');
             this.paySpinner = document.getElementById('paySpinner');
             this.isProcessing = false;
+            this.isCheckingStock = false;
             this.API_BASE_URL = '/api';
             this.cartUtils = null;
             this.userProfile = null;
@@ -643,6 +815,120 @@
                 console.log('✅ Checkout system initialized');
             });
         }
+
+        // ============ WAREHOUSE HELPERS ============
+
+        getWarehouseFromAddress(address) {
+            if (!address) return null;
+            if (address.includes('Johannesburg')) {
+                return '6a6b52b9d25e7e36e46f78ab'; // Johannesburg Warehouse ID
+            } else if (address.includes('Durban')) {
+                return '6a6b52ddd25e7e36e46f78b7'; // Durban Warehouse ID
+            } else if (address.includes('Pietermaritzburg')) {
+                return '6a6b52f7d25e7e36e46f78c1'; // Pietermaritzburg Warehouse ID
+            } else if (address.includes('South Coast')) {
+                return '6a6b5311d25e7e36e46f78c9'; // South Coast Warehouse ID
+            }
+            return null;
+        }
+
+        // ============ STOCK AVAILABILITY CHECK ============
+
+        async checkStockAvailability(allCartItems) {
+            // Only check wine items
+            const wineItems = allCartItems.filter(item => item.type === 'wine');
+
+            if (wineItems.length === 0) {
+                console.log('✅ No wine items to check stock for');
+                return true;
+            }
+
+            // Get delivery address
+            const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
+            if (!deliveryAddress) {
+                this.showToast('Please provide a delivery address first', 'error');
+                return false;
+            }
+
+            // Determine warehouse from address
+            const warehouseId = this.getWarehouseFromAddress(deliveryAddress);
+            if (!warehouseId) {
+                this.showToast('Could not determine warehouse for your location', 'error');
+                return false;
+            }
+
+            this.isCheckingStock = true;
+            this.updatePayButtonState();
+
+            try {
+                const items = wineItems.map(item => ({
+                    wineId: item.id.toString(),
+                    name: item.name,
+                    quantity: item.quantity
+                }));
+
+                console.log('🔍 Checking stock availability...');
+                console.log('   Warehouse:', warehouseId);
+                console.log('   Items:', items);
+
+                const token = localStorage.getItem('wineBubbles_token');
+                const response = await fetch(`${this.API_BASE_URL}/deliveries/check-availability`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
+                    body: JSON.stringify({ warehouseId, items })
+                });
+
+                const result = await response.json();
+                console.log('📊 Stock check result:', result);
+
+                if (result.success && result.data) {
+                    const data = result.data;
+                    if (data.allAvailable === false) {
+                        const unavailable = data.unavailableItems || [];
+                        this.showStockUnavailableModal(unavailable);
+                        return false;
+                    }
+                    console.log('✅ All items are available in warehouse');
+                    return true;
+                } else {
+                    this.showToast('Unable to verify stock availability. Please try again.', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Error checking stock:', error);
+                this.showToast('We\'re having trouble checking stock. Please try again.', 'error');
+                return false;
+            } finally {
+                this.isCheckingStock = false;
+                this.updatePayButtonState();
+            }
+        }
+
+        showStockUnavailableModal(unavailableItems) {
+            const modal = document.getElementById('stockModal');
+            const list = document.getElementById('stockUnavailableList');
+            
+            list.innerHTML = unavailableItems.map(item => `
+                <div class="stock-unavailable-item">
+                    <div class="close-icon"><i class="fas fa-times"></i></div>
+                    <div class="item-info">
+                        <div class="item-name">${this.escapeHtml(item.name || 'Unknown Wine')}</div>
+                    </div>
+                    <div class="item-requested">Requested: ${item.requested}</div>
+                </div>
+            `).join('');
+            
+            modal.style.display = 'flex';
+        }
+
+        closeStockModal() {
+            document.getElementById('stockModal').style.display = 'none';
+        }
+
+        // ============ LOAD DATA ============
 
         loadAdvertItems() {
             try {
@@ -727,6 +1013,8 @@
             document.head.appendChild(script);
         }
 
+        // ============ SETUP ============
+
         setupEventListeners() {
             if (this.payBtn) {
                 this.payBtn.addEventListener('click', () => this.processPayment());
@@ -770,9 +1058,9 @@
                 const orderItemsContainer = document.getElementById('orderItems');
 
                 if ((!cart || !cart.items || cart.items.length === 0) && this.advertItems.length === 0) {
-                    orderItemsContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 40px;">
+                    orderItemsContainer.innerHTML = `<div style="text-align: center; padding: 40px;">
                         <i class="fas fa-shopping-cart" style="font-size: 48px; color: #ccc;"></i>
-                        <h3>Your cart is empty</h3>
+                        <h3 style="color:#666;">Your cart is empty</h3>
                     </div>`;
                     return;
                 }
@@ -792,13 +1080,13 @@
                         itemsHTML += `
                             <div class="order-item">
                                 <div class="item-image">
-                                    <img src="${imageUrl}" alt="${item.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">🍷</text></svg>';">
+                                    <img src="${imageUrl}" alt="${item.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"80\\" height=\\"100\\" viewBox=\\"0 0 80 100\\"><rect width=\\"80\\" height=\\"100\\" fill=\\"%23f0f0f0\\"/><text x=\\"40\\" y=\\"50\\" text-anchor=\\"middle\\" fill=\\"%23666\\" font-size=\\"14\\">🍷</text></svg>';">
                                 </div>
                                 <div class="item-details">
-                                    <div class="item-name">${itemDisplayName}</div>
+                                    <div class="item-name">${this.escapeHtml(itemDisplayName)}</div>
                                     <div class="item-meta">
                                         <span style="background: rgba(107,13,43,0.1); color:#6b0d2b; padding:2px 6px; border-radius:4px; font-size:12px;">${itemTypeBadge}</span>
-                                        ${item.category ? `<span style="margin-left:8px;">${item.category}</span>` : ''}
+                                        ${item.category ? `<span style="margin-left:8px;">${this.escapeHtml(item.category)}</span>` : ''}
                                         ${isCase ? `<span style="margin-left:8px; color:#666;">(6 bottles per case)</span>` : ''}
                                     </div>
                                     <div class="item-quantity-price">
@@ -820,15 +1108,15 @@
                         itemsHTML += `
                             <div class="order-item" style="border-left: 3px solid #03a9f4; padding-left: 10px;">
                                 <div class="item-image">
-                                    <img src="${imageUrl}" alt="${advert.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"100\" viewBox=\"0 0 80 100\"><rect width=\"80\" height=\"100\" fill=\"%23f0f0f0\"/><text x=\"40\" y=\"50\" text-anchor=\"middle\" fill=\"%23666\" font-size=\"14\">📢</text></svg>';">
+                                    <img src="${imageUrl}" alt="${advert.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"80\\" height=\\"100\\" viewBox=\\"0 0 80 100\\"><rect width=\\"80\\" height=\\"100\\" fill=\\"%23f0f0f0\\"/><text x=\\"40\\" y=\\"50\\" text-anchor=\\"middle\\" fill=\\"%23666\\" font-size=\\"14\\">📢</text></svg>';">
                                 </div>
                                 <div class="item-details">
-                                    <div class="item-name" style="color: #03a9f4;">📢 ${advert.title}</div>
+                                    <div class="item-name" style="color: #03a9f4;">📢 ${this.escapeHtml(advert.title)}</div>
                                     <div class="item-meta">
                                         <span style="background: rgba(3,169,244,0.1); color:#03a9f4; padding:2px 6px; border-radius:4px; font-size:12px;">Advert Placement</span>
-                                        ${advert.category ? `<span style="margin-left:8px;">${advert.category}</span>` : ''}
+                                        ${advert.category ? `<span style="margin-left:8px;">${this.escapeHtml(advert.category)}</span>` : ''}
                                     </div>
-                                    ${advert.subtitle ? `<div style="color:#666; font-size:12px;">${advert.subtitle}</div>` : ''}
+                                    ${advert.subtitle ? `<div style="color:#666; font-size:12px;">${this.escapeHtml(advert.subtitle)}</div>` : ''}
                                     <div class="item-quantity-price">
                                         <div class="item-quantity">Qty: ${quantity}</div>
                                         <div class="item-price" style="color:#03a9f4;">R${itemTotal.toFixed(2)}</div>
@@ -912,9 +1200,24 @@
                 return false;
             }
         }
-        
+
+        updatePayButtonState() {
+            if (this.payBtn) {
+                this.payBtn.disabled = this.isProcessing || this.isCheckingStock;
+                if (this.isCheckingStock) {
+                    this.payBtn.querySelector('span').textContent = 'CHECKING STOCK...';
+                } else if (this.isProcessing) {
+                    this.payBtn.querySelector('span').textContent = 'PROCESSING...';
+                } else {
+                    this.payBtn.querySelector('span').textContent = 'PAY NOW';
+                }
+            }
+        }
+
+        // ============ PAYMENT PROCESSING ============
+
         async processPayment() {
-            if (this.isProcessing) return;
+            if (this.isProcessing || this.isCheckingStock) return;
 
             const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
 
@@ -938,15 +1241,21 @@
                 return;
             }
 
+            // Get all cart items for stock check
+            const cart = this.cartUtils.getCart();
+            const allCartItems = cart.items || [];
+
+            // Check stock availability FIRST
+            const stockAvailable = await this.checkStockAvailability(allCartItems);
+            if (!stockAvailable) return;
+
             this.isProcessing = true;
+            this.updatePayButtonState();
             this.showLoading(true);
-            this.payBtn.disabled = true;
             this.paySpinner.style.display = 'block';
-            this.payBtn.querySelector('span').textContent = 'PROCESSING...';
 
             try {
                 const user = JSON.parse(userData);
-                const cart = this.cartUtils.getCart();
                 const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
                 const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
                 
@@ -1072,15 +1381,21 @@
                 return;
             }
 
+            // Get all cart items for stock check
+            const cart = this.cartUtils.getCart();
+            const allCartItems = cart.items || [];
+
+            // Check stock availability FIRST
+            const stockAvailable = await this.checkStockAvailability(allCartItems);
+            if (!stockAvailable) return;
+
             this.isProcessing = true;
+            this.updatePayButtonState();
             this.showLoading(true);
-            this.payBtn.disabled = true;
             this.paySpinner.style.display = 'block';
-            this.payBtn.querySelector('span').textContent = 'PROCESSING...';
 
             try {
                 const user = JSON.parse(userData);
-                const cart = this.cartUtils.getCart();
                 const paymentMethod = localStorage.getItem('wineBubbles_paymentMethod');
                 const deliveryAddress = localStorage.getItem('wineBubbles_deliveryAddress');
 
@@ -1280,15 +1595,16 @@
         
         resetProcessingState() {
             this.isProcessing = false;
+            this.updatePayButtonState();
             this.showLoading(false);
-            this.payBtn.disabled = false;
             this.paySpinner.style.display = 'none';
-            this.payBtn.querySelector('span').textContent = 'PAY NOW';
         }
 
         updateCartBadge() {
             if (this.cartUtils) this.cartUtils.updateCartBadge();
         }
+
+        // ============ AUTHENTICATION ============
 
         setupAuthentication() {
             const isValidToken = this.isAuthenticated();
@@ -1378,6 +1694,8 @@
             });
         }
 
+        // ============ UI HELPERS ============
+
         showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             if (!toast) return;
@@ -1392,9 +1710,9 @@
             if (content) {
                 content.innerHTML = `<div style="text-align:center;padding:40px;">
                     <i class="fas fa-exclamation-triangle" style="font-size:48px;color:#e74c3c;"></i>
-                    <h3>Error</h3>
-                    <p>${message}</p>
-                    <button onclick="location.reload()" style="background:#6b0d2b;color:white;padding:12px 24px;border:none;border-radius:8px;">Refresh</button>
+                    <h3 style="color:#333;">Error</h3>
+                    <p style="color:#666;">${message}</p>
+                    <button onclick="location.reload()" style="background:#6b0d2b;color:white;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Refresh</button>
                 </div>`;
             }
         }
@@ -1403,6 +1721,16 @@
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.style.display = show ? 'flex' : 'none';
         }
+
+        escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+    }
+
+    // Make closeStockModal globally accessible
+    function closeStockModal() {
+        document.getElementById('stockModal').style.display = 'none';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
