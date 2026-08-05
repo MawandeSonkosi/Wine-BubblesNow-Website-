@@ -76,12 +76,41 @@
       position: absolute;
       top: 8px;
       left: 8px;
-      padding: 2px 8px;
+      padding: 4px 10px;
       border-radius: 4px;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 600;
       background: var(--admin-primary);
       color: white;
+      text-transform: uppercase;
+    }
+    .stock-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .out-of-stock-badge {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff4444;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
     
     .addon-info {
@@ -107,7 +136,7 @@
       line-height: 1.4;
       max-height: 36px;
       overflow: hidden;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .addon-price {
       font-weight: 700;
@@ -248,6 +277,6 @@
 
   <footer class="footer"><div class="container footer-inner"><div class="footer-brand"><img src="../../assets/categories/Logo_Botttom.png" class="footer-logo"><p class="brand-tagline">Admin Panel — Add-On Management</p></div></div></footer>
 
-  <script src="addon_management.js"></script>
+  <script src="addon_management.js?v=2"></script>
 </body>
 </html>

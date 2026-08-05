@@ -40,7 +40,7 @@ function toggleUserDropdown(user) {
     dropdown.style.cssText = 'position:absolute; top:100px; right:20px; background:white; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12); padding:16px; min-width:220px; z-index:1000; border:1px solid #eae3da;';
     dropdown.innerHTML = `
         <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #eee;">
-            <div style="font-weight:bold; margin-bottom:4px;">${escapeHtml(user.fullName || user.email)} <span class="badge badge-admin">ADMIN</span></div>
+            <div style="font-weight:bold; margin-bottom:4px;">${escapeHtml(user.fullName || user.email)} <span class="badge badge-admin" style="background:#6b0d2b; color:white; padding:2px 8px; border-radius:4px; font-size:11px;">ADMIN</span></div>
             <div style="font-size:13px; color:#6d6d6d;">${escapeHtml(user.email)}</div>
         </div>
         <a href="../../user/profile.html" style="display:flex; align-items:center; gap:10px; padding:10px 0; color:#1b1b1b; text-decoration:none;"><i class="fas fa-user"></i> My Profile</a>
@@ -79,6 +79,21 @@ function getImageUrl(imageUrl) {
         return '../../' + imageUrl;
     }
     return '../../assets/images/' + imageUrl;
+}
+
+// ========== STOCK STATUS HELPERS ==========
+function getStockStatusColor(addon) {
+    if (!addon.isActive) return '#6d6d6d';
+    if (addon.stockCount <= 0) return '#d32f2f';
+    if (addon.stockCount <= 5) return '#ed6c02';
+    return '#2e7d32';
+}
+
+function getStockStatusText(addon) {
+    if (!addon.isActive) return 'Inactive';
+    if (addon.stockCount <= 0) return 'Out of Stock';
+    if (addon.stockCount <= 5) return 'Low Stock';
+    return 'In Stock';
 }
 
 // ========== FETCH ADD-ONS ==========
@@ -136,24 +151,38 @@ function renderAddOns() {
     
     const gridHtml = `
         <div class="addons-grid">
-            ${filtered.map(addon => `
+            ${filtered.map(addon => {
+                const statusColor = getStockStatusColor(addon);
+                const statusText = getStockStatusText(addon);
+                const isOutOfStock = addon.stockCount <= 0 || !addon.isActive;
+                
+                return `
                 <div class="addon-card" onclick="showAddOnActions(${addon.id})">
                     <div class="addon-image">
                         <img src="${getImageUrl(addon.imageUrl)}" alt="${escapeHtml(addon.name)}" onerror="this.src='../../assets/images/default_addon.png'">
                         <div class="category-badge">${escapeHtml(addon.category).toUpperCase()}</div>
+                        ${isOutOfStock ? '<div class="out-of-stock-badge">OUT OF STOCK</div>' : ''}
+                        <div class="stock-badge" style="background:${statusColor};">
+                            ${statusText}
+                        </div>
                     </div>
                     <div class="addon-info">
-                        <div class="addon-name">${escapeHtml(addon.name)}</div>
+                        <div class="addon-name" style="${isOutOfStock ? 'color:#888;' : ''}">${escapeHtml(addon.name)}</div>
                         <div class="addon-category">${escapeHtml(addon.category)}</div>
                         <div class="addon-description">${escapeHtml(addon.description?.substring(0, 80) || 'No description')}${addon.description?.length > 80 ? '...' : ''}</div>
-                        <div class="addon-price">R${(addon.price || 0).toFixed(2)}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                            <div class="addon-price" style="${isOutOfStock ? 'color:#999;' : ''}">R${(addon.price || 0).toFixed(2)}</div>
+                            <div style="display:flex; align-items:center; gap:4px; font-size:12px; color:${statusColor};">
+                                <span>Stock: ${addon.stockCount}</span>
+                            </div>
+                        </div>
                         <div class="addon-actions" onclick="event.stopPropagation()">
                             <button class="icon-btn" onclick="editAddOn(${addon.id})" title="Edit"><i class="fas fa-edit"></i></button>
                             <button class="icon-btn" onclick="deleteAddOnPrompt(${addon.id}, '${escapeHtml(addon.name)}')" title="Delete" style="color:#d32f2f;"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>
                 </div>
-            `).join('')}
+            `}).join('')}
         </div>
     `;
     
@@ -165,19 +194,38 @@ function showAddOnActions(addonId) {
     const addon = allAddOns.find(a => a.id == addonId);
     if (!addon) return;
     
+    const statusColor = getStockStatusColor(addon);
+    const statusText = getStockStatusText(addon);
+    const isOutOfStock = addon.stockCount <= 0 || !addon.isActive;
+    
     const modalHtml = `
         <div class="modal-overlay" id="addonActionsModal">
             <div class="modal-content">
-                <h3><i class="fas fa-gift"></i> ${escapeHtml(addon.name)}</h3>
-                <div style="margin-bottom: 20px;">
-                    <p><strong>Category:</strong> ${escapeHtml(addon.category)}</p>
-                    <p><strong>Price:</strong> R${(addon.price || 0).toFixed(2)}</p>
-                    <p><strong>Description:</strong> ${escapeHtml(addon.description || 'No description')}</p>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                    <div style="width:50px; height:50px; background:#f8f8f8; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                        <img src="${getImageUrl(addon.imageUrl)}" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-gift\\' style=\\'font-size:24px; color:#999;\\'></i>'">
+                    </div>
+                    <div>
+                        <h3 style="font-family:'Playfair Display'; margin:0; color:var(--admin-text);">${escapeHtml(addon.name)}</h3>
+                        <p style="margin:2px 0 0; color:var(--admin-muted); font-size:13px;">${escapeHtml(addon.category)} • R${(addon.price || 0).toFixed(2)}</p>
+                    </div>
                 </div>
+                <div style="margin-bottom: 16px; padding:10px 14px; background:#f8f8f8; border-radius:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <span style="color:var(--admin-muted);">Stock:</span>
+                        <span style="color:${statusColor}; font-weight:600;">${addon.stockCount} units</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:4px;">
+                        <span style="color:var(--admin-muted);">Status:</span>
+                        <span style="color:${statusColor}; font-weight:600;">${statusText}</span>
+                    </div>
+                </div>
+                <p style="font-size:13px; color:var(--admin-muted); margin-bottom:16px;">${escapeHtml(addon.description || 'No description')}</p>
                 <div style="display: flex; gap: 12px; flex-direction: column;">
                     <button class="btn-primary" onclick="editAddOn(${addonId})" style="width:100%;"><i class="fas fa-edit"></i> Edit Add-On</button>
+                    <button class="btn-primary" onclick="toggleActiveStatus(${addonId}, ${!addon.isActive})" style="width:100%; background:${addon.isActive ? '#ed6c02' : '#2e7d32'};"><i class="fas fa-${addon.isActive ? 'eye-slash' : 'eye'}"></i> ${addon.isActive ? 'Deactivate' : 'Activate'}</button>
                     <button class="btn-primary" onclick="deleteAddOnPrompt(${addonId}, '${escapeHtml(addon.name)}')" style="width:100%; background:#d32f2f;"><i class="fas fa-trash-alt"></i> Delete Add-On</button>
-                    <button onclick="closeModal()" style="background:#f0f0f0; border:none; padding:12px; border-radius:40px; cursor:pointer; width:100%;">Cancel</button>
+                    <button onclick="closeModal()" style="background:#f0f0f0; border:none; padding:12px; border-radius:40px; cursor:pointer; width:100%; font-weight:500;">Cancel</button>
                 </div>
             </div>
         </div>
@@ -202,6 +250,27 @@ window.deleteAddOnPrompt = function(addonId, addonName) {
     }
 };
 
+// ========== TOGGLE ACTIVE STATUS ==========
+window.toggleActiveStatus = async function(addonId, isActive) {
+    closeModal();
+    try {
+        const token = localStorage.getItem('wineBubbles_token');
+        const response = await fetch(`${API_BASE}/api/addons/${addonId}`, {
+            method: 'PATCH',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isActive: isActive })
+        });
+        
+        if (!response.ok) throw new Error('Failed to update status');
+        
+        showToast(`Add-on ${isActive ? 'activated' : 'deactivated'} successfully`, 'success');
+        fetchAddOns();
+    } catch (error) {
+        showToast('Failed to update status', 'error');
+    }
+};
+
+// ========== DELETE ADD-ON ==========
 async function deleteAddOn(addonId) {
     try {
         const token = localStorage.getItem('wineBubbles_token');

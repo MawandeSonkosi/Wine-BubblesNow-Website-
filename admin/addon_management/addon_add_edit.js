@@ -88,6 +88,16 @@ async function loadAddOnData() {
         document.getElementById('category').value = addonData.category || 'Biltong';
         document.getElementById('description').value = addonData.description || '';
         document.getElementById('imageUrl').value = addonData.imageUrl || '';
+        document.getElementById('stockCount').value = addonData.stockCount || 0;
+        
+        // Set active status toggle
+        const isActive = addonData.isActive !== undefined ? addonData.isActive : true;
+        const toggle = document.getElementById('activeToggle');
+        const statusText = document.getElementById('statusText');
+        if (toggle) {
+            toggle.checked = isActive;
+            updateActiveStatus(isActive);
+        }
         
         // Update image preview
         const previewContainer = document.getElementById('imagePreview');
@@ -105,11 +115,35 @@ async function loadAddOnData() {
     }
 }
 
+// ========== ACTIVE STATUS TOGGLE ==========
+function updateActiveStatus(isActive) {
+    const statusText = document.getElementById('statusText');
+    const statusIcon = document.getElementById('statusIcon');
+    if (statusText) {
+        statusText.textContent = isActive ? 'Active' : 'Inactive';
+        statusText.style.color = isActive ? '#2e7d32' : '#6d6d6d';
+    }
+    if (statusIcon) {
+        statusIcon.className = isActive ? 'fas fa-check-circle' : 'fas fa-times-circle';
+        statusIcon.style.color = isActive ? '#2e7d32' : '#6d6d6d';
+    }
+}
+
+function setupActiveToggle() {
+    const toggle = document.getElementById('activeToggle');
+    if (toggle) {
+        toggle.addEventListener('change', function() {
+            updateActiveStatus(this.checked);
+        });
+    }
+}
+
 // ========== VALIDATION ==========
 function validateForm() {
     const name = document.getElementById('name').value.trim();
     const price = document.getElementById('price').value;
     const category = document.getElementById('category').value;
+    const stockCount = document.getElementById('stockCount').value;
     
     if (!name) {
         showError('Add-on name is required');
@@ -121,6 +155,10 @@ function validateForm() {
     }
     if (!category) {
         showError('Category is required');
+        return false;
+    }
+    if (!stockCount || stockCount < 0) {
+        showError('Valid stock count is required');
         return false;
     }
     
@@ -164,12 +202,16 @@ async function saveAddOn(event) {
     
     showLoading(true);
     
+    const isActive = document.getElementById('activeToggle').checked;
+    
     const addonDataToSave = {
         name: document.getElementById('name').value.trim(),
         price: parseFloat(document.getElementById('price').value),
         category: document.getElementById('category').value,
         description: document.getElementById('description').value.trim() || null,
-        imageUrl: document.getElementById('imageUrl').value.trim() || 'assets/images/default_addon.png'
+        imageUrl: document.getElementById('imageUrl').value.trim() || 'assets/images/default_addon.png',
+        stockCount: parseInt(document.getElementById('stockCount').value) || 0,
+        isActive: isActive
     };
     
     // Generate numeric ID for new add-ons (use timestamp)
@@ -214,5 +256,6 @@ document.getElementById('addonForm')?.addEventListener('submit', saveAddOn);
 
 if (checkAuth()) {
     setupImagePreview();
+    setupActiveToggle();
     loadAddOnData();
 }
