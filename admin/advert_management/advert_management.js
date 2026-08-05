@@ -1,4 +1,4 @@
-// Advert Management JavaScript
+// Advert Management JavaScript - Updated with wine linking and stock display
 
 const API_BASE = window.location.origin;
 let allAdverts = [];
@@ -110,6 +110,7 @@ function renderStats() {
     
     const total = allAdverts.length;
     const active = allAdverts.filter(a => a.isActive === true).length;
+    const linkedToWine = allAdverts.filter(a => a.wineId).length;
     const totalImpressions = allAdverts.reduce((sum, a) => sum + (a.impressions || 0), 0);
     const totalClicks = allAdverts.reduce((sum, a) => sum + (a.clicks || 0), 0);
     const avgCTR = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(1) : 0;
@@ -117,6 +118,7 @@ function renderStats() {
     container.innerHTML = `
         <div class="stat-box"><i class="fas fa-ad"></i><div class="stat-box-info"><div class="stat-box-value">${total}</div><div class="stat-box-label">Total Adverts</div></div></div>
         <div class="stat-box"><i class="fas fa-check-circle" style="color:#2e7d32;"></i><div class="stat-box-info"><div class="stat-box-value">${active}</div><div class="stat-box-label">Active</div></div></div>
+        <div class="stat-box"><i class="fas fa-wine-bottle" style="color:#6b0d2b;"></i><div class="stat-box-info"><div class="stat-box-value">${linkedToWine}</div><div class="stat-box-label">Linked to Wine</div></div></div>
         <div class="stat-box"><i class="fas fa-chart-line" style="color:#ed6c02;"></i><div class="stat-box-info"><div class="stat-box-value">${avgCTR}%</div><div class="stat-box-label">Avg CTR</div></div></div>
     `;
 }
@@ -213,16 +215,20 @@ function renderAdverts() {
                 const advertId = getAdvertId(advert);
                 const ctr = (advert.ctr || 0).toFixed(1);
                 const bannerPosition = advert.bannerPosition === 'top' ? 'TOP BANNER' : 'BOTTOM BANNER';
+                const isLinkedToWine = advert.wineId !== null && advert.wineId !== undefined;
+                const isOutOfStock = advert.stockCount <= 0;
                 
                 return `
                     <div class="advert-card" onclick="viewAdvertDetail('${advertId}')">
                         <div class="advert-image">
                             ${getAdvertImageHtml(advert)}
+                            ${isOutOfStock ? '<div class="out-of-stock-badge">OUT OF STOCK</div>' : ''}
                         </div>
                         <div class="advert-header">
                             <span class="advert-title" title="${escapeHtml(advert.title)}">${escapeHtml(advert.title)}</span>
                             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                                 <span class="badge ${advert.isActive ? 'badge-active' : 'badge-inactive'}">${advert.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
+                                ${isLinkedToWine ? '<span class="badge badge-purchasable" style="background:rgba(107,13,43,0.1); color:#6b0d2b;">WINE</span>' : ''}
                             </div>
                         </div>
                         <div class="advert-body">
@@ -232,11 +238,20 @@ function renderAdverts() {
                                 <span class="stat-chip"><i class="fas fa-mouse-pointer"></i> ${formatNumber(advert.clicks || 0)}</span>
                                 <span class="stat-chip"><i class="fas fa-chart-line"></i> ${ctr}% CTR</span>
                             </div>
-                            <div class="advert-price">Position: ${advert.position || 0}</div>
-                            <div class="stock-info">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                                <div class="advert-price">Position: ${advert.position || 0}</div>
+                                <div class="stock-info" style="color: ${isOutOfStock ? '#d32f2f' : '#2e7d32'};">
+                                    <i class="fas fa-boxes"></i> ${advert.stockCount || 0}
+                                </div>
+                            </div>
+                            <div class="stock-info" style="margin-top:4px;">
                                 <i class="fas fa-map-pin"></i> ${bannerPosition}
                             </div>
-                            ${advert.wineId ? `<div class="stock-info" style="margin-top:4px;"><i class="fas fa-wine-bottle"></i> Linked to Wine ID: ${advert.wineId}</div>` : ''}
+                            ${isLinkedToWine ? `<div class="stock-info" style="margin-top:4px; color:#6b0d2b;"><i class="fas fa-wine-bottle"></i> Linked to Wine ID: ${advert.wineId}</div>` : ''}
+                            <div class="stock-info" style="margin-top:4px; font-size:11px; color:var(--admin-muted);">
+                                <i class="fas fa-${advert.isAvailableForPurchase ? 'shopping-cart' : 'eye'}"></i> 
+                                ${advert.isAvailableForPurchase ? 'Purchasable' : 'Display Only'}
+                            </div>
                         </div>
                         <div class="advert-actions" onclick="event.stopPropagation()">
                             <button class="icon-btn" onclick="editAdvert('${advertId}')" title="Edit Advert"><i class="fas fa-edit"></i> Edit</button>

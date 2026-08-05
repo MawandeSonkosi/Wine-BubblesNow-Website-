@@ -1,4 +1,4 @@
-// Advert Management Detail JavaScript
+// Advert Management Detail JavaScript - Updated with wine linking and stock
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -153,6 +153,7 @@ function renderDetail() {
     const stockCount = linkedWine?.stockCount || advertData.stockCount || 0;
     const isInStock = stockCount > 0;
     const isLowStock = stockCount > 0 && stockCount <= 10;
+    const isLinkedToWine = advertData.wineId !== null && advertData.wineId !== undefined;
     
     const imageUrl = getImageUrl(advertData.imageUrl);
     
@@ -184,7 +185,7 @@ function renderDetail() {
             <div class="detail-section">
                 <div class="image-container">
                     ${advertData.imageUrl ? 
-                        `<img src="${imageUrl}" alt="${escapeHtml(advertData.title)}" onerror="this.parentElement.innerHTML='<div class=\'image-placeholder\'><i class=\'fas ${icon}\'></i><p>Failed to load image</p><p style=\'font-size:12px; margin-top:5px;\'>${escapeHtml(advertData.title)}</p></div>'">` : 
+                        `<img src="${imageUrl}" alt="${escapeHtml(advertData.title)}" onerror="this.parentElement.innerHTML='<div class=\\'image-placeholder\\'><i class=\\'fas ${icon}\\'></i><p>Failed to load image</p><p style=\\'font-size:12px; margin-top:5px;\\'>${escapeHtml(advertData.title)}</p></div>'">` : 
                         `<div class="image-placeholder"><i class="fas ${icon}"></i><p>${escapeHtml(advertData.title)}</p><p style="font-size:12px; opacity:0.7;">No image available</p></div>`
                     }
                 </div>
@@ -198,8 +199,20 @@ function renderDetail() {
                     <div class="info-row"><div class="info-label">Banner Position:</div><div class="info-value"><span class="badge" style="background:rgba(107,13,43,0.1);">${advertData.bannerPosition === 'top' ? 'TOP BANNER' : 'BOTTOM BANNER'}</span></div></div>
                     <div class="info-row"><div class="info-label">Target URL:</div><div class="info-value">${advertData.targetUrl ? `<a href="${escapeHtml(advertData.targetUrl)}" target="_blank" style="color:var(--admin-primary); text-decoration:none;"><i class="fas fa-external-link-alt"></i> ${escapeHtml(advertData.targetUrl)}</a>` : '—'}</div></div>
                     <div class="info-row"><div class="info-label">Display Position:</div><div class="info-value">${advertData.position || 0}</div></div>
+                    <div class="info-row"><div class="info-label">Stock Count:</div><div class="info-value">
+                        <span style="color: ${isInStock ? (isLowStock ? '#ed6c02' : '#2e7d32') : '#d32f2f'};">
+                            ${stockCount}
+                            ${isLowStock && isInStock ? ' <i class="fas fa-exclamation-triangle"></i> Low Stock' : ''}
+                            ${!isInStock ? ' <i class="fas fa-times-circle"></i> Out of Stock' : ''}
+                        </span>
+                    </div></div>
+                    <div class="info-row"><div class="info-label">Price:</div><div class="info-value"><strong style="color:var(--admin-primary);">R${(advertData.price || 0).toFixed(2)}</strong></div></div>
                     <div class="info-row"><div class="info-label">Status:</div><div class="info-value">
                         <span class="badge ${advertData.isActive ? 'badge-active' : 'badge-inactive'}">${advertData.isActive ? 'ACTIVE' : 'INACTIVE'}</span>
+                    </div></div>
+                    <div class="info-row"><div class="info-label">Type:</div><div class="info-value">${escapeHtml(advertData.type || '—')}</div></div>
+                    <div class="info-row"><div class="info-label">Linked to Wine:</div><div class="info-value">
+                        ${isLinkedToWine ? `<span style="color:var(--admin-primary); font-weight:600;"><i class="fas fa-wine-bottle"></i> Wine ID: ${advertData.wineId}</span>` : '—'}
                     </div></div>
                     ${advertData.createdAt ? `<div class="info-row"><div class="info-label">Created:</div><div class="info-value">${formatDate(advertData.createdAt)}</div></div>` : ''}
                     ${advertData.updatedAt ? `<div class="info-row"><div class="info-label">Last Updated:</div><div class="info-value">${formatDate(advertData.updatedAt)}</div></div>` : ''}
@@ -208,19 +221,17 @@ function renderDetail() {
             
             ${linkedWine ? `
             <div class="detail-section">
-                <h3 class="section-title"><i class="fas fa-wine-bottle"></i> Linked Wine Information</h3>
+                <h3 class="section-title"><i class="fas fa-wine-bottle"></i> Linked Wine Details</h3>
                 <div class="info-grid">
                     <div class="info-row"><div class="info-label">Wine Name:</div><div class="info-value">${escapeHtml(linkedWine.name)}</div></div>
                     <div class="info-row"><div class="info-label">Type:</div><div class="info-value">${escapeHtml(linkedWine.type || '—')}</div></div>
                     <div class="info-row"><div class="info-label">Category:</div><div class="info-value">${escapeHtml(linkedWine.category || '—')}</div></div>
-                    <div class="info-row"><div class="info-label">Price per Bottle:</div><div class="info-value"><strong style="color:var(--admin-primary);">R${(linkedWine.price || 0).toFixed(2)}</strong></div></div>
-                    <div class="info-row"><div class="info-label">Stock Count:</div><div class="info-value">
-                        <span style="color: ${isInStock ? (isLowStock ? '#ed6c02' : '#2e7d32') : '#d32f2f'};">
-                            ${stockCount} bottle${stockCount !== 1 ? 's' : ''}
-                            ${isLowStock && isInStock ? ' <i class="fas fa-exclamation-triangle"></i> Low Stock' : ''}
+                    <div class="info-row"><div class="info-label">Price:</div><div class="info-value"><strong style="color:var(--admin-primary);">R${(linkedWine.price || 0).toFixed(2)}</strong></div></div>
+                    <div class="info-row"><div class="info-label">Stock:</div><div class="info-value">
+                        <span style="color: ${linkedWine.stockCount > 0 ? '#2e7d32' : '#d32f2f'};">
+                            ${linkedWine.stockCount || 0} bottle${(linkedWine.stockCount || 0) !== 1 ? 's' : ''}
                         </span>
                     </div></div>
-                    ${linkedWine.isCase ? `<div class="info-row"><div class="info-label">Case Option:</div><div class="info-value">Available as case of 6 (R${(linkedWine.price * 6).toFixed(2)} per case)</div></div>` : ''}
                 </div>
             </div>
             ` : ''}

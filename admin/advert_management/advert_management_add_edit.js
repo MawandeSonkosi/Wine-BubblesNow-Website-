@@ -1,4 +1,4 @@
-// Advert Add/Edit JavaScript
+// Advert Add/Edit JavaScript - Updated with wine linking and stock functionality
 
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
@@ -6,7 +6,9 @@ const advertId = urlParams.get('id');
 
 let advertData = null;
 let wines = [];
+let selectedWine = null;
 let isLoadingWines = false;
+let isSaving = false;
 
 // ========== AUTHENTICATION ==========
 function checkAuth() {
@@ -108,7 +110,7 @@ function populateWineSelect() {
     const select = document.getElementById('wineId');
     if (!select) return;
     
-    const currentWineId = document.getElementById('wineId').value;
+    const currentWineId = select.value;
     
     select.innerHTML = '<option value="">-- Select a Wine --</option>' +
         wines.map(wine => `<option value="${wine.id}" ${currentWineId == wine.id ? 'selected' : ''}>${escapeHtml(wine.name)} (${escapeHtml(wine.type)} - R${wine.price.toFixed(2)})</option>`).join('');
@@ -116,17 +118,29 @@ function populateWineSelect() {
 
 function onWineSelect() {
     const wineId = document.getElementById('wineId').value;
-    if (!wineId) return;
+    if (!wineId) {
+        selectedWine = null;
+        // Clear auto-populated fields
+        document.getElementById('title').value = '';
+        document.getElementById('subtitle').value = '';
+        document.getElementById('imageUrl').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('stockCount').value = '';
+        updateImagePreview();
+        return;
+    }
     
-    const selectedWine = wines.find(w => w.id == wineId);
-    if (!selectedWine) return;
+    const selected = wines.find(w => w.id == wineId);
+    if (!selected) return;
+    
+    selectedWine = selected;
     
     // Auto-populate fields from selected wine
-    document.getElementById('title').value = selectedWine.name;
-    document.getElementById('subtitle').value = selectedWine.type;
-    document.getElementById('imageUrl').value = selectedWine.bannerImageUrl || selectedWine.imageUrl;
-    document.getElementById('price').value = selectedWine.price;
-    document.getElementById('stockCount').value = selectedWine.stockCount;
+    document.getElementById('title').value = selected.name;
+    document.getElementById('subtitle').value = selected.type;
+    document.getElementById('imageUrl').value = selected.bannerImageUrl || selected.imageUrl || '';
+    document.getElementById('price').value = selected.price;
+    document.getElementById('stockCount').value = selected.stockCount;
     
     // Update image preview
     updateImagePreview();
@@ -166,8 +180,6 @@ async function loadAdvertData() {
                 'Content-Type': 'application/json'
             }
         });
-        
-        console.log('📡 Response status:', response.status);
         
         if (!response.ok) {
             if (response.status === 404) {
@@ -209,6 +221,8 @@ async function loadAdvertData() {
         // Set wine selection if linked
         if (advert.wineId) {
             document.getElementById('wineId').value = advert.wineId;
+            // Trigger wine selection to populate fields
+            onWineSelect();
         }
         
         // Update image preview
@@ -325,9 +339,14 @@ function validateForm() {
         return false;
     }
     
+    // If no wine selected, require target URL or image
     if (!wineId) {
-        showError('Please select a wine to link to this advert');
-        return false;
+        const imageUrl = document.getElementById('imageUrl').value.trim();
+        const targetUrl = document.getElementById('targetUrl').value.trim();
+        if (!imageUrl && !targetUrl) {
+            showError('Please either select a wine or provide an image URL');
+            return false;
+        }
     }
     
     const position = parseInt(document.getElementById('position').value);
@@ -358,9 +377,11 @@ function showLoading(show) {
     if (show) {
         if (loadingDiv) loadingDiv.style.display = 'block';
         if (submitBtn) submitBtn.disabled = true;
+        isSaving = true;
     } else {
         if (loadingDiv) loadingDiv.style.display = 'none';
         if (submitBtn) submitBtn.disabled = false;
+        isSaving = false;
     }
 }
 
@@ -385,28 +406,40 @@ function escapeHtml(str) {
 async function saveAdvert(event) {
     event.preventDefault();
     
+    if (isSaving) return;
+    
     if (!validateForm()) return;
     
     showLoading(true);
     
-    const selectedWine = wines.find(w => w.id == document.getElementById('wineId').value);
+    const wineId = document.getElementById('wineId').value;
+    const selectedWine = wines.find(w => w.id == wineId);
     
     const advertDataToSave = {
         title: document.getElementById('title').value.trim(),
         subtitle: document.getElementById('subtitle').value.trim(),
         imageUrl: document.getElementById('imageUrl').value.trim(),
         targetUrl: document.getElementById('targetUrl').value.trim(),
-        price: selectedWine ? selectedWine.price : parseFloat(document.getElementById('price').value),
-        type: 'wine',
-        category: 'wine',
-        productType: 'wine',
-        stockCount: selectedWine ? selectedWine.stockCount : parseInt(document.getElementById('stockCount').value),
-        position: parseInt(document.getElementById('position').value) || 0,
+        price: selectedWine ? selectedWine.price : parseFloat(document.getElementById('price').value) || 0,
+        productType: selectedWine ? 'wine' : 'advert',
+        category: selectedWine ? 'wine' : 'marketing',
+        type: selectedWine ? 'wine' : 'homepage',
+        isAvailableForPurchase: selectedWine ? selectedWine.stockCount > 0 : false,
+        stockCount: selectedWine ? selectedWine.stockCount : parseInt(document.getElementById('stockCount').value) || 0,
         isActive: document.getElementById('isActive').checked,
-        isAvailableForPurchase: false, // Adverts are not purchasable items
-        wineId: parseInt(document.getElementById('wineId').value),
-        bannerPosition: document.getElementById('bannerPosition').value
+        position: parseInt(document.getElementById('position').value) || 0,
+        bannerPosition: document.getElementById('bannerPosition').value,
+        wineId: selectedWine ? parseInt(wineId) : null,
     };
+    
+    // Preserve analytics if editing
+    if (advertData) {
+        advertDataToSave.impressions = advertData.impressions || 0;
+        advertDataToSave.clicks = advertData.clicks || 0;
+        advertDataToSave.purchases = advertData.purchases || 0;
+        advertDataToSave.ctr = advertData.ctr || 0;
+        advertDataToSave.conversionRate = advertData.conversionRate || 0;
+    }
     
     console.log('📤 Saving advert:', advertDataToSave);
     
