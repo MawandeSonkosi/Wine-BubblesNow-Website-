@@ -164,17 +164,17 @@ function renderPairings() {
     const stockCount = pairing.stockCount || 0;
     const isOutOfStock = stockCount <= 0;
     
-    // Determine stock status for display
+    // Determine stock status for display - NO COUNT SHOWN
     let stockStatus = '';
     let stockColor = '';
     if (isOutOfStock) {
       stockStatus = 'Out of Stock';
       stockColor = '#e74c3c';
     } else if (stockCount <= 5) {
-      stockStatus = `Low Stock (${stockCount} left)`;
+      stockStatus = 'Low Stock';
       stockColor = '#f39c12';
     } else {
-      stockStatus = `In Stock (${stockCount} available)`;
+      stockStatus = 'In Stock';
       stockColor = '#27ae60';
     }
     
@@ -192,10 +192,10 @@ function renderPairings() {
           <div class="wine-title">${pairing.name}</div>
           <div class="wine-sub">${category}</div>
           <div class="wine-price">R${price.toFixed(2)}</div>
-          <div class="stock-status" style="color: ${stockColor}; font-size: 12px; margin-top: 4px;">
+          ${!isOutOfStock ? `<div class="stock-status" style="color: ${stockColor}; font-size: 12px; margin-top: 4px;">
             <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${stockColor}; margin-right: 6px;"></span>
             ${stockStatus}
-          </div>
+          </div>` : ''}
         </div>
       </div>
     `;

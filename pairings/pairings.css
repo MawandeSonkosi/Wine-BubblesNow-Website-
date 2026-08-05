@@ -245,7 +245,7 @@
   margin-top: 8px;
 }
 
-/* Stock Status in List */
+/* Stock Status in List - No count shown */
 .stock-status {
   display: flex;
   align-items: center;

@@ -138,7 +138,7 @@ function renderPairingDetail(pairing) {
   const stockCount = pairing.stockCount || 0;
   const isOutOfStock = stockCount <= 0;
   
-  // Determine stock status for display
+  // Determine stock status for display - NO COUNT SHOWN
   let stockStatus = '';
   let stockColor = '';
   let statusText = '';
@@ -147,13 +147,13 @@ function renderPairingDetail(pairing) {
     stockColor = '#e74c3c';
     statusText = 'This item is currently out of stock.';
   } else if (stockCount <= 5) {
-    stockStatus = `Low Stock (${stockCount} left)`;
+    stockStatus = 'Low Stock';
     stockColor = '#f39c12';
-    statusText = `Only ${stockCount} units remaining!`;
+    statusText = 'Limited stock available.';
   } else {
-    stockStatus = `In Stock (${stockCount} available)`;
+    stockStatus = 'In Stock';
     stockColor = '#27ae60';
-    statusText = `${stockCount} units available`;
+    statusText = 'Available for purchase.';
   }
   
   const template = `
@@ -177,7 +177,7 @@ function renderPairingDetail(pairing) {
             <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${stockColor}; margin-right: 8px;"></span>
             ${stockStatus}
           </span>
-          ${!isOutOfStock ? `<p style="color: #666; font-size: 13px; margin-top: 4px;">${statusText}</p>` : `<p style="color: #e74c3c; font-size: 13px; margin-top: 4px;">${statusText}</p>`}
+          <p style="color: ${isOutOfStock ? '#e74c3c' : '#666'}; font-size: 13px; margin-top: 4px;">${statusText}</p>
         </div>
         
         <p class="pairing-detail-description">${pairing.description || 'No description available.'}</p>
@@ -215,11 +215,11 @@ function renderPairingDetail(pairing) {
 
 // Quantity controls
 function incrementQuantity() {
-  if (currentPairing && quantity < (currentPairing.stockCount || 0)) {
+  if (currentPairing && quantity < 20) { // Max quantity limit without showing stock count
     quantity++;
     updateQuantityDisplay();
-  } else if (currentPairing && quantity >= (currentPairing.stockCount || 0)) {
-    showToast(`Only ${currentPairing.stockCount} units available`, 'error');
+  } else {
+    showToast('Maximum quantity reached', 'error');
   }
 }
 
@@ -426,17 +426,17 @@ function renderRelatedPairings(pairings) {
     const stockCount = pairing.stockCount || 0;
     const isOutOfStock = stockCount <= 0;
     
-    // Determine stock status for display
+    // Determine stock status for display - NO COUNT SHOWN
     let stockStatus = '';
     let stockColor = '';
     if (isOutOfStock) {
       stockStatus = 'Out of Stock';
       stockColor = '#e74c3c';
     } else if (stockCount <= 5) {
-      stockStatus = `Low Stock (${stockCount} left)`;
+      stockStatus = 'Low Stock';
       stockColor = '#f39c12';
     } else {
-      stockStatus = `In Stock (${stockCount} available)`;
+      stockStatus = 'In Stock';
       stockColor = '#27ae60';
     }
     
@@ -454,10 +454,10 @@ function renderRelatedPairings(pairings) {
           <div class="wine-title">${pairing.name}</div>
           <div class="wine-sub">${category}</div>
           <div class="wine-price">R${price.toFixed(2)}</div>
-          <div class="stock-status" style="color: ${stockColor}; font-size: 12px; margin-top: 4px;">
+          ${!isOutOfStock ? `<div class="stock-status" style="color: ${stockColor}; font-size: 12px; margin-top: 4px;">
             <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${stockColor}; margin-right: 6px;"></span>
             ${stockStatus}
-          </div>
+          </div>` : ''}
         </div>
       </div>
     `;

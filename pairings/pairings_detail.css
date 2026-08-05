@@ -149,7 +149,7 @@
   margin: 0 0 25px;
 }
 
-/* Stock Status Badge */
+/* Stock Status Badge - No count shown */
 .stock-status-container {
   text-align: center;
   margin: 10px 0 20px;
@@ -163,7 +163,7 @@
   font-size: 14px;
 }
 
-/* Stock Status */
+/* Stock Status - No count shown */
 .stock-status {
   display: inline-block;
   padding: 6px 12px;
@@ -473,7 +473,7 @@
   margin-top: 8px;
 }
 
-/* Stock Status in Related Items */
+/* Stock Status in Related Items - No count shown */
 .wine-card .stock-status {
   display: flex;
   align-items: center;
