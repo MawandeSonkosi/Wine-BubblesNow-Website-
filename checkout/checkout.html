@@ -928,6 +928,38 @@
             document.getElementById('stockModal').style.display = 'none';
         }
 
+        // ============ DECREASE STOCK FOR DELIVERY ============
+
+        async decreaseStockForDelivery(wineId, quantity, deliveryId, warehouseId) {
+            console.log(`📦 Decreasing stock for delivery ${deliveryId}`);
+            console.log(`   Wine ID: ${wineId}, Quantity: ${quantity}`);
+            console.log(`   Warehouse: ${warehouseId}`);
+            
+            try {
+                const token = localStorage.getItem('wineBubbles_token');
+                const response = await fetch(`${this.API_BASE_URL}/warehouse/decrease-stock-for-delivery`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
+                    body: JSON.stringify({
+                        wineId: parseInt(wineId),
+                        quantity: quantity,
+                        deliveryId: deliveryId,
+                        warehouseId: warehouseId
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('📊 Decrease stock result:', result);
+                return result;
+            } catch (error) {
+                console.error('❌ Error decreasing stock:', error);
+                return { success: false, message: error.message };
+            }
+        }
+
         // ============ LOAD DATA ============
 
         loadAdvertItems() {
@@ -1262,6 +1294,9 @@
                 const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
                 const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
                 
+                // Get warehouse ID from address for stock decrease
+                const warehouseId = this.getWarehouseFromAddress(deliveryAddress);
+                
                 // Prepare wine items with case handling
                 const wineItems = (cart.items || []).filter(item => item.type === 'wine').map(item => ({
                     id: parseInt(item.id) || 0,
@@ -1330,6 +1365,29 @@
                 if (response.success) {
                     console.log('✅ Delivery created with adverts!');
                     
+                    // ============ DECREASE STOCK FOR EACH WINE ITEM ============
+                    console.log('📦 Decreasing stock for wine items...');
+                    const deliveryId = response.data._id || 'local-' + Date.now();
+                    
+                    for (const item of wineItems) {
+                        try {
+                            const result = await this.decreaseStockForDelivery(
+                                item.id,
+                                item.quantity,
+                                deliveryId,
+                                warehouseId
+                            );
+                            
+                            if (result.success) {
+                                console.log(`✅ Stock decreased for ${item.name}: ${result.message}`);
+                            } else {
+                                console.warn(`⚠️ Could not decrease stock for ${item.name}: ${result.message}`);
+                            }
+                        } catch (error) {
+                            console.warn(`⚠️ Error decreasing stock for ${item.name}:`, error);
+                        }
+                    }
+                    
                     // Send email
                     const emailData = {
                         delivery: response.data,
@@ -1344,7 +1402,7 @@
                     // Save order locally
                     this.saveOrderLocal({
                         ...deliveryData,
-                        id: response.data._id || 'ORD-' + Date.now(),
+                        id: deliveryId,
                         status: 'Order received',
                         createdAt: new Date().toISOString(),
                         userFullName: userFullName,
@@ -1357,9 +1415,14 @@
                     localStorage.removeItem('wineBubbles_deliveryAddress');
                     localStorage.removeItem('wineBubbles_paymentMethod');
 
+                    // Update cart badge
+                    if (window.CartUtils) {
+                        window.CartUtils.updateCartBadge();
+                    }
+
                     this.showToast('Order placed successfully!', 'success');
                     setTimeout(() => {
-                        window.location.href = `../cart/order-confirmation.html?orderId=${response.data._id}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
+                        window.location.href = `../cart/order-confirmation.html?orderId=${deliveryId}&total=${totalAmount}&payment=${encodeURIComponent(paymentMethod)}`;
                     }, 2000);
                 } else {
                     throw new Error(response.message || 'Failed to create delivery');
@@ -1401,6 +1464,9 @@
 
                 const userFullName = this.userProfile?.fullName || user.fullName || user.email.split('@')[0];
                 const userPhoneNumber = this.userProfile?.phoneNumber || user.phoneNumber || 'Not provided';
+
+                // Get warehouse ID from address for stock decrease
+                const warehouseId = this.getWarehouseFromAddress(deliveryAddress);
 
                 // Calculate total
                 let subtotal = 0;
