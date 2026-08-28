@@ -18,9 +18,140 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <link rel="stylesheet" href="blog.css" />
+  
+  <style>
+    /* ========== AGE VERIFICATION MODAL (Simplified) ========== */
+    .age-verification-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .age-verification-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .age-verification-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #6b0d2b, #8a1e3d, #6b0d2b);
+    }
+
+    .age-verification-logo {
+      height: 70px;
+      margin-bottom: 20px;
+    }
+
+    .age-verification-title {
+      font-family: 'Playfair Display', serif;
+      color: #6b0d2b;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .age-verification-subtitle {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .age-verification-text {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    .age-verification-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .age-btn {
+      padding: 16px 40px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 180px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .age-btn-yes {
+      background: #6b0d2b;
+      color: white;
+    }
+
+    .age-btn-yes:hover {
+      background: #8a1e3d;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(107, 13, 43, 0.4);
+    }
+
+    .age-btn-no {
+      background: #f5f5f5;
+      color: #666;
+      border: 2px solid #ddd;
+    }
+
+    .age-btn-no:hover {
+      background: #e9e9e9;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .age-verification-content {
+        padding: 30px 20px;
+        width: 95%;
+      }
+      .age-verification-title { font-size: 28px; }
+      .age-verification-buttons {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .age-btn {
+        width: 100%;
+        min-width: auto;
+        padding: 14px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .age-verification-title { font-size: 24px; }
+      .age-verification-text { font-size: 14px; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Age Verification Modal -->
+  <!-- Age Verification Modal (Simplified - No Warning or Footer) -->
   <div id="ageVerificationModal" class="age-verification-modal" style="display: none;">
     <div class="age-verification-content">
       <img src="assets/categories/Logo_Top.png" alt="Wine & Bubbles" class="age-verification-logo">
@@ -30,10 +161,6 @@
       <p class="age-verification-text">
         To access our exclusive collection of wines, champagnes, and spirits, we need to verify that you are of legal drinking age in your country.
       </p>
-      
-      <div class="age-verification-warning">
-        <p><i class="fas fa-exclamation-triangle"></i> <strong>Important Notice:</strong> By entering this site, you confirm that you are at least 18 years old (or the legal drinking age in your country).</p>
-      </div>
       
       <h3 style="color: #6b0d2b; margin-bottom: 20px; font-size: 20px;">Are you 18 years or older?</h3>
       
@@ -45,405 +172,210 @@
           <i class="fas fa-times-circle"></i> No, I am under 18
         </button>
       </div>
-      
-      <div class="age-verification-footer">
-        <p><i class="fas fa-info-circle"></i> Alcohol should be consumed responsibly. Please drink responsibly.</p>
-      </div>
     </div>
   </div>
 
-  <!-- Top bar -->
-  <div class="topbar-top">
-    <div class="topbar-top-inner"></div>
-  </div>
+  <!-- Blog Design -->
+  <main class="blog-design">
 
-  <div class="topbar-main">
-    <div class="topbar-main-inner">
-      <div class="logo">
-        <a href="index.html">
-          <img src="assets/categories/Logo_Top.png" alt="Wine & Bubbles Logo">
-        </a>
-      </div>
+    <!-- Cover Section -->
+    <section class="blog-cover" aria-label="Wine & Bubbles blog cover">
+      <div class="cover-card">
+        <img
+          class="cover-image"
+          src="assets/blogs/wine-expo.jpg"
+          alt="Wine & Bubbles activation in Fourways"
+        />
 
-      <nav class="main-nav">
-        <ul>
-          <li><a href="wine/all_wines.html">In-Stock</a></li>
-          <li><a href="booking/booking.html">Book African Wine Bar</a></li>
-          <li><a href="wine_farm/wine_farm.html">Liquor Stores Near Me</a></li>
-          <li><a href="pairings/pairings.html">Pairings</a></li>
-          <li><a href="order/track_order.html">Track Order</a></li>
-        </ul>
-      </nav>
+        <div class="cover-content">
+          <h1 class="cover-title">
+            Another Great Weekend, Another
+          </h1>
 
-      <div class="top-icons">
-        <a href="/cart/cart.html" class="icon cart-icon">
-          <i class="fas fa-shopping-cart"></i>
-          <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-        </a>
-        <a href="user/profile.html" class="icon" id="userIcon">
-          <i class="fas fa-user" id="userIconElement"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Blog Header -->
-  <section class="blog-header">
-    <div class="container">
-      <h1 class="blog-header-title">Wine & Bubbles <span>Blog</span></h1>
-      <p class="blog-header-subtitle">Stories, insights, and updates from the world of wine and bubbles</p>
-    </div>
-  </section>
-
-  <!-- Featured Blog Post -->
-  <section class="blog-section">
-    <div class="container">
-      <div class="blog-featured">
-        <div class="blog-featured-image">
-          <img src="assets/blogs/wine-expo.jpg" alt="Wine & Bubbles Activation">
-          <div class="blog-featured-badge">Featured</div>
-        </div>
-        <div class="blog-featured-content">
-          <div class="blog-meta">
-            <span class="blog-date"><i class="far fa-calendar-alt"></i> November 2024</span>
-            <span class="blog-category"><i class="far fa-folder"></i> Events & Activations</span>
-            <span class="blog-read-time"><i class="far fa-clock"></i> 3 min read</span>
+          <div class="cover-subtitle">
+            Successful Wine &amp; Bubbles Activation
           </div>
-          <h2 class="blog-featured-title">Another Great Weekend, Another Successful Wine & Bubbles Activation</h2>
-          <p class="blog-featured-excerpt">
-            There's nothing better than getting out into the community and meeting the people who make Wine & Bubbles what it is. This past weekend, our team headed to Fourways for our monthly activation, and we couldn't have asked for a better day.
-          </p>
-          <a href="#post1" class="blog-read-more">Read Full Story <i class="fas fa-arrow-right"></i></a>
+
+          <img
+            class="cover-logo"
+            src="assets/categories/Logo_Botttom.png"
+            alt="Wine & Bubbles Now"
+          />
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Blog Posts Grid -->
-  <section class="blog-section">
-    <div class="container">
-      <div class="blog-grid-header">
-        <h3 class="blog-grid-title">Recent Stories</h3>
-        <div class="blog-filter">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="events">Events</button>
-          <button class="filter-btn" data-filter="community">Community</button>
-          <button class="filter-btn" data-filter="partnerships">Partnerships</button>
-        </div>
-      </div>
+    <!-- Page 2 -->
+    <section class="blog-page article-page article-page-two" aria-label="Blog page 2">
+      <div class="article-card">
+        <div class="article-inner">
+          <h2 class="article-title">
+            Another Great Weekend,<br>
+            Another Successful Wine<br>
+            &amp; Bubbles Activation
+          </h2>
 
-      <div class="blog-grid" id="blogGrid">
-        <!-- Post 1 -->
-        <article class="blog-card" data-category="events">
-          <div class="blog-card-image">
-            <img src="assets/blogs/wine-expo.jpg" alt="Wine & Bubbles Activation">
-            <span class="blog-card-badge">Events</span>
-          </div>
-          <div class="blog-card-content">
-            <div class="blog-meta">
-              <span class="blog-date"><i class="far fa-calendar-alt"></i> Nov 2024</span>
-              <span class="blog-read-time"><i class="far fa-clock"></i> 3 min</span>
-            </div>
-            <h4 class="blog-card-title">Another Great Weekend, Another Successful Wine & Bubbles Activation</h4>
-            <p class="blog-card-excerpt">
-              Our team headed to Fourways for our monthly activation, connecting with the community and sharing the Wine & Bubbles experience.
-            </p>
-            <a href="#post1" class="blog-card-link">Read More <i class="fas fa-arrow-right"></i></a>
-          </div>
-        </article>
-
-        <!-- Post 2 -->
-        <article class="blog-card" data-category="partnerships">
-          <div class="blog-card-image">
-            <img src="assets/adverts/Wine_Farm.png" alt="Partnership with RYDAD">
-            <span class="blog-card-badge">Partnerships</span>
-          </div>
-          <div class="blog-card-content">
-            <div class="blog-meta">
-              <span class="blog-date"><i class="far fa-calendar-alt"></i> Oct 2024</span>
-              <span class="blog-read-time"><i class="far fa-clock"></i> 2 min</span>
-            </div>
-            <h4 class="blog-card-title">Taking Our Brand Beyond the Activation</h4>
-            <p class="blog-card-excerpt">
-              Our partnership with RYDAD helped us take the Wine & Bubbles experience beyond our stand and into the streets of Fourways.
-            </p>
-            <a href="#post2" class="blog-card-link">Read More <i class="fas fa-arrow-right"></i></a>
-          </div>
-        </article>
-
-        <!-- Post 3 -->
-        <article class="blog-card" data-category="community">
-          <div class="blog-card-image">
-            <img src="assets/adverts/Parings.png" alt="Community Engagement">
-            <span class="blog-card-badge">Community</span>
-          </div>
-          <div class="blog-card-content">
-            <div class="blog-meta">
-              <span class="blog-date"><i class="far fa-calendar-alt"></i> Sep 2024</span>
-              <span class="blog-read-time"><i class="far fa-clock"></i> 2 min</span>
-            </div>
-            <h4 class="blog-card-title">More Than Just a Pop-Up</h4>
-            <p class="blog-card-excerpt">
-              For us, monthly activations are about more than promoting an app — they're about building relationships with our community.
-            </p>
-            <a href="#post3" class="blog-card-link">Read More <i class="fas fa-arrow-right"></i></a>
-          </div>
-        </article>
-
-        <!-- Post 4 -->
-        <article class="blog-card" data-category="events">
-          <div class="blog-card-image">
-            <img src="assets/adverts/phone.png" alt="App Launch">
-            <span class="blog-card-badge">Events</span>
-          </div>
-          <div class="blog-card-content">
-            <div class="blog-meta">
-              <span class="blog-date"><i class="far fa-calendar-alt"></i> Aug 2024</span>
-              <span class="blog-read-time"><i class="far fa-clock"></i> 2 min</span>
-            </div>
-            <h4 class="blog-card-title">Where Are We Heading Next?</h4>
-            <p class="blog-card-excerpt">
-              If you missed us in Fourways, don't worry. We're already planning our next stop, and we'd love for you to join us.
-            </p>
-            <a href="#post4" class="blog-card-link">Read More <i class="fas fa-arrow-right"></i></a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- Full Blog Post Section (Hidden until clicked) -->
-  <section class="blog-full-post" id="post1" style="display: none;">
-    <div class="container">
-      <div class="blog-full-post-inner">
-        <button class="blog-close-btn" onclick="closeBlogPost()"><i class="fas fa-times"></i></button>
-        <div class="blog-full-post-content">
-          <div class="blog-full-post-header">
-            <div class="blog-meta">
-              <span class="blog-date"><i class="far fa-calendar-alt"></i> November 2024</span>
-              <span class="blog-category"><i class="far fa-folder"></i> Events & Activations</span>
-              <span class="blog-read-time"><i class="far fa-clock"></i> 3 min read</span>
-            </div>
-            <h1 class="blog-full-post-title">Another Great Weekend, Another Successful Wine & Bubbles Activation</h1>
-          </div>
-
-          <div class="blog-full-post-image">
-            <img src="assets/blogs/wine-expo.jpg" alt="Wine & Bubbles Activation">
-          </div>
-
-          <div class="blog-full-post-body">
+          <div class="article-copy">
             <p>
-              There's nothing better than getting out into the community and meeting the people who make Wine & Bubbles what it is. This past weekend, our team headed to Fourways for our monthly activation, and we couldn't have asked for a better day.
+              There's nothing better than getting out into the community and
+              meeting the people who make Wine &amp; Bubbles what it is. This past
+              weekend, our team headed to Fourways for our monthly activation,
+              and we couldn't have asked for a better day. From the moment we
+              arrived, we had the opportunity to connect with so many people
+              who were curious about the Wine &amp; Bubbles Now app. Whether
+              they were hearing about us for the first time or already familiar
+              with the brand, it was great to share what we do and welcome new
+              users to our growing community.
+            </p>
+
+            <h2 class="article-title">
+              Taking Our Brand Beyond<br>
+              the Activation
+            </h2>
+
+            <p>
+              This activation was made even more exciting thanks to our
+              partnership with <strong>RYDAD</strong>. Their branded bikes helped
+              us take the Wine &amp; Bubbles experience beyond our stand and
+              into the streets of Fourways, catching the attention of shoppers,
+              commuters, and passers-by throughout the day.
             </p>
 
             <p>
-              From the moment we arrived, we had the opportunity to connect with so many people who were curious about the Wine & Bubbles Now app. Whether they were hearing about us for the first time or already familiar with the brand, it was great to share what we do and welcome new users to our growing community.
+              It's partnerships like these that allow us to reach more people in
+              creative ways while making our brand more visible where it matters most.
             </p>
-
-            <h2>Taking Our Brand Beyond the Activation</h2>
-
-            <p>
-              This activation was made even more exciting thanks to our partnership with RYDAD. Their branded bikes helped us take the Wine & Bubbles experience beyond our stand and into the streets of Fourways, catching the attention of shoppers, commuters, and passers-by throughout the day.
-            </p>
-
-            <p>
-              It's partnerships like these that allow us to reach more people in creative ways while making our brand more visible where it matters most.
-            </p>
-
-            <div class="blog-quote">
-              <i class="fas fa-quote-left"></i>
-              <p>Our monthly activations are about more than promoting an app — they're about building relationships.</p>
-            </div>
-
-            <h2>More Than Just a Pop-Up</h2>
-
-            <p>
-              For us, monthly activations are about more than promoting an app — they're about building relationships.
-            </p>
-
-            <p>
-              Every conversation, every new download, and every interaction gives us the chance to understand what our customers are looking for while showing them just how easy it is to order their favourite wines and beverages through the Wine & Bubbles Now app.
-            </p>
-
-            <p>
-              We're always looking for new ways to bring convenience closer to our customers, and these activations are one of our favourite ways to do that.
-            </p>
-
-            <h2>Where Are We Heading Next?</h2>
-
-            <p>
-              If you missed us in Fourways, don't worry. We're already planning our next stop, and we'd love for you to join us.
-            </p>
-
-            <p>
-              Follow us on social media to stay up to date with our upcoming activations, exciting collaborations, and exclusive offers.
-            </p>
-
-            <p>
-              And if you haven't already, now's the perfect time to download the Wine & Bubbles Now app. With a wide range of premium wines and beverages available at your fingertips, ordering has never been easier.
-            </p>
-
-            <p>
-              <strong>We can't wait to see you at our next activation!</strong>
-            </p>
-          </div>
-
-          <div class="blog-share">
-            <span>Share this story:</span>
-            <a href="#"><i class="fab fa-facebook"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-whatsapp"></i></a>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <img src="assets/categories/Logo_Botttom.png" alt="Wine & Bubbles Logo" class="footer-logo">
-        <p class="brand-tagline">Simplifying Luxury. Enhancing Moments.</p>
-        <p class="brand-description">Wine & Bubbles Now is a lifestyle-driven mobile app designed to bring the elegance of curated wines and champagnes directly to your fingertips.</p>
-        <div class="socials">
-          <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
-        </div>
+        <div class="page-arrow" aria-hidden="true"><span></span></div>
       </div>
-      <div class="footer-links-grid">
-        <div class="footer-links-column">
-          <h4 class="footer-heading">Quick Links</h4>
-          <ul class="footer-links">
-            <li><a href="wine/all_wines.html">All Wines</a></li>
-            <li><a href="wine/wine_cases_list.html">Wine Cases</a></li>
-            <li><a href="pairings/pairings.html">Pairings</a></li>
-            <li><a href="wine_farm/wine_farm.html">Liquor Stores</a></li>
-          </ul>
-        </div>
-        <div class="footer-links-column">
-          <h4 class="footer-heading">&nbsp;</h4>
-          <ul class="footer-links">
-            <li><a href="/contact_us.html">Contact Us</a></li>
-            <li><a href="/faq.html">FAQ</a></li>
-            <li><a href="/terms_conditions.html">Terms & Conditions</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </footer>
+    </section>
 
-  <!-- Authentication Script -->
+    <!-- Page 3 -->
+    <section class="blog-page article-page article-page-three" aria-label="Blog page 3">
+      <div class="article-card">
+        <div class="article-inner">
+          <h2 class="article-title">More Than Just a Pop-Up</h2>
+
+          <div class="article-copy">
+            <p>
+              For us, monthly activations are about more than promoting an app,
+              they're about building relationships.
+            </p>
+
+            <p>
+              Every conversation, every new download, and every interaction
+              gives us the chance to understand what our customers are looking
+              for while showing them just how easy it is to order their favourite
+              wines and beverages through the Wine &amp; Bubbles Now app.
+            </p>
+
+            <p>
+              We're always looking for new ways to bring convenience closer to
+              our customers, and these activations are one of our favourite ways
+              to do that.
+            </p>
+          </div>
+        </div>
+
+        <div class="page-arrow" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <!-- Page 4 -->
+    <section class="blog-page article-page article-page-four" aria-label="Blog page 4">
+      <div class="article-card">
+        <div class="article-inner">
+          <h2 class="article-title">Where Are We Heading Next?</h2>
+
+          <div class="article-copy">
+            <p>
+              If you missed us in Fourways, don't worry. We're already planning
+              our next stop, and we'd love for you to join us.
+            </p>
+
+            <p>
+              Follow us on <a href="#">social media</a> to stay up to date with
+              our upcoming activations, exciting collaborations, and exclusive offers.
+            </p>
+
+            <p>
+              And if you haven't already, now's the perfect time to download the
+              Wine &amp; Bubbles Now app. With a wide range of premium wines
+              and beverages available at your fingertips, ordering has never been
+              easier.
+            </p>
+
+            <p>
+              We can't wait to see you at our next activation!
+            </p>
+          </div>
+        </div>
+
+        <div class="page-arrow" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JavaScript -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const ageConfirmed = localStorage.getItem('wineBubbles_ageConfirmed');
+
       if (!ageConfirmed) {
         const ageModal = document.getElementById('ageVerificationModal');
-        ageModal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        
-        document.getElementById('ageConfirmYes').addEventListener('click', function() {
-          localStorage.setItem('wineBubbles_ageConfirmed', 'true');
-          ageModal.style.display = 'none';
-          document.body.style.overflow = 'auto';
-          location.reload();
-        });
-        
-        document.getElementById('ageConfirmNo').addEventListener('click', function() {
-          alert('You must be 18 years or older to access Wine & Bubbles. Redirecting...');
-          window.location.href = 'https://www.google.com';
-        });
-        
-        ageModal.addEventListener('click', function(e) {
-          if (e.target === ageModal) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        });
+
+        if (ageModal) {
+          ageModal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+
+          document.getElementById('ageConfirmYes')?.addEventListener('click', function() {
+            localStorage.setItem('wineBubbles_ageConfirmed', 'true');
+            ageModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+          });
+
+          document.getElementById('ageConfirmNo')?.addEventListener('click', function() {
+            alert('You must be 18 years or older to access Wine & Bubbles. Redirecting...');
+            window.location.href = 'https://www.google.com';
+          });
+
+          ageModal.addEventListener('click', function(e) {
+            if (e.target === ageModal) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          });
+        }
       }
 
-      // Cart badge
       function loadCartCount() {
         let itemCount = 0;
         const wineCartData = localStorage.getItem('wine_cart');
+
         if (wineCartData) {
           try {
             const wineCart = JSON.parse(wineCartData);
             if (wineCart.items && Array.isArray(wineCart.items)) {
-              itemCount = wineCart.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+              itemCount = wineCart.items.reduce(
+                (sum, item) => sum + (item.quantity || 0), 0
+              );
             }
           } catch (error) {
             console.error('Error parsing wine_cart:', error);
           }
         }
-        const cartBadges = document.querySelectorAll('.cart-badge');
-        cartBadges.forEach(badge => {
-          if (itemCount > 0) {
-            badge.textContent = itemCount;
-            badge.style.display = 'flex';
-          } else {
-            badge.textContent = '0';
-            badge.style.display = 'none';
-          }
+
+        document.querySelectorAll('.cart-badge').forEach(function(badge) {
+          badge.textContent = itemCount;
+          badge.style.display = itemCount > 0 ? 'flex' : 'none';
         });
-        return itemCount;
       }
+
       loadCartCount();
-
-      // Filter functionality
-      const filterBtns = document.querySelectorAll('.filter-btn');
-      const blogCards = document.querySelectorAll('.blog-card');
-
-      filterBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          filterBtns.forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-
-          const filter = this.dataset.filter;
-
-          blogCards.forEach(card => {
-            if (filter === 'all' || card.dataset.category === filter) {
-              card.style.display = 'block';
-              setTimeout(() => {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-              }, 50);
-            } else {
-              card.style.opacity = '0';
-              card.style.transform = 'translateY(20px)';
-              setTimeout(() => {
-                card.style.display = 'none';
-              }, 300);
-            }
-          });
-        });
-      });
-
-      // Blog post click handlers
-      document.querySelectorAll('.blog-card-link, .blog-featured-content .blog-read-more').forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const targetId = this.getAttribute('href');
-          const post = document.querySelector(targetId);
-          if (post) {
-            post.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            post.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      });
     });
-
-    function closeBlogPost() {
-      const posts = document.querySelectorAll('.blog-full-post');
-      posts.forEach(post => {
-        post.style.display = 'none';
-      });
-      document.body.style.overflow = 'auto';
-    }
   </script>
 </body>
 </html>
