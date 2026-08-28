@@ -879,3 +879,141 @@ html, body {
     min-width: auto;
   }
 }
+
+/* =========================================================================
+   BLOG DESIGN — Instagram-carousel style pages
+   Colours and type pulled directly from the approved PDF design:
+     - Outer background maroon : #6F0529
+     - Card / page background  : #D7B987 (article pages)
+     - Heading + body font     : Poppins (bold rounded geometric sans)
+   ========================================================================= */
+
+.blog-design {
+  background-color: #6F0529;
+  /* subtle wavy line texture, matching the thin curved strokes on the maroon
+     background in the PDF, kept low-opacity so it reads as texture, not noise */
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255,255,255,0.05) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(255,255,255,0.05) 0%, transparent 45%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.06' stroke-width='1.5'%3E%3Cpath d='M-20 60 C 80 10, 160 110, 260 60 S 420 10, 480 60'/%3E%3Cpath d='M-20 180 C 80 130, 160 230, 260 180 S 420 130, 480 180'/%3E%3Cpath d='M-20 300 C 80 250, 160 350, 260 300 S 420 250, 480 300'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: auto, auto, 400px 400px;
+  padding: 0;
+}
+
+.blog-cover,
+.blog-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 28px 18px;
+}
+
+/* ---------- Cover (page 1): single baked image asset ---------- */
+.cover-card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 4 / 5;
+  border-radius: 34px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* ---------- Article pages (2–4): tan card ---------- */
+.article-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 4 / 5;
+  background: #D7B987;
+  border-radius: 34px;
+  padding: 56px 40px 34px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.article-inner {
+  flex: 1 1 auto;
+}
+
+.article-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: clamp(20px, 4.6vw, 26px);
+  line-height: 1.28;
+  color: #171008;
+  text-align: center;
+  letter-spacing: -0.01em;
+  margin: 0 0 22px;
+}
+
+/* second (and later) headings on a page get breathing room above them */
+.article-title ~ .article-title,
+.article-copy + .article-title {
+  margin-top: 30px;
+}
+
+.article-copy p {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: clamp(13.5px, 2.6vw, 15.5px);
+  line-height: 1.72;
+  color: #1c140c;
+  text-align: left;
+  margin: 0 0 16px;
+}
+
+.article-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.article-copy strong {
+  font-weight: 700;
+}
+
+.article-copy a {
+  color: #6F0529;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.article-copy a:hover {
+  text-decoration: underline;
+}
+
+/* decorative dash–dash–chevron arrow, centred at the bottom of each card */
+.page-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.page-arrow svg {
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .blog-cover, .blog-page {
+    padding: 18px 12px;
+  }
+  .article-card {
+    padding: 40px 26px 26px;
+    border-radius: 26px;
+  }
+  .cover-card {
+    border-radius: 26px;
+  }
+}
